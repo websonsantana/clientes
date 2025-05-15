@@ -336,7 +336,7 @@
                         <p class="text-gray-600 text-sm mb-3">Cabeceira estofada em tecido premium com detalhes em costura</p>
                         <div class="flex justify-between items-center">
                             <span class="text-lg font-bold text-amber-600">R$ 899,00</span>
-                            <button class="add-to-cart bg-gray-800 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm transition duration-300" data-id="5" data-name="Cabeceira King Size" data-price="899.00" data-image="https://images.unsplash.com/photo-1556909114-44e2d001cacf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80">
+                            <button class="add-to-cart bg-gray-800 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm transition duration-300" data-id="5" data-name="Cabeceira King Size" data-price="899.00" data-image="cama.png">
                                 <i class="fas fa-cart-plus mr-1"></i> Comprar
                             </button>
                         </div>
@@ -353,7 +353,7 @@
                         <p class="text-gray-600 text-sm mb-3">Banqueta para balcão com assento em couro</p>
                         <div class="flex justify-between items-center">
                             <span class="text-lg font-bold text-amber-600">R$ 349,00</span>
-                            <button class="add-to-cart bg-gray-800 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm transition duration-300" data-id="6" data-name="Banqueta Alta Giratória" data-price="349.00" data-image="https://images.unsplash.com/photo-1556909212-2315b467646b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80">
+                            <button class="add-to-cart bg-gray-800 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm transition duration-300" data-id="6" data-name="Banqueta Alta Giratória" data-price="349.00" data-image="banqueta.png">
                                 <i class="fas fa-cart-plus mr-1"></i> Comprar
                             </button>
                         </div>
@@ -370,7 +370,7 @@
                         <p class="text-gray-600 text-sm mb-3">Rack em MDF com gavetas e espaço para equipamentos</p>
                         <div class="flex justify-between items-center">
                             <span class="text-lg font-bold text-amber-600">R$ 699,00</span>
-                            <button class="add-to-cart bg-gray-800 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm transition duration-300" data-id="7" data-name="Rack para TV 65" data-price="699.00" data-image="https://images.unsplash.com/photo-1556909211-5b64ce40a1a0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80">
+                            <button class="add-to-cart bg-gray-800 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm transition duration-300" data-id="7" data-name="Rack para TV 65" data-price="699.00" data-image="sala.png">
                                 <i class="fas fa-cart-plus mr-1"></i> Comprar
                             </button>
                         </div>
@@ -387,7 +387,7 @@
                         <p class="text-gray-600 text-sm mb-3">Mesa para computador com gaveta e prateleira inferior</p>
                         <div class="flex justify-between items-center">
                             <span class="text-lg font-bold text-amber-600">R$ 599,00</span>
-                            <button class="add-to-cart bg-gray-800 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm transition duration-300" data-id="8" data-name="Escrivaninha Home Office" data-price="599.00" data-image="https://images.unsplash.com/photo-1556909200-86d515f6b3e6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80">
+                            <button class="add-to-cart bg-gray-800 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm transition duration-300" data-id="8" data-name="Escrivaninha Home Office" data-price="599.00" data-image="escrivania.png">
                                 <i class="fas fa-cart-plus mr-1"></i> Comprar
                             </button>
                         </div>
@@ -711,9 +711,14 @@
         <div class="p-6">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-bold text-gray-800">Seu Carrinho</h2>
-                <button id="close-cart" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
+                <div class="flex items-center space-x-4">
+                    <button id="clear-cart" class="text-gray-500 hover:text-red-500" title="Limpar carrinho">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    <button id="close-cart" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
             </div>
             
             <div id="cart-items" class="space-y-4 mb-6">
@@ -785,6 +790,7 @@
         const cartSidebar = document.getElementById('cart-sidebar');
         const cartOverlay = document.getElementById('cart-overlay');
         const closeCartButton = document.getElementById('close-cart');
+        const clearCartButton = document.getElementById('clear-cart');
         const cartItemsContainer = document.getElementById('cart-items');
         const emptyCartMessage = document.getElementById('empty-cart-message');
         const cartSummary = document.getElementById('cart-summary');
@@ -804,6 +810,7 @@
         mobileCartButtonFixed.addEventListener('click', toggleCart);
         closeCartButton.addEventListener('click', toggleCart);
         cartOverlay.addEventListener('click', toggleCart);
+        clearCartButton.addEventListener('click', clearCart);
         
         // Update cart count
         function updateCartCount() {
@@ -893,11 +900,16 @@
         // Add to cart
         addToCartButtons.forEach(button => {
             button.addEventListener('click', (e) => {
+                // Encontrar o elemento pai do botão (o card do produto)
+                const productCard = e.currentTarget.closest('.furniture-card');
+                // Obter a imagem diretamente do elemento img dentro do card
+                const productImage = productCard.querySelector('img').getAttribute('src');
+                
                 const product = {
                     id: e.currentTarget.dataset.id,
                     name: e.currentTarget.dataset.name,
                     price: parseFloat(e.currentTarget.dataset.price),
-                    image: e.currentTarget.dataset.image,
+                    image: productImage,
                     quantity: 1
                 };
                 
@@ -927,6 +939,15 @@
             cart.splice(index, 1);
             saveCart();
             renderCartItems();
+        }
+        
+        // Clear entire cart
+        function clearCart() {
+            cart = [];
+            saveCart();
+            renderCartItems();
+            // Atualizar a página automaticamente após limpar o carrinho
+            window.location.reload();
         }
         
         // Update quantity
