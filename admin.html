@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - JA Móveis Planejados</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .admin-card:hover {
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-100">
+    <header class="bg-amber-600 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="logo.png" alt="Logo" class="w-12 h-12 mr-2 inline-block">
+                <h1 class="text-2xl font-bold">JA Móveis Planejados - Painel Administrativo</h1>
+            </div>
+            <a href="ja.html" class="bg-white text-amber-600 px-4 py-2 rounded-md font-medium hover:bg-gray-100 transition duration-300">
+                <i class="fas fa-external-link-alt mr-2"></i>Ver Site
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Editar Produtos</h2>
+            <p class="text-gray-600 mb-4">Altere as informações dos produtos diretamente nesta página. Todas as alterações serão salvas automaticamente.</p>
+            <div class="bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-6">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-triangle text-yellow-500"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-yellow-700">
+                            Importante: Para alterar as imagens, certifique-se de que o arquivo já esteja na pasta do projeto.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid gap-6 mb-8" id="products-container">
+            <!-- Os produtos serão carregados aqui dinamicamente -->
+        </div>
+
+        <div class="mt-8 flex justify-center">
+            <button id="add-product-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 flex items-center">
+                <i class="fas fa-plus mr-2"></i> Adicionar Novo Produto
+            </button>
+        </div>
+
+        <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Exportar/Importar Dados</h3>
+            <div class="flex flex-col md:flex-row gap-4">
+                <button id="export-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 flex items-center justify-center">
+                    <i class="fas fa-download mr-2"></i> Exportar Dados
+                </button>
+                <div class="relative">
+                    <input type="file" id="import-file" class="hidden" accept=".json">
+                    <button id="import-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 flex items-center justify-center">
+                        <i class="fas fa-upload mr-2"></i> Importar Dados
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-4 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p>&copy; 2025 JA Móveis Planejados. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Template para novos produtos -->
+    <template id="product-template">
+        <div class="admin-card bg-white rounded-lg shadow-md p-6 transition duration-300">
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="md:w-1/3">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">
+                            Imagem Principal
+                        </label>
+                        <div class="relative">
+                            <img class="product-image w-full h-48 object-cover rounded-md mb-2" src="" alt="Imagem do produto">
+                            <input type="text" class="image-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-600" placeholder="Nome do arquivo da imagem">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">
+                            Categoria
+                        </label>
+                        <select class="category-select w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-600">
+                            <option value="sala">Sala</option>
+                            <option value="quarto">Quarto</option>
+                            <option value="cozinha">Cozinha</option>
+                            <option value="escritorio">Escritório</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="md:w-2/3">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">
+                            Nome do Produto
+                        </label>
+                        <input type="text" class="name-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-600" placeholder="Nome do produto">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">
+                            Descrição
+                        </label>
+                        <textarea class="description-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-600" rows="2" placeholder="Descrição do produto"></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">
+                                Preço (R$)
+                            </label>
+                            <input type="number" step="0.01" class="price-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-600" placeholder="0.00">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">
+                                Preço Antigo (opcional)
+                            </label>
+                            <input type="number" step="0.01" class="old-price-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-600" placeholder="0.00">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">
+                            ID do Produto
+                        </label>
+                        <input type="text" class="id-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-600" placeholder="ID único do produto" readonly>
+                    </div>
+                    <div class="flex justify-end space-x-2">
+                        <button class="delete-btn bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                            <i class="fas fa-trash-alt mr-1"></i> Excluir
+                        </button>
+                        <button class="save-btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                            <i class="fas fa-save mr-1"></i> Salvar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        // Dados iniciais dos produtos
+        let products = [
+            {
+                id: "1",
+                name: "Mesa de Jantar Retrátil",
+                description: "Mesa em madeira maciça com extensão para 6 pessoas",
+                price: 2499.00,
+                oldPrice: null,
+                image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+                category: "sala"
+            },
+            {
+                id: "2",
+                name: "Poltrona Moderna em Couro",
+                description: "Poltrona ergonômica com estrutura em aço e couro ecológico",
+                price: 1799.00,
+                oldPrice: null,
+                image: "https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+                category: "sala"
+            },
+            {
+                id: "3",
+                name: "Cômoda Vintage 6 Gavetas",
+                description: "Cômoda em MDF com acabamento envelhecido e pés em metal",
+                price: 1299.00,
+                oldPrice: null,
+                image: "https://images.unsplash.com/photo-1554295405-abb8fd54f153?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+                category: "quarto"
+            },
+            {
+                id: "4",
+                name: "Estante Modular 5 Peças",
+                description: "Sistema modular que pode ser montado em diversas configurações",
+                price: 1519.20,
+                oldPrice: 1899.00,
+                image: "https://images.unsplash.com/photo-1556020685-ae41abfc9365?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+                category: "sala"
+            },
+            {
+                id: "5",
+                name: "Cabeceira King Size",
+                description: "Cabeceira estofada em tecido premium com detalhes em costura",
+                price: 899.00,
+                oldPrice: null,
+                image: "cama.png",
+                category: "quarto"
+            },
+            {
+                id: "6",
+                name: "Banqueta Alta Giratória",
+                description: "Banqueta para balcão com assento em couro",
+                price: 349.00,
+                oldPrice: null,
+                image: "banqueta.png",
+                category: "cozinha"
+            },
+            {
+                id: "7",
+                name: "Rack para TV 65\"",
+                description: "Rack em MDF com gavetas e espaço para equipamentos",
+                price: 699.00,
+                oldPrice: null,
+                image: "sala.png",
+                category: "sala"
+            },
+            {
+                id: "8",
+                name: "Escrivaninha Home Office",
+                description: "Mesa para computador com gaveta e prateleira inferior",
+                price: 599.00,
+                oldPrice: null,
+                image: "escrivania.png",
+                category: "escritorio"
+            }
+        ];
+
+        // Carregar produtos do localStorage se existirem
+        const loadProducts = () => {
+            const savedProducts = localStorage.getItem('jaMoveisProdutos');
+            if (savedProducts) {
+                products = JSON.parse(savedProducts);
+            }
+            renderProducts();
+        };
+
+        // Salvar produtos no localStorage
+        const saveProducts = () => {
+            localStorage.setItem('jaMoveisProdutos', JSON.stringify(products));
+        };
+
+        // Renderizar produtos na página
+        const renderProducts = () => {
+            const container = document.getElementById('products-container');
+            container.innerHTML = '';
+            
+            products.forEach(product => {
+                const template = document.getElementById('product-template');
+                const clone = template.content.cloneNode(true);
+                
+                const card = clone.querySelector('.admin-card');
+                card.dataset.id = product.id;
+                
+                const imageElement = clone.querySelector('.product-image');
+                imageElement.src = product.image;
+                imageElement.alt = product.name;
+                
+                const imageInput = clone.querySelector('.image-input');
+                imageInput.value = product.image;
+                
+                const categorySelect = clone.querySelector('.category-select');
+                categorySelect.value = product.category;
+                
+                const nameInput = clone.querySelector('.name-input');
+                nameInput.value = product.name;
+                
+                const descriptionInput = clone.querySelector('.description-input');
+                descriptionInput.value = product.description;
+                
+                const priceInput = clone.querySelector('.price-input');
+                priceInput.value = product.price;
+                
+                const oldPriceInput = clone.querySelector('.old-price-input');
+                oldPriceInput.value = product.oldPrice || '';
+                
+                const idInput = clone.querySelector('.id-input');
+                idInput.value = product.id;
+                
+                // Adicionar event listeners
+                const saveBtn = clone.querySelector('.save-btn');
+                saveBtn.addEventListener('click', () => saveProduct(product.id));
+                
+                const deleteBtn = clone.querySelector('.delete-btn');
+                deleteBtn.addEventListener('click', () => deleteProduct(product.id));
+                
+                container.appendChild(clone);
+            });
+        };
+
+        // Salvar alterações em um produto
+        const saveProduct = (id) => {
+            const card = document.querySelector(`.admin-card[data-id="${id}"]`);
+            const index = products.findIndex(p => p.id === id);
+            
+            if (index !== -1) {
+                products[index] = {
+                    id: id,
+                    name: card.querySelector('.name-input').value,
+                    description: card.querySelector('.description-input').value,
+                    price: parseFloat(card.querySelector('.price-input').value),
+                    oldPrice: card.querySelector('.old-price-input').value ? parseFloat(card.querySelector('.old-price-input').value) : null,
+                    image: card.querySelector('.image-input').value,
+                    category: card.querySelector('.category-select').value
+                };
+                
+                saveProducts();
+                alert('Produto salvo com sucesso!');
+            }
+        };
+
+        // Excluir um produto
+        const deleteProduct = (id) => {
+            if (confirm('Tem certeza que deseja excluir este produto?')) {
+                const index = products.findIndex(p => p.id === id);
+                
+                if (index !== -1) {
+                    products.splice(index, 1);
+                    saveProducts();
+                    renderProducts();
+                    alert('Produto excluído com sucesso!');
+                }
+            }
+        };
+
+        // Adicionar novo produto
+        const addProduct = () => {
+            const newId = (Math.max(...products.map(p => parseInt(p.id)), 0) + 1).toString();
+            
+            const newProduct = {
+                id: newId,
+                name: "Novo Produto",
+                description: "Descrição do novo produto",
+                price: 0.00,
+                oldPrice: null,
+                image: "placeholder.png",
+                category: "sala"
+            };
+            
+            products.push(newProduct);
+            saveProducts();
+            renderProducts();
+            
+            // Rolar para o novo produto
+            setTimeout(() => {
+                const newCard = document.querySelector(`.admin-card[data-id="${newId}"]`);
+                newCard.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        };
+
+        // Exportar dados
+        const exportData = () => {
+            const dataStr = JSON.stringify(products, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'ja-moveis-produtos.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        };
+
+        // Importar dados
+        const importData = () => {
+            const fileInput = document.getElementById('import-file');
+            fileInput.click();
+            
+            fileInput.addEventListener('change', function() {
+                const file = fileInput.files[0];
+                
+                if (file) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        try {
+                            const importedProducts = JSON.parse(e.target.result);
+                            
+                            if (Array.isArray(importedProducts)) {
+                                if (confirm(`Tem certeza que deseja importar ${importedProducts.length} produtos? Isso substituirá todos os produtos existentes.`)) {
+                                    products = importedProducts;
+                                    saveProducts();
+                                    renderProducts();
+                                    alert('Produtos importados com sucesso!');
+                                }
+                            } else {
+                                alert('Formato de arquivo inválido. O arquivo deve conter um array de produtos.');
+                            }
+                        } catch (error) {
+                            alert('Erro ao importar arquivo: ' + error.message);
+                        }
+                        
+                        // Limpar o input de arquivo
+                        fileInput.value = '';
+                    };
+                    
+                    reader.readAsText(file);
+                }
+            }, { once: true });
+        };
+
+        // Inicializar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProducts();
+            
+            // Event listeners
+            document.getElementById('add-product-btn').addEventListener('click', addProduct);
+            document.getElementById('export-btn').addEventListener('click', exportData);
+            document.getElementById('import-btn').addEventListener('click', importData);
+        });
+    </script>
+</body>
+</html>
