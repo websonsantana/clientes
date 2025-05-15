@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Móveis Sob Medida | Design Exclusivo para seu Espaço</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .hero-image {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1556909212-d5b604d0c90d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 80vh;
+        }
+        
+        .furniture-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .cart-item-enter {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        .cart-item-enter-active {
+            opacity: 1;
+            transform: translateX(0);
+            transition: all 300ms ease-in;
+        }
+        .cart-item-exit {
+            opacity: 1;
+        }
+        .cart-item-exit-active {
+            opacity: 0;
+            transform: translateX(20px);
+            transition: all 300ms ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50">
+    <!-- Navigation -->
+    <nav class="fixed w-full bg-white shadow-md z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <img src="logo.png" alt="Logo" class="w-14 h-14 mr-2 inline-block">
+                        <span class="text-xl font-bold text-gray-800"><span class="text-xl font-bold text-gray-800">Marcenaria</span></span>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#home" class="text-gray-800 hover:text-amber-600 px-3 py-2 font-medium">Início</a>
+                    <a href="#services" class="text-gray-800 hover:text-amber-600 px-3 py-2 font-medium">Serviços</a>
+                    <a href="#products" class="text-gray-800 hover:text-amber-600 px-3 py-2 font-medium">Produtos</a>
+                    <a href="#budget" class="text-gray-800 hover:text-amber-600 px-3 py-2 font-medium">Orçamento</a>
+                    <div class="relative">
+                        <button id="cart-button" class="text-gray-800 hover:text-amber-600">
+                            <i class="fas fa-shopping-cart text-xl"></i>
+                            <span id="cart-count" class="absolute -top-2 -right-2 bg-amber-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-button" class="text-gray-800 hover:text-amber-600">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#home" class="block px-3 py-2 text-gray-800 hover:text-amber-600 font-medium">Início</a>
+                <a href="#services" class="block px-3 py-2 text-gray-800 hover:text-amber-600 font-medium">Serviços</a>
+                <a href="#products" class="block px-3 py-2 text-gray-800 hover:text-amber-600 font-medium">Produtos</a>
+                <a href="#budget" class="block px-3 py-2 text-gray-800 hover:text-amber-600 font-medium">Orçamento</a>
+                <div class="relative px-3 py-2">
+                    <button id="mobile-cart-button" class="text-gray-800 hover:text-amber-600">
+                        <i class="fas fa-shopping-cart mr-2"></i>Carrinho
+                        <span id="mobile-cart-count" class="ml-2 bg-amber-600 text-white text-xs font-bold rounded-full h-5 w-5 inline-flex items-center justify-center">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-image flex items-center justify-center text-white pt-16">
+        <div class="text-center px-4 animate-fadeIn">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6">Móveis Sob Medida para seu Estilo</h1>
+            <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">Transformamos seus espaços com design exclusivo e qualidade premium</p>
+            <a href="#budget" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-8 rounded-full text-lg transition duration-300 inline-block">Solicitar Orçamento</a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800">Sobre Nossa Empresa</h2>
+                <div class="w-20 h-1 bg-amber-600 mx-auto mt-4"></div>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <p class="text-gray-600 mb-6">Com mais de 15 anos de experiência no mercado, a <span class="font-bold text-amber-600">JA Marcenaria</span> se destaca pela excelência em móveis sob medida, combinando design inovador com funcionalidade.</p>
+                    <p class="text-gray-600 mb-6">Nossa equipe de designers e marceneiros altamente qualificados trabalha para transformar seus sonhos em realidade, criando peças únicas que se adaptam perfeitamente ao seu espaço e estilo de vida.</p>
+                    <div class="flex flex-wrap gap-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-amber-600 mr-2"></i>
+                            <span class="text-gray-700">Materiais de alta qualidade</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-amber-600 mr-2"></i>
+                            <span class="text-gray-700">Design personalizado</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-amber-600 mr-2"></i>
+                            <span class="text-gray-700">Garantia de satisfação</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-amber-600 mr-2"></i>
+                            <span class="text-gray-700">Entrega pontual</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="overflow-hidden rounded-lg shadow-md">
+                        <img src="planejado.png" alt="Cozinha planejada" class="w-full h-full object-cover transition duration-500 hover:scale-105">
+                    </div>
+                    <div class="overflow-hidden rounded-lg shadow-md">
+                        <img src="sala.png" alt="Sala de estar com móveis sob medida" class="w-full h-full object-cover transition duration-500 hover:scale-105">
+                    </div>
+                    <div class="overflow-hidden rounded-lg shadow-md">
+                        <img src="quarto.png" alt="Quarto com armário embutido" class="w-full h-full object-cover transition duration-500 hover:scale-105">
+                    </div>
+                    <div class="overflow-hidden rounded-lg shadow-md">
+                        <img src="escritorio1	.png" alt="Escritório com móveis personalizados" class="w-full h-full object-cover transition duration-500 hover:scale-105">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800">Nossos Serviços</h2>
+                <div class="w-20 h-1 bg-amber-600 mx-auto mt-4"></div>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white rounded-lg shadow-md overflow-hidden furniture-card transition duration-300">
+                    <div class="h-48 overflow-hidden">
+                        <img src="cozinha.png" alt="Cozinha planejada" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Cozinhas Planejadas</h3>
+                        <p class="text-gray-600 mb-4">Projetamos cozinhas funcionais e elegantes, otimizando cada centímetro do seu espaço com materiais duráveis e acabamentos impecáveis.</p>
+                        <ul class="space-y-2 text-gray-600">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-amber-600 mt-1 mr-2"></i>
+                                <span>Materiais resistentes a umidade</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-amber-600 mt-1 mr-2"></i>
+                                <span>Soluções inteligentes de armazenamento</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-amber-600 mt-1 mr-2"></i>
+                                <span>Variedade de acabamentos e cores</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md overflow-hidden furniture-card transition duration-300">
+                    <div class="h-48 overflow-hidden">
+                        <img src="imbutidos.png" alt="Armários embutidos" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Armários Embutidos</h3>
+                        <p class="text-gray-600 mb-4">Criamos armários sob medida que se integram perfeitamente à arquitetura do seu ambiente, maximizando espaço e organização.</p>
+                        <ul class="space-y-2 text-gray-600">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-amber-600 mt-1 mr-2"></i>
+                                <span>Para quartos, salas, lavanderias e mais</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-amber-600 mt-1 mr-2"></i>
+                                <span>Portas de correr ou abrir</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-amber-600 mt-1 mr-2"></i>
+                                <span>Interiores personalizáveis</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md overflow-hidden furniture-card transition duration-300">
+                    <div class="h-48 overflow-hidden">
+                        <img src="comercial.png" alt="Móveis comerciais" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Móveis Comerciais</h3>
+                        <p class="text-gray-600 mb-4">Desenvolvemos móveis que reforçam a identidade da sua empresa, combinando ergonomia, durabilidade e design profissional.</p>
+                        <ul class="space-y-2 text-gray-600">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-amber-600 mt-1 mr-2"></i>
+                                <span>Balcões de atendimento</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-amber-600 mt-1 mr-2"></i>
+                                <span>Estantes e prateleiras</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-amber-600 mt-1 mr-2"></i>
+                                <span>Móveis para escritório</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section id="products" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800">Nossos Produtos</h2>
+                <div class="w-20 h-1 bg-amber-600 mx-auto mt-4"></div>
+                <p class="text-gray-600 mt-4 max-w-2xl mx-auto">Além de móveis sob medida, oferecemos peças exclusivas prontas para entrega imediata.</p>
+            </div>
+            
+            <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                <!-- Product 1 -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden furniture-card transition duration-300">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Mesa de jantar" class="w-full h-full object-cover">
+                        <div class="absolute top-2 right-2 bg-amber-600 text-white text-xs font-bold px-2 py-1 rounded-full">NOVO</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold text-gray-800 mb-1">Mesa de Jantar Retrátil</h3>
+                        <p class="text-gray-600 text-sm mb-3">Mesa em madeira maciça com extensão para 6 pessoas</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-lg font-bold text-amber-600">R$ 2.499,00</span>
+                            <button class="add-to-cart bg-gray-800 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm transition duration-300" data-id="1" data-name="Mesa de Jantar Retrátil" data-price="2499.00" data-image="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80">
+                                <i class="fas fa-cart-plus mr-1"></i> Comprar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product 2 -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden furniture-card transition duration-300">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Poltrona moderna" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold text-gray-800 mb-1">Poltrona Moderna em Couro</h3>
+                        <p class="text-gray-600 text-sm mb-3">Poltrona ergonômica com estrutura em aço e couro ecológico</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-lg font-bold text-amber-600">R$ 1.799,00</span>
+                            <button class="add-to-cart bg-gray-800 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm transition duration-300" data-id="2" data-name="Poltrona Moderna em Couro" data-price="1799.00" data-image="https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80">
+                                <i class="fas fa-cart-plus mr-1"></i> Comprar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product 3 -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden furniture-card transition duration-300">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1554295405-abb8fd54f153?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Cômoda vintage" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold text-gray-800 mb-1">Cômoda Vintage 6 Gavetas</h3>
+                        <p class="text-gray-600 text-sm mb-3">Cômoda em MDF com acabamento envelhecido e pés em metal</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-lg font-bold text-amber-600">R$ 1.299,00</span>
+                            <button class="add-to-cart bg-gray-800 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm transition duration-300" data-id="3" data-name="Cômoda Vintage 6 Gavetas" data-price="1299.00" data-image="https://images.unsplash.com/photo-1554295405-abb8fd54f153?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80">
+                                <i class="fas fa-cart-plus mr-1"></i> Comprar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product 4 -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden furniture-card transition duration-300">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1556020685-ae41abfc9365?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Estante modular" class="w-full h-full object-cover">
+                        <div class="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full">-20%</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold text-gray-800 mb-1">Estante Modular 5 Peças</h3>
+                        <p class="text-gray-600 text-sm mb-3">Sistema modular que pode ser montado em diversas configurações</p>
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="text-sm text-gray-500 line-through mr-2">R$ 1.899,00</span>
+                                <span class="text-lg font-bold text-amber-600">R$ 1.519,20</span>
+                            </div>
+                            <button class="add-to-cart bg-gray-800 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm transition duration-300" data-id="4" data-name="Estante Modular 5 Peças" data-price="1519.20" data-image="https://images.unsplash.com/photo-1556020685-ae41abfc9365?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80">
+                                <i class="fas fa-cart-plus mr-1"></i> Comprar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product 5 -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden furniture-card transition duration-300">
+                    <div class="h-48 overflow-hidden">
+                        <img src="cama.png" alt="Cabeceira de cama" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold text-gray-800 mb-1">Cabeceira King Size</h3>
+                        <p class="text-gray-600 text-sm mb-3">Cabeceira estofada em tecido premium com detalhes em costura</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-lg font-bold text-amber-600">R$ 899,00</span>
+                            <button class="add-to-cart bg-gray-800 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm transition duration-300" data-id="5" data-name="Cabeceira King Size" data-price="899.00" data-image="https://images.unsplash.com/photo-1556909114-44e2d001cacf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80">
+                                <i class="fas fa-cart-plus mr-1"></i> Comprar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product 6 -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden furniture-card transition duration-300">
+                    <div class="h-48 overflow-hidden">
+                        <img src="banqueta.png" alt="Banqueta alta" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold text-gray-800 mb-1">Banqueta Alta</h3>
+                        <p class="text-gray-600 text-sm mb-3">Banqueta para balcão com assento em couro</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-lg font-bold text-amber-600">R$ 349,00</span>
+                            <button class="add-to-cart bg-gray-800 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm transition duration-300" data-id="6" data-name="Banqueta Alta Giratória" data-price="349.00" data-image="https://images.unsplash.com/photo-1556909212-2315b467646b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80">
+                                <i class="fas fa-cart-plus mr-1"></i> Comprar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product 7 -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden furniture-card transition duration-300">
+                    <div class="h-48 overflow-hidden">
+                        <img src="sala.png" alt="Rack para TV" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold text-gray-800 mb-1">Rack para TV 65"</h3>
+                        <p class="text-gray-600 text-sm mb-3">Rack em MDF com gavetas e espaço para equipamentos</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-lg font-bold text-amber-600">R$ 699,00</span>
+                            <button class="add-to-cart bg-gray-800 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm transition duration-300" data-id="7" data-name="Rack para TV 65" data-price="699.00" data-image="https://images.unsplash.com/photo-1556909211-5b64ce40a1a0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80">
+                                <i class="fas fa-cart-plus mr-1"></i> Comprar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product 8 -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden furniture-card transition duration-300">
+                    <div class="h-48 overflow-hidden">
+                        <img src="escrivania.png" alt="Escrivaninha" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold text-gray-800 mb-1">Escrivaninha Home Office</h3>
+                        <p class="text-gray-600 text-sm mb-3">Mesa para computador com gaveta e prateleira inferior</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-lg font-bold text-amber-600">R$ 599,00</span>
+                            <button class="add-to-cart bg-gray-800 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm transition duration-300" data-id="8" data-name="Escrivaninha Home Office" data-price="599.00" data-image="https://images.unsplash.com/photo-1556909200-86d515f6b3e6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80">
+                                <i class="fas fa-cart-plus mr-1"></i> Comprar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Budget Section -->
+    <section id="budget" class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800">Solicite Seu Orçamento</h2>
+                <div class="w-20 h-1 bg-amber-600 mx-auto mt-4"></div>
+                <p class="text-gray-600 mt-4 max-w-2xl mx-auto">Preencha o formulário abaixo e nossa equipe entrará em contato para discutir seu projeto.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-12">
+                <div class="bg-white rounded-lg shadow-lg p-8">
+                    <form id="budget-form" class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nome Completo*</label>
+                            <input type="text" id="name" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-amber-500 focus:border-amber-500">
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">E-mail*</label>
+                                <input type="email" id="email" name="email" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-amber-500 focus:border-amber-500">
+                            </div>
+                            
+                            <div>
+                                <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Telefone*</label>
+                                <input type="tel" id="phone" name="phone" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-amber-500 focus:border-amber-500">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="service" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Serviço*</label>
+                            <select id="service" name="service" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-amber-500 focus:border-amber-500">
+                                <option value="" disabled selected>Selecione uma opção</option>
+                                <option value="cozinha">Cozinha Planejada</option>
+                                <option value="armario">Armários Embutidos</option>
+                                <option value="comercial">Móveis Comerciais</option>
+                                <option value="residencial">Móveis Residenciais</option>
+                                <option value="outro">Outro</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Descrição do Projeto*</label>
+                            <textarea id="description" name="description" rows="4" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-amber-500 focus:border-amber-500"></textarea>
+                        </div>
+                        
+                        <div>
+                            <label for="images" class="block text-sm font-medium text-gray-700 mb-1">Anexar Imagens (Opcional)</label>
+                            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                                <div class="space-y-1 text-center">
+                                    <div class="flex text-sm text-gray-600">
+                                        <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-amber-600 hover:text-amber-500 focus-within:outline-none">
+                                            <span>Enviar arquivos</span>
+                                            <input id="file-upload" name="file-upload" type="file" class="sr-only" multiple>
+                                        </label>
+                                        <p class="pl-1">ou arraste e solte</p>
+                                    </div>
+                                    <p class="text-xs text-gray-500">PNG, JPG, GIF até 10MB</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-md transition duration-300 flex items-center justify-center">
+                                <i class="fas fa-paper-plane mr-2"></i> Enviar Solicitação
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div>
+                    <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Como Funciona</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 bg-amber-100 rounded-full p-2">
+                                    <i class="fas fa-phone-alt text-amber-600"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <h4 class="text-sm font-medium text-gray-800">1. Contato Inicial</h4>
+                                    <p class="text-sm text-gray-600 mt-1">Nossa equipe entrará em contato para entender suas necessidades e preferências.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 bg-amber-100 rounded-full p-2">
+                                    <i class="fas fa-ruler-combined text-amber-600"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <h4 class="text-sm font-medium text-gray-800">2. Visita Técnica</h4>
+                                    <p class="text-sm text-gray-600 mt-1">Agendamos uma visita para medição do espaço e discussão de detalhes.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 bg-amber-100 rounded-full p-2">
+                                    <i class="fas fa-pencil-ruler text-amber-600"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <h4 class="text-sm font-medium text-gray-800">3. Projeto Personalizado</h4>
+                                    <p class="text-sm text-gray-600 mt-1">Criamos um projeto 3D exclusivo para sua aprovação.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 bg-amber-100 rounded-full p-2">
+                                    <i class="fas fa-tools text-amber-600"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <h4 class="text-sm font-medium text-gray-800">4. Fabricação e Instalação</h4>
+                                    <p class="text-sm text-gray-600 mt-1">Após aprovação, fabricamos e instalamos seus móveis no prazo combinado.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-amber-600 rounded-lg shadow-lg p-8 text-white">
+                        <h3 class="text-xl font-bold mb-4">Dúvidas Frequentes</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="font-medium">Qual o prazo para um orçamento?</h4>
+                                <p class="text-sm opacity-90 mt-1">Normalmente respondemos em até 48 horas úteis.</p>
+                            </div>
+                            
+                            <div>
+                                <h4 class="font-medium">Quanto custa um projeto?</h4>
+                                <p class="text-sm opacity-90 mt-1">O valor varia conforme tamanho, materiais e complexidade. Nosso orçamento é gratuito.</p>
+                            </div>
+                            
+                            <div>
+                                <h4 class="font-medium">Qual a garantia dos móveis?</h4>
+                                <p class="text-sm opacity-90 mt-1">Oferecemos garantia de 2 anos contra defeitos de fabricação.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800">O Que Nossos Clientes Dizem</h2>
+                <div class="w-20 h-1 bg-amber-600 mx-auto mt-4"></div>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-gray-50 rounded-lg p-8 shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="flex-shrink-0">
+                            <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/women/32.jpg" alt="Cliente 1">
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-gray-800">Ana Paula S.</h3>
+                            <div class="flex text-amber-500">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">"Minha cozinha ficou exatamente como eu sonhava! O projeto levou em conta todos os meus hábitos e necessidades. A qualidade dos materiais e o acabamento são impecáveis."</p>
+                </div>
+                
+                <div class="bg-gray-50 rounded-lg p-8 shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="flex-shrink-0">
+                            <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/men/54.jpg" alt="Cliente 2">
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-gray-800">Carlos R.</h3>
+                            <div class="flex text-amber-500">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">"Contratei para fazer os armários do meu apartamento e superou todas as expectativas. O espaço foi otimizado de forma incrível e o atendimento foi excelente em todas as etapas."</p>
+                </div>
+                
+                <div class="bg-gray-50 rounded-lg p-8 shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="flex-shrink-0">
+                            <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/women/68.jpg" alt="Cliente 3">
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-gray-800">Mariana T.</h3>
+                            <div class="flex text-amber-500">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">"Adorei a escrivaninha que comprei pronta! A qualidade é excelente e chegou antes do prazo. Já estou planejando encomendar móveis sob medida para o quarto do meu filho."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="py-16 bg-gray-800 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-12">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Contato</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <i class="fas fa-map-marker-alt mt-1 mr-3 text-amber-400"></i>
+                            <div>
+                                <h4 class="font-medium">Endereço</h4>
+                                <p class="text-gray-400">Rua são josé, 59<br>Santo aleixo<br>Jaboatao dos Guararapes - Pe</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <i class="fas fa-phone-alt mt-1 mr-3 text-amber-400"></i>
+                            <div>
+                                <h4 class="font-medium">Telefone</h4>
+                                <p class="text-gray-400">(81) 98888-8888<br>(81) 9 7777-7777</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <i class="fas fa-envelope mt-1 mr-3 text-amber-400"></i>
+                            <div>
+                                <h4 class="font-medium">E-mail</h4>
+                                <p class="text-gray-400">contato@jamarcenaria.com.br</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Horário de Funcionamento</h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between border-b border-gray-700 pb-2">
+                            <span class="text-gray-400">Segunda - Sexta</span>
+                            <span>08:00 - 18:00</span>
+                        </div>
+                        <div class="flex justify-between border-b border-gray-700 pb-2">
+                            <span class="text-gray-400">Sábado</span>
+                            <span>09:00 - 13:00</span>
+                        </div>
+                        <div class="flex justify-between border-b border-gray-700 pb-2">
+                            <span class="text-gray-400">Domingo</span>
+                            <span class="text-gray-400">Fechado</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8">
+                        <h3 class="text-xl font-bold mb-4">Redes Sociais</h3>
+                        <div class="flex space-x-4">
+                            <a href="#" class="text-gray-400 hover:text-amber-400 transition duration-300">
+                                <i class="fab fa-facebook-f text-xl"></i>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-amber-400 transition duration-300">
+                                <i class="fab fa-instagram text-xl"></i>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-amber-400 transition duration-300">
+                                <i class="fab fa-pinterest-p text-xl"></i>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-amber-400 transition duration-300">
+                                <i class="fab fa-whatsapp text-xl"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Newsletter</h3>
+                    <p class="text-gray-400 mb-4">Assine nossa newsletter e receba novidades, promoções e dicas de decoração.</p>
+                    <form class="space-y-4">
+                        <input type="text" placeholder="Seu nome" class="w-full px-4 py-2 rounded bg-gray-700 border border-gray-600 focus:border-amber-400 focus:ring-amber-400">
+                        <input type="email" placeholder="Seu e-mail" class="w-full px-4 py-2 rounded bg-gray-700 border border-gray-600 focus:border-amber-400 focus:ring-amber-400">
+                        <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded transition duration-300">
+                            Assinar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-6 bg-gray-900 text-gray-400">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <p>&copy; 2025 Ja Marcenaria. Todos os direitos reservados.</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="hover:text-amber-400 transition duration-300">Termos de Serviço</a>
+                    <a href="#" class="hover:text-amber-400 transition duration-300">Política de Privacidade</a>
+                    <a href="#" class="hover:text-amber-400 transition duration-300">FAQ</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Shopping Cart Sidebar -->
+    <div id="cart-sidebar" class="fixed top-0 right-0 w-full md:w-96 h-full bg-white shadow-xl transform translate-x-full transition-transform duration-300 ease-in-out z-50 overflow-y-auto">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-800">Seu Carrinho</h2>
+                <button id="close-cart" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div id="cart-items" class="space-y-4 mb-6">
+                <!-- Cart items will be added here dynamically -->
+                <div class="text-center py-8 text-gray-500" id="empty-cart-message">
+                    <i class="fas fa-shopping-cart text-4xl mb-4 text-gray-300"></i>
+                    <p>Seu carrinho está vazio</p>
+                </div>
+            </div>
+            
+            <div id="cart-summary" class="border-t border-gray-200 pt-4 hidden">
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-600">Subtotal</span>
+                    <span id="cart-subtotal" class="font-medium">R$ 0,00</span>
+                </div>
+                <div class="flex justify-between mb-4">
+                    <span class="text-gray-600">Frete</span>
+                    <span class="font-medium">Calculado no checkout</span>
+                </div>
+                <div class="flex justify-between text-lg font-bold mb-6">
+                    <span>Total</span>
+                    <span id="cart-total">R$ 0,00</span>
+                </div>
+                
+                <button id="checkout-button" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-md transition duration-300 flex items-center justify-center">
+                    <i class="fab fa-whatsapp mr-2"></i> Finalizar pelo WhatsApp
+                </button>
+                
+                <div class="mt-4 text-center">
+                    <a href="#products" class="text-amber-600 hover:text-amber-700 text-sm font-medium">Continuar comprando</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cart Overlay -->
+    <div id="cart-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6 text-center">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-check text-green-600 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Solicitação Enviada!</h3>
+            <p class="text-gray-600 mb-6">Nossa equipe entrará em contato em breve para discutir seu projeto.</p>
+            <button id="close-modal" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-6 rounded-md transition duration-300">
+                Fechar
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // Cart functionality
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        
+        // DOM elements
+        const cartButton = document.getElementById('cart-button');
+        const mobileCartButton = document.getElementById('mobile-cart-button');
+        const cartSidebar = document.getElementById('cart-sidebar');
+        const cartOverlay = document.getElementById('cart-overlay');
+        const closeCartButton = document.getElementById('close-cart');
+        const cartItemsContainer = document.getElementById('cart-items');
+        const emptyCartMessage = document.getElementById('empty-cart-message');
+        const cartSummary = document.getElementById('cart-summary');
+        const cartCountElements = document.querySelectorAll('#cart-count, #mobile-cart-count');
+        const addToCartButtons = document.querySelectorAll('.add-to-cart');
+        const checkoutButton = document.getElementById('checkout-button');
+        
+        // Toggle cart sidebar
+        function toggleCart() {
+            cartSidebar.classList.toggle('translate-x-full');
+            cartOverlay.classList.toggle('hidden');
+            document.body.classList.toggle('overflow-hidden');
+        }
+        
+        cartButton.addEventListener('click', toggleCart);
+        mobileCartButton.addEventListener('click', toggleCart);
+        closeCartButton.addEventListener('click', toggleCart);
+        cartOverlay.addEventListener('click', toggleCart);
+        
+        // Update cart count
+        function updateCartCount() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCountElements.forEach(el => el.textContent = totalItems);
+        }
+        
+        // Format price
+        function formatPrice(price) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(price);
+        }
+        
+        // Render cart items
+        function renderCartItems() {
+            if (cart.length === 0) {
+                emptyCartMessage.classList.remove('hidden');
+                cartSummary.classList.add('hidden');
+                return;
+            }
+            
+            emptyCartMessage.classList.add('hidden');
+            cartSummary.classList.remove('hidden');
+            
+            cartItemsContainer.innerHTML = '';
+            
+            let subtotal = 0;
+            
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+                
+                const cartItemElement = document.createElement('div');
+                cartItemElement.className = 'flex border-b border-gray-200 pb-4';
+                cartItemElement.innerHTML = `
+                    <div class="flex-shrink-0 w-20 h-20 bg-gray-100 rounded-md overflow-hidden">
+                        <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <div class="flex justify-between">
+                            <h3 class="text-sm font-medium text-gray-800">${item.name}</h3>
+                            <button class="remove-item text-gray-400 hover:text-red-500" data-index="${index}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-1">${formatPrice(item.price)}</p>
+                        <div class="flex items-center mt-2">
+                            <button class="decrease-quantity text-gray-500 hover:text-amber-600 px-2" data-index="${index}">
+                                <i class="fas fa-minus text-xs"></i>
+                            </button>
+                            <span class="quantity mx-2 text-sm w-8 text-center">${item.quantity}</span>
+                            <button class="increase-quantity text-gray-500 hover:text-amber-600 px-2" data-index="${index}">
+                                <i class="fas fa-plus text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                cartItemsContainer.appendChild(cartItemElement);
+            });
+            
+            document.getElementById('cart-subtotal').textContent = formatPrice(subtotal);
+            document.getElementById('cart-total').textContent = formatPrice(subtotal);
+            
+            // Add event listeners to new buttons
+            document.querySelectorAll('.remove-item').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const index = e.currentTarget.dataset.index;
+                    removeItemFromCart(index);
+                });
+            });
+            
+            document.querySelectorAll('.decrease-quantity').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const index = e.currentTarget.dataset.index;
+                    updateQuantity(index, -1);
+                });
+            });
+            
+            document.querySelectorAll('.increase-quantity').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const index = e.currentTarget.dataset.index;
+                    updateQuantity(index, 1);
+                });
+            });
+        }
+        
+        // Add to cart
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const product = {
+                    id: e.currentTarget.dataset.id,
+                    name: e.currentTarget.dataset.name,
+                    price: parseFloat(e.currentTarget.dataset.price),
+                    image: e.currentTarget.dataset.image,
+                    quantity: 1
+                };
+                
+                // Check if product already in cart
+                const existingItemIndex = cart.findIndex(item => item.id === product.id);
+                
+                if (existingItemIndex !== -1) {
+                    cart[existingItemIndex].quantity += 1;
+                } else {
+                    cart.push(product);
+                }
+                
+                saveCart();
+                renderCartItems();
+                
+                // Show a quick visual feedback
+                const cartIcon = document.querySelector('#cart-button i');
+                cartIcon.classList.add('animate-ping');
+                setTimeout(() => {
+                    cartIcon.classList.remove('animate-ping');
+                }, 500);
+            });
+        });
+        
+        // Remove item from cart
+        function removeItemFromCart(index) {
+            cart.splice(index, 1);
+            saveCart();
+            renderCartItems();
+        }
+        
+        // Update quantity
+        function updateQuantity(index, change) {
+            const newQuantity = cart[index].quantity + change;
+            
+            if (newQuantity < 1) {
+                removeItemFromCart(index);
+            } else {
+                cart[index].quantity = newQuantity;
+                saveCart();
+                renderCartItems();
+            }
+        }
+        
+        // Save cart to localStorage
+        function saveCart() {
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+        }
+        
+        // Checkout via WhatsApp
+        checkoutButton.addEventListener('click', () => {
+            if (cart.length === 0) return;
+            
+            let message = 'Olá, gostaria de finalizar minha compra com os seguintes itens:\n\n';
+            
+            cart.forEach(item => {
+                message += `- ${item.name} (${item.quantity}x) - ${formatPrice(item.price * item.quantity)}\n`;
+            });
+            
+            message += `\nTotal: ${document.getElementById('cart-total').textContent}\n\nPor favor, confirme a disponibilidade e formas de pagamento.`;
+            
+            const whatsappUrl = `https://wa.me/5581981521109?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        });
+        
+        // Budget form submission
+        const budgetForm = document.getElementById('budget-form');
+        const successModal = document.getElementById('success-modal');
+        const closeModalButton = document.getElementById('close-modal');
+        
+        budgetForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Get form values
+            const formData = new FormData(budgetForm);
+            const data = Object.fromEntries(formData);
+            
+            // Create WhatsApp message
+            let message = `Olá, gostaria de solicitar um orçamento:\n\n`;
+            message += `Nome: ${data.name}\n`;
+            message += `E-mail: ${data.email}\n`;
+            message += `Telefone: ${data.phone}\n`;
+            message += `Serviço: ${data.service}\n`;
+            message += `Descrição:\n${data.description}\n\n`;
+            message += `Por favor, entre em contato para discutirmos o projeto.`;
+            
+            // Open WhatsApp
+            const whatsappUrl = `https://wa.me/5581981521109?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+            
+            // Show success modal
+            successModal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+            
+            // Reset form
+            budgetForm.reset();
+        });
+        
+        // Close modal
+        closeModalButton.addEventListener('click', () => {
+            successModal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        });
+        
+        // Initialize cart
+        updateCartCount();
+        renderCartItems();
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu if open
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
