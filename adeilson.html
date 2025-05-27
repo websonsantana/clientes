@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Embalagens e Descartáveis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .sidebar {
+            transition: all 0.3s;
+        }
+        .sidebar.collapsed {
+            width: 70px;
+            overflow: hidden;
+        }
+        .sidebar.collapsed .nav-text {
+            display: none;
+        }
+        .sidebar.collapsed .logo-text {
+            display: none;
+        }
+        .sidebar.collapsed .nav-item {
+            justify-content: center;
+        }
+        .print-area {
+            display: none;
+        }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .print-area, .print-area * {
+                visibility: visible;
+            }
+            .print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                display: block;
+            }
+        }
+        .barcode-scanner {
+            animation: scan 2s infinite;
+        }
+        @keyframes scan {
+            0% { top: 0%; }
+            50% { top: 90%; }
+            100% { top: 0%; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="sidebar bg-blue-800 text-white w-64 flex flex-col">
+            <div class="p-4 flex items-center">
+                <i class="fas fa-box-open text-2xl mr-3"></i>
+                <span class="logo-text text-xl font-bold">Embalagens+</span>
+            </div>
+            <div class="flex-1 overflow-y-auto">
+                <nav class="mt-6">
+                    <div class="nav-item px-6 py-3 flex items-center hover:bg-blue-700 cursor-pointer active-module" data-module="dashboard">
+                        <i class="fas fa-tachometer-alt mr-3"></i>
+                        <span class="nav-text">Dashboard</span>
+                    </div>
+                    <div class="nav-item px-6 py-3 flex items-center hover:bg-blue-700 cursor-pointer" data-module="products">
+                        <i class="fas fa-boxes mr-3"></i>
+                        <span class="nav-text">Produtos</span>
+                    </div>
+                    <div class="nav-item px-6 py-3 flex items-center hover:bg-blue-700 cursor-pointer" data-module="pos">
+                        <i class="fas fa-cash-register mr-3"></i>
+                        <span class="nav-text">Ponto de Venda</span>
+                    </div>
+                    <div class="nav-item px-6 py-3 flex items-center hover:bg-blue-700 cursor-pointer" data-module="sales">
+                        <i class="fas fa-receipt mr-3"></i>
+                        <span class="nav-text">Vendas</span>
+                    </div>
+                </nav>
+            </div>
+            <div class="p-4 border-t border-blue-700">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <img src="https://via.placeholder.com/40" alt="User" class="rounded-full">
+                        <div class="ml-3">
+                            <p class="text-sm font-medium">Usuário Admin</p>
+                            <p class="text-xs text-blue-200">Administrador</p>
+                        </div>
+                    </div>
+                    <button id="toggleSidebar" class="text-blue-200 hover:text-white">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Navigation -->
+            <header class="bg-white shadow-sm">
+                <div class="px-6 py-4 flex items-center justify-between">
+                    <h1 class="text-xl font-semibold text-gray-800" id="module-title">Dashboard</h1>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <input type="text" placeholder="Buscar..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                        <button class="text-gray-600 hover:text-gray-800">
+                            <i class="fas fa-bell"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Module Content -->
+            <main class="flex-1 overflow-y-auto p-6 bg-gray-50">
+                <!-- Dashboard Module -->
+                <div id="dashboard-module" class="module-content">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                                    <i class="fas fa-boxes text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500">Produtos Cadastrados</p>
+                                    <h3 class="text-2xl font-bold" id="total-products">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                                    <i class="fas fa-receipt text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500">Vendas Hoje</p>
+                                    <h3 class="text-2xl font-bold" id="today-sales">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4">
+                                    <i class="fas fa-dollar-sign text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500">Faturamento</p>
+                                    <h3 class="text-2xl font-bold" id="today-revenue">R$ 0,00</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
+                                    <i class="fas fa-barcode text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500">Itens Vendidos</p>
+                                    <h3 class="text-2xl font-bold" id="items-sold">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h2 class="text-lg font-semibold mb-4">Últimas Vendas</h2>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200" id="recent-sales">
+                                        <!-- Filled by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h2 class="text-lg font-semibold mb-4">Produtos em Destaque</h2>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produto</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estoque</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendidos</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200" id="top-products">
+                                        <!-- Filled by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products Module -->
+                <div id="products-module" class="module-content hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-semibold">Gestão de Produtos</h2>
+                        <button id="add-product-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Adicionar Produto
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow overflow-hidden mb-6">
+                        <div class="p-4 border-b border-gray-200">
+                            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                                <div class="relative mb-4 md:mb-0 md:w-1/3">
+                                    <input type="text" id="product-search" placeholder="Buscar produtos..." class="pl-10 pr-4 py-2 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <select id="product-filter" class="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="all">Todos os Produtos</option>
+                                        <option value="low-stock">Baixo Estoque</option>
+                                        <option value="no-stock">Sem Estoque</option>
+                                    </select>
+                                    <button id="export-products" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-2 rounded-lg flex items-center">
+                                        <i class="fas fa-file-export mr-2"></i> Exportar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produto</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preço</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estoque</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="products-table">
+                                    <!-- Filled by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="p-4 border-t border-gray-200 flex justify-between items-center">
+                            <div class="text-sm text-gray-500">
+                                Mostrando <span id="products-showing">1</span> a <span id="products-of">10</span> de <span id="products-total">0</span> produtos
+                            </div>
+                            <div class="flex space-x-1">
+                                <button class="px-3 py-1 border rounded-lg hover:bg-gray-100" id="products-prev">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button class="px-3 py-1 border rounded-lg hover:bg-gray-100" id="products-next">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add/Edit Product Modal -->
+                <div id="product-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+                    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-screen overflow-y-auto">
+                        <div class="p-6">
+                            <div class="flex justify-between items-center border-b pb-4 mb-4">
+                               <!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Embalagens e Descartáveis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .sidebar {
+            transition: all 0.3s;
+        }
+        .sidebar.collapsed {
+            width: 70px;
+            overflow: hidden;
+        }
+        .sidebar.collapsed .nav-text {
+            display: none;
+        }
+        .sidebar.collapsed .logo-text {
+            display: none;
+        }
+        .sidebar.collapsed .nav-item {
+            justify-content: center;
+        }
+        .print-area {
+            display: none;
+        }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .print-area, .print-area * {
+                visibility: visible;
+            }
+            .print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                display: block;
+            }
+        }
+        .barcode-scanner {
+            animation: scan 2s infinite;
+        }
+        @keyframes scan {
+            0% { top: 0%; }
+            50% { top: 90%; }
+            100% { top: 0%; }
+        }
+        .active-module {
+            background-color: #1e40af;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="sidebar bg-blue-800 text-white w-64 flex flex-col">
+            <div class="p-4 flex items-center">
+                <i class="fas fa-box-open text-2xl mr-3"></i>
+                <span class="logo-text text-xl font-bold">Embalagens+</span>
+            </div>
+            <div class="flex-1 overflow-y-auto">
+                <nav class="mt-6">
+                    <div class="nav-item px-6 py-3 flex items-center hover:bg-blue-700 cursor-pointer active-module" data-module="dashboard">
+                        <i class="fas fa-tachometer-alt mr-3"></i>
+                        <span class="nav-text">Dashboard</span>
+                    </div>
+                    <div class="nav-item px-6 py-3 flex items-center hover:bg-blue-700 cursor-pointer" data-module="products">
+                        <i class="fas fa-boxes mr-3"></i>
+                        <span class="nav-text">Produtos</span>
+                    </div>
+                    <div class="nav-item px-6 py-3 flex items-center hover:bg-blue-700 cursor-pointer" data-module="pos">
+                        <i class="fas fa-cash-register mr-3"></i>
+                        <span class="nav-text">Ponto de Venda</span>
+                    </div>
+                    <div class="nav-item px-6 py-3 flex items-center hover:bg-blue-700 cursor-pointer" data-module="sales">
+                        <i class="fas fa-receipt mr-3"></i>
+                        <span class="nav-text">Vendas</span>
+                    </div>
+                </nav>
+            </div>
+            <div class="p-4 border-t border-blue-700">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <img src="https://via.placeholder.com/40" alt="User" class="rounded-full">
+                        <div class="ml-3">
+                            <p class="text-sm font-medium">Usuário Admin</p>
+                            <p class="text-xs text-blue-200">Administrador</p>
+                        </div>
+                    </div>
+                    <button id="toggleSidebar" class="text-blue-200 hover:text-white">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Navigation -->
+            <header class="bg-white shadow-sm">
+                <div class="px-6 py-4 flex items-center justify-between">
+                    <h1 class="text-xl font-semibold text-gray-800" id="module-title">Dashboard</h1>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <input type="text" placeholder="Buscar..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                        <button class="text-gray-600 hover:text-gray-800">
+                            <i class="fas fa-bell"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Module Content -->
+            <main class="flex-1 overflow-y-auto p-6 bg-gray-50">
+                <!-- Dashboard Module -->
+                <div id="dashboard-module" class="module-content">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                                    <i class="fas fa-boxes text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500">Produtos Cadastrados</p>
+                                    <h3 class="text-2xl font-bold" id="total-products">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                                    <i class="fas fa-receipt text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500">Vendas Hoje</p>
+                                    <h3 class="text-2xl font-bold" id="today-sales">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4">
+                                    <i class="fas fa-dollar-sign text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500">Faturamento</p>
+                                    <h3 class="text-2xl font-bold" id="today-revenue">R$ 0,00</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
+                                    <i class="fas fa-barcode text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500">Itens Vendidos</p>
+                                    <h3 class="text-2xl font-bold" id="items-sold">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h2 class="text-lg font-semibold mb-4">Últimas Vendas</h2>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200" id="recent-sales">
+                                        <!-- Filled by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h2 class="text-lg font-semibold mb-4">Produtos em Destaque</h2>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produto</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estoque</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendidos</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200" id="top-products">
+                                        <!-- Filled by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products Module -->
+                <div id="products-module" class="module-content hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-semibold">Gestão de Produtos</h2>
+                        <button id="add-product-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Adicionar Produto
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow overflow-hidden mb-6">
+                        <div class="p-4 border-b border-gray-200">
+                            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                                <div class="relative mb-4 md:mb-0 md:w-1/3">
+                                    <input type="text" id="product-search" placeholder="Buscar produtos..." class="pl-10 pr-4 py-2 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <select id="product-filter" class="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="all">Todos os Produtos</option>
+                                        <option value="low-stock">Baixo Estoque</option>
+                                        <option value="no-stock">Sem Estoque</option>
+                                    </select>
+                                    <button id="export-products" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-2 rounded-lg flex items-center">
+                                        <i class="fas fa-file-export mr-2"></i> Exportar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produto</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preço</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estoque</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="products-table">
+                                    <!-- Filled by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="p-4 border-t border-gray-200 flex justify-between items-center">
+                            <div class="text-sm text-gray-500">
+                                Mostrando <span id="products-showing">1</span> a <span id="products-of">10</span> de <span id="products-total">0</span> produtos
+                            </div>
+                            <div class="flex space-x-1">
+                                <button class="px-3 py-1 border rounded-lg hover:bg-gray-100" id="products-prev">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button class="px-3 py-1 border rounded-lg hover:bg-gray-100" id="products-next">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add/Edit Product Modal -->
+                <div id="product-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+                    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-screen overflow-y-auto">
+                        <div class="p-6">
+                            <div class="flex justify-between items-center border-b pb-4 mb-4">
+                                <h3 class="text-xl font-semibold" id="product-modal-title">Adicionar Produto</h3>
+                                <button id="close-product-modal" class="text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <form id="product-form">
+                                <input type="hidden" id="product-id">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label for="product-name" class="block text-sm font-medium text-gray-700 mb-1">Nome do Produto*</label>
+                                        <input type="text" id="product-name" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                    </div>
+                                    <div>
+                                        <label for="product-barcode" class="block text-sm font-medium text-gray-700 mb-1">Código de Barras</label>
+                                        <input type="text" id="product-barcode" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div>
+                                        <label for="product-price" class="block text-sm font-medium text-gray-700 mb-1">Preço Unitário*</label>
+                                        <div class="relative">
+                                            <span class="absolute left-3 top-2">R$</span>
+                                            <input type="number" id="product-price" step="0.01" min="0" class="w-full pl-8 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label for="product-unit" class="block text-sm font-medium text-gray-700 mb-1">Unidade de Medida*</label>
+                                        <select id="product-unit" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                            <option value="un">Unidade</option>
+                                            <option value="pct">Pacote</option>
+                                            <option value="cx">Caixa</option>
+                                            <option value="kg">Quilo</option>
+                                            <option value="l">Litro</option>
+                                        </select>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label for="product-description" class="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+                                        <textarea id="product-description" rows="3" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Imagem do Produto</label>
+                                        <div class="mt-1 flex items-center">
+                                            <div class="relative">
+                                                <img id="product-image-preview" src="https://via.placeholder.com/150" alt="Preview" class="w-32 h-32 object-cover rounded-lg border">
+                                                <input type="file" id="product-image" class="hidden" accept="image/*">
+                                                <button type="button" id="upload-image-btn" class="absolute bottom-2 right-2 bg-blue-600 text-white p-1 rounded-full">
+                                                    <i class="fas fa-camera text-xs"></i>
+                                                </button>
+                                            </div>
+                                            <div class="ml-4">
+                                                <button type="button" id="select-image-btn" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-2 rounded-lg">
+                                                    <i class="fas fa-image mr-2"></i> Selecionar Imagem
+                                                </button>
+                                                <p class="text-xs text-gray-500 mt-1">Formatos: JPG, PNG (Máx. 2MB)</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-6 flex justify-end space-x-3">
+                                    <button type="button" id="cancel-product" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100">
+                                        Cancelar
+                                    </button>
+                                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                        Salvar Produto
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- POS Module -->
+                <div id="pos-module" class="module-content hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2">
+                            <div class="bg-white rounded-lg shadow p-6 mb-6">
+                                <h2 class="text-xl font-semibold mb-4">Ponto de Venda</h2>
+                                <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                                    <div class="relative mb-4 md:mb-0 md:w-2/3">
+                                        <input type="text" id="pos-search" placeholder="Digite o nome ou código de barras..." class="pl-10 pr-4 py-3 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <i class="fas fa-search absolute left-3 top-4 text-gray-400"></i>
+                                    </div>
+                                    <button id="scan-barcode" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg flex items-center">
+                                        <i class="fas fa-barcode mr-2"></i> Ler Código
+                                    </button>
+                                </div>
+                                
+                                <!-- Barcode Scanner Modal -->
+                                <div id="barcode-scanner-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+                                    <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+                                        <div class="p-6">
+                                    <div class="flex justify-between items-center border-b pb-4 mb-4">
+                                        <h3 class="text-xl font-semibold">Leitor de Código de Barras</h3>
+                                        <button id="close-scanner-modal" class="text-gray-500 hover:text-gray-700">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                    <div class="relative h-64 bg-gray-800 rounded-lg overflow-hidden">
+                                        <div class="barcode-scanner absolute left-0 w-full h-1 bg-red-500"></div>
+                                        <div class="flex items-center justify-center h-full text-white">
+                                            <i class="fas fa-barcode text-5xl"></i>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4">
+                                        <p class="text-sm text-gray-600">Posicione o código de barras na frente da câmera</p>
+                                    </div>
+                                    <div class="mt-6 flex justify-end">
+                                        <button id="manual-barcode" class="px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 mr-3">
+                                            Digitar Manualmente
+                                        </button>
+                                        <button id="stop-scanning" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                            Concluir
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produto</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preço</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estoque</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="pos-products">
+                                    <!-- Filled by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="bg-white rounded-lg shadow p-6 sticky top-6">
+                        <h2 class="text-xl font-semibold mb-4">Carrinho de Compras</h2>
+                        <div class="border-b pb-4 mb-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-gray-600">Itens:</span>
+                                <span class="font-medium" id="cart-items-count">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Subtotal:</span>
+                                <span class="font-medium" id="cart-subtotal">R$ 0,00</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="discount-type" class="block text-sm font-medium text-gray-700 mb-1">Desconto</label>
+                            <div class="flex">
+                                <select id="discount-type" class="border rounded-l-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="percent">%</option>
+                                    <option value="fixed">R$</option>
+                                </select>
+                                <input type="number" id="discount-value" min="0" step="0.01" class="flex-1 border-t border-b border-r rounded-r-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                        
+                        <div class="border-t pt-4 mb-4">
+                            <div class="flex justify-between items-center font-semibold text-lg">
+                                <span>Total:</span>
+                                <span id="cart-total">R$ 0,00</span>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <button id="checkout-btn" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-check-circle mr-2"></i> Finalizar Venda
+                            </button>
+                            <button id="clear-cart" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-trash-alt mr-2"></i> Limpar Carrinho
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Receipt Modal -->
+        <div id="receipt-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+                <div class="p-6">
+                    <div class="flex justify-between items-center border-b pb-4 mb-4">
+                        <h3 class="text-xl font-semibold">Cupom de Venda</h3>
+                        <button id="close-receipt-modal" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="print-area">
+                        <div class="text-center mb-4">
+                            <h2 class="text-xl font-bold">Embalagens+</h2>
+                            <p class="text-sm text-gray-600">Av. Principal, 123 - Centro</p>
+                            <p class="text-sm text-gray-600">CNPJ: 12.345.678/0001-99</p>
+                        </div>
+                        
+                        <div class="border-b border-dashed border-gray-400 mb-3"></div>
+                        
+                        <div class="mb-3">
+                            <div class="flex justify-between text-sm">
+                                <span>Data:</span>
+                                <span id="receipt-date">01/01/2023 14:30</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span>Vendedor:</span>
+                                <span>Usuário Admin</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span>Cupom:</span>
+                                <span id="receipt-number">#00001</span>
+                            </div>
+                        </div>
+                        
+                        <div class="border-b border-dashed border-gray-400 mb-3"></div>
+                        
+                        <div class="mb-4" id="receipt-items">
+                            <!-- Filled by JavaScript -->
+                        </div>
+                        
+                        <div class="border-b border-dashed border-gray-400 mb-3"></div>
+                        
+                        <div class="mb-3">
+                            <div class="flex justify-between font-medium">
+                                <span>Subtotal:</span>
+                                <span id="receipt-subtotal">R$ 0,00</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span>Desconto:</span>
+                                <span id="receipt-discount">R$ 0,00</span>
+                            </div>
+                            <div class="flex justify-between font-bold">
+                                <span>Total:</span>
+                                <span id="receipt-total">R$ 0,00</span>
+                            </div>
+                        </div>
+                        
+                        <div class="border-b border-dashed border-gray-400 mb-3"></div>
+                        
+                        <div class="text-center text-xs text-gray-600">
+                            <p>Obrigado pela preferência!</p>
+                            <p>Volte sempre!</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 flex justify-center space-x-3">
+                        <button id="print-receipt" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center">
+                            <i class="fas fa-print mr-2"></i> Imprimir
+                        </button>
+                        <button id="new-sale" class="px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200">
+                            Nova Venda
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales Module -->
+        <div id="sales-module" class="module-content hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-semibold">Histórico de Vendas</h2>
+                <div class="flex space-x-3">
+                    <div class="relative">
+                        <input type="date" id="sales-date" class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <button id="export-sales" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-lg flex items-center">
+                        <i class="fas fa-file-export mr-2"></i> Exportar
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow overflow-hidden mb-6">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cupom</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Itens</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="sales-table">
+                            <!-- Filled by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-4 border-t border-gray-200 flex justify-between items-center">
+                    <div class="text-sm text-gray-500">
+                        Mostrando <span id="sales-showing">1</span> a <span id="sales-of">10</span> de <span id="sales-total">0</span> vendas
+                    </div>
+                    <div class="flex space-x-1">
+                        <button class="px-3 py-1 border rounded-lg hover:bg-gray-100" id="sales-prev">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="px-3 py-1 border rounded-lg hover:bg-gray-100" id="sales-next">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</div>
+
+<script>
+    // Navigation between modules
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all navigation items
+        const navItems = document.querySelectorAll('.nav-item');
+        
+        // Add click event to each navigation item
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove active class from all items
+                navItems.forEach(navItem => {
+                    navItem.classList.remove('active-module');
+                });
+                
+                // Add active class to clicked item
+                this.classList.add('active-module');
+                
+                // Get module to show
+                const moduleToShow = this.getAttribute('data-module');
+                
+                // Hide all modules
+                document.querySelectorAll('.module-content').forEach(module => {
+                    module.classList.add('hidden');
+                });
+                
+                // Show selected module
+                document.getElementById(`${moduleToShow}-module`).classList.remove('hidden');
+                
+                // Update module title
+                const moduleTitle = document.getElementById('module-title');
+                
+                switch(moduleToShow) {
+                    case 'dashboard':
+                        moduleTitle.textContent = 'Dashboard';
+                        break;
+                    case 'products':
+                        moduleTitle.textContent = 'Produtos';
+                        break;
+                    case 'pos':
+                        moduleTitle.textContent = 'Ponto de Venda';
+                        break;
+                    case 'sales':
+                        moduleTitle.textContent = 'Vendas';
+                        break;
+                }
+            });
+        });
+        
+        // Toggle sidebar
+        document.getElementById('toggleSidebar').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('collapsed');
+            
+            // Change icon
+            const icon = this.querySelector('i');
+            if (document.querySelector('.sidebar').classList.contains('collapsed')) {
+                icon.classList.remove('fa-chevron-left');
+                icon.classList.add('fa-chevron-right');
+            } else {
+                icon.classList.remove('fa-chevron-right');
+                icon.classList.add('fa-chevron-left');
+            }
+        });
+        
+        // Product modal
+        const addProductBtn = document.getElementById('add-product-btn');
+        const productModal = document.getElementById('product-modal');
+        const closeProductModal = document.getElementById('close-product-modal');
+        const cancelProduct = document.getElementById('cancel-product');
+        
+        if (addProductBtn) {
+            addProductBtn.addEventListener('click', function() {
+                productModal.classList.remove('hidden');
+            });
+        }
+        
+        if (closeProductModal) {
+            closeProductModal.addEventListener('click', function() {
+                productModal.classList.add('hidden');
+            });
+        }
+        
+        if (cancelProduct) {
+            cancelProduct.addEventListener('click', function() {
+                productModal.classList.add('hidden');
+            });
+        }
+        
+        // Barcode scanner modal
+        const scanBarcodeBtn = document.getElementById('scan-barcode');
+        const barcodeScannerModal = document.getElementById('barcode-scanner-modal');
+        const closeScannerModal = document.getElementById('close-scanner-modal');
+        const stopScanning = document.getElementById('stop-scanning');
+        
+        if (scanBarcodeBtn) {
+            scanBarcodeBtn.addEventListener('click', function() {
+                barcodeScannerModal.classList.remove('hidden');
+            });
+        }
+        
+        if (closeScannerModal) {
+            closeScannerModal.addEventListener('click', function() {
+                barcodeScannerModal.classList.add('hidden');
+            });
+        }
+        
+        if (stopScanning) {
+            stopScanning.addEventListener('click', function() {
+                barcodeScannerModal.classList.add('hidden');
+            });
+        }
+        
+        // Receipt modal
+        const checkoutBtn = document.getElementById('checkout-btn');
+        const receiptModal = document.getElementById('receipt-modal');
+        const closeReceiptModal = document.getElementById('close-receipt-modal');
+        const newSaleBtn = document.getElementById('new-sale');
+        
+        if (checkoutBtn) {
+            checkoutBtn.addEventListener('click', function() {
+                receiptModal.classList.remove('hidden');
+            });
+        }
+        
+        if (closeReceiptModal) {
+            closeReceiptModal.addEventListener('click', function() {
+                receiptModal.classList.add('hidden');
+            });
+        }
+        
+        if (newSaleBtn) {
+            newSaleBtn.addEventListener('click', function() {
+                receiptModal.classList.add('hidden');
+            });
+        }
+        
+        // Print receipt
+        const printReceiptBtn = document.getElementById('print-receipt');
+        
+        if (printReceiptBtn) {
+            printReceiptBtn.addEventListener('click', function() {
+                window.print();
+            });
+        }
+        
+        // Image upload
+        const selectImageBtn = document.getElementById('select-image-btn');
+        const productImage = document.getElementById('product-image');
+        const productImagePreview = document.getElementById('product-image-preview');
+        
+        if (selectImageBtn) {
+            selectImageBtn.addEventListener('click', function() {
+                productImage.click();
+            });
+        }
+        
+        if (productImage) {
+            productImage.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        productImagePreview.src = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>
