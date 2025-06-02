@@ -145,6 +145,23 @@
           </div>
         </div>
       </div>
+
+      <!-- Admin Content -->
+      <div id="admin-tab" class="tab-content hidden p-6">
+        <div class="mb-8">
+          <h2 class="text-xl font-bold mb-4">Reservas Pendentes</h2>
+          <div id="pending-reservations" class="space-y-4">
+            <!-- Reservas pendentes serão inseridas aqui via JS -->
+          </div>
+        </div>
+
+        <div>
+          <h2 class="text-xl font-bold mb-4">Reservas Confirmadas</h2>
+          <div id="confirmed-reservations" class="space-y-4">
+            <!-- Reservas confirmadas serão inseridas aqui via JS -->
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -158,10 +175,10 @@
 
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
-<script>
+  <script>
   // Configuração do Supabase
   const SUPABASE_URL = 'https://sdsvbkobrcmqlyxmrxxv.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkc3Zia29icmNtcWx5eG1yeHh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDczNTUxNjAsImV4cCI6MjA2MjkzMTE2MH0.ICXhQKN1UIzcnyD1XDU00gvd8K8YxqYrrjH5DubyFGc'; // mantenha sua chave segura
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkc3Zia29icmNtcWx5eG1yeHh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDczNTUxNjAsImV4cCI6MjA2MjkzMTE2MH0.ICXhQKN1UIzcnyD1XDU00gvd8K8YxqYrrjH5DubyFGc';
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   // Estado da aplicação
@@ -208,9 +225,8 @@
     toastEl.textContent = message;
     toastEl.className = `toast fixed bottom-6 right-6 px-6 py-3 rounded-lg shadow-lg text-white bg-${type} show`;
     setTimeout(() => toastEl.classList.remove('show'), 3000);
-  }
-
-  const initializeCalendar = renderCalendar; // 🔧 Correção do erro: função definida aqui
+  }  // Funções do Calendário
+  const initializeCalendar = renderCalendar;
 
   async function fetchReservations() {
     try {
@@ -238,6 +254,7 @@
       showToast('Erro ao carregar reservas', 'danger');
     }
   }
+
   async function renderCalendar() {
     calendarEl.innerHTML = '';
 
@@ -393,17 +410,133 @@
     } finally {
       hideLoading();
     }
+  }  // Funções do Administrador
+  async function renderAdminReservations() {
+    try {
+      showLoading();
+      
+      // Busca reservas pendentes
+      const { data: pendingData, error: pendingError } = await supabase
+        .from('reservas')
+        .select('*')
+        .eq('status', 'pending')
+        .order('data', { ascending: true });
+
+      if (pendingError) throw pendingError;
+
+      const pendingContainer = document.getElementById('pending-reservations');
+      pendingContainer.innerHTML = '';
+
+      if (pendingData.length === 0) {
+        pendingContainer.innerHTML = '<p class="text-gray-600">Nenhuma reserva pendente no momento.</p>';
+      } else {
+        pendingData.forEach(reserva => {
+          const card = document.createElement('div');
+          card.className = 'border rounded-lg p-4 shadow flex flex-col md:flex-row justify-between items-start md:items-center gap-4';
+          
+          card.innerHTML = `
+            <div class="flex-1">
+              <p><strong>Data:</strong> ${formatDateBR(reserva.data)}</p>
+              <p><strong>Nome:</strong> ${reserva.nome_do_cliente}</p>
+              <p><strong>Telefone:</strong> ${reserva.telefone_do_cliente}</p>
+              <p><strong>Email:</strong> ${reserva.e_mail || '-'}</p>
+              <p><strong>Solicitado em:</strong> ${new Date(reserva.criado_em).toLocaleString('pt-BR')}</p>
+            </div>
+            <div class="flex gap-2 flex-wrap">
+              <button class="btn bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded" data-id="${reserva.id}" data-action="approve">
+                <span class="material-icons mr-1">check</span> Aprovar
+              </button>
+              <button class="btn bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded" data-id="${reserva.id}" data-action="reject">
+                <span class="material-icons mr-1">close</span> Rejeitar
+              </button>
+            </div>
+          `;
+          pendingContainer.appendChild(card);
+        });
+      }
+
+      // Busca reservas confirmadas
+      const { data: confirmedData, error: confirmedError } = await supabase
+        .from('reservas')
+        .select('*')
+        .eq('status', 'confirmed')
+        .order('data', { ascending: true });
+
+      if (confirmedError) throw confirmedError;
+
+      const confirmedContainer = document.getElementById('confirmed-reservations');
+      confirmedContainer.innerHTML = '';
+
+      if (confirmedData.length === 0) {
+        confirmedContainer.innerHTML = '<p class="text-gray-600">Nenhuma reserva confirmada no momento.</p>';
+      } else {
+        confirmedData.forEach(reserva => {
+          const card = document.createElement('div');
+          card.className = 'border rounded-lg p-4 shadow bg-green-50';
+          
+          card.innerHTML = `
+            <div class="flex justify-between items-start">
+              <div>
+                <p><strong>Data:</strong> ${formatDateBR(reserva.data)}</p>
+                <p><strong>Nome:</strong> ${reserva.nome_do_cliente}</p>
+                <p><strong>Telefone:</strong> ${reserva.telefone_do_cliente}</p>
+                <p><strong>Email:</strong> ${reserva.e_mail || '-'}</p>
+                <p><strong>Confirmado em:</strong> ${new Date(reserva.criado_em).toLocaleString('pt-BR')}</p>
+              </div>
+              <button class="btn bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded" data-id="${reserva.id}" data-action="cancel">
+                <span class="material-icons mr-1">delete</span> Cancelar
+              </button>
+            </div>
+          `;
+          confirmedContainer.appendChild(card);
+        });
+      }
+
+      // Adiciona eventos aos botões
+      document.querySelectorAll('button[data-action]').forEach(button => {
+        button.addEventListener('click', async () => {
+          const id = button.dataset.id;
+          const action = button.dataset.action;
+          let newStatus;
+          
+          if (action === 'approve') newStatus = 'confirmed';
+          else if (action === 'reject') newStatus = 'rejected';
+          else if (action === 'cancel') newStatus = 'cancelled';
+
+          const { error } = await supabase
+            .from('reservas')
+            .update({ status: newStatus })
+            .eq('id', id);
+
+          if (error) {
+            showToast('Erro ao atualizar reserva', 'danger');
+          } else {
+            showToast(`Reserva ${action === 'approve' ? 'aprovada' : action === 'reject' ? 'rejeitada' : 'cancelada'} com sucesso`);
+            await fetchReservations();
+            await renderAdminReservations();
+            initializeCalendar();
+          }
+        });
+      });
+
+    } catch (error) {
+      console.error('Erro ao renderizar reservas:', error);
+      showToast('Erro ao carregar reservas', 'danger');
+    } finally {
+      hideLoading();
+    }
   }
-</script>
-<script>
+
+  // Inicialização
   document.addEventListener('DOMContentLoaded', async () => {
     try {
       showLoading();
 
       // Navegação entre abas
       document.querySelectorAll('.tab').forEach(tab => {
-        tab.addEventListener('click', () => {
+        tab.addEventListener('click', async () => {
           const target = tab.dataset.tab;
+          
           document.querySelectorAll('.tab').forEach(t => {
             t.classList.remove('bg-white', 'text-primary');
             t.classList.add('bg-gray-100', 'text-gray-600');
@@ -412,6 +545,10 @@
 
           document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
           document.getElementById(`${target}-tab`).classList.remove('hidden');
+          
+          if (target === 'admin') {
+            await renderAdminReservations();
+          }
         });
       });
 
@@ -449,6 +586,5 @@
     }
   });
 </script>
-
 </body>
 </html>
