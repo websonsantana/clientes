@@ -66,6 +66,152 @@
       transform: translateY(0);
       opacity: 1;
     }
+
+    /* Estilos para os botões do calendário */
+    .month-selector {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .month-arrow {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s;
+    }
+
+    .month-arrow:hover {
+      background-color: rgba(0, 74, 173, 0.1);
+    }
+
+    .month-arrow:active {
+      background-color: rgba(0, 74, 173, 0.2);
+    }
+
+    .month-arrow .material-icons {
+      font-size: 24px;
+      color: var(--primary);
+    }
+
+    #month-year {
+      font-size: 1.2rem;
+      font-weight: 500;
+      min-width: 150px;
+      text-align: center;
+    }
+
+    /* Estilos para os botões de ação */
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      gap: 8px;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: var(--white);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background-color: var(--primary-light);
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+    }
+
+    .btn-outline:hover:not(:disabled) {
+      background-color: var(--primary);
+      color: var(--white);
+    }
+
+    /* Estilos para os dias do calendário */
+    .calendar-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--light);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      font-size: 0.9rem;
+    }
+
+    .calendar-day.empty {
+      border: none;
+      cursor: default;
+    }
+
+    .calendar-day.past {
+      background-color: var(--light);
+      color: var(--gray);
+      cursor: not-allowed;
+    }
+
+    .calendar-day.reserved {
+      background-color: var(--danger);
+      color: white;
+      border-color: var(--danger);
+      cursor: not-allowed;
+    }
+
+    .calendar-day.pending {
+      background-color: var(--warning);
+      color: var(--dark);
+      border-color: var(--warning);
+    }
+
+    .calendar-day.selected {
+      background-color: var(--success);
+      color: white;
+      border-color: var(--success);
+    }
+
+    .calendar-day:not(.empty):not(.past):not(.reserved):hover {
+      background-color: rgba(0, 74, 173, 0.1);
+      border-color: var(--primary);
+    }
+
+    /* Tooltip styles */
+    .calendar-day[title]:hover::after {
+      content: attr(title);
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--dark);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      z-index: 10;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-gray-50">
@@ -98,13 +244,13 @@
         <!-- Calendar Tab Content -->
         <div id="calendar-tab" class="tab-content p-6">
           <!-- Calendar Header -->
-          <div class="flex justify-between items-center mb-6">
-            <div class="flex items-center text-xl font-medium">
-              <button id="prev-month" class="p-2 text-primary hover:bg-gray-100 rounded-full transition-colors">
+          <div class="calendar-header">
+            <div class="month-selector">
+              <button class="month-arrow" id="prev-month" type="button">
                 <span class="material-icons">chevron_left</span>
               </button>
-              <span id="month-year" class="mx-4">Maio 2025</span>
-              <button id="next-month" class="p-2 text-primary hover:bg-gray-100 rounded-full transition-colors">
+              <span id="month-year">Maio 2025</span>
+              <button class="month-arrow" id="next-month" type="button">
                 <span class="material-icons">chevron_right</span>
               </button>
             </div>
@@ -140,8 +286,8 @@
           
           <!-- Action Buttons -->
           <div class="flex justify-end">
-            <button id="reserve-btn" class="flex items-center bg-primary hover:bg-primary-light text-white font-medium py-2 px-4 rounded-lg transition-colors">
-              <span class="material-icons mr-2">event_available</span>
+            <button id="reserve-btn" class="btn btn-primary" disabled>
+              <span class="material-icons">event_available</span>
               Reservar Datas
             </button>
           </div>
@@ -173,11 +319,12 @@
                 </div>
               </div>
               
+              <!-- Modal Buttons -->
               <div class="flex justify-end space-x-3 mt-6">
-                <button id="cancel-reservation" class="px-4 py-2 border border-primary text-primary rounded-lg hover:bg-gray-50 transition-colors">
+                <button id="cancel-reservation" class="btn btn-outline">
                   Cancelar
                 </button>
-                <button id="confirm-reservation" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-light transition-colors">
+                <button id="confirm-reservation" class="btn btn-primary">
                   Confirmar Reserva
                 </button>
               </div>
@@ -202,7 +349,8 @@
                 <input type="password" id="admin-pass" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="Senha">
               </div>
               
-              <button id="login-btn" class="w-full py-2 bg-primary text-white rounded-lg hover:bg-primary-light transition-colors">
+              <!-- Admin Buttons -->
+              <button id="login-btn" class="btn btn-primary w-full">
                 Entrar
               </button>
             </div>
@@ -400,18 +548,33 @@
       }
     }
     
-    // Calendar functions
-    function initializeCalendar() {
+    // Função para mudar o mês
+    function changeMonth(offset) {
+      showLoading();
+      try {
+        today.setMonth(today.getMonth() + offset);
+        renderCalendar();
+      } catch (error) {
+        console.error('Erro ao mudar mês:', error);
+        showToast('Erro ao mudar mês', 'error');
+      } finally {
+        hideLoading();
+      }
+    }
+    
+    // Função para renderizar o calendário
+    async function renderCalendar() {
       try {
         // Clear calendar days (but keep weekday headers)
         const dayElements = calendarEl.querySelectorAll('.calendar-day');
         dayElements.forEach(el => el.remove());
         
         // Set month and year display
-        monthYearEl.textContent = today.toLocaleDateString('pt-BR', {
+        const monthYear = today.toLocaleDateString('pt-BR', {
           month: 'long',
           year: 'numeric'
-        }).replace(/^./, c => c.toUpperCase());
+        });
+        monthYearEl.textContent = monthYear.charAt(0).toUpperCase() + monthYear.slice(1);
         
         // Get first and last day of month
         const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -429,63 +592,57 @@
         for (let i = 1; i <= lastDay.getDate(); i++) {
           const date = new Date(today.getFullYear(), today.getMonth(), i);
           const dateStr = formatDateStr(date);
-          
           const dayEl = document.createElement('div');
-          dayEl.className = 'calendar-day aspect-square flex items-center justify-center rounded-lg border border-gray-200 cursor-pointer transition-colors';
+          dayEl.className = 'calendar-day';
           dayEl.textContent = i;
           dayEl.dataset.date = dateStr;
           
-          // Check reservation status
-          if (reservations[dateStr]) {
-            const reservation = reservations[dateStr];
-            
-            if (reservation.status === 'confirmed') {
-              dayEl.classList.add('bg-danger', 'text-white', 'border-danger', 'cursor-not-allowed');
-              
-              // Add tooltip with client name
-              const tooltip = document.createElement('div');
-              tooltip.className = 'tooltip absolute -top-10 left-1/2 transform -translate-x-1/2 bg-dark text-white text-xs px-3 py-1 rounded-lg whitespace-nowrap';
-              tooltip.textContent = `Reservado: ${reservation.client_name}`;
-              dayEl.appendChild(tooltip);
-            } else if (reservation.status === 'pending') {
-              dayEl.classList.add('bg-warning', 'text-dark', 'border-warning');
-              
-              const tooltip = document.createElement('div');
-              tooltip.className = 'tooltip absolute -top-10 left-1/2 transform -translate-x-1/2 bg-dark text-white text-xs px-3 py-1 rounded-lg whitespace-nowrap';
-              tooltip.textContent = 'Reserva pendente';
-              dayEl.appendChild(tooltip);
-            }
+          // Check if date is in the past
+          const currentDate = new Date();
+          currentDate.setHours(0, 0, 0, 0);
+          
+          if (date < currentDate) {
+            dayEl.classList.add('past');
+            dayEl.title = 'Data passada';
           } else {
-            // Only allow selection of future dates
-            const currentDate = new Date();
-            currentDate.setHours(0, 0, 0, 0);
-            
-            if (date >= currentDate) {
-              dayEl.addEventListener('click', () => toggleDateSelection(dateStr));
+            // Check reservation status
+            if (reservations[dateStr]) {
+              const reservation = reservations[dateStr];
               
-              // Check if date is selected
-              if (selectedDates.includes(dateStr)) {
-                dayEl.classList.add('bg-success', 'text-white', 'border-success');
-              } else {
-                dayEl.classList.add('hover:bg-gray-100');
+              if (reservation.status === 'confirmed') {
+                dayEl.classList.add('reserved');
+                dayEl.title = `Reservado: ${reservation.client_name}`;
+              } else if (reservation.status === 'pending') {
+                dayEl.classList.add('pending');
+                dayEl.title = 'Reserva pendente';
               }
             } else {
-              dayEl.classList.add('bg-gray-100', 'cursor-not-allowed', 'text-gray-400');
+              dayEl.addEventListener('click', () => toggleDateSelection(dateStr));
+              dayEl.title = 'Clique para selecionar';
+              
+              if (selectedDates.includes(dateStr)) {
+                dayEl.classList.add('selected');
+              }
             }
           }
           
           calendarEl.appendChild(dayEl);
         }
+        
+        // Update reserve button state
+        if (reserveBtn) {
+          reserveBtn.disabled = selectedDates.length === 0;
+        }
+        
       } catch (error) {
         console.error('Erro ao renderizar calendário:', error);
-        showToast('Erro ao exibir calendário', 'danger');
+        showToast('Erro ao exibir calendário', 'error');
       }
     }
     
-    // Initialize the application
-    async function initializeApp() {
+    // Initialize the app when DOM is loaded
+    document.addEventListener('DOMContentLoaded', async () => {
       try {
-        showLoading();
         console.log('Iniciando aplicação...');
         
         // Initialize calendar
@@ -493,133 +650,93 @@
         selectedDates = [];
         reservations = {};
         
-        // Fetch initial data
+        // Initialize DOM elements
+        const prevMonthBtn = document.getElementById('prev-month');
+        const nextMonthBtn = document.getElementById('next-month');
+        const reserveBtn = document.getElementById('reserve-btn');
+        const cancelReservationBtn = document.getElementById('cancel-reservation');
+        const confirmReservationBtn = document.getElementById('confirm-reservation');
+        const loginBtn = document.getElementById('login-btn');
+        
+        // Validate required elements
+        if (!prevMonthBtn || !nextMonthBtn || !reserveBtn || !cancelReservationBtn || !confirmReservationBtn || !loginBtn) {
+          throw new Error('Elementos necessários não encontrados');
+        }
+        
+        // Initialize button states
+        reserveBtn.disabled = true;
+        
+        // Add event listeners
+        prevMonthBtn.addEventListener('click', () => changeMonth(-1));
+        nextMonthBtn.addEventListener('click', () => changeMonth(1));
+        reserveBtn.addEventListener('click', showReservationModal);
+        cancelReservationBtn.addEventListener('click', () => {
+          reservationModal.classList.add('hidden');
+          selectedDates = [];
+          renderCalendar();
+        });
+        confirmReservationBtn.addEventListener('click', submitReservation);
+        loginBtn.addEventListener('click', loginAdmin);
+        
+        // Initialize tabs
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+          tab.addEventListener('click', () => {
+            const target = tab.dataset.tab;
+            
+            // Update tab styles
+            tabs.forEach(t => {
+              t.classList.remove('bg-white', 'text-primary');
+              t.classList.add('bg-gray-100', 'text-gray-600');
+            });
+            tab.classList.remove('bg-gray-100', 'text-gray-600');
+            tab.classList.add('bg-white', 'text-primary');
+            
+            // Show/hide content
+            tabContents.forEach(content => {
+              content.classList.add('hidden');
+            });
+            document.getElementById(`${target}-tab`).classList.remove('hidden');
+          });
+        });
+        
+        // Initialize admin tabs
+        const adminTabs = document.querySelectorAll('.tab-admin');
+        const adminContents = document.querySelectorAll('.tab-admin-content');
+        
+        adminTabs.forEach(tab => {
+          tab.addEventListener('click', () => {
+            const target = tab.dataset.tab;
+            
+            adminTabs.forEach(t => {
+              t.classList.remove('bg-white', 'text-primary');
+              t.classList.add('bg-gray-100', 'text-gray-600');
+            });
+            tab.classList.remove('bg-gray-100', 'text-gray-600');
+            tab.classList.add('bg-white', 'text-primary');
+            
+            adminContents.forEach(content => {
+              content.classList.add('hidden');
+            });
+            document.getElementById(`${target}-tab`).classList.remove('hidden');
+          });
+        });
+        
+        // Initialize data
         await fetchReservations();
-        
-        // Initialize calendar UI
-        initializeCalendar();
-        
-        // Setup realtime
+        await renderCalendar();
         await setupRealtimeSubscription();
-        
-        // Initialize event listeners
-        initializeEventListeners();
         
         console.log('Aplicação inicializada com sucesso');
       } catch (error) {
         console.error('Erro ao inicializar aplicação:', error);
-        showToast('Erro ao inicializar aplicação', 'danger');
+        showToast('Erro ao inicializar aplicação. Por favor, recarregue a página.', 'error');
       } finally {
         hideLoading();
       }
-    }
-    
-    function initializeEventListeners() {
-      // Month navigation
-      prevMonthBtn.addEventListener('click', () => {
-        today.setMonth(today.getMonth() - 1);
-        initializeCalendar();
-      });
-      
-      nextMonthBtn.addEventListener('click', () => {
-        today.setMonth(today.getMonth() + 1);
-        initializeCalendar();
-      });
-      
-      // Reservation buttons
-      reserveBtn.addEventListener('click', showReservationModal);
-      
-      cancelReservationBtn.addEventListener('click', () => {
-        reservationModal.classList.add('hidden');
-      });
-      
-      confirmReservationBtn.addEventListener('click', submitReservation);
-      
-      // Admin login
-      loginBtn.addEventListener('click', loginAdmin);
-      
-      // Main tabs navigation
-      tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-          const tabName = tab.dataset.tab;
-          const tabContent = document.getElementById(`${tabName}-tab`);
-          
-          // Deactivate all tabs
-          tabs.forEach(t => t.classList.remove('bg-gray-100', 'text-primary'));
-          tabs.forEach(t => t.classList.add('bg-gray-100', 'text-gray-600'));
-          document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-          
-          // Activate selected tab
-          tab.classList.remove('text-gray-600');
-          tab.classList.add('bg-white', 'text-primary');
-          tabContent.classList.remove('hidden');
-        });
-      });
-      
-      // Admin tabs navigation
-      adminTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-          const tabName = tab.dataset.tab;
-          const tabContent = document.getElementById(`${tabName}-tab`);
-          
-          // Deactivate all tabs
-          adminTabs.forEach(t => t.classList.remove('bg-gray-100', 'text-primary'));
-          adminTabs.forEach(t => t.classList.add('bg-gray-100', 'text-gray-600'));
-          adminTabContents.forEach(c => c.classList.add('hidden'));
-          
-          // Activate selected tab
-          tab.classList.remove('text-gray-600');
-          tab.classList.add('bg-white', 'text-primary');
-          tabContent.classList.remove('hidden');
-        });
-      });
-    }
-    
-    // Enhanced fetchReservations
-    async function fetchReservations() {
-      try {
-        console.log('Buscando reservas...');
-        
-        const { data, error } = await supabase
-          .from('reservas')
-          .select('*')
-          .order('data', { ascending: true });
-        
-        if (error) {
-          console.error('Erro ao buscar reservas:', error);
-          throw error;
-        }
-        
-        console.log('Dados recebidos:', data);
-        
-        // Convert array to object with date as key
-        reservations = {};
-        
-        if (data && data.length > 0) {
-          data.forEach(reservation => {
-            reservations[reservation.data] = {
-              id: reservation.id,
-              date: reservation.data,
-              client_name: reservation.nome_do_cliente,
-              client_phone: reservation.telefone_do_cliente,
-              client_email: reservation.e_mail,
-              status: reservation.status,
-              created_at: reservation.criado_em
-            };
-          });
-          
-          console.log('Reservas processadas:', reservations);
-        } else {
-          console.log('Nenhuma reserva encontrada');
-        }
-        
-        return reservations;
-      } catch (error) {
-        console.error('Erro ao buscar reservas:', error);
-        showToast('Erro ao carregar reservas: ' + (error.message || 'Erro desconhecido'), 'danger');
-        return {};
-      }
-    }
+    });
     
     async function loginAdmin() {
       const username = adminUserInput.value.trim();
@@ -926,15 +1043,6 @@
         hideLoading();
       }
     }
-    
-    // Initialize the app when DOM is loaded
-    document.addEventListener('DOMContentLoaded', () => {
-      initializeApp().catch(error => {
-        console.error('Erro fatal ao inicializar aplicação:', error);
-        hideLoading();
-        showToast('Erro ao carregar aplicação. Por favor, recarregue a página.', 'danger');
-      });
-    });
   </script>
 </body>
 </html>
