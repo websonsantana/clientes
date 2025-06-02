@@ -541,7 +541,7 @@
         
         const { data, error } = await supabase
           .from('reservas')
-          .select('*')
+          .select('id, dados:data, nome_do_cliente, telefone_do_cliente, e_mail, status, criado_em')
           .order('data', { ascending: true });
         
         if (error) throw error;
@@ -553,9 +553,9 @@
         
         if (data && data.length > 0) {
           data.forEach(reservation => {
-            reservations[reservation.data] = {
+            reservations[reservation.dados] = {
               id: reservation.id,
-              date: reservation.data,
+              date: reservation.dados,
               client_name: reservation.nome_do_cliente,
               client_phone: reservation.telefone_do_cliente,
               client_email: reservation.e_mail,
@@ -666,23 +666,30 @@
         console.log('Iniciando aplicação...');
         showLoading();
         
-        // Initialize calendar
-        today = new Date();
-        selectedDates = [];
-        reservations = {};
-        
-        // Initialize DOM elements
+        // Get DOM elements
+        const calendarEl = document.querySelector('.grid.grid-cols-7');
+        const monthYearEl = document.getElementById('month-year');
         const prevMonthBtn = document.getElementById('prev-month');
         const nextMonthBtn = document.getElementById('next-month');
         const reserveBtn = document.getElementById('reserve-btn');
         const cancelReservationBtn = document.getElementById('cancel-reservation');
         const confirmReservationBtn = document.getElementById('confirm-reservation');
         const loginBtn = document.getElementById('login-btn');
+        const loadingEl = document.getElementById('loading');
+        const toastEl = document.getElementById('toast');
+        const reservationModal = document.getElementById('reservation-modal');
         
         // Validate required elements
-        if (!prevMonthBtn || !nextMonthBtn || !reserveBtn || !cancelReservationBtn || !confirmReservationBtn || !loginBtn) {
+        if (!calendarEl || !monthYearEl || !prevMonthBtn || !nextMonthBtn || 
+            !reserveBtn || !cancelReservationBtn || !confirmReservationBtn || 
+            !loginBtn || !loadingEl || !toastEl || !reservationModal) {
           throw new Error('Elementos necessários não encontrados');
         }
+        
+        // Initialize state
+        today = new Date();
+        selectedDates = [];
+        reservations = {};
         
         // Initialize button states
         reserveBtn.disabled = true;
@@ -743,7 +750,7 @@
           });
         });
         
-        // Initialize data
+        // Initialize data and render calendar
         await fetchReservations();
         await renderCalendar();
         await setupRealtimeSubscription();
