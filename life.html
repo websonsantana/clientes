@@ -557,8 +557,63 @@
     // Supabase configuration
     const SUPABASE_URL = 'https://sdsvbkobrcmqlyxmrxxv.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkc3Zia29icmNtcWx5eG1yeHh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDczNTUxNjAsImV4cCI6MjA2MjkzMTE2MH0.ICXhQKN1UIzcnyD1XDU00gvd8K8YxqYrrjH5DubyFGc';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     
+    // Initialize Supabase client with improved configuration
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true
+      },
+      realtime: {
+        params: {
+          eventsPerSecond: 10
+        }
+      },
+      db: {
+        schema: 'public'
+      }
+    });
+
+    // Test Supabase connection
+    async function testSupabaseConnection() {
+      try {
+        showLoading();
+        console.log('Testando conexão com Supabase...');
+        
+        // Test database connection
+        const { data, error } = await supabase
+          .from('reservas')
+          .select('count()', { count: 'exact' })
+          .limit(1);
+
+        if (error) {
+          throw error;
+        }
+
+        console.log('Conexão com banco de dados OK:', data);
+
+        // Test realtime connection
+        const channel = supabase
+          .channel('connection-test')
+          .subscribe((status) => {
+            console.log('Status da conexão realtime:', status);
+            if (status === 'SUBSCRIBED') {
+              console.log('Conexão realtime OK');
+              channel.unsubscribe();
+            }
+          });
+
+        return true;
+      } catch (error) {
+        console.error('Erro na conexão com Supabase:', error);
+        showToast('Erro na conexão com o servidor. Verifique o console para mais detalhes.', 'error');
+        return false;
+      } finally {
+        hideLoading();
+      }
+    }
+
     // App state
     let today = new Date();
     let selectedDates = [];
@@ -636,7 +691,7 @@
         const { data, error } = await supabase
           .from('reservas')
           .select('*')
-          .order('dados', { ascending: true });
+          .order('data', { ascending: true });
           
         if (error) throw error;
         
@@ -644,9 +699,9 @@
         reservations = {};
         if (data && data.length > 0) {
           data.forEach(reservation => {
-            reservations[reservation.dados] = {
+            reservations[reservation.data] = {
               id: reservation.id,
-              date: reservation.dados,
+              date: reservation.data,
               client_name: reservation.nome_do_cliente,
               client_phone: reservation.telefone_do_cliente,
               client_email: reservation.e_mail,
@@ -675,11 +730,12 @@
         await supabase.removeAllChannels();
 
         const channel = supabase
-          .channel('reservas-changes')
+          .channel('public:reservas')
           .on('postgres_changes', { 
             event: '*', 
             schema: 'public', 
-            table: 'reservas' 
+            table: 'reservas',
+            filter: '*'
           }, async (payload) => {
             console.log('Mudança recebida:', payload);
             
@@ -698,13 +754,10 @@
 
             // Refresh data
             await fetchReservations();
-            renderCalendar();
-            
-            if (currentUser?.role === 'admin') {
-              await loadAdminData();
-            }
+            await renderCalendar();
           })
           .subscribe((status) => {
+            console.log('Status da inscrição:', status);
             if (status === 'SUBSCRIBED') {
               console.log('Conectado ao canal de tempo real');
             }
@@ -763,14 +816,14 @@
         // Check for conflicting reservations first
         const { data: existingReservations, error: checkError } = await supabase
           .from('reservas')
-          .select('dados')
-          .in('dados', selectedDates)
+          .select('data')
+          .in('data', selectedDates)
           .eq('status', 'confirmed');
 
         if (checkError) throw checkError;
 
         if (existingReservations?.length > 0) {
-          const conflictDates = existingReservations.map(r => formatDateBR(r.dados)).join(', ');
+          const conflictDates = existingReservations.map(r => formatDateBR(r.data)).join(', ');
           showToast(`As datas ${conflictDates} já estão reservadas`, 'error');
           return;
         }
@@ -780,7 +833,7 @@
           supabase
             .from('reservas')
             .insert([{
-              dados: date,
+              data: date,
               nome_do_cliente: name,
               telefone_do_cliente: phone,
               e_mail: email,
@@ -866,7 +919,7 @@
         const { data, error } = await supabase
           .from('reservas')
           .select('*')
-          .order('dados', { ascending: true });
+          .order('data', { ascending: true });
           
         if (error) throw error;
         
@@ -882,7 +935,7 @@
           const dateInfo = document.createElement('div');
           dateInfo.className = 'reservation-date';
           dateInfo.innerHTML = `
-            <strong>${formatDateBR(reservation.dados)}</strong><br>
+            <strong>${formatDateBR(reservation.data)}</strong><br>
             <span>${reservation.nome_do_cliente}</span><br>
             <small>${reservation.telefone_do_cliente}</small>
           `;
@@ -1108,6 +1161,13 @@
     // Event listeners
     document.addEventListener('DOMContentLoaded', async () => {
       try {
+        // Test connection first
+        const isConnected = await testSupabaseConnection();
+        if (!isConnected) {
+          showToast('Erro na conexão com o servidor. Verifique suas credenciais.', 'error');
+          return;
+        }
+
         // Initialize Supabase session
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) throw error;
