@@ -678,5 +678,26 @@
     }
   });
 </script>
+
+<!-- Modal de Login do Administrador -->
+<div id="admin-login-modal" tabindex="0" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 hidden">
+  <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+    <h3 class="text-xl font-bold mb-4">Login do Administrador</h3>
+    <div class="space-y-4">
+      <div>
+        <label for="admin-username" class="block font-medium mb-1">Usuário</label>
+        <input type="text" id="admin-username" class="w-full border rounded-lg px-4 py-2" />
+      </div>
+      <div>
+        <label for="admin-password" class="block font-medium mb-1">Senha</label>
+        <input type="password" id="admin-password" class="w-full border rounded-lg px-4 py-2" />
+      </div>
+    </div>
+    <div class="flex justify-end gap-2 mt-6">
+      <button id="admin-login-btn" class="btn btn-primary">Entrar</button>
+    </div>
+  </div>
+</div>
+<script src="script.js"></script>
 </body>
 </html>
