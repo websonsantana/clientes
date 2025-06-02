@@ -405,7 +405,7 @@
     const SUPABASE_URL = 'https://sdsvbkobrcmqlyxmrxxv.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkc3Zia29icmNtcWx5eG1yeHh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDczNTUxNjAsImV4cCI6MjA2MjkzMTE2MH0.ICXhQKN1UIzcnyD1XDU00gvd8K8YxqYrrjH5DubyFGc';
     
-    // Initialize Supabase client with improved configuration
+    // Initialize Supabase client
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
       auth: {
         autoRefreshToken: true,
@@ -481,7 +481,7 @@
       }, 3000);
     }
     
-    // Improved error handling function
+    // Enhanced error handling function
     async function handleSupabaseError(error, operation) {
       console.error(`Error during ${operation}:`, error);
       
@@ -498,40 +498,26 @@
     // Improved setupRealtimeSubscription
     async function setupRealtimeSubscription() {
       try {
-        // Remove any existing subscription
         await supabase.removeAllChannels();
         
         const channel = supabase
           .channel('reservas')
           .on('postgres_changes', {
-            event: 'INSERT',
+            event: '*',
             schema: 'public',
             table: 'reservas'
           }, async (payload) => {
-            console.log('Nova reserva:', payload);
-            showToast('Nova reserva recebida!', 'success');
+            console.log('Mudança na tabela reservas:', payload);
             await fetchReservations();
             await renderCalendar();
-          })
-          .on('postgres_changes', {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'reservas'
-          }, async (payload) => {
-            console.log('Reserva atualizada:', payload);
-            showToast('Reserva atualizada!', 'success');
-            await fetchReservations();
-            await renderCalendar();
-          })
-          .on('postgres_changes', {
-            event: 'DELETE',
-            schema: 'public',
-            table: 'reservas'
-          }, async (payload) => {
-            console.log('Reserva removida:', payload);
-            showToast('Reserva removida!', 'success');
-            await fetchReservations();
-            await renderCalendar();
+            
+            const messages = {
+              INSERT: 'Nova reserva recebida!',
+              UPDATE: 'Reserva atualizada!',
+              DELETE: 'Reserva removida!'
+            };
+            
+            showToast(messages[payload.eventType] || 'Dados atualizados!', 'success');
           });
         
         channel.subscribe(async (status) => {
@@ -548,7 +534,50 @@
       }
     }
     
-    // Função para mudar o mês
+    // Enhanced fetchReservations
+    async function fetchReservations() {
+      try {
+        console.log('Buscando reservas...');
+        
+        const { data, error } = await supabase
+          .from('reservas')
+          .select('*')
+          .order('data', { ascending: true });
+        
+        if (error) throw error;
+        
+        console.log('Dados recebidos:', data);
+        
+        // Convert array to object with date as key
+        reservations = {};
+        
+        if (data && data.length > 0) {
+          data.forEach(reservation => {
+            reservations[reservation.data] = {
+              id: reservation.id,
+              date: reservation.data,
+              client_name: reservation.nome_do_cliente,
+              client_phone: reservation.telefone_do_cliente,
+              client_email: reservation.e_mail,
+              status: reservation.status,
+              created_at: reservation.criado_em
+            };
+          });
+          
+          console.log('Reservas processadas:', reservations);
+        } else {
+          console.log('Nenhuma reserva encontrada');
+        }
+        
+        return reservations;
+      } catch (error) {
+        console.error('Erro ao buscar reservas:', error);
+        showToast('Erro ao carregar reservas: ' + (error.message || 'Erro desconhecido'), 'danger');
+        return {};
+      }
+    }
+    
+    // Calendar functions
     function changeMonth(offset) {
       showLoading();
       try {
@@ -562,25 +591,20 @@
       }
     }
     
-    // Função para renderizar o calendário
     async function renderCalendar() {
       try {
-        // Clear calendar days (but keep weekday headers)
         const dayElements = calendarEl.querySelectorAll('.calendar-day');
         dayElements.forEach(el => el.remove());
         
-        // Set month and year display
         const monthYear = today.toLocaleDateString('pt-BR', {
           month: 'long',
           year: 'numeric'
         });
         monthYearEl.textContent = monthYear.charAt(0).toUpperCase() + monthYear.slice(1);
         
-        // Get first and last day of month
         const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
         const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
         
-        // Add empty cells for days before start of month
         const startDayOfWeek = firstDay.getDay();
         for (let i = 0; i < startDayOfWeek; i++) {
           const emptyDay = document.createElement('div');
@@ -588,7 +612,6 @@
           calendarEl.appendChild(emptyDay);
         }
         
-        // Add days of month
         for (let i = 1; i <= lastDay.getDate(); i++) {
           const date = new Date(today.getFullYear(), today.getMonth(), i);
           const dateStr = formatDateStr(date);
@@ -597,7 +620,6 @@
           dayEl.textContent = i;
           dayEl.dataset.date = dateStr;
           
-          // Check if date is in the past
           const currentDate = new Date();
           currentDate.setHours(0, 0, 0, 0);
           
@@ -605,7 +627,6 @@
             dayEl.classList.add('past');
             dayEl.title = 'Data passada';
           } else {
-            // Check reservation status
             if (reservations[dateStr]) {
               const reservation = reservations[dateStr];
               
@@ -629,7 +650,6 @@
           calendarEl.appendChild(dayEl);
         }
         
-        // Update reserve button state
         if (reserveBtn) {
           reserveBtn.disabled = selectedDates.length === 0;
         }
@@ -644,6 +664,7 @@
     document.addEventListener('DOMContentLoaded', async () => {
       try {
         console.log('Iniciando aplicação...');
+        showLoading();
         
         // Initialize calendar
         today = new Date();
@@ -686,7 +707,6 @@
           tab.addEventListener('click', () => {
             const target = tab.dataset.tab;
             
-            // Update tab styles
             tabs.forEach(t => {
               t.classList.remove('bg-white', 'text-primary');
               t.classList.add('bg-gray-100', 'text-gray-600');
@@ -694,7 +714,6 @@
             tab.classList.remove('bg-gray-100', 'text-gray-600');
             tab.classList.add('bg-white', 'text-primary');
             
-            // Show/hide content
             tabContents.forEach(content => {
               content.classList.add('hidden');
             });
