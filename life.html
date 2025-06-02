@@ -472,15 +472,79 @@
               <p><strong>Solicitado em:</strong> ${new Date(reserva.criado_em).toLocaleString('pt-BR')}</p>
             </div>
             <div class="flex gap-2 flex-wrap">
-              <button class="btn bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded" data-id="${reserva.id}" data-action="approve">
+              <button class="btn-approve bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded" data-id="${reserva.id}">
                 <span class="material-icons mr-1">check</span> Aprovar
               </button>
-              <button class="btn bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded" data-id="${reserva.id}" data-action="reject">
+              <button class="btn-reject bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded" data-id="${reserva.id}">
                 <span class="material-icons mr-1">close</span> Rejeitar
               </button>
             </div>
           `;
           pendingContainer.appendChild(card);
+          
+          // Adiciona eventos aos botões
+          const approveBtn = card.querySelector('.btn-approve');
+          const rejectBtn = card.querySelector('.btn-reject');
+          
+          approveBtn.addEventListener('click', async () => {
+            if (confirm('Tem certeza que deseja aprovar esta reserva?')) {
+              try {
+                showLoading();
+                console.log('Tentando aprovar reserva:', reserva.id);
+                const { data, error } = await supabase
+                  .from('reservas')
+                  .update({ status: 'confirmed' })
+                  .eq('id', reserva.id)
+                  .select();
+
+                if (error) {
+                  console.error('Erro detalhado:', error);
+                  throw error;
+                }
+                
+                console.log('Resposta do Supabase:', data);
+                showToast('Reserva aprovada com sucesso');
+                await fetchReservations();
+                await renderAdminReservations();
+                initializeCalendar();
+              } catch (error) {
+                console.error('Erro ao aprovar reserva:', error);
+                showToast('Erro ao aprovar reserva', 'danger');
+              } finally {
+                hideLoading();
+              }
+            }
+          });
+          
+          rejectBtn.addEventListener('click', async () => {
+            if (confirm('Tem certeza que deseja rejeitar esta reserva?')) {
+              try {
+                showLoading();
+                console.log('Tentando rejeitar reserva:', reserva.id);
+                const { data, error } = await supabase
+                  .from('reservas')
+                  .update({ status: 'rejected' })
+                  .eq('id', reserva.id)
+                  .select();
+
+                if (error) {
+                  console.error('Erro detalhado:', error);
+                  throw error;
+                }
+                
+                console.log('Resposta do Supabase:', data);
+                showToast('Reserva rejeitada com sucesso');
+                await fetchReservations();
+                await renderAdminReservations();
+                initializeCalendar();
+              } catch (error) {
+                console.error('Erro ao rejeitar reserva:', error);
+                showToast('Erro ao rejeitar reserva', 'danger');
+              } finally {
+                hideLoading();
+              }
+            }
+          });
         });
       }
 
@@ -512,41 +576,40 @@
                 <p><strong>Email:</strong> ${reserva.e_mail || '-'}</p>
                 <p><strong>Confirmado em:</strong> ${new Date(reserva.criado_em).toLocaleString('pt-BR')}</p>
               </div>
-              <button class="btn bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded" data-id="${reserva.id}" data-action="cancel">
+              <button class="btn-cancel bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded" data-id="${reserva.id}">
                 <span class="material-icons mr-1">delete</span> Cancelar
               </button>
             </div>
           `;
           confirmedContainer.appendChild(card);
+          
+          // Adiciona evento ao botão de cancelar
+          const cancelBtn = card.querySelector('.btn-cancel');
+          cancelBtn.addEventListener('click', async () => {
+            if (confirm('Tem certeza que deseja cancelar esta reserva?')) {
+              try {
+                showLoading();
+                const { error } = await supabase
+                  .from('reservas')
+                  .update({ status: 'cancelled' })
+                  .eq('id', reserva.id);
+
+                if (error) throw error;
+                
+                showToast('Reserva cancelada com sucesso');
+                await fetchReservations();
+                await renderAdminReservations();
+                initializeCalendar();
+              } catch (error) {
+                console.error('Erro ao cancelar reserva:', error);
+                showToast('Erro ao cancelar reserva', 'danger');
+              } finally {
+                hideLoading();
+              }
+            }
+          });
         });
       }
-
-      // Adiciona eventos aos botões
-      document.querySelectorAll('button[data-action]').forEach(button => {
-        button.addEventListener('click', async () => {
-          const id = button.dataset.id;
-          const action = button.dataset.action;
-          let newStatus;
-          
-          if (action === 'approve') newStatus = 'confirmed';
-          else if (action === 'reject') newStatus = 'rejected';
-          else if (action === 'cancel') newStatus = 'cancelled';
-
-          const { error } = await supabase
-            .from('reservas')
-            .update({ status: newStatus })
-            .eq('id', id);
-
-          if (error) {
-            showToast('Erro ao atualizar reserva', 'danger');
-          } else {
-            showToast(`Reserva ${action === 'approve' ? 'aprovada' : action === 'reject' ? 'rejeitada' : 'cancelada'} com sucesso`);
-            await fetchReservations();
-            await renderAdminReservations();
-            initializeCalendar();
-          }
-        });
-      });
 
     } catch (error) {
       console.error('Erro ao renderizar reservas:', error);
