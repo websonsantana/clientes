@@ -60,6 +60,23 @@
     .calendar-day.pending { background-color: var(--warning); color: var(--dark); border-color: var(--warning); }
     .calendar-day.selected { background-color: var(--success); color: white; border-color: var(--success); }
     .calendar-day.empty { border: none; cursor: default; }
+	
+	.circle-container {
+    width: 150px; /* Ajuste o tamanho do círculo conforme necessário */
+    height: 150px; /* Deve ser igual à largura para manter a forma circular */
+    background-color: rgba(255, 255, 255, 0.4); /* Círculo branco com transparência */
+    border-radius: 50%; /* Faz o contêiner ser circular */
+    display: flex; /* Usado para centralizar o conteúdo */
+    align-items: center; /* Centraliza verticalmente */
+    justify-content: center; /* Centraliza horizontalmente */
+    margin: 0 auto; /* Centraliza o círculo na página */
+}
+
+.logo {
+    max-width: 80%; /* Ajusta a largura da imagem para caber no círculo */
+    max-height: 80%; /* Ajusta a altura da imagem para caber no círculo */
+}
+
   </style>
 </head>
 <body class="min-h-screen bg-gray-50">
@@ -70,7 +87,9 @@
   <div class="container mx-auto px-4 py-8">
     <!-- Header -->
     <header class="text-center mb-8">
+	<div class="circle-container">
       <img src="life.png" alt="Logo Life Festas" class="mx-auto h-28 mb-4 drop-shadow-lg">
+	  </div>
       <h1 class="text-4xl font-bold text-white mb-2 drop-shadow-md">Reserva Espaço Life Festas</h1>
       <p class="text-lg text-white/90 font-light">Escolha as datas para seu evento especial</p>
     </header>
@@ -105,15 +124,15 @@
 
         <div class="flex flex-wrap gap-4 mb-6">
           <div class="flex items-center">
-    <div class="w-4 h-4 bg-green-500 mr-2 rounded"></div>
+    <div class="w-3 h-3 bg-green-500 mr-2 rounded"></div>
     <span>Selecionado</span>
 </div>
 <div class="flex items-center">
-    <div class="w-4 h-4 bg-yellow-500 mr-2 rounded"></div>
+    <div class="w-3 h-3 bg-yellow-500 mr-2 rounded"></div>
     <span>Pendente</span>
 </div>
 <div class="flex items-center">
-    <div class="w-4 h-4 bg-red-500 mr-2 rounded"></div>
+    <div class="w-3 h-3 bg-red-500 mr-2 rounded"></div>
     <span>Reservado</span>
 </div>
 
