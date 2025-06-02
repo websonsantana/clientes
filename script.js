@@ -1,6 +1,6 @@
 // Configuração do usuário e senha do admin
-const ADMIN_USER = 'admin';
-const ADMIN_PASS = '123456';
+const ADMIN_USER = 'psouza';
+const ADMIN_PASS = 'Lifesouza@10';
 
 // Elementos do modal
 const adminLoginModal = document.getElementById('admin-login-modal');
