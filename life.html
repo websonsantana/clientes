@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Reserva Espaço Life Festas</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,521 +23,215 @@
       --light: #F5F5F5;
       --dark: #212121;
       --gray: #757575;
-      --white: #FFFFFF;
-      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      --radius: 8px;
     }
     
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    
-    body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
+    body {
       font-family: 'Poppins', sans-serif;
-      background-color: #f9f9f9;
-      color: var(--dark);
     }
     
     h1, h2, h3, h4 {
       font-family: 'Montserrat', sans-serif;
-      font-weight: 600;
     }
     
     .background {
-      background-color: var(--primary);
-      position: fixed;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
       background-image: linear-gradient(135deg, rgba(0,74,173,0.9), rgba(0,74,173,0.7)), url('life.jpg');
-      background-size: cover;
-      background-position: center;
     }
     
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    
-    .card {
-      background: var(--white);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-    
-    .header {
-      text-align: center;
-      padding: 30px 0;
-    }
-    
-    .logo {
-      max-height: 120px;
-      margin-bottom: 15px;
-      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
-    }
-    
-    .title {
-      color: var(--white);
-      margin-bottom: 10px;
-      font-size: 2.5rem;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
-    
-    .subtitle {
-      color: var(--light);
-      font-weight: 300;
-      margin-bottom: 30px;
-    }
-    
-    .content {
-      margin: 20px auto 50px;
-      max-width: 800px;
-    }
-    
-    .tabs {
-      display: flex;
-      margin-bottom: 20px;
-      border-radius: var(--radius) var(--radius) 0 0;
-      overflow: hidden;
-    }
-    
-    .tab {
-      flex: 1;
-      padding: 15px;
-      text-align: center;
-      background-color: #e9e9e9;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-weight: 500;
-    }
-    
-    .tab.active {
-      background-color: var(--white);
-      color: var(--primary);
-      box-shadow: 0 -3px 0 var(--primary) inset;
-    }
-    
-    .tab-content {
-      display: none;
-      padding: 25px;
-    }
-    
-    .tab-content.active {
-      display: block;
-    }
-    
-    .calendar-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    
-    .btn {
-      padding: 10px 20px;
-      border: none;
-      border-radius: var(--radius);
-      cursor: pointer;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-    }
-    
-    .btn-icon {
-      margin-right: 8px;
-    }
-    
-    .btn-primary {
-      background-color: var(--primary);
-      color: var(--white);
-    }
-    
-    .btn-primary:hover {
-      background-color: var(--primary-light);
-    }
-    
-    .btn-outline {
-      background-color: transparent;
-      border: 1px solid var(--primary);
-      color: var(--primary);
-    }
-    
-    .btn-outline:hover {
-      background-color: var(--primary);
-      color: var(--white);
-    }
-    
-    .btn-secondary {
-      background-color: var(--secondary);
-      color: var(--white);
-    }
-    
-    .month-selector {
-      display: flex;
-      align-items: center;
-      font-weight: 500;
-      font-size: 1.2rem;
-    }
-    
-    .month-arrow {
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      font-size: 1.5rem;
-      color: var(--primary);
-      padding: 0 15px;
-    }
-    
-    .calendar {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 8px;
-    }
-    
-    .calendar-weekday {
-      text-align: center;
-      font-weight: 600;
-      padding: 10px 0;
-      color: var(--gray);
-    }
-    
-    .calendar-day {
-      aspect-ratio: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: var(--radius);
-      position: relative;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border: 1px solid #e0e0e0;
-    }
-    
-    .calendar-day:hover {
-      background-color: #f0f0f0;
-    }
-    
-    .calendar-day.empty {
-      background: transparent;
-      border: none;
-      cursor: default;
-    }
-    
-    .calendar-day.reserved {
-      background-color: var(--danger);
-      color: var(--white);
-      cursor: not-allowed;
-      border-color: var(--danger);
-    }
-    
-    .calendar-day.pending {
-      background-color: var(--warning);
-      color: var(--dark);
-      border-color: var(--warning);
-    }
-    
-    .calendar-day.selected {
-      background-color: var(--success);
-      color: var(--white);
-      border-color: var(--success);
-    }
-    
+    /* Custom tooltip */
     .tooltip {
-      position: absolute;
-      top: -40px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--dark);
-      color: var(--white);
-      padding: 5px 10px;
-      border-radius: var(--radius);
-      font-size: 12px;
-      white-space: nowrap;
-      z-index: 10;
-      opacity: 0;
       visibility: hidden;
+      opacity: 0;
       transition: all 0.2s ease;
     }
     
     .calendar-day:hover .tooltip {
-      opacity: 1;
       visibility: visible;
+      opacity: 1;
     }
     
-    .action-bar {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 20px;
-    }
-    
-    .form-group {
-      margin-bottom: 20px;
-    }
-    
-    .form-label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
-    }
-    
-    .form-control {
-      width: 100%;
-      padding: 12px 15px;
-      border: 1px solid #ddd;
-      border-radius: var(--radius);
-      font-family: 'Poppins', sans-serif;
-      font-size: 1rem;
-    }
-    
-    .form-control:focus {
-      outline: none;
-      border-color: var(--primary);
-    }
-    
-    .reservation-list {
-      list-style: none;
-      margin-top: 15px;
-    }
-    
-    .reservation-item {
-      padding: 15px;
-      border-radius: var(--radius);
-      background-color: #f5f5f5;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .reservation-date {
-      font-weight: 500;
-    }
-    
-    .reservation-actions {
-      display: flex;
-      gap: 10px;
-    }
-    
-    .badge {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-size: 0.8rem;
-      font-weight: 500;
-    }
-    
-    .badge-pending {
-      background-color: var(--warning);
-      color: var(--dark);
-    }
-    
-    .badge-confirmed {
-      background-color: var(--success);
-      color: var(--white);
-    }
-    
-    .hidden {
-      display: none;
-    }
-    
-    .loading {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    
-    .loading-spinner {
-      width: 50px;
-      height: 50px;
-      border: 5px solid var(--light);
-      border-top: 5px solid var(--primary);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    
+    /* Loading spinner animation */
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
     
+    /* Toast animation */
     .toast {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      padding: 15px 25px;
-      border-radius: var(--radius);
-      color: var(--white);
-      font-weight: 500;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      z-index: 1000;
-      opacity: 0;
       transform: translateY(20px);
+      opacity: 0;
       transition: all 0.3s ease;
     }
     
     .toast.show {
-      opacity: 1;
       transform: translateY(0);
-    }
-    
-    .toast-success {
-      background-color: var(--success);
-    }
-    
-    .toast-error {
-      background-color: var(--danger);
-    }
-    
-    @media (max-width: 768px) {
-      .title {
-        font-size: 1.8rem;
-      }
-      
-      .calendar-day {
-        font-size: 0.9rem;
-      }
-      
-      .action-bar {
-        flex-direction: column;
-        gap: 10px;
-      }
-      
-      .btn {
-        width: 100%;
-      }
+      opacity: 1;
     }
   </style>
 </head>
-
-<body>
-  <div class="background"></div>
+<body class="min-h-screen bg-gray-50">
+  <!-- Background -->
+  <div class="background fixed inset-0 -z-10 bg-cover bg-center"></div>
   
-  <div class="container">
-    <header class="header">
-      <img src="life.png" alt="Logo Life Festas" class="logo">
-      <h1 class="title">Reserva Espaço Life Festas</h1>
-      <p class="subtitle">Escolha as datas para seu evento especial</p>
+  <!-- Main Container -->
+  <div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <header class="text-center mb-8">
+      <img src="life.png" alt="Logo Life Festas" class="mx-auto h-28 mb-4 drop-shadow-lg">
+      <h1 class="text-4xl font-bold text-white mb-2 drop-shadow-md">Reserva Espaço Life Festas</h1>
+      <p class="text-lg text-white/90 font-light">Escolha as datas para seu evento especial</p>
     </header>
     
-    <main class="content">
-      <div class="card">
-        <div class="tabs">
-          <div class="tab active" data-tab="calendar">Calendário</div>
-          <div class="tab" data-tab="admin">Administrador</div>
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto">
+      <!-- Card Container -->
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <!-- Tabs Navigation -->
+        <div class="flex border-b">
+          <button data-tab="calendar" class="tab flex-1 py-4 px-6 text-center font-medium bg-gray-100 text-primary cursor-pointer transition-all">
+            Calendário
+          </button>
+          <button data-tab="admin" class="tab flex-1 py-4 px-6 text-center font-medium bg-gray-100 text-gray-600 cursor-pointer transition-all">
+            Administrador
+          </button>
         </div>
         
-        <div class="tab-content active" id="calendar-tab">
-          <div class="calendar-header">
-            <div class="month-selector">
-              <button class="month-arrow" id="prev-month">&#10094;</button>
-              <span id="month-year">Maio 2025</span>
-              <button class="month-arrow" id="next-month">&#10095;</button>
+        <!-- Calendar Tab Content -->
+        <div id="calendar-tab" class="tab-content p-6">
+          <!-- Calendar Header -->
+          <div class="flex justify-between items-center mb-6">
+            <div class="flex items-center text-xl font-medium">
+              <button id="prev-month" class="p-2 text-primary hover:bg-gray-100 rounded-full transition-colors">
+                <span class="material-icons">chevron_left</span>
+              </button>
+              <span id="month-year" class="mx-4">Maio 2025</span>
+              <button id="next-month" class="p-2 text-primary hover:bg-gray-100 rounded-full transition-colors">
+                <span class="material-icons">chevron_right</span>
+              </button>
             </div>
           </div>
           
-          <div class="calendar">
-            <div class="calendar-weekday">Dom</div>
-            <div class="calendar-weekday">Seg</div>
-            <div class="calendar-weekday">Ter</div>
-            <div class="calendar-weekday">Qua</div>
-            <div class="calendar-weekday">Qui</div>
-            <div class="calendar-weekday">Sex</div>
-            <div class="calendar-weekday">Sáb</div>
+          <!-- Calendar Grid -->
+          <div class="grid grid-cols-7 gap-2 mb-6">
+            <div class="text-center py-2 font-medium text-gray-500">Dom</div>
+            <div class="text-center py-2 font-medium text-gray-500">Seg</div>
+            <div class="text-center py-2 font-medium text-gray-500">Ter</div>
+            <div class="text-center py-2 font-medium text-gray-500">Qua</div>
+            <div class="text-center py-2 font-medium text-gray-500">Qui</div>
+            <div class="text-center py-2 font-medium text-gray-500">Sex</div>
+            <div class="text-center py-2 font-medium text-gray-500">Sáb</div>
             <!-- Calendar days will be inserted here by JavaScript -->
           </div>
           
-          <div class="action-bar">
-            <div>
-              <div style="display: flex; gap: 15px; margin-bottom: 15px;">
-                <div style="display: flex; align-items: center; gap: 5px;">
-                  <div style="width: 15px; height: 15px; background-color: var(--success); border-radius: 3px;"></div>
-                  <span>Selecionado</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 5px;">
-                  <div style="width: 15px; height: 15px; background-color: var(--warning); border-radius: 3px;"></div>
-                  <span>Pendente</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 5px;">
-                  <div style="width: 15px; height: 15px; background-color: var(--danger); border-radius: 3px;"></div>
-                  <span>Reservado</span>
-                </div>
-              </div>
+          <!-- Legend -->
+          <div class="flex flex-wrap gap-4 mb-6">
+            <div class="flex items-center">
+              <div class="w-4 h-4 rounded bg-success mr-2"></div>
+              <span>Selecionado</span>
             </div>
-            <button class="btn btn-primary" id="reserve-btn">
-              <span class="material-icons btn-icon">event_available</span>Reservar Datas
+            <div class="flex items-center">
+              <div class="w-4 h-4 rounded bg-warning mr-2"></div>
+              <span>Pendente</span>
+            </div>
+            <div class="flex items-center">
+              <div class="w-4 h-4 rounded bg-danger mr-2"></div>
+              <span>Reservado</span>
+            </div>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="flex justify-end">
+            <button id="reserve-btn" class="flex items-center bg-primary hover:bg-primary-light text-white font-medium py-2 px-4 rounded-lg transition-colors">
+              <span class="material-icons mr-2">event_available</span>
+              Reservar Datas
             </button>
           </div>
           
-          <!-- Reservation Form Modal (hidden by default) -->
-          <div id="reservation-modal" class="hidden">
-            <div class="form-group">
-              <label class="form-label" for="client-name">Nome Completo</label>
-              <input type="text" id="client-name" class="form-control" placeholder="Digite seu nome completo">
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="client-phone">Telefone</label>
-              <input type="tel" id="client-phone" class="form-control" placeholder="(00) 00000-0000">
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="client-email">Email</label>
-              <input type="email" id="client-email" class="form-control" placeholder="seu@email.com">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Datas Selecionadas</label>
-              <div id="selected-dates-list"></div>
-            </div>
-            <div class="action-bar">
-              <button class="btn btn-outline" id="cancel-reservation">Cancelar</button>
-              <button class="btn btn-primary" id="confirm-reservation">Confirmar Reserva</button>
+          <!-- Reservation Form Modal -->
+          <div id="reservation-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+              <h3 class="text-xl font-bold mb-4">Formulário de Reserva</h3>
+              
+              <div class="space-y-4">
+                <div>
+                  <label for="client-name" class="block font-medium mb-1">Nome Completo</label>
+                  <input type="text" id="client-name" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="Digite seu nome completo">
+                </div>
+                
+                <div>
+                  <label for="client-phone" class="block font-medium mb-1">Telefone</label>
+                  <input type="tel" id="client-phone" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="(00) 00000-0000">
+                </div>
+                
+                <div>
+                  <label for="client-email" class="block font-medium mb-1">Email</label>
+                  <input type="email" id="client-email" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="seu@email.com">
+                </div>
+                
+                <div>
+                  <label class="block font-medium mb-1">Datas Selecionadas</label>
+                  <div id="selected-dates-list" class="space-y-2 max-h-40 overflow-y-auto p-2 border rounded-lg"></div>
+                </div>
+              </div>
+              
+              <div class="flex justify-end space-x-3 mt-6">
+                <button id="cancel-reservation" class="px-4 py-2 border border-primary text-primary rounded-lg hover:bg-gray-50 transition-colors">
+                  Cancelar
+                </button>
+                <button id="confirm-reservation" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-light transition-colors">
+                  Confirmar Reserva
+                </button>
+              </div>
             </div>
           </div>
         </div>
         
-        <div class="tab-content" id="admin-tab">
+        <!-- Admin Tab Content -->
+        <div id="admin-tab" class="tab-content hidden p-6">
+          <!-- Login Form -->
           <div id="login-form">
-            <div class="form-group">
-              <label class="form-label" for="admin-user">Usuário</label>
-              <input type="text" id="admin-user" class="form-control" placeholder="Nome de usuário">
+            <h3 class="text-xl font-bold mb-4">Acesso Administrativo</h3>
+            
+            <div class="space-y-4 max-w-md mx-auto">
+              <div>
+                <label for="admin-user" class="block font-medium mb-1">Usuário</label>
+                <input type="text" id="admin-user" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="Nome de usuário">
+              </div>
+              
+              <div>
+                <label for="admin-pass" class="block font-medium mb-1">Senha</label>
+                <input type="password" id="admin-pass" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="Senha">
+              </div>
+              
+              <button id="login-btn" class="w-full py-2 bg-primary text-white rounded-lg hover:bg-primary-light transition-colors">
+                Entrar
+              </button>
             </div>
-            <div class="form-group">
-              <label class="form-label" for="admin-pass">Senha</label>
-              <input type="password" id="admin-pass" class="form-control" placeholder="Senha">
-            </div>
-            <button class="btn btn-primary" id="login-btn">Entrar</button>
           </div>
           
+          <!-- Admin Panel -->
           <div id="admin-panel" class="hidden">
-            <h3>Gerenciar Reservas</h3>
-            <div class="tabs" style="margin-top: 20px;">
-              <div class="tab active" data-tab="pending">Pendentes</div>
-              <div class="tab" data-tab="confirmed">Confirmadas</div>
+            <h3 class="text-xl font-bold mb-4">Gerenciar Reservas</h3>
+            
+            <!-- Admin Tabs -->
+            <div class="flex border-b mb-4">
+              <button data-tab="pending" class="tab-admin flex-1 py-3 px-6 text-center font-medium bg-gray-100 text-primary cursor-pointer transition-all">
+                Pendentes
+              </button>
+              <button data-tab="confirmed" class="tab-admin flex-1 py-3 px-6 text-center font-medium bg-gray-100 text-gray-600 cursor-pointer transition-all">
+                Confirmadas
+              </button>
             </div>
             
-            <div class="tab-content active" id="pending-tab">
-              <ul class="reservation-list" id="pending-list">
+            <!-- Pending Reservations -->
+            <div id="pending-tab" class="tab-admin-content">
+              <ul id="pending-list" class="space-y-3">
                 <!-- Pending reservations will be inserted here -->
               </ul>
             </div>
             
-            <div class="tab-content" id="confirmed-tab">
-              <ul class="reservation-list" id="confirmed-list">
+            <!-- Confirmed Reservations -->
+            <div id="confirmed-tab" class="tab-admin-content hidden">
+              <ul id="confirmed-list" class="space-y-3">
                 <!-- Confirmed reservations will be inserted here -->
               </ul>
             </div>
@@ -545,12 +241,15 @@
     </main>
   </div>
   
-  <div id="toast" class="toast"></div>
-  <div id="loading" class="loading hidden">
-    <div class="loading-spinner"></div>
+  <!-- Toast Notification -->
+  <div id="toast" class="toast fixed bottom-6 right-6 px-6 py-3 rounded-lg shadow-lg text-white"></div>
+  
+  <!-- Loading Overlay -->
+  <div id="loading" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="w-12 h-12 border-4 border-gray-200 border-t-primary rounded-full animate-spin"></div>
   </div>
-
-  <!-- Supabase JS -->  
+  
+  <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
   
   <script>
@@ -574,46 +273,7 @@
         schema: 'public'
       }
     });
-
-    // Test Supabase connection
-    async function testSupabaseConnection() {
-      try {
-        showLoading();
-        console.log('Testando conexão com Supabase...');
-        
-        // Test database connection
-        const { data, error } = await supabase
-          .from('reservas')
-          .select('count()', { count: 'exact' })
-          .limit(1);
-
-        if (error) {
-          throw error;
-        }
-
-        console.log('Conexão com banco de dados OK:', data);
-
-        // Test realtime connection
-        const channel = supabase
-          .channel('connection-test')
-          .subscribe((status) => {
-            console.log('Status da conexão realtime:', status);
-            if (status === 'SUBSCRIBED') {
-              console.log('Conexão realtime OK');
-              channel.unsubscribe();
-            }
-          });
-
-        return true;
-      } catch (error) {
-        console.error('Erro na conexão com Supabase:', error);
-        showToast('Erro na conexão com o servidor. Verifique o console para mais detalhes.', 'error');
-        return false;
-      } finally {
-        hideLoading();
-      }
-    }
-
+    
     // App state
     let today = new Date();
     let selectedDates = [];
@@ -621,7 +281,7 @@
     let currentUser = null;
     
     // DOM Elements
-    const calendarEl = document.querySelector('.calendar');
+    const calendarEl = document.querySelector('.grid.grid-cols-7');
     const monthYearEl = document.getElementById('month-year');
     const prevMonthBtn = document.getElementById('prev-month');
     const nextMonthBtn = document.getElementById('next-month');
@@ -642,6 +302,9 @@
     const confirmedList = document.getElementById('confirmed-list');
     const loadingEl = document.getElementById('loading');
     const toastEl = document.getElementById('toast');
+    const tabs = document.querySelectorAll('.tab');
+    const adminTabs = document.querySelectorAll('.tab-admin');
+    const adminTabContents = document.querySelectorAll('.tab-admin-content');
     
     // Utility functions
     function formatDateStr(date) {
@@ -654,35 +317,33 @@
     }
     
     function showLoading() {
-      if (loadingEl) loadingEl.classList.remove('hidden');
+      loadingEl.classList.remove('hidden');
     }
     
     function hideLoading() {
-      if (loadingEl) loadingEl.classList.add('hidden');
+      loadingEl.classList.add('hidden');
     }
     
     function showToast(message, type = 'success') {
-      if (!toastEl) return;
-      
       toastEl.textContent = message;
-      toastEl.className = `toast toast-${type} show`;
+      toastEl.className = `toast fixed bottom-6 right-6 px-6 py-3 rounded-lg shadow-lg text-white bg-${type} show`;
       
       setTimeout(() => {
-        if (toastEl) toastEl.classList.remove('show');
+        toastEl.classList.remove('show');
       }, 3000);
     }
     
     // Improved error handling function
     async function handleSupabaseError(error, operation) {
       console.error(`Error during ${operation}:`, error);
+      
       if (error.code === 'PGRST301') {
-        showToast('Sua sessão expirou. Por favor, faça login novamente.', 'error');
-        // Handle session expiration
+        showToast('Sua sessão expirou. Por favor, faça login novamente.', 'danger');
         currentUser = null;
         loginForm.classList.remove('hidden');
         adminPanel.classList.add('hidden');
       } else {
-        showToast(`Erro ao ${operation}. ${error.message || 'Tente novamente.'}`, 'error');
+        showToast(`Erro ao ${operation}. ${error.message || 'Tente novamente.'}`, 'danger');
       }
     }
     
@@ -691,40 +352,40 @@
       try {
         // Remove any existing subscription
         await supabase.removeAllChannels();
-
+        
         const channel = supabase
           .channel('reservas')
-          .on('postgres_changes', { 
+          .on('postgres_changes', {
             event: 'INSERT',
-            schema: 'public', 
+            schema: 'public',
             table: 'reservas'
           }, async (payload) => {
             console.log('Nova reserva:', payload);
-            showToast('Nova reserva recebida!');
+            showToast('Nova reserva recebida!', 'success');
             await fetchReservations();
             await renderCalendar();
           })
-          .on('postgres_changes', { 
+          .on('postgres_changes', {
             event: 'UPDATE',
-            schema: 'public', 
+            schema: 'public',
             table: 'reservas'
           }, async (payload) => {
             console.log('Reserva atualizada:', payload);
-            showToast('Reserva atualizada!');
+            showToast('Reserva atualizada!', 'success');
             await fetchReservations();
             await renderCalendar();
           })
-          .on('postgres_changes', { 
+          .on('postgres_changes', {
             event: 'DELETE',
-            schema: 'public', 
+            schema: 'public',
             table: 'reservas'
           }, async (payload) => {
             console.log('Reserva removida:', payload);
-            showToast('Reserva removida!');
+            showToast('Reserva removida!', 'success');
             await fetchReservations();
             await renderCalendar();
           });
-
+        
         channel.subscribe(async (status) => {
           console.log('Status da inscrição:', status);
           if (status === 'SUBSCRIBED') {
@@ -733,327 +394,14 @@
             await renderCalendar();
           }
         });
-
       } catch (error) {
         console.error('Erro ao configurar sincronização em tempo real:', error);
-        showToast('Erro ao configurar sincronização em tempo real', 'error');
-      }
-    }
-    
-    // Enhanced fetchReservations with better error handling
-    async function fetchReservations() {
-      try {
-        showLoading();
-        console.log('Buscando reservas...');
-        const { data, error } = await supabase
-          .from('reservas')
-          .select('*');
-          
-        if (error) {
-          console.error('Erro ao buscar reservas:', error);
-          throw error;
-        }
-        
-        console.log('Dados recebidos:', data);
-        
-        // Convert array to object with date as key
-        reservations = {};
-        if (data && data.length > 0) {
-          data.forEach(reservation => {
-            reservations[reservation.data] = {
-              id: reservation.id,
-              date: reservation.data,
-              client_name: reservation.nome_do_cliente,
-              client_phone: reservation.telefone_do_cliente,
-              client_email: reservation.e_mail,
-              status: reservation.status,
-              created_at: reservation.criado_em
-            };
-          });
-          console.log('Reservas processadas:', reservations);
-        } else {
-          console.log('Nenhuma reserva encontrada');
-        }
-        
-        return reservations;
-      } catch (error) {
-        console.error('Erro ao buscar reservas:', error);
-        showToast('Erro ao carregar reservas. ' + error.message, 'error');
-        return {};
-      } finally {
-        hideLoading();
-      }
-    }
-    
-    // Enhanced submitReservation with validation and error handling
-    async function submitReservation() {
-      // Enhanced validation
-      const name = clientNameInput.value.trim();
-      const phone = clientPhoneInput.value.trim();
-      const email = clientEmailInput.value.trim();
-
-      if (!name) {
-        showToast('Por favor, informe seu nome', 'error');
-        clientNameInput.focus();
-        return;
-      }
-      
-      if (!phone) {
-        showToast('Por favor, informe seu telefone', 'error');
-        clientPhoneInput.focus();
-        return;
-      }
-
-      // Validate phone format
-      const phoneRegex = /^\(\d{2}\)\s?\d{4,5}-\d{4}$/;
-      if (!phoneRegex.test(phone)) {
-        showToast('Formato de telefone inválido. Use (XX) XXXXX-XXXX', 'error');
-        clientPhoneInput.focus();
-        return;
-      }
-
-      // Validate email if provided
-      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        showToast('Formato de e-mail inválido', 'error');
-        clientEmailInput.focus();
-        return;
-      }
-      
-      showLoading();
-      
-      try {
-        // Check for conflicting reservations first
-        const { data: existingReservations, error: checkError } = await supabase
-          .from('reservas')
-          .select('data')
-          .in('data', selectedDates)
-          .eq('status', 'confirmed');
-
-        if (checkError) throw checkError;
-
-        if (existingReservations?.length > 0) {
-          const conflictDates = existingReservations.map(r => formatDateBR(r.data)).join(', ');
-          showToast(`As datas ${conflictDates} já estão reservadas`, 'error');
-          return;
-        }
-
-        // Create reservations for each selected date
-        const reservationPromises = selectedDates.map(date => 
-          supabase
-            .from('reservas')
-            .insert([{
-              data: date,
-              nome_do_cliente: name,
-              telefone_do_cliente: phone,
-              e_mail: email,
-              status: 'pending',
-              criado_em: new Date().toISOString()
-            }])
-        );
-        
-        const results = await Promise.all(reservationPromises);
-        const errors = results.filter(r => r.error);
-
-        if (errors.length > 0) {
-          throw errors[0].error;
-        }
-        
-        // Success - clear form and selected dates
-        showToast('Reserva solicitada com sucesso!');
-        reservationModal.classList.add('hidden');
-        
-        // Store info for WhatsApp message
-        const datesToFormat = [...selectedDates];
-        
-        // Clear form and selection
-        selectedDates = [];
-        clientNameInput.value = '';
-        clientPhoneInput.value = '';
-        clientEmailInput.value = '';
-        
-        // Refresh calendar
-        await fetchReservations();
-        renderCalendar();
-        
-        // Open WhatsApp with reservation details
-        const formattedDates = datesToFormat.map(date => formatDateBR(date)).join(', ');
-        const msg = `Olá! Eu, ${name}, gostaria de reservar o espaço Life Festas nas datas: ${formattedDates}. Telefone: ${phone}`;
-        const url = `https://wa.me/5581981521109?text=${encodeURIComponent(msg)}`;
-        window.open(url, '_blank');
-      } catch (error) {
-        await handleSupabaseError(error, 'criar reserva');
-      } finally {
-        hideLoading();
-      }
-    }
-    
-    async function loginAdmin() {
-      const username = adminUserInput.value.trim();
-      const password = adminPassInput.value.trim();
-      
-      if (!username || !password) {
-        showToast('Por favor, preencha todos os campos', 'error');
-        return;
-      }
-      
-      showLoading();
-      
-      try {
-        // In a real application, you would authenticate with Supabase Auth
-        // For this demo, we'll use a simple check
-        if (username === 'admin' && password === 'senha123') {
-          currentUser = { role: 'admin' };
-          loginForm.classList.add('hidden');
-          adminPanel.classList.remove('hidden');
-          await loadAdminData();
-          showToast('Login realizado com sucesso!');
-        } else {
-          showToast('Usuário ou senha inválidos', 'error');
-        }
-      } catch (error) {
-        console.error('Login error:', error);
-        showToast('Erro ao fazer login', 'error');
-      } finally {
-        hideLoading();
-        adminUserInput.value = '';
-        adminPassInput.value = '';
-      }
-    }
-    
-    async function loadAdminData() {
-      showLoading();
-      
-      try {
-        // Fetch all reservations
-        const { data, error } = await supabase
-          .from('reservas')
-          .select('*')
-          .order('data', { ascending: true });
-          
-        if (error) throw error;
-        
-        // Clear lists
-        pendingList.innerHTML = '';
-        confirmedList.innerHTML = '';
-        
-        // Populate lists
-        data.forEach(reservation => {
-          const listItem = document.createElement('li');
-          listItem.className = 'reservation-item';
-          
-          const dateInfo = document.createElement('div');
-          dateInfo.className = 'reservation-date';
-          dateInfo.innerHTML = `
-            <strong>${formatDateBR(reservation.data)}</strong><br>
-            <span>${reservation.nome_do_cliente}</span><br>
-            <small>${reservation.telefone_do_cliente}</small>
-          `;
-          
-          const statusBadge = document.createElement('span');
-          statusBadge.className = `badge badge-${reservation.status === 'confirmed' ? 'confirmed' : 'pending'}`;
-          statusBadge.textContent = reservation.status === 'confirmed' ? 'Confirmado' : 'Pendente';
-          
-          const actions = document.createElement('div');
-          actions.className = 'reservation-actions';
-          
-          if (reservation.status === 'pending') {
-            const confirmBtn = document.createElement('button');
-            confirmBtn.className = 'btn btn-primary';
-            confirmBtn.textContent = 'Confirmar';
-            confirmBtn.addEventListener('click', () => confirmReservation(reservation.id));
-            
-            const rejectBtn = document.createElement('button');
-            rejectBtn.className = 'btn btn-outline';
-            rejectBtn.textContent = 'Recusar';
-            rejectBtn.addEventListener('click', () => deleteReservation(reservation.id));
-            
-            actions.appendChild(confirmBtn);
-            actions.appendChild(rejectBtn);
-            
-            listItem.appendChild(dateInfo);
-            listItem.appendChild(actions);
-            pendingList.appendChild(listItem);
-          } else {
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'btn btn-outline';
-            deleteBtn.textContent = 'Cancelar';
-            deleteBtn.addEventListener('click', () => deleteReservation(reservation.id));
-            
-            actions.appendChild(deleteBtn);
-            
-            listItem.appendChild(dateInfo);
-            listItem.appendChild(statusBadge);
-            listItem.appendChild(actions);
-            confirmedList.appendChild(listItem);
-          }
-        });
-        
-        // Show empty message if no reservations
-        if (pendingList.children.length === 0) {
-          pendingList.innerHTML = '<p>Não há reservas pendentes.</p>';
-        }
-        
-        if (confirmedList.children.length === 0) {
-          confirmedList.innerHTML = '<p>Não há reservas confirmadas.</p>';
-        }
-      } catch (error) {
-        console.error('Error loading admin data:', error);
-        showToast('Erro ao carregar dados', 'error');
-      } finally {
-        hideLoading();
-      }
-    }
-    
-    async function confirmReservation(id) {
-      showLoading();
-      
-      try {
-        const { error } = await supabase
-          .from('reservas')
-          .update({ status: 'confirmed' })
-          .eq('id', id);
-          
-        if (error) throw error;
-        
-        showToast('Reserva confirmada com sucesso!');
-        await loadAdminData();
-        await fetchReservations();
-        renderCalendar();
-      } catch (error) {
-        console.error('Error confirming reservation:', error);
-        showToast('Erro ao confirmar reserva', 'error');
-      } finally {
-        hideLoading();
-      }
-    }
-    
-    async function deleteReservation(id) {
-      if (!confirm('Tem certeza que deseja cancelar esta reserva?')) return;
-      
-      showLoading();
-      
-      try {
-        const { error } = await supabase
-          .from('reservas')
-          .delete()
-          .eq('id', id);
-          
-        if (error) throw error;
-        
-        showToast('Reserva cancelada com sucesso!');
-        await loadAdminData();
-        await fetchReservations();
-        renderCalendar();
-      } catch (error) {
-        console.error('Error deleting reservation:', error);
-        showToast('Erro ao cancelar reserva', 'error');
-      } finally {
-        hideLoading();
+        showToast('Erro ao configurar sincronização em tempo real', 'danger');
       }
     }
     
     // Calendar functions
-    async function renderCalendar() {
+    function initializeCalendar() {
       try {
         // Clear calendar days (but keep weekday headers)
         const dayElements = calendarEl.querySelectorAll('.calendar-day');
@@ -1061,9 +409,9 @@
         
         // Set month and year display
         monthYearEl.textContent = today.toLocaleDateString('pt-BR', {
-          month: 'long', 
+          month: 'long',
           year: 'numeric'
-        });
+        }).replace(/^./, c => c.toUpperCase());
         
         // Get first and last day of month
         const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -1081,8 +429,9 @@
         for (let i = 1; i <= lastDay.getDate(); i++) {
           const date = new Date(today.getFullYear(), today.getMonth(), i);
           const dateStr = formatDateStr(date);
+          
           const dayEl = document.createElement('div');
-          dayEl.className = 'calendar-day';
+          dayEl.className = 'calendar-day aspect-square flex items-center justify-center rounded-lg border border-gray-200 cursor-pointer transition-colors';
           dayEl.textContent = i;
           dayEl.dataset.date = dateStr;
           
@@ -1091,18 +440,18 @@
             const reservation = reservations[dateStr];
             
             if (reservation.status === 'confirmed') {
-              dayEl.classList.add('reserved');
+              dayEl.classList.add('bg-danger', 'text-white', 'border-danger', 'cursor-not-allowed');
               
               // Add tooltip with client name
               const tooltip = document.createElement('div');
-              tooltip.className = 'tooltip';
+              tooltip.className = 'tooltip absolute -top-10 left-1/2 transform -translate-x-1/2 bg-dark text-white text-xs px-3 py-1 rounded-lg whitespace-nowrap';
               tooltip.textContent = `Reservado: ${reservation.client_name}`;
               dayEl.appendChild(tooltip);
             } else if (reservation.status === 'pending') {
-              dayEl.classList.add('pending');
+              dayEl.classList.add('bg-warning', 'text-dark', 'border-warning');
               
               const tooltip = document.createElement('div');
-              tooltip.className = 'tooltip';
+              tooltip.className = 'tooltip absolute -top-10 left-1/2 transform -translate-x-1/2 bg-dark text-white text-xs px-3 py-1 rounded-lg whitespace-nowrap';
               tooltip.textContent = 'Reserva pendente';
               dayEl.appendChild(tooltip);
             }
@@ -1116,8 +465,12 @@
               
               // Check if date is selected
               if (selectedDates.includes(dateStr)) {
-                dayEl.classList.add('selected');
+                dayEl.classList.add('bg-success', 'text-white', 'border-success');
+              } else {
+                dayEl.classList.add('hover:bg-gray-100');
               }
+            } else {
+              dayEl.classList.add('bg-gray-100', 'cursor-not-allowed', 'text-gray-400');
             }
           }
           
@@ -1125,7 +478,313 @@
         }
       } catch (error) {
         console.error('Erro ao renderizar calendário:', error);
-        showToast('Erro ao exibir calendário', 'error');
+        showToast('Erro ao exibir calendário', 'danger');
+      }
+    }
+    
+    // Initialize the application
+    async function initializeApp() {
+      try {
+        showLoading();
+        console.log('Iniciando aplicação...');
+        
+        // Initialize calendar
+        today = new Date();
+        selectedDates = [];
+        reservations = {};
+        
+        // Fetch initial data
+        await fetchReservations();
+        
+        // Initialize calendar UI
+        initializeCalendar();
+        
+        // Setup realtime
+        await setupRealtimeSubscription();
+        
+        // Initialize event listeners
+        initializeEventListeners();
+        
+        console.log('Aplicação inicializada com sucesso');
+      } catch (error) {
+        console.error('Erro ao inicializar aplicação:', error);
+        showToast('Erro ao inicializar aplicação', 'danger');
+      } finally {
+        hideLoading();
+      }
+    }
+    
+    function initializeEventListeners() {
+      // Month navigation
+      prevMonthBtn.addEventListener('click', () => {
+        today.setMonth(today.getMonth() - 1);
+        initializeCalendar();
+      });
+      
+      nextMonthBtn.addEventListener('click', () => {
+        today.setMonth(today.getMonth() + 1);
+        initializeCalendar();
+      });
+      
+      // Reservation buttons
+      reserveBtn.addEventListener('click', showReservationModal);
+      
+      cancelReservationBtn.addEventListener('click', () => {
+        reservationModal.classList.add('hidden');
+      });
+      
+      confirmReservationBtn.addEventListener('click', submitReservation);
+      
+      // Admin login
+      loginBtn.addEventListener('click', loginAdmin);
+      
+      // Main tabs navigation
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const tabName = tab.dataset.tab;
+          const tabContent = document.getElementById(`${tabName}-tab`);
+          
+          // Deactivate all tabs
+          tabs.forEach(t => t.classList.remove('bg-gray-100', 'text-primary'));
+          tabs.forEach(t => t.classList.add('bg-gray-100', 'text-gray-600'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+          
+          // Activate selected tab
+          tab.classList.remove('text-gray-600');
+          tab.classList.add('bg-white', 'text-primary');
+          tabContent.classList.remove('hidden');
+        });
+      });
+      
+      // Admin tabs navigation
+      adminTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const tabName = tab.dataset.tab;
+          const tabContent = document.getElementById(`${tabName}-tab`);
+          
+          // Deactivate all tabs
+          adminTabs.forEach(t => t.classList.remove('bg-gray-100', 'text-primary'));
+          adminTabs.forEach(t => t.classList.add('bg-gray-100', 'text-gray-600'));
+          adminTabContents.forEach(c => c.classList.add('hidden'));
+          
+          // Activate selected tab
+          tab.classList.remove('text-gray-600');
+          tab.classList.add('bg-white', 'text-primary');
+          tabContent.classList.remove('hidden');
+        });
+      });
+    }
+    
+    // Enhanced fetchReservations
+    async function fetchReservations() {
+      try {
+        console.log('Buscando reservas...');
+        
+        const { data, error } = await supabase
+          .from('reservas')
+          .select('*')
+          .order('data', { ascending: true });
+        
+        if (error) {
+          console.error('Erro ao buscar reservas:', error);
+          throw error;
+        }
+        
+        console.log('Dados recebidos:', data);
+        
+        // Convert array to object with date as key
+        reservations = {};
+        
+        if (data && data.length > 0) {
+          data.forEach(reservation => {
+            reservations[reservation.data] = {
+              id: reservation.id,
+              date: reservation.data,
+              client_name: reservation.nome_do_cliente,
+              client_phone: reservation.telefone_do_cliente,
+              client_email: reservation.e_mail,
+              status: reservation.status,
+              created_at: reservation.criado_em
+            };
+          });
+          
+          console.log('Reservas processadas:', reservations);
+        } else {
+          console.log('Nenhuma reserva encontrada');
+        }
+        
+        return reservations;
+      } catch (error) {
+        console.error('Erro ao buscar reservas:', error);
+        showToast('Erro ao carregar reservas: ' + (error.message || 'Erro desconhecido'), 'danger');
+        return {};
+      }
+    }
+    
+    async function loginAdmin() {
+      const username = adminUserInput.value.trim();
+      const password = adminPassInput.value.trim();
+      
+      if (!username || !password) {
+        showToast('Por favor, preencha todos os campos', 'danger');
+        return;
+      }
+      
+      showLoading();
+      
+      try {
+        // In a real application, you would authenticate with Supabase Auth
+        // For this demo, we'll use a simple check
+        if (username === 'admin' && password === 'senha123') {
+          currentUser = { role: 'admin' };
+          loginForm.classList.add('hidden');
+          adminPanel.classList.remove('hidden');
+          await loadAdminData();
+          showToast('Login realizado com sucesso!', 'success');
+        } else {
+          showToast('Usuário ou senha inválidos', 'danger');
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        showToast('Erro ao fazer login', 'danger');
+      } finally {
+        hideLoading();
+        adminUserInput.value = '';
+        adminPassInput.value = '';
+      }
+    }
+    
+    async function loadAdminData() {
+      showLoading();
+      
+      try {
+        // Fetch all reservations
+        const { data, error } = await supabase
+          .from('reservas')
+          .select('*')
+          .order('data', { ascending: true });
+        
+        if (error) throw error;
+        
+        // Clear lists
+        pendingList.innerHTML = '';
+        confirmedList.innerHTML = '';
+        
+        // Populate lists
+        data.forEach(reservation => {
+          const listItem = document.createElement('li');
+          listItem.className = 'bg-gray-50 p-4 rounded-lg flex flex-col md:flex-row md:items-center justify-between gap-4';
+          
+          const dateInfo = document.createElement('div');
+          dateInfo.className = 'flex-1';
+          dateInfo.innerHTML = `
+            <div class="font-medium">${formatDateBR(reservation.data)}</div>
+            <div class="text-sm">${reservation.nome_do_cliente}</div>
+            <div class="text-xs text-gray-500">${reservation.telefone_do_cliente}</div>
+          `;
+          
+          const statusBadge = document.createElement('span');
+          statusBadge.className = `inline-block px-3 py-1 rounded-full text-xs font-medium ${
+            reservation.status === 'confirmed' ? 'bg-success text-white' : 'bg-warning text-dark'
+          }`;
+          statusBadge.textContent = reservation.status === 'confirmed' ? 'Confirmado' : 'Pendente';
+          
+          const actions = document.createElement('div');
+          actions.className = 'flex gap-2';
+          
+          if (reservation.status === 'pending') {
+            const confirmBtn = document.createElement('button');
+            confirmBtn.className = 'px-3 py-1 bg-primary text-white rounded hover:bg-primary-light transition-colors text-sm';
+            confirmBtn.textContent = 'Confirmar';
+            confirmBtn.addEventListener('click', () => confirmReservation(reservation.id));
+            
+            const rejectBtn = document.createElement('button');
+            rejectBtn.className = 'px-3 py-1 border border-gray-300 rounded hover:bg-gray-100 transition-colors text-sm';
+            rejectBtn.textContent = 'Recusar';
+            rejectBtn.addEventListener('click', () => deleteReservation(reservation.id));
+            
+            actions.appendChild(confirmBtn);
+            actions.appendChild(rejectBtn);
+            
+            listItem.appendChild(dateInfo);
+            listItem.appendChild(actions);
+            pendingList.appendChild(listItem);
+          } else {
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'px-3 py-1 border border-gray-300 rounded hover:bg-gray-100 transition-colors text-sm';
+            deleteBtn.textContent = 'Cancelar';
+            deleteBtn.addEventListener('click', () => deleteReservation(reservation.id));
+            
+            actions.appendChild(deleteBtn);
+            
+            listItem.appendChild(dateInfo);
+            listItem.appendChild(statusBadge);
+            listItem.appendChild(actions);
+            confirmedList.appendChild(listItem);
+          }
+        });
+        
+        // Show empty message if no reservations
+        if (pendingList.children.length === 0) {
+          pendingList.innerHTML = '<li class="text-center py-4 text-gray-500">Não há reservas pendentes.</li>';
+        }
+        
+        if (confirmedList.children.length === 0) {
+          confirmedList.innerHTML = '<li class="text-center py-4 text-gray-500">Não há reservas confirmadas.</li>';
+        }
+      } catch (error) {
+        console.error('Error loading admin data:', error);
+        showToast('Erro ao carregar dados', 'danger');
+      } finally {
+        hideLoading();
+      }
+    }
+    
+    async function confirmReservation(id) {
+      showLoading();
+      
+      try {
+        const { error } = await supabase
+          .from('reservas')
+          .update({ status: 'confirmed' })
+          .eq('id', id);
+        
+        if (error) throw error;
+        
+        showToast('Reserva confirmada com sucesso!', 'success');
+        await loadAdminData();
+        await fetchReservations();
+        initializeCalendar();
+      } catch (error) {
+        console.error('Error confirming reservation:', error);
+        showToast('Erro ao confirmar reserva', 'danger');
+      } finally {
+        hideLoading();
+      }
+    }
+    
+    async function deleteReservation(id) {
+      if (!confirm('Tem certeza que deseja cancelar esta reserva?')) return;
+      
+      showLoading();
+      
+      try {
+        const { error } = await supabase
+          .from('reservas')
+          .delete()
+          .eq('id', id);
+        
+        if (error) throw error;
+        
+        showToast('Reserva cancelada com sucesso!', 'success');
+        await loadAdminData();
+        await fetchReservations();
+        initializeCalendar();
+      } catch (error) {
+        console.error('Error deleting reservation:', error);
+        showToast('Erro ao cancelar reserva', 'danger');
+      } finally {
+        hideLoading();
       }
     }
     
@@ -1141,20 +800,15 @@
       }
       
       // Update calendar UI
-      renderCalendar();
+      initializeCalendar();
       
       // Enable/disable reserve button
       reserveBtn.disabled = selectedDates.length === 0;
     }
     
-    function changeMonth(offset) {
-      today.setMonth(today.getMonth() + offset);
-      renderCalendar();
-    }
-    
     function showReservationModal() {
       if (selectedDates.length === 0) {
-        showToast('Selecione pelo menos uma data', 'error');
+        showToast('Selecione pelo menos uma data', 'danger');
         return;
       }
       
@@ -1162,7 +816,7 @@
       selectedDatesList.innerHTML = '';
       selectedDates.sort().forEach(date => {
         const dateItem = document.createElement('div');
-        dateItem.className = 'reservation-item';
+        dateItem.className = 'p-2 bg-gray-50 rounded text-center';
         dateItem.textContent = formatDateBR(date);
         selectedDatesList.appendChild(dateItem);
       });
@@ -1172,49 +826,114 @@
       clientNameInput.focus();
     }
     
-    // Event listeners
-    document.addEventListener('DOMContentLoaded', async () => {
-      try {
-        console.log('Iniciando aplicação...');
-        hideLoading(); // Garante que o loading está escondido no início
-        
-        // Initialize app
-        await fetchReservations();
-        await renderCalendar();
-        await setupRealtimeSubscription();
-        
-        // Set up event listeners
-        prevMonthBtn.addEventListener('click', () => changeMonth(-1));
-        nextMonthBtn.addEventListener('click', () => changeMonth(1));
-        reserveBtn.addEventListener('click', showReservationModal);
-        cancelReservationBtn.addEventListener('click', () => {
-          reservationModal.classList.add('hidden');
-        });
-        confirmReservationBtn.addEventListener('click', submitReservation);
-        loginBtn.addEventListener('click', loginAdmin);
-
-        // Initialize tabs
-        document.querySelectorAll('.tab').forEach(tab => {
-          tab.addEventListener('click', () => {
-            const tabName = tab.dataset.tab;
-            const tabContent = document.getElementById(`${tabName}-tab`);
-            
-            // Deactivate all tabs
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            
-            // Activate selected tab
-            tab.classList.add('active');
-            tabContent.classList.add('active');
-          });
-        });
-        
-      } catch (error) {
-        console.error('Erro ao inicializar app:', error);
-        showToast('Erro ao inicializar o aplicativo', 'error');
-      } finally {
-        hideLoading(); // Garante que o loading está escondido mesmo em caso de erro
+    async function submitReservation() {
+      // Enhanced validation
+      const name = clientNameInput.value.trim();
+      const phone = clientPhoneInput.value.trim();
+      const email = clientEmailInput.value.trim();
+      
+      if (!name) {
+        showToast('Por favor, informe seu nome', 'danger');
+        clientNameInput.focus();
+        return;
       }
+      
+      if (!phone) {
+        showToast('Por favor, informe seu telefone', 'danger');
+        clientPhoneInput.focus();
+        return;
+      }
+      
+      // Validate phone format
+      const phoneRegex = /^\(\d{2}\)\s?\d{4,5}-\d{4}$/;
+      if (!phoneRegex.test(phone)) {
+        showToast('Formato de telefone inválido. Use (XX) XXXXX-XXXX', 'danger');
+        clientPhoneInput.focus();
+        return;
+      }
+      
+      // Validate email if provided
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showToast('Formato de e-mail inválido', 'danger');
+        clientEmailInput.focus();
+        return;
+      }
+      
+      showLoading();
+      
+      try {
+        // Check for conflicting reservations first
+        const { data: existingReservations, error: checkError } = await supabase
+          .from('reservas')
+          .select('data')
+          .in('data', selectedDates)
+          .eq('status', 'confirmed');
+        
+        if (checkError) throw checkError;
+        
+        if (existingReservations?.length > 0) {
+          const conflictDates = existingReservations.map(r => formatDateBR(r.data)).join(', ');
+          showToast(`As datas ${conflictDates} já estão reservadas`, 'danger');
+          return;
+        }
+        
+        // Create reservations for each selected date
+        const reservationPromises = selectedDates.map(date => 
+          supabase
+            .from('reservas')
+            .insert([{
+              data: date,
+              nome_do_cliente: name,
+              telefone_do_cliente: phone,
+              e_mail: email,
+              status: 'pending',
+              criado_em: new Date().toISOString()
+            }])
+        );
+        
+        const results = await Promise.all(reservationPromises);
+        const errors = results.filter(r => r.error);
+        
+        if (errors.length > 0) {
+          throw errors[0].error;
+        }
+        
+        // Success - clear form and selected dates
+        showToast('Reserva solicitada com sucesso!', 'success');
+        reservationModal.classList.add('hidden');
+        
+        // Store info for WhatsApp message
+        const datesToFormat = [...selectedDates];
+        
+        // Clear form and selection
+        selectedDates = [];
+        clientNameInput.value = '';
+        clientPhoneInput.value = '';
+        clientEmailInput.value = '';
+        
+        // Refresh calendar
+        await fetchReservations();
+        initializeCalendar();
+        
+        // Open WhatsApp with reservation details
+        const formattedDates = datesToFormat.map(date => formatDateBR(date)).join(', ');
+        const msg = `Olá! Eu, ${name}, gostaria de reservar o espaço Life Festas nas datas: ${formattedDates}. Telefone: ${phone}`;
+        const url = `https://wa.me/5581981521109?text=${encodeURIComponent(msg)}`;
+        window.open(url, '_blank');
+      } catch (error) {
+        await handleSupabaseError(error, 'criar reserva');
+      } finally {
+        hideLoading();
+      }
+    }
+    
+    // Initialize the app when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeApp().catch(error => {
+        console.error('Erro fatal ao inicializar aplicação:', error);
+        hideLoading();
+        showToast('Erro ao carregar aplicação. Por favor, recarregue a página.', 'danger');
+      });
     });
   </script>
 </body>
