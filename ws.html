@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TecnoService - Painel Administrativo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        .active-sidebar {
+            background: rgba(255, 255, 255, 0.25);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-900 to-indigo-900 min-h-screen text-gray-100">
+    <!-- Tela de Login -->
+    <div id="login-screen" class="flex items-center justify-center min-h-screen p-4">
+        <div class="glass-card rounded-xl p-8 w-full max-w-md">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold mb-1">TecnoService</h1>
+                <p class="opacity-70">Painel Administrativo</p>
+            </div>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label for="login-email" class="block mb-1">E-mail</label>
+                    <input type="email" id="login-email" required class="w-full px-4 py-2 bg-slate-800 bg-opacity-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="login-password" class="block mb-1">Senha</label>
+                    <input type="password" id="login-password" required class="w-full px-4 py-2 bg-slate-800 bg-opacity-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded-lg transition duration-200 font-medium">Entrar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Painel Administrativo (inicialmente oculto) -->
+    <div id="admin-panel" class="hidden min-h-screen">
+        <!-- Sidebar -->
+        <div class="fixed inset-y-0 left-0 w-64 bg-slate-800 bg-opacity-50 z-30 transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out shadow-xl" id="sidebar">
+            <div class="flex items-center p-4 border-b border-slate-700">
+                <div class="text-2xl font-bold ml-2">
+                    <span class="text-blue-400">Tecno</span><span class="text-white">Service</span>
+                </div>
+            </div>
+            <nav class="mt-6 px-2">
+                <div class="flex flex-col space-y-1">
+                    <a href="#" class="sidebar-item flex items-center px-3 py-3 rounded-lg text-white active-sidebar" data-page="dashboard">
+                        <i class="fas fa-chart-line mr-3 text-blue-400"></i>
+                        Dashboard
+                    </a>
+                    <a href="#" class="sidebar-item flex items-center px-3 py-3 rounded-lg text-white hover:text-white" data-page="customers">
+                        <i class="fas fa-users mr-3 text-blue-400"></i>
+                        Clientes
+                    </a>
+                    <a href="#" class="sidebar-item flex items-center px-3 py-3 rounded-lg text-white hover:text-white" data-page="services">
+                        <i class="fas fa-tools mr-3 text-blue-400"></i>
+                        Serviços
+                    </a>
+                    <a href="#" class="sidebar-item flex items-center px-3 py-3 rounded-lg text-white hover:text-white" data-page="employees">
+                        <i class="fas fa-user-tie mr-3 text-blue-400"></i>
+                        Funcionários
+                    </a>
+                    <a href="#" class="sidebar-item flex items-center px-3 py-3 rounded-lg text-white hover:text-white" data-page="budgets">
+                        <i class="fas fa-file-invoice-dollar mr-3 text-blue-400"></i>
+                        Orçamentos
+                    </a>
+                    <a href="#" class="sidebar-item flex items-center px-3 py-3 rounded-lg text-white hover:text-white" data-page="receipts">
+                        <i class="fas fa-receipt mr-3 text-blue-400"></i>
+                        Recibos
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <div class="lg:ml-64">
+            <!-- Header -->
+            <header class="fixed top-0 right-0 left-0 lg:left-64 z-20 bg-slate-800 bg-opacity-50 backdrop-filter backdrop-blur-lg border-b border-slate-700">
+                <div class="flex items-center justify-between px-6 h-16">
+                    <div class="flex items-center">
+                        <button id="mobile-menu-button" class="lg:hidden mr-4 focus:outline-none">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <h2 id="page-title" class="text-xl font-semibold">Dashboard</h2>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative hidden md:block">
+                            <input type="text" class="w-64 px-4 py-2 bg-slate-700 bg-opacity-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pl-10" placeholder="Pesquisar...">
+                            <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
+                        </div>
+                        <button class="p-2 rounded-full bg-slate-700 bg-opacity-50 hover:bg-slate-600">
+                            <i class="fas fa-bell text-xl"></i>
+                        </button>
+                        <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none">
+                            <div class="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center font-semibold">AD</div>
+                            <span class="hidden md:inline">Admin</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Conteúdo da Página -->
+            <main class="pt-16 px-4 pb-6">
+                <!-- Dashboard -->
+                <div id="dashboard-page" class="page-content">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                        <div class="glass-card rounded-xl p-6">
+                            <div class="flex justify-between">
+                                <div>
+                                    <p class="text-sm opacity-70 mb-1">Clientes</p>
+                                    <h3 class="text-2xl font-bold">248</h3>
+                                    <p class="text-green-400 text-sm mt-1"><i class="fas fa-arrow-up mr-1"></i> 12% mês</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-full bg-blue-600 bg-opacity-30 flex items-center justify-center">
+                                    <i class="fas fa-users text-xl text-blue-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-card rounded-xl p-6">
+                            <div class="flex justify-between">
+                                <div>
+                                    <p class="text-sm opacity-70 mb-1">Orçamentos</p>
+                                    <h3 class="text-2xl font-bold">156</h3>
+                                    <p class="text-green-400 text-sm mt-1"><i class="fas fa-arrow-up mr-1"></i> 8% mês</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-full bg-indigo-600 bg-opacity-30 flex items-center justify-center">
+                                    <i class="fas fa-file-invoice-dollar text-xl text-indigo-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-card rounded-xl p-6">
+                            <div class="flex justify-between">
+                                <div>
+                                    <p class="text-sm opacity-70 mb-1">Serviços Ativos</p>
+                                    <h3 class="text-2xl font-bold">42</h3>
+                                    <p class="text-red-400 text-sm mt-1"><i class="fas fa-arrow-down mr-1"></i> 3% mês</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-full bg-purple-600 bg-opacity-30 flex items-center justify-center">
+                                    <i class="fas fa-tools text-xl text-purple-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-card rounded-xl p-6">
+                            <div class="flex justify-between">
+                                <div>
+                                    <p class="text-sm opacity-70 mb-1">Receita</p>
+                                    <h3 class="text-2xl font-bold">R$ 89.452</h3>
+                                    <p class="text-green-400 text-sm mt-1"><i class="fas fa-arrow-up mr-1"></i> 23% mês</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-full bg-green-600 bg-opacity-30 flex items-center justify-center">
+                                    <i class="fas fa-dollar-sign text-xl text-green-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                        <div class="glass-card rounded-xl p-6 lg:col-span-2">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-semibold">Atendimentos Mensais</h3>
+                                <select class="bg-slate-800 bg-opacity-50 px-3 py-1 rounded-lg text-sm">
+                                    <option>Últimos 6 meses</option>
+                                    <option>Últimos 12 meses</option>
+                                    <option>Este ano</option>
+                                </select>
+                            </div>
+                            <canvas id="services-chart" height="300"></canvas>
+                        </div>
+                        <div class="glass-card rounded-xl p-6">
+                            <h3 class="text-lg font-semibold mb-4">Serviços Mais Solicitados</h3>
+                            <canvas id="top-services-chart" height="300"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="glass-card rounded-xl p-6 mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold">Últimos Orçamentos</h3>
+                            <a href="#" class="text-sm text-blue-400 hover:text-blue-300">Ver todos</a>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="border-b border-slate-700">
+                                        <th class="pb-3 text-left">Nº</th>
+                                        <th class="pb-3 text-left">Cliente</th>
+                                        <th class="pb-3 text-left">Serviço</th>
+                                        <th class="pb-3 text-left">Status</th>
+                                        <th class="pb-3 text-left">Valor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b border-slate-700 hover:bg-slate-800 hover:bg-opacity-50">
+                                        <td class="py-3">#8765</td>
+                                        <td class="py-3">João Silva</td>
+                                        <td class="py-3">Manutenção Notebook</td>
+                                        <td class="py-3"><span class="px-2 py-1 bg-yellow-500 bg-opacity-20 text-yellow-400 rounded-full text-xs">Pendente</span></td>
+                                        <td class="py-3">R$ 350,00</td>
+                                    </tr>
+                                    <tr class="border-b border-slate-700 hover:bg-slate-800 hover:bg-opacity-50">
+                                        <td class="py-3">#8764</td>
+                                        <td class="py-3">Maria Souza</td>
+                                        <td class="py-3">Troca de Tela Smartphone</td>
+                                        <td class="py-3"><span class="px-2 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded-full text-xs">Aprovado</span></td>
+                                        <td class="py-3">R$ 180,00</td>
+                                    </tr>
+                                    <tr class="border-b border-slate-700 hover:bg-slate-800 hover:bg-opacity-50">
+                                        <td class="py-3">#8763</td>
+                                        <td class="py-3">Carlos Oliveira</td>
+                                        <td class="py-3">Formatação e Backup</td>
+                                        <td class="py-3"><span class="px-2 py-1 bg-red-500 bg-opacity-20 text-red-400 rounded-full text-xs">Recusado</span></td>
+                                        <td class="py-3">R$ 120,00</td>
+                                    </tr>
+                                    <tr class="border-b border-slate-700 hover:bg-slate-800 hover:bg-opacity-50">
+                                        <td class="py-3">#8762</td>
+                                        <td class="py-3">Ana Santos</td>
+                                        <td class="py-3">Instalação de Software</td>
+                                        <td class="py-3"><span class="px-2 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded-full text-xs">Aprovado</span></td>
+                                        <td class="py-3">R$ 85,00</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Página de Clientes -->
+                <div id="customers-page" class="page-content hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold">Clientes</h2>
+                        <button id="add-customer-btn" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Novo Cliente
+                        </button>
+                    </div>
+
+                    <div class="glass-card rounded-xl p-6 mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <div class="flex space-x-4">
+                                <div class="relative">
+                                    <input type="text" placeholder="Pesquisar..." class="bg-slate-700 bg-opacity-50 px-4 py-2 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-64">
+                                    <i class="fas fa-search absolute right-3 top-2.5 text-gray-400"></i>
+                                </div>
+                                <select class="bg-slate-800 bg-opacity-50 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option>Todos os status</option>
+                                    <option>Ativos</option>
+                                    <option>Inativos</option>
+                                </select>
+                            </div>
+                            <div>
+                                <button class="p-2 bg-slate-700 bg-opacity-50 hover:bg-slate-600 rounded-lg">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="border-b border-slate-700">
+                                        <th class="pb-3 text-left"></th>
+                                        <th class="pb-3 text-left">Nome</th>
+                                        <th class="pb-3 text-left">E-mail</th>
+                                        <th class="pb-3 text-left">Telefone</th>
+                                        <th class="pb-3 text-left">Atendimentos</th>
+                                        <th class="pb-3 text-left">Status</th>
+                                        <th class="pb-3 text-left">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="customers-table-body">
+                                    <!-- Dados serão carregados via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="flex justify-between items-center mt-4">
+                            <div class="text-sm opacity-70">Mostrando 1 a 10 de 248 clientes</div>
+                            <div class="flex space-x-2">
+                                <button class="p-2 rounded-lg bg-slate-700 bg-opacity-50 hover:bg-slate-600 disabled:opacity-30" disabled>
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button class="p-2 px-3 rounded-lg bg-blue-600">
+                                    1
+                                </button>
+                                <button class="p-2 px-3 rounded-lg bg-slate-700 bg-opacity-50 hover:bg-slate-600">
+                                    2
+                                </button>
+                                <button class="p-2 px-3 rounded-lg bg-slate-700 bg-opacity-50 hover:bg-slate-600">
+                                    3
+                                </button>
+                                <button class="p-2 rounded-lg bg-slate-700 bg-opacity-50 hover:bg-slate-600">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Páginas para outros módulos (ocultas inicialmente) -->
+                <div id="services-page" class="page-content hidden">
+                    <div class="text-center py-20">
+                        <h2 class="text-2xl mb-2">Serviços</h2>
+                        <p>Em desenvolvimento</p>
+                    </div>
+                </div>
+                <div id="employees-page" class="page-content hidden">
+                    <div class="text-center py-20">
+                        <h2 class="text-2xl mb-2">Funcionários</h2>
+                        <p>Em desenvolvimento</p>
+                    </div>
+                </div>
+                <div id="budgets-page" class="page-content hidden">
+                    <div class="text-center py-20">
+                        <h2 class="text-2xl mb-2">Orçamentos</h2>
+                        <p>Em desenvolvimento</p>
+                    </div>
+                </div>
+                <div id="receipts-page" class="page-content hidden">
+                    <div class="text-center py-20">
+                        <h2 class="text-2xl mb-2">Recibos</h2>
+                        <p>Em desenvolvimento</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Adicionar Cliente -->
+    <div id="customer-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 hidden">
+        <div class="glass-card rounded-xl p-6 w-full max-w-xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold">Adicionar Novo Cliente</h3>
+                <button id="close-customer-modal" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="customer-form">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="customer-name" class="block mb-1">Nome Completo*</label>
+                        <input type="text" id="customer-name" required class="w-full px-4 py-2 bg-slate-800 bg-opacity-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="customer-email" class="block mb-1">E-mail*</label>
+                        <input type="email" id="customer-email" required class="w-full px-4 py-2 bg-slate-800 bg-opacity-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="customer-phone" class="block mb-1">Telefone*</label>
+                        <input type="tel" id="customer-phone" required class="w-full px-4 py-2 bg-slate-800 bg-opacity-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="customer-cpf" class="block mb-1">CPF</label>
+                        <input type="text" id="customer-cpf" class="w-full px-4 py-2 bg-slate-800 bg-opacity-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="customer-address" class="block mb-1">Endereço</label>
+                    <input type="text" id="customer-address" class="w-full px-4 py-2 bg-slate-800 bg-opacity-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div>
+                        <label for="customer-city" class="block mb-1">Cidade</label>
+                        <input type="text" id="customer-city" class="w-full px-4 py-2 bg-slate-800 bg-opacity-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="customer-state" class="block mb-1">Estado</label>
+                        <select id="customer-state" class="w-full px-4 py-2 bg-slate-800 bg-opacity-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Selecione</option>
+                            <option value="AC">Acre</option>
+                            <option value="AL">Alagoas</option>
+                            <!-- outros estados -->
+                        </select>
+                    </div>
+                    <div>
+                        <label for="customer-zip" class="block mb-1">CEP</label>
+                        <input type="text" id="customer-zip" class="w-full px-4 py-2 bg-slate-800 bg-opacity-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" id="cancel-customer" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg">Salvar Cliente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notificação -->
+    <div id="notification" class="fixed bottom-6 right-6 bg-green-600 text-white px-4 py-3 rounded-lg shadow-lg transform translate-y-10 opacity-0 transition-all duration-300 hidden">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="notification-message">Operação realizada com sucesso!</span>
+        </div>
+    </div>
+
+    <script>
+        // Configuração do Tailwind
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#1e40af',
+                        'primary-light': '#3b82f6',
+                        'primary-dark': '#1e3a8a'
+                    }
+                }
+            }
+        }
+
+        // Funções utilitárias
+        const Utils = {
+            showNotification: (message, type = 'success') => {
+                const notification = document.getElementById('notification');
+                const notificationMsg = document.getElementById('notification-message');
+                
+                notification.className = `fixed bottom-6 right-6 ${type === 'success' ? 'bg-green-600' : 'bg-red-600'} text-white px-4 py-3 rounded-lg shadow-lg transform opacity-100 transition-all duration-300 flex items-center`;
+                notificationMsg.textContent = message;
+                
+                setTimeout(() => {
+                    notification.className = `fixed bottom-6 right-6 ${type === 'success' ? 'bg-green-600' : 'bg-red-600'} text-white px-4 py-3 rounded-lg shadow-lg transform translate-y-10 opacity-0 transition-all duration-300 flex items-center`;
+                }, 3000);
+            },
+            
+            formatPhone: (phone) => {
+                return phone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+            },
+            
+            formatCPF: (cpf) => {
+                return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+            }
+        };
+
+        // API Supabase
+        class SupabaseAPI {
+            constructor() {
+                this.supabaseUrl = 'https://your-supabase-url.supabase.co';
+                this.supabaseKey = 'your-supabase-key';
+                this.client = supabase.createClient(this.supabaseUrl, this.supabaseKey);
+                
+                // Verificar sessão ao carregar
+                this.client.auth.onAuthStateChange((event, session) => {
+                    if (event === 'SIGNED_IN') {
+                        document.getElementById('login-screen').classList.add('hidden');
+                        document.getElementById('admin-panel').classList.remove('hidden');
+                        this.loadInitialData();
+                    } else if (event === 'SIGNED_OUT') {
+                        document.getElementById('login-screen').classList.remove('hidden');
+                        document.getElementById('admin-panel').classList.add('hidden');
+                    }
+                });
+            }
+            
+            async login(email, password) {
+                const { error } = await this.client.auth.signInWithPassword({
+                    email,
+                    password
+                });
+                
+                if (error) throw error;
+            }
+            
+            async logout() {
+                const { error } = await this.client.auth.signOut();
+                if (error) throw error;
+            }
+            
+            // Clientes
+            async fetchCustomers() {
+                const { data, error } = await this.client
+                    .from('clientes')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                return { data, error };
+            }
+            
+            async getCustomer(id) {
+                const { data, error } = await this.client
+                    .from('clientes')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+                
+                return { data, error };
+            }
+            
+            async addCustomer(customerData) {
+                const { data, error } = await this.client
+                    .from('clientes')
+                    .insert(customerData)
+                    .select()
+                    .single();
+                
+                return { data, error };
+            }
+            
+            async updateCustomer(id, customerData) {
+                const { data, error } = await this.client
+                    .from('clientes')
+                    .update(customerData)
+                    .eq('id', id)
+                    .select()
+                    .single();
+                
+                return { data, error };
+            }
+            
+            async deleteCustomer(id) {
+                const { data, error } = await this.client
+                    .from('clientes')
+                    .delete()
+                    .eq('id', id);
+                
+                return { data, error };
+            }
+            
+            // Serviços
+            async fetchServices() {
+                const { data, error } = await this.client
+                    .from('servicos')
+                    .select('*, clientes(nome)')
+                    .order('created_at', { ascending: false });
+                
+                return { data, error };
+            }
+            
+            async getService(id) {
+                const { data, error } = await this.client
+                    .from('servicos')
+                    .select('*, clientes(*)')
+                    .eq('id', id)
+                    .single();
+                
+                return { data, error };
+            }
+            
+            async addService(serviceData) {
+                const { data, error } = await this.client
+                    .from('servicos')
+                    .insert(serviceData)
+                    .select()
+                    .single();
+                
+                return { data, error };
+            }
+            
+            async updateService(id, serviceData) {
+                const { data, error } = await this.client
+                    .from('servicos')
+                    .update(serviceData)
+                    .eq('id', id)
+                    .select()
+                    .single();
+                
+                return { data, error };
+            }
+            
+            async deleteService(id) {
+                const { data, error } = await this.client
+                    .from('servicos')
+                    .delete()
+                    .eq('id', id);
+                
+                return { data, error };
+            }
+            
+            // Funcionários/Equipe
+            async fetchEmployees() {
+                const { data, error } = await this.client
+                    .from('equipe')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                return { data, error };
+            }
+            
+            async getEmployee(id) {
+                const { data, error } = await this.client
+                    .from('equipe')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+                
+                return { data, error };
+            }
+            
+            // Orçamentos
+            async fetchBudgets() {
+                const { data, error } = await this.client
+                    .from('orcamentos')
+                    .select('*, clientes(nome), servicos(descricao), equipe(nome)')
+                    .order('created_at', { ascending: false });
+                
+                return { data, error };
+            }
+            
+            async getBudget(id) {
+                const { data, error } = await this.client
+                    .from('orcamentos')
+                    .select('*, clientes(*), servicos(*), equipe(*)')
+                    .eq('id', id)
+                    .single();
+                
+                return { data, error };
+            }
+            
+            async addBudget(budgetData) {
+                const { data, error } = await this.client
+                    .from('orcamentos')
+                    .insert(budgetData)
+                    .select()
+                    .single();
+                
+                return { data, error };
+            }
+            
+            async updateBudget(id, budgetData) {
+                const { data, error } = await this.client
+                    .from('orcamentos')
+                    .update(budgetData)
+                    .eq('id', id)
+                    .select()
+                    .single();
+                
+                return { data, error };
+            }
+            
+            async deleteBudget(id) {
+                const { data, error } = await this.client
+                    .from('orcamentos')
+                    .delete()
+                    .eq('id', id);
+                
+                return { data, error };
+            }
+            
+            // Recibos
+            async fetchReceipts() {
+                const { data, error } = await this.client
+                    .from('recibos')
+                    .select('*, clientes(nome), servicos(descricao)')
+                    .order('created_at', { ascending: false });
+                
+                return { data, error };
+            }
+            
+            async getReceipt(id) {
+                const { data, error } = await this.client
+                    .from('recibos')
+                    .select('*, clientes(*), servicos(*)')
+                    .eq('id', id)
+                    .single();
+                
+                return { data, error };
+            }
+            
+            async addReceipt(receiptData) {
+                const { data, error } = await this.client
+                    .from('recibos')
+                    .insert(receiptData)
+                    .select()
+                    .single();
+                
+                return { data, error };
+            }
+            
+            async updateReceipt(id, receiptData) {
+                const { data, error } = await this.client
+                    .from('recibos')
+                    .update(receiptData)
+                    .eq('id', id)
+                    .select()
+                    .single();
+                
+                return { data, error };
+            }
+            
+            async deleteReceipt(id) {
+                const { data, error } = await this.client
+                    .from('recibos')
+                    .delete()
+                    .eq('id', id);
+                
+                return { data, error };
+            }
+            
+            loadInitialData() {
+                // Carregar gráficos e dados iniciais
+                this.createCharts();
+                this.loadCustomersTable();
+            }
+            
+            createCharts() {
+                // Gráfico de serviços mensais
+                const servicesCtx = document.getElementById('services-chart').getContext('2d');
+                const servicesChart = new Chart(servicesCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho'],
+                        datasets: [
+                            {
+                                label: 'Serviços Concluídos',
+                                data: [12, 19, 15, 24, 18, 22],
+                                borderColor: '#3b82f6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                tension: 0.3,
+                                fill: true
+                            },
+                            {
+                                label: 'Orçamentos',
+                                data: [8, 12, 10, 15, 12, 17],
+                                borderColor: '#8b5cf6',
+                                backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                                tension: 0.3,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+                
+                // Gráfico de serviços mais solicitados
+                const topServicesCtx = document.getElementById('top-services-chart').getContext('2d');
+                const topServicesChart = new Chart(topServicesCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Manutenção', 'Formatação', 'Troca de Tela', 'Instalação', 'Backup'],
+                        datasets: [{
+                            data: [35, 20, 18, 15, 12],
+                            backgroundColor: [
+                                '#3b82f6',
+                                '#8b5cf6',
+                                '#ec4899',
+                                '#f59e0b',
+                                '#10b981'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            }
+                        }
+                    }
+                });
+            }
+            
+            async loadCustomersTable() {
+                const { data: customers, error } = await this.fetchCustomers();
+                
+                if (error) {
+                    Utils.showNotification('Erro ao carregar clientes: ' + error.message, 'error');
+                    return;
+                }
+                
+                const tbody = document.getElementById('customers-table-body');
+                tbody.innerHTML = '';
+                
+                customers.forEach(customer => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b border-slate-700 hover:bg-slate-800 hover:bg-opacity-50';
+                    
+                    tr.innerHTML = `
+                        <td class="py-3"><div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center font-semibold">${customer.name.charAt(0)}</div></td>
+                        <td class="py-3">${customer.name}</td>
+                        <td class="py-3">${customer.email}</td>
+                        <td class="py-3">${Utils.formatPhone(customer.phone)}</td>
+                        <td class="py-3">${customer.services_count}</td>
+                        <td class="py-3">
+                            <span class="px-2 py-1 ${customer.status === 'ativo' ? 'bg-green-500 bg-opacity-20 text-green-400' : 'bg-red-500 bg-opacity-20 text-red-400'} rounded-full text-xs">
+                                ${customer.status === 'ativo' ? 'Ativo' : 'Inativo'}
+                            </span>
+                        </td>
+                        <td class="py-3">
+                            <div class="flex space-x-2">
+                                <button class="edit-customer p-1.5 bg-slate-700 hover:bg-blue-600 rounded-lg" data-id="${customer.id}">
+                                    <i class="fas fa-edit text-sm"></i>
+                                </button>
+                                <button class="delete-customer p-1.5 bg-slate-700 hover:bg-red-600 rounded-lg" data-id="${customer.id}">
+                                    <i class="fas fa-trash text-sm"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    
+                    tbody.appendChild(tr);
+                });
+                
+                // Adicionar listeners aos botões de edição e exclusão
+                document.querySelectorAll('.edit-customer').forEach(btn => {
+                    btn.addEventListener('click', () => CustomerUI.editCustomer(btn.getAttribute('data-id')));
+                });
+                
+                document.querySelectorAll('.delete-customer').forEach(btn => {
+                    btn.addEventListener('click', () => CustomerUI.deleteCustomer(btn.getAttribute('data-id')));
+                });
+            }
+        }
+
+        // Lógica para UI de Clientes
+        const CustomerUI = {
+            init: function() {
+                document.getElementById('add-customer-btn').addEventListener('click', this.showAddCustomerForm);
+                document.getElementById('close-customer-modal').addEventListener('click', this.hideCustomerModal);
+                document.getElementById('cancel-customer').addEventListener('click', this.hideCustomerModal);
+                document.getElementById('customer-form').addEventListener('submit', this.handleCustomerSubmit);
+            },
+            
+            showAddCustomerForm: function() {
+                document.getElementById('customer-form').reset();
+                document.getElementById('customer-modal').classList.remove('hidden');
+                document.getElementById('customer-modal').querySelector('h3').textContent = 'Adicionar Novo Cliente';
+                document.getElementById('customer-form').setAttribute('data-mode', 'add');
+            },
+            
+            editCustomer: async function(id) {
+                const { data: customer, error } = await api.fetchCustomers();
+                
+                if (error || !customer || customer.length === 0) {
+                    Utils.showNotification('Erro ao carregar dados do cliente', 'error');
+                    return;
+                }
+                
+                // Para demonstração, vamos usar o primeiro cliente
+                const cust = customer[0];
+                
+                document.getElementById('customer-name').value = cust.name;
+                document.getElementById('customer-email').value = cust.email;
+                document.getElementById('customer-phone').value = cust.phone;
+                document.getElementById('customer-cpf').value = cust.cpf;
+                document.getElementById('customer-address').value = cust.address;
+                document.getElementById('customer-city').value = cust.city;
+                document.getElementById('customer-state').value = cust.state;
+                document.getElementById('customer-zip').value = cust.zip;
+                
+                document.getElementById('customer-modal').querySelector('h3').textContent = 'Editar Cliente';
+                document.getElementById('customer-form').setAttribute('data-mode', 'edit');
+                document.getElementById('customer-form').setAttribute('data-id', id);
+                
+                document.getElementById('customer-modal').classList.remove('hidden');
+            },
+            
+            deleteCustomer: function(id) {
+                if (confirm('Tem certeza que deseja excluir este cliente?')) {
+                    // api.deleteCustomer(id).then(() => {
+                        Utils.showNotification('Cliente excluído com sucesso!');
+                        api.loadCustomersTable();
+                    // }).catch(error => {
+                    //     Utils.showNotification('Erro ao excluir cliente: ' + error.message, 'error');
+                    // });
+                }
+            },
+            
+            hideCustomerModal: function() {
+                document.getElementById('customer-modal').classList.add('hidden');
+            },
+            
+            handleCustomerSubmit: function(e) {
+                e.preventDefault();
+                
+                const form = e.target;
+                const mode = form.getAttribute('data-mode');
+                
+                const customerData = {
+                    name: document.getElementById('customer-name').value,
+                    email: document.getElementById('customer-email').value,
+                    phone: document.getElementById('customer-phone').value,
+                    cpf: document.getElementById('customer-cpf').value,
+                    address: document.getElementById('customer-address').value,
+                    city: document.getElementById('customer-city').value,
+                    state: document.getElementById('customer-state').value,
+                    zip: document.getElementById('customer-zip').value,
+                    status: 'ativo'
+                };
+                
+                if (mode === 'add') {
+                    // api.addCustomer(customerData).then(() => {
+                        Utils.showNotification('Cliente adicionado com sucesso!');
+                        form.reset();
+                        this.hideCustomerModal();
+                        api.loadCustomersTable();
+                    // }).catch(error => {
+                    //     Utils.showNotification('Erro ao adicionar cliente: ' + error.message, 'error');
+                    // });
+                } else {
+                    const id = form.getAttribute('data-id');
+                    // api.updateCustomer(id, customerData).then(() => {
+                        Utils.showNotification('Cliente atualizado com sucesso!');
+                        this.hideCustomerModal();
+                        api.loadCustomersTable();
+                    // }).catch(error => {
+                    //     Utils.showNotification('Erro ao atualizar cliente: ' + error.message, 'error');
+                    // });
+                }
+            }
+        };
+
+        // Lógica principal do aplicativo
+        const App = {
+            init: function() {
+                // Event listeners
+                document.getElementById('login-form').addEventListener('submit', this.handleLogin);
+                document.getElementById('mobile-menu-button').addEventListener('click', this.toggleSidebar);
+                
+                // Navegação entre páginas
+                document.querySelectorAll('[data-page]').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.showPage(link.getAttribute('data-page'));
+                    });
+                });
+                
+                // Inicializar módulos
+                CustomerUI.init();
+            },
+            
+            handleLogin: async function(e) {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                
+                try {
+                    await api.login(email, password);
+                } catch (error) {
+                    Utils.showNotification('Erro no login: ' + error.message, 'error');
+                }
+            },
+            
+            toggleSidebar: function() {
+                document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            },
+            
+            showPage: function(pageId) {
+                // Esconder todas as páginas
+                document.querySelectorAll('.page-content').forEach(page => {
+                    page.classList.add('hidden');
+                });
+                
+                // Mostrar a página selecionada
+                document.getElementById(`${pageId}-page`).classList.remove('hidden');
+                
+                // Atualizar título da página
+                document.getElementById('page-title').textContent = document.querySelector(`[data-page="${pageId}"]`).textContent.trim();
+                
+                // Atualizar item ativo na sidebar
+                document.querySelectorAll('.sidebar-item').forEach(item => {
+                    item.classList.remove('active-sidebar');
+                });
+                document.querySelector(`[data-page="${pageId}"]`).classList.add('active-sidebar');
+                
+                // Fechar sidebar no mobile
+                if (window.innerWidth < 1024) {
+                    this.toggleSidebar();
+                }
+            }
+        };
+
+        // Instanciar API Supabase
+        const api = new SupabaseAPI();
+        
+        // Iniciar aplicativo quando o DOM estiver carregado
+        document.addEventListener('DOMContentLoaded', () => {
+            App.init();
+            
+            // Mostrar página de dashboard por padrão
+            App.showPage('dashboard');
+        });
+    </script>
+</body>
+</html>
