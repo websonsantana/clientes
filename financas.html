@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meu Controle Financeiro 50-30-20</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .chart-container {
@@ -285,6 +286,14 @@
     </div>
 
     <script>
+        // --- Supabase client & auth check ---
+const supabase = window.supabase.createClient(
+  'https://pzxixywhuhofeiipwiro.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6eGl4eXdodWhvZmVpaXB3aXJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk2NTcxMTQsImV4cCI6MjA2NTIzMzExNH0._EdPnaZ_wOw1q4VQjHJApEjMnaz9l6MdRy1S9mkYR1I'
+);
+supabase.auth.getUser().then(({data})=>{
+  if (!data.user) window.location='login.html';
+});
         document.addEventListener('DOMContentLoaded', function() {
             // DOM Elements
             const salaryInput = document.getElementById('salaryInput');
@@ -331,453 +340,112 @@
             const wantsPercentage = document.getElementById('wantsPercentage');
             const savingsPercentage = document.getElementById('savingsPercentage');
             
-            const financialStatus = document.getElementById('financialStatus');
-            
-            // Data
-            let incomes = [];
-            let fixedExpenses = [];
-            let variableExpenses = [];
-            let unexpectedExpenses = [];
-            let bills = [];
-            
-            // Initialize
-            loadFromLocalStorage();
-            updateDashboard();
-            updateChart();
-            
-            // Event Listeners
-            salaryInput.addEventListener('change', updateDashboard);
-            addIncomeBtn.addEventListener('click', addIncome);
-            addFixedExpenseBtn.addEventListener('click', addFixedExpense);
-            addVariableExpenseBtn.addEventListener('click', addVariableExpense);
-            addUnexpectedExpenseBtn.addEventListener('click', addUnexpectedExpense);
-            addBillBtn.addEventListener('click', addBill);
-            saveDataBtn.addEventListener('click', saveToLocalStorage);
-            loadDataBtn.addEventListener('click', loadFromLocalStorage);
-            clearDataBtn.addEventListener('click', clearAllData);
-            
-            // Functions
-            function formatCurrency(value) {
-                return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-            }
-            
-            function addIncome() {
-                const description = otherIncomeDesc.value.trim();
-                const value = parseFloat(otherIncomeValue.value);
-                
-                if (!description || isNaN(value) || value <= 0) {
-                    alert('Por favor, preencha a descrição e um valor válido maior que zero.');
-                    return;
-                }
-                
-                incomes.push({
-                    id: Date.now(),
-                    description,
-                    value
-                });
-                
-                otherIncomeDesc.value = '';
-                otherIncomeValue.value = '';
-                
-                updateDashboard();
-                renderIncomeList();
-            }
-            
-            function addFixedExpense() {
-                const type = fixedExpenseType.value;
-                const value = parseFloat(fixedExpenseValue.value);
-                
-                if (!type || isNaN(value) || value <= 0) {
-                    alert('Por favor, selecione um tipo e insira um valor válido maior que zero.');
-                    return;
-                }
-                
-                fixedExpenses.push({
-                    id: Date.now(),
-                    type,
-                    value
-                });
-                
-                fixedExpenseType.value = '';
-                fixedExpenseValue.value = '';
-                
-                updateDashboard();
-                renderFixedExpensesList();
-            }
-            
-            function addVariableExpense() {
-                const description = variableExpenseDesc.value.trim();
-                const value = parseFloat(variableExpenseValue.value);
-                
-                if (!description || isNaN(value) || value <= 0) {
-                    alert('Por favor, preencha a descrição e um valor válido maior que zero.');
-                    return;
-                }
-                
-                variableExpenses.push({
-                    id: Date.now(),
-                    description,
-                    value
-                });
-                
-                variableExpenseDesc.value = '';
-                variableExpenseValue.value = '';
-                
-                updateDashboard();
-                renderVariableExpensesList();
-            }
-            
-            function addUnexpectedExpense() {
-                const description = unexpectedExpenseDesc.value.trim();
-                const value = parseFloat(unexpectedExpenseValue.value);
-                
-                if (!description || isNaN(value) || value <= 0) {
-                    alert('Por favor, preencha a descrição e um valor válido maior que zero.');
-                    return;
-                }
-                
-                unexpectedExpenses.push({
-                    id: Date.now(),
-                    description,
-                    value
-                });
-                
-                unexpectedExpenseDesc.value = '';
-                unexpectedExpenseValue.value = '';
-                
-                updateDashboard();
-                renderUnexpectedExpensesList();
-            }
-            
-            function addBill() {
-                const description = billDesc.value.trim();
-                const value = parseFloat(billValue.value);
-                const dueDate = billDueDate.value;
-                
-                if (!description || isNaN(value) || value <= 0 || !dueDate) {
-                    alert('Por favor, preencha todos os campos com valores válidos.');
-                    return;
-                }
-                
-                bills.push({
-                    id: Date.now(),
-                    description,
-                    value,
-                    dueDate,
-                    paid: false
-                });
-                
-                billDesc.value = '';
-                billValue.value = '';
-                billDueDate.value = '';
-                
-                renderBillsTable();
-            }
-            
-            function deleteIncome(id) {
-                incomes = incomes.filter(income => income.id !== id);
-                updateDashboard();
-                renderIncomeList();
-            }
-            
-            function deleteFixedExpense(id) {
-                fixedExpenses = fixedExpenses.filter(expense => expense.id !== id);
-                updateDashboard();
-                renderFixedExpensesList();
-            }
-            
-            function deleteVariableExpense(id) {
-                variableExpenses = variableExpenses.filter(expense => expense.id !== id);
-                updateDashboard();
-                renderVariableExpensesList();
-            }
-            
-            function deleteUnexpectedExpense(id) {
-                unexpectedExpenses = unexpectedExpenses.filter(expense => expense.id !== id);
-                updateDashboard();
-                renderUnexpectedExpensesList();
-            }
-            
-            function deleteBill(id) {
-                bills = bills.filter(bill => bill.id !== id);
-                renderBillsTable();
-            }
-            
-            function toggleBillStatus(id) {
-                const bill = bills.find(bill => bill.id === id);
-                if (bill) {
-                    bill.paid = !bill.paid;
-                    updateDashboard();
-                    renderBillsTable();
-                }
-            }
-            
-            function renderIncomeList() {
-                incomeList.innerHTML = incomes.map(income => `
-                    <li class="py-2 flex justify-between items-center fade-in">
-                        <div>
-                            <span class="font-medium">${income.description}</span>
-                            <span class="text-sm text-gray-500 ml-2">${formatCurrency(income.value)}</span>
-                        </div>
-                        <button onclick="deleteIncome(${income.id})" class="text-red-500 hover:text-red-700">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </li>
-                `).join('');
-            }
-            
-            function renderFixedExpensesList() {
-                fixedExpensesList.innerHTML = fixedExpenses.map(expense => `
-                    <li class="py-2 flex justify-between items-center fade-in">
-                        <div>
-                            <span class="font-medium">${expense.type}</span>
-                            <span class="text-sm text-gray-500 ml-2">${formatCurrency(expense.value)}</span>
-                        </div>
-                        <button onclick="deleteFixedExpense(${expense.id})" class="text-red-500 hover:text-red-700">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </li>
-                `).join('');
-            }
-            
-            function renderVariableExpensesList() {
-                variableExpensesList.innerHTML = variableExpenses.map(expense => `
-                    <li class="py-2 flex justify-between items-center fade-in">
-                        <div>
-                            <span class="font-medium">${expense.description}</span>
-                            <span class="text-sm text-gray-500 ml-2">${formatCurrency(expense.value)}</span>
-                        </div>
-                        <button onclick="deleteVariableExpense(${expense.id})" class="text-red-500 hover:text-red-700">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </li>
-                `).join('');
-            }
-            
-            function renderUnexpectedExpensesList() {
-                unexpectedExpensesList.innerHTML = unexpectedExpenses.map(expense => `
-                    <li class="py-2 flex justify-between items-center fade-in">
-                        <div>
-                            <span class="font-medium">${expense.description}</span>
-                            <span class="text-sm text-gray-500 ml-2">${formatCurrency(expense.value)}</span>
-                        </div>
-                        <button onclick="deleteUnexpectedExpense(${expense.id})" class="text-red-500 hover:text-red-700">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </li>
-                `).join('');
-            }
-            
-            function renderBillsTable() {
-                billsTable.innerHTML = bills.map(bill => {
-                    const dueDate = new Date(bill.dueDate);
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    
-                    let statusClass = '';
-                    let statusText = '';
-                    
-                    if (bill.paid) {
-                        statusClass = 'bg-green-100 text-green-800';
-                        statusText = 'Pago';
-                    } else if (dueDate < today) {
-                        statusClass = 'bg-red-100 text-red-800';
-                        statusText = 'Atrasado';
-                    } else {
-                        statusClass = 'bg-yellow-100 text-yellow-800';
-                        statusText = 'Pendente';
-                    }
-                    
-                    return `
-                        <tr class="fade-in">
-                            <td class="px-4 py-2">${bill.description}</td>
-                            <td class="px-4 py-2 text-right">${formatCurrency(bill.value)}</td>
-                            <td class="px-4 py-2">${dueDate.toLocaleDateString('pt-BR')}</td>
-                            <td class="px-4 py-2 text-center">
-                                <span class="px-2 py-1 rounded-full text-xs ${statusClass}">${statusText}</span>
-                            </td>
-                            <td class="px-4 py-2 text-right">
-                                <button onclick="toggleBillStatus(${bill.id})" class="text-blue-500 hover:text-blue-700 mr-2">
-                                    ${bill.paid ? '<i class="fas fa-undo"></i>' : '<i class="fas fa-check"></i>'}
-                                </button>
-                                <button onclick="deleteBill(${bill.id})" class="text-red-500 hover:text-red-700">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
-            }
-            
-            function updateDashboard() {
-                const salary = parseFloat(salaryInput.value) || 0;
-                const otherIncomesTotal = incomes.reduce((sum, income) => sum + income.value, 0);
-                const totalIncomeValue = salary + otherIncomesTotal;
-                
-                const fixedExpensesTotal = fixedExpenses.reduce((sum, expense) => sum + expense.value, 0);
-                const variableExpensesTotal = variableExpenses.reduce((sum, expense) => sum + expense.value, 0);
-                const unexpectedExpensesTotal = unexpectedExpenses.reduce((sum, expense) => sum + expense.value, 0);
-                const unpaidBillsTotal = bills.reduce((sum, bill) => sum + (!bill.paid ? bill.value : 0), 0);
-                
-                const totalExpensesValue = fixedExpensesTotal + variableExpensesTotal + unexpectedExpensesTotal + unpaidBillsTotal;
-                
-                // Apply 50-30-20 rule
-                const needs = totalIncomeValue * 0.5;
-                const wants = totalIncomeValue * 0.3;
-                const savings = totalIncomeValue * 0.2;
-                
-                // Calculate actual percentages
-                const needsSpent = fixedExpensesTotal;
-                const wantsSpent = variableExpensesTotal + unexpectedExpensesTotal;
-                
-                let needsPercent = 0;
-                let wantsPercent = 0;
-                let savingsPercent = 0;
-                
-                if (totalIncomeValue > 0) {
-                    needsPercent = Math.round((needsSpent / needs) * 100);
-                    wantsPercent = Math.round((wantsSpent / wants) * 100);
-                    savingsPercent = Math.round(((totalIncomeValue - totalExpensesValue) / savings) * 100);
-                }
-                
-                // Update UI
-                totalIncome.textContent = formatCurrency(totalIncomeValue);
-                totalExpenses.textContent = formatCurrency(totalExpensesValue);
-                currentBalance.textContent = formatCurrency(totalIncomeValue - totalExpensesValue);
-                totalSavings.textContent = formatCurrency(totalIncomeValue - totalExpensesValue);
-                
-                needsAmount.textContent = formatCurrency(needs);
-                wantsAmount.textContent = formatCurrency(wants);
-                savingsAmount.textContent = formatCurrency(savings);
-                
-                needsPercentage.textContent = `${needsPercent}%`;
-                wantsPercentage.textContent = `${wantsPercent}%`;
-                savingsPercentage.textContent = `${savingsPercent}%`;
-                
-                // Update financial status
-                if (totalIncomeValue === 0) {
-                    financialStatus.textContent = 'Adicione suas receitas e despesas para ver o status financeiro.';
-                } else {
-                    const balance = totalIncomeValue - totalExpensesValue;
-                    const balancePercentage = (balance / totalIncomeValue) * 100;
-                    
-                    if (balancePercentage >= 20) {
-                        financialStatus.textContent = 'Ótimo! Você está economizando mais do que o recomendado.';
-                    } else if (balancePercentage >= 15) {
-                        financialStatus.textContent = 'Bom! Você está próximo da meta de economias (20%).';
-                    } else if (balancePercentage >= 0) {
-                        financialStatus.textContent = 'Atenção! Você está economizando menos do que o recomendado.';
-                    } else {
-                        financialStatus.textContent = 'Urgente! Você está gastando mais do que ganha.';
-                    }
-                }
-                
-                updateChart();
-            }
-            
-            function updateChart() {
-                const salary = parseFloat(salaryInput.value) || 0;
-                const otherIncomesTotal = incomes.reduce((sum, income) => sum + income.value, 0);
-                const totalIncomeValue = salary + otherIncomesTotal;
-                
-                const fixedExpensesTotal = fixedExpenses.reduce((sum, expense) => sum + expense.value, 0);
-                const variableExpensesTotal = variableExpenses.reduce((sum, expense) => sum + expense.value, 0);
-                const unexpectedExpensesTotal = unexpectedExpenses.reduce((sum, expense) => sum + expense.value, 0);
-                const unpaidBillsTotal = bills.reduce((sum, bill) => sum + (!bill.paid ? bill.value : 0), 0);
-                
-                const totalExpensesValue = fixedExpensesTotal + variableExpensesTotal + unexpectedExpensesTotal + unpaidBillsTotal;
-                
-                // Calculate percentages for chart
-                let needsPercent = 0;
-                let wantsPercent = 0;
-                let savingsPercent = 0;
-                
-                if (totalIncomeValue > 0) {
-                    needsPercent = (fixedExpensesTotal / totalIncomeValue) * 100;
-                    wantsPercent = ((variableExpensesTotal + unexpectedExpensesTotal) / totalIncomeValue) * 100;
-                    savingsPercent = ((totalIncomeValue - totalExpensesValue) / totalIncomeValue) * 100;
-                }
-                
-                // Calculate circle dashoffset
-                const radius = 80;
-                const circumference = 2 * Math.PI * radius;
-                
-                document.getElementById('needsArc').setAttribute('stroke-dasharray', `${circumference * (needsPercent/100)} ${circumference}`);
-                document.getElementById('wantsArc').setAttribute('stroke-dasharray', `${circumference * (wantsPercent/100)} ${circumference}`);
-                document.getElementById('wantsArc').setAttribute('transform', `rotate(${needsPercent * 3.6})`);
-                document.getElementById('savingsArc').setAttribute('stroke-dasharray', `${circumference * (savingsPercent/100)} ${circumference}`);
-                document.getElementById('savingsArc').setAttribute('transform', `rotate(${(needsPercent + wantsPercent) * 3.6})`);
-            }
-            
-            function saveToLocalStorage() {
-                const data = {
-                    salary: salaryInput.value,
-                    incomes,
-                    fixedExpenses,
-                    variableExpenses,
-                    unexpectedExpenses,
-                    bills,
-                    lastUpdated: new Date().toISOString()
-                };
-                
-                localStorage.setItem('financeTrackerData', JSON.stringify(data));
-                alert('Dados salvos com sucesso no navegador!');
-            }
-            
-            function loadFromLocalStorage() {
-                const savedData = localStorage.getItem('financeTrackerData');
-                
-                if (savedData) {
-                    const data = JSON.parse(savedData);
-                    
-                    salaryInput.value = data.salary || '';
-                    incomes = data.incomes || [];
-                    fixedExpenses = data.fixedExpenses || [];
-                    variableExpenses = data.variableExpenses || [];
-                    unexpectedExpenses = data.unexpectedExpenses || [];
-                    bills = data.bills || [];
-                    
-                    renderIncomeList();
-                    renderFixedExpensesList();
-                    renderVariableExpensesList();
-                    renderUnexpectedExpensesList();
-                    renderBillsTable();
-                    updateDashboard();
-                    
-                    alert('Dados carregados com sucesso!');
-                } else {
-                    alert('Nenhum dado salvo foi encontrado.');
-                }
-            }
-            
-            function clearAllData() {
-                if (confirm('Tem certeza que deseja limpar todos os dados? Esta ação não pode ser desfeita.')) {
-                    salaryInput.value = '';
-                    incomes = [];
-                    fixedExpenses = [];
-                    variableExpenses = [];
-                    unexpectedExpenses = [];
-                    bills = [];
-                    
-                    renderIncomeList();
-                    renderFixedExpensesList();
-                    renderVariableExpensesList();
-                    renderUnexpectedExpensesList();
-                    renderBillsTable();
-                    updateDashboard();
-                    
-                    localStorage.removeItem('financeTrackerData');
-                    alert('Todos os dados foram removidos.');
-                }
-            }
-            
-            // Make functions available globally for event handlers in HTML
-            window.deleteIncome = deleteIncome;
-            window.deleteFixedExpense = deleteFixedExpense;
-            window.deleteVariableExpense = deleteVariableExpense;
-            window.deleteUnexpectedExpense = deleteUnexpectedExpense;
-            window.deleteBill = deleteBill;
-            window.toggleBillStatus = toggleBillStatus;
+            // Mapa categoria para despesas fixas
+const categoriaMap = {
+  'Moradia':'necessidade','Transporte':'necessidade','Alimentação':'necessidade',
+  'Educação':'necessidade','Saúde':'necessidade','Outros':'desejo'
+};
+
+// ---------- Funções CRUD Supabase ----------
+async function addIncome(){
+  const desc = otherIncomeDesc.value.trim();
+  const val  = parseFloat(otherIncomeValue.value);
+  if(!desc||isNaN(val)||val<=0){alert('Preencha descrição e valor');return;}
+  const {data:{user}} = await supabase.auth.getUser();
+  const {error} = await supabase.from('receitas').insert({usuario_id:user.id,descricao:desc,valor:val});
+  if(error){alert(error.message);return;}
+  otherIncomeDesc.value=''; otherIncomeValue.value='';
+  await renderIncomeList(); await updateDashboard();
+}
+
+async function renderIncomeList(){
+  const {data:{user}} = await supabase.auth.getUser();
+  const {data:receitas,error} = await supabase.from('receitas').select('*').eq('usuario_id',user.id).order('data',{ascending:false});
+  if(error){console.error(error);return;}
+  incomeList.innerHTML = (receitas||[]).map(r=>`<li class="py-2 flex justify-between items-center fade-in"><div><span class="font-medium">${r.descricao}</span><span class="text-sm text-gray-500 ml-2">${formatCurrency(r.valor)}</span></div><button onclick=\"deleteIncome('${r.id}')\" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button></li>`).join('');
+}
+
+async function deleteIncome(id){
+  if(!confirm('Excluir receita?'))return;
+  const {error}=await supabase.from('receitas').delete().eq('id',id);
+  if(error){alert(error.message);return;}
+  await renderIncomeList(); await updateDashboard();
+}
+
+async function addFixedExpense(){
+  const type=fixedExpenseType.value; const val=parseFloat(fixedExpenseValue.value);
+  if(!type||isNaN(val)||val<=0){alert('Tipo/valor inválido');return;}
+  const cat=categoriaMap[type]||'necessidade';
+  const {data:{user}} = await supabase.auth.getUser();
+  const {error}=await supabase.from('despesas').insert({usuario_id:user.id,descricao:type,valor:val,categoria:cat});
+  if(error){alert(error.message);return;}
+  fixedExpenseType.value=''; fixedExpenseValue.value='';
+  await renderFixedExpensesList(); await updateDashboard();
+}
+
+async function renderFixedExpensesList(){
+  const {data:{user}} = await supabase.auth.getUser();
+  const {data:despesas}=await supabase.from('despesas').select('*').eq('usuario_id',user.id).eq('categoria','necessidade').order('data',{ascending:false});
+  fixedExpensesList.innerHTML = (despesas||[]).map(d=>`<li class="py-2 flex justify-between items-center fade-in"><div><span class="font-medium">${d.descricao}</span><span class="text-sm text-gray-500 ml-2">${formatCurrency(d.valor)}</span></div><button onclick=\"deleteFixedExpense('${d.id}')\" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button></li>`).join('');
+}
+
+async function deleteFixedExpense(id){
+  if(!confirm('Excluir despesa?'))return;
+  const {error}=await supabase.from('despesas').delete().eq('id',id);
+  if(error){alert(error.message);return;}
+  await renderFixedExpensesList(); await updateDashboard();
+}
+
+async function addVariableExpense(){
+  const desc=variableExpenseDesc.value.trim(); const val=parseFloat(variableExpenseValue.value);
+  if(!desc||isNaN(val)||val<=0){alert('Descrição/valor inválido');return;}
+  const {data:{user}}=await supabase.auth.getUser();
+  const {error}=await supabase.from('despesas').insert({usuario_id:user.id,descricao:desc,valor:val,categoria:'desejo'});
+  if(error){alert(error.message);return;}
+  variableExpenseDesc.value=''; variableExpenseValue.value='';
+  await renderVariableExpensesList(); await updateDashboard();
+}
+
+async function renderVariableExpensesList(){
+  const {data:{user}} = await supabase.auth.getUser();
+  const {data:despesas}=await supabase.from('despesas').select('*').eq('usuario_id',user.id).eq('categoria','desejo').order('data',{ascending:false});
+  variableExpensesList.innerHTML = (despesas||[]).map(d=>`<li class="py-2 flex justify-between items-center fade-in"><div><span class="font-medium">${d.descricao}</span><span class="text-sm text-gray-500 ml-2">${formatCurrency(d.valor)}</span></div><button onclick=\"deleteVariableExpense('${d.id}')\" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button></li>`).join('');
+}
+
+async function deleteVariableExpense(id){
+  if(!confirm('Excluir despesa?'))return;
+  const {error}=await supabase.from('despesas').delete().eq('id',id);
+  if(error){alert(error.message);return;}
+  await renderVariableExpensesList(); await updateDashboard();
+}
+
+async function updateDashboard(){
+  const {data:{user}}=await supabase.auth.getUser();
+  const {data:receitas}=await supabase.from('receitas').select('valor').eq('usuario_id',user.id);
+  const {data:despesas}=await supabase.from('despesas').select('valor,categoria').eq('usuario_id',user.id);
+  const totalReceitas=receitas.reduce((s,r)=>s+r.valor,0);
+  const totalNecess=despesas.filter(d=>d.categoria==='necessidade').reduce((s,d)=>s+d.valor,0);
+  const totalDesejos=despesas.filter(d=>d.categoria==='desejo').reduce((s,d)=>s+d.valor,0);
+  const totalDespesas=totalNecess+totalDesejos;
+  const saldo=totalReceitas-totalDespesas;
+  currentBalance.textContent=formatCurrency(saldo);
+  totalIncome.textContent=formatCurrency(totalReceitas);
+  totalExpenses.textContent=formatCurrency(totalDespesas);
+  totalSavings.textContent=formatCurrency(Math.max(saldo,0));
+  needsAmount.textContent=formatCurrency(totalNecess);
+  wantsAmount.textContent=formatCurrency(totalDesejos);
+  savingsAmount.textContent=formatCurrency(Math.max(saldo,0));
+  const percNec=totalReceitas?((totalNecess/totalReceitas)*100).toFixed(0):0;
+  const percDes=totalReceitas?((totalDesejos/totalReceitas)*100).toFixed(0):0;
+  needsPercentage.textContent=percNec+'%';
+  wantsPercentage.textContent=percDes+'%';
+  savingsPercentage.textContent=(100-percNec-percDes)+'%';
+}
+
+// Exportar funções para HTML
+window.deleteIncome=deleteIncome;
+window.deleteFixedExpense=deleteFixedExpense;
+window.deleteVariableExpense=deleteVariableExpense;
         });
     </script>
 </body>
