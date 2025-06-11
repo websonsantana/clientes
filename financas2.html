@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Controle Financeiro 50-30-20</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+        }
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.5s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-indigo-700 mb-2">Meu Controle Financeiro</h1>
+            <p class="text-gray-600">Sistema baseado na regra 50-30-20 para gerenciar suas finanças pessoais</p>
+        </header>
+
+        <!-- Dashboard Summary -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
+                <h3 class="text-gray-500 font-medium">Saldo Atual</h3>
+                <p class="text-2xl font-bold" id="currentBalance">R$ 0,00</p>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4 border-l-4 border-green-500">
+                <h3 class="text-gray-500 font-medium">Receitas</h3>
+                <p class="text-2xl font-bold" id="totalIncome">R$ 0,00</p>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4 border-l-4 border-red-500">
+                <h3 class="text-gray-500 font-medium">Despesas</h3>
+                <p class="text-2xl font-bold" id="totalExpenses">R$ 0,00</p>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4 border-l-4 border-purple-500">
+                <h3 class="text-gray-500 font-medium">Economias</h3>
+                <p class="text-2xl font-bold" id="totalSavings">R$ 0,00</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            <!-- Income Section -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-money-bill-wave text-green-500 mr-2"></i> Receitas
+                </h2>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Salário</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-600">R$</span>
+                        <input type="number" id="salaryInput" class="w-full pl-8 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="0,00">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Outras Receitas</label>
+                    <div class="flex space-x-2 mb-2">
+                        <input type="text" id="otherIncomeDesc" class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Descrição">
+                        <div class="relative w-32">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-600">R$</span>
+                            <input type="number" id="otherIncomeValue" class="w-full pl-8 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="0,00">
+                        </div>
+                        <button id="addIncomeBtn" class="bg-green-500 text-white px-3 py-2 rounded-lg hover:bg-green-600 transition">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <ul id="incomeList" class="divide-y">
+                        <!-- Income items will be added here -->
+                    </ul>
+                </div>
+                <div class="mt-6 bg-blue-50 p-4 rounded-lg">
+                    <h3 class="font-medium text-blue-800 mb-2">Distribuição 50-30-20</h3>
+                    <ul class="text-sm text-blue-700">
+                        <li class="flex justify-between"><span>Necessidades (50%):</span> <span id="needsAmount">R$ 0,00</span></li>
+                        <li class="flex justify-between"><span>Desejos (30%):</span> <span id="wantsAmount">R$ 0,00</span></li>
+                        <li class="flex justify-between"><span>Economias (20%):</span> <span id="savingsAmount">R$ 0,00</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Expenses Section -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-credit-card text-red-500 mr-2"></i> Despesas
+                </h2>
+                
+                <div class="mb-6">
+                    <h3 class="font-medium text-gray-700 mb-2">Custos Fixos</h3>
+                    <div class="flex space-x-2 mb-2">
+                        <select id="fixedExpenseType" class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="">Selecione um tipo</option>
+                            <option value="Moradia">Moradia</option>
+                            <option value="Transporte">Transporte</option>
+                            <option value="Alimentação">Alimentação</option>
+                            <option value="Educação">Educação</option>
+                            <option value="Saúde">Saúde</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                        <div class="relative w-32">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-600">R$</span>
+                            <input type="number" id="fixedExpenseValue" class="w-full pl-8 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="0,00">
+                        </div>
+                        <button id="addFixedExpenseBtn" class="bg-indigo-500 text-white px-3 py-2 rounded-lg hover:bg-indigo-600 transition">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <ul id="fixedExpensesList" class="divide-y">
+                        <!-- Fixed expenses will be added here -->
+                    </ul>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="font-medium text-gray-700 mb-2">Custos Variáveis</h3>
+                    <div class="flex space-x-2 mb-2">
+                        <input type="text" id="variableExpenseDesc" class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Descrição">
+                        <div class="relative w-32">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-600">R$</span>
+                            <input type="number" id="variableExpenseValue" class="w-full pl-8 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="0,00">
+                        </div>
+                        <button id="addVariableExpenseBtn" class="bg-indigo-500 text-white px-3 py-2 rounded-lg hover:bg-indigo-600 transition">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <ul id="variableExpensesList" class="divide-y">
+                        <!-- Variable expenses will be added here -->
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-medium text-gray-700 mb-2">Gastos Não Previstos</h3>
+                    <div class="flex space-x-2 mb-2">
+                        <input type="text" id="unexpectedExpenseDesc" class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Descrição">
+                        <div class="relative w-32">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-600">R$</span>
+                            <input type="number" id="unexpectedExpenseValue" class="w-full pl-8 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="0,00">
+                        </div>
+                        <button id="addUnexpectedExpenseBtn" class="bg-indigo-500 text-white px-3 py-2 rounded-lg hover:bg-indigo-600 transition">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <ul id="unexpectedExpensesList" class="divide-y">
+                        <!-- Unexpected expenses will be added here -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Stats & Charts -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-chart-pie text-purple-500 mr-2"></i> Análise
+                </h2>
+
+                <div class="mb-6">
+                    <h3 class="font-medium text-gray-700 mb-3">Distribuição de Gastos</h3>
+                    <div class="chart-container">
+                        <svg id="expenseChart" width="100%" height="100%" viewBox="0 0 200 200">
+                            <path id="needsArc" class="progress-ring__circle" stroke="url(#needsGradient)" stroke-width="30" fill="transparent" stroke-dasharray="0 1000"/>
+                            <path id="wantsArc" class="progress-ring__circle" stroke="url(#wantsGradient)" stroke-width="30" fill="transparent" stroke-dasharray="0 1000" transform="rotate(0)"/>
+                            <path id="savingsArc" class="progress-ring__circle" stroke="url(#savingsGradient)" stroke-width="30" fill="transparent" stroke-dasharray="0 1000" transform="rotate(0)"/>
+                            
+                            <defs>
+                                <linearGradient id="needsGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#3B82F6" />
+                                    <stop offset="100%" stop-color="#1D4ED8" />
+                                </linearGradient>
+                                <linearGradient id="wantsGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#EC4899" />
+                                    <stop offset="100%" stop-color="#BE185D" />
+                                </linearGradient>
+                                <linearGradient id="savingsGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#10B981" />
+                                    <stop offset="100%" stop-color="#047857" />
+                                </linearGradient>
+                            </defs>
+                            
+                            <text x="50%" y="50%" text-anchor="middle" dy="0" class="text-lg font-bold fill-gray-700">50-30-20</text>
+                            <text x="50%" y="50%" text-anchor="middle" dy="20" class="text-xs fill-gray-500">Regra Financeira</text>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h3 class="font-medium text-gray-700 mb-2">Resumo por Categoria</h3>
+                    <div class="space-y-2">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                            <span class="flex-1 text-sm">Necessidades (50%)</span>
+                            <span id="needsPercentage" class="text-sm font-medium">0%</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-pink-500 rounded-full mr-2"></div>
+                            <span class="flex-1 text-sm">Desejos (30%)</span>
+                            <span id="wantsPercentage" class="text-sm font-medium">0%</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                            <span class="flex-1 text-sm">Economias (20%)</span>
+                            <span id="savingsPercentage" class="text-sm font-medium">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 bg-yellow-50 p-4 rounded-lg">
+                    <h3 class="font-medium text-yellow-800 mb-2">Status Financeiro</h3>
+                    <p class="text-sm text-yellow-700" id="financialStatus">Adicione suas receitas e despesas para ver o status.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bills to Pay -->
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-file-invoice-dollar text-orange-500 mr-2"></i> Contas a Pagar
+            </h2>
+            <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mb-4">
+                <div class="flex-1">
+                    <label class="block text-gray-700 mb-2">Descrição</label>
+                    <input type="text" id="billDesc" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Ex: Luz, Água, Internet">
+                </div>
+                <div class="flex-1">
+                    <label class="block text-gray-700 mb-2">Valor</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-600">R$</span>
+                        <input type="number" id="billValue" class="w-full pl-8 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="0,00">
+                    </div>
+                </div>
+                <div class="flex-1">
+                    <label class="block text-gray-700 mb-2">Data de Vencimento</label>
+                    <input type="date" id="billDueDate" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div class="flex items-end">
+                    <button id="addBillBtn" class="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition">
+                        Adicionar Conta
+                    </button>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-600 text-sm">
+                            <th class="px-4 py-2 text-left">Descrição</th>
+                            <th class="px-4 py-2 text-right">Valor</th>
+                            <th class="px-4 py-2 text-left">Vencimento</th>
+                            <th class="px-4 py-2 text-center">Status</th>
+                            <th class="px-4 py-2 text-right">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="billsTable" class="divide-y">
+                        <!-- Bill items will be added here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Local Storage Controls -->
+        <div class="bg-gray-100 rounded-lg shadow p-6 mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Salvar Dados</h2>
+            <div class="flex flex-wrap gap-4">
+                <button id="saveDataBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition flex items-center">
+                    <i class="fas fa-save mr-2"></i> Salvar no Navegador
+                </button>
+                <button id="loadDataBtn" class="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition flex items-center">
+                    <i class="fas fa-folder-open mr-2"></i> Carregar Dados
+                </button>
+                <button id="clearDataBtn" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition flex items-center">
+                    <i class="fas fa-trash-alt mr-2"></i> Limpar Tudo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuração do Supabase
+        const supabaseUrl = 'https://pzxixywhuhofeiipwiro.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6eGl4eXdodWhvZmVpaXB3aXJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk2NTcxMTQsImV4cCI6MjA2NTIzMzExNH0._EdPnaZ_wOw1q4VQjHJApEjMnaz9l6MdRy1S9mkYR1I';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Verificar se usuário está logado
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                // Redirecionar para login ou mostrar modal
+                window.location.href = '/login.html';
+                return;
+            }
+            // DOM Elements
+            const salaryInput = document.getElementById('salaryInput');
+            const otherIncomeDesc = document.getElementById('otherIncomeDesc');
+            const otherIncomeValue = document.getElementById('otherIncomeValue');
+            const addIncomeBtn = document.getElementById('addIncomeBtn');
+            const incomeList = document.getElementById('incomeList');
+            
+            const fixedExpenseType = document.getElementById('fixedExpenseType');
+            const fixedExpenseValue = document.getElementById('fixedExpenseValue');
+            const addFixedExpenseBtn = document.getElementById('addFixedExpenseBtn');
+            const fixedExpensesList = document.getElementById('fixedExpensesList');
+            
+            const variableExpenseDesc = document.getElementById('variableExpenseDesc');
+            const variableExpenseValue = document.getElementById('variableExpenseValue');
+            const addVariableExpenseBtn = document.getElementById('addVariableExpenseBtn');
+            const variableExpensesList = document.getElementById('variableExpensesList');
+            
+            const unexpectedExpenseDesc = document.getElementById('unexpectedExpenseDesc');
+            const unexpectedExpenseValue = document.getElementById('unexpectedExpenseValue');
+            const addUnexpectedExpenseBtn = document.getElementById('addUnexpectedExpenseBtn');
+            const unexpectedExpensesList = document.getElementById('unexpectedExpensesList');
+            
+            const billDesc = document.getElementById('billDesc');
+            const billValue = document.getElementById('billValue');
+            const billDueDate = document.getElementById('billDueDate');
+            const addBillBtn = document.getElementById('addBillBtn');
+            const billsTable = document.getElementById('billsTable');
+            
+            const saveDataBtn = document.getElementById('saveDataBtn');
+            const loadDataBtn = document.getElementById('loadDataBtn');
+            const clearDataBtn = document.getElementById('clearDataBtn');
+            
+            const currentBalance = document.getElementById('currentBalance');
+            const totalIncome = document.getElementById('totalIncome');
+            const totalExpenses = document.getElementById('totalExpenses');
+            const totalSavings = document.getElementById('totalSavings');
+            
+            const needsAmount = document.getElementById('needsAmount');
+            const wantsAmount = document.getElementById('wantsAmount');
+            const savingsAmount = document.getElementById('savingsAmount');
+            
+            const needsPercentage = document.getElementById('needsPercentage');
+            const wantsPercentage = document.getElementById('wantsPercentage');
+            const savingsPercentage = document.getElementById('savingsPercentage');
+            
+            const financialStatus = document.getElementById('financialStatus');
+            
+            // Data
+            let incomes = [];
+            let fixedExpenses = [];
+            let variableExpenses = [];
+            let unexpectedExpenses = [];
+            let bills = [];
+            
+            // Initialize
+            loadFromLocalStorage();
+            updateDashboard();
+            updateChart();
+            
+            // Event Listeners
+            salaryInput.addEventListener('change', updateDashboard);
+            addIncomeBtn.addEventListener('click', addIncome);
+            addFixedExpenseBtn.addEventListener('click', addFixedExpense);
+            addVariableExpenseBtn.addEventListener('click', addVariableExpense);
+            addUnexpectedExpenseBtn.addEventListener('click', addUnexpectedExpense);
+            addBillBtn.addEventListener('click', addBill);
+            saveDataBtn.addEventListener('click', saveToLocalStorage);
+            loadDataBtn.addEventListener('click', loadFromLocalStorage);
+            clearDataBtn.addEventListener('click', clearAllData);
+            
+            // Functions
+            function formatCurrency(value) {
+                return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+            }
+            
+            async function addIncome() {
+                const description = otherIncomeDesc.value.trim();
+                const value = parseFloat(otherIncomeValue.value);
+                
+                if (!description || isNaN(value) || value <= 0) {
+                    alert('Por favor, preencha a descrição e um valor válido maior que zero.');
+                    return;
+                }
+                
+                const { data, error } = await supabase
+                    .from('receitas')
+                    .insert([
+                        { 
+                            descricao: description,
+                            valor: value
+                        }
+                    ])
+                    .select();
+                
+                if (error) {
+                    console.error('Erro ao adicionar receita:', error);
+                    alert('Erro ao adicionar receita');
+                    return;
+                }
+                
+                otherIncomeDesc.value = '';
+                otherIncomeValue.value = '';
+                
+                await updateDashboard();
+                await renderIncomeList();
+            }
+            
+            async function addFixedExpense() {
+                const type = fixedExpenseType.value;
+                const value = parseFloat(fixedExpenseValue.value);
+                
+                if (!type || isNaN(value) || value <= 0) {
+                    alert('Por favor, selecione um tipo e insira um valor válido maior que zero.');
+                    return;
+                }
+                
+                const categoriaMap = {
+                    'Moradia': 'necessidade',
+                    'Transporte': 'necessidade',
+                    'Alimentação': 'necessidade',
+                    'Educação': 'necessidade',
+                    'Saúde': 'necessidade',
+                    'Outros': 'desejo'
+                };
+                
+                const { data, error } = await supabase
+                    .from('despesas')
+                    .insert([
+                        { 
+                            descricao: type,
+                            valor: value,
+                            categoria: categoriaMap[type] || 'desejo'
+                        }
+                    ])
+                    .select();
+                
+                if (error) {
+                    console.error('Erro ao adicionar despesa:', error);
+                    alert('Erro ao adicionar despesa');
+                    return;
+                }
+                
+                fixedExpenseType.value = '';
+                fixedExpenseValue.value = '';
+                
+                await updateDashboard();
+                await renderFixedExpensesList();
+            }
+            
+            function addVariableExpense() {
+                const description = variableExpenseDesc.value.trim();
+                const value = parseFloat(variableExpenseValue.value);
+                
+                if (!description || isNaN(value) || value <= 0) {
+                    alert('Por favor, preencha a descrição e um valor válido maior que zero.');
+                    return;
+                }
+                
+                variableExpenses.push({
+                    id: Date.now(),
+                    description,
+                    value
+                });
+                
+                variableExpenseDesc.value = '';
+                variableExpenseValue.value = '';
+                
+                updateDashboard();
+                renderVariableExpensesList();
+            }
+            
+            function addUnexpectedExpense() {
+                const description = unexpectedExpenseDesc.value.trim();
+                const value = parseFloat(unexpectedExpenseValue.value);
+                
+                if (!description || isNaN(value) || value <= 0) {
+                    alert('Por favor, preencha a descrição e um valor válido maior que zero.');
+                    return;
+                }
+                
+                unexpectedExpenses.push({
+                    id: Date.now(),
+                    description,
+                    value
+                });
+                
+                unexpectedExpenseDesc.value = '';
+                unexpectedExpenseValue.value = '';
+                
+                updateDashboard();
+                renderUnexpectedExpensesList();
+            }
+            
+            function addBill() {
+                const description = billDesc.value.trim();
+                const value = parseFloat(billValue.value);
+                const dueDate = billDueDate.value;
+                
+                if (!description || isNaN(value) || value <= 0 || !dueDate) {
+                    alert('Por favor, preencha todos os campos com valores válidos.');
+                    return;
+                }
+                
+                bills.push({
+                    id: Date.now(),
+                    description,
+                    value,
+                    dueDate,
+                    paid: false
+                });
+                
+                billDesc.value = '';
+                billValue.value = '';
+                billDueDate.value = '';
+                
+                renderBillsTable();
+            }
+            
+            async function deleteIncome(id) {
+                if (!confirm('Tem certeza que deseja excluir esta receita?')) return;
+                
+                const { error } = await supabase
+                    .from('receitas')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) {
+                    console.error('Erro ao excluir receita:', error);
+                    alert('Erro ao excluir receita');
+                    return;
+                }
+                
+                await updateDashboard();
+                await renderIncomeList();
+            }
+            
+            function deleteFixedExpense(id) {
+                fixedExpenses = fixedExpenses.filter(expense => expense.id !== id);
+                updateDashboard();
+                renderFixedExpensesList();
+            }
+            
+            function deleteVariableExpense(id) {
+                variableExpenses = variableExpenses.filter(expense => expense.id !== id);
+                updateDashboard();
+                renderVariableExpensesList();
+            }
+            
+            function deleteUnexpectedExpense(id) {
+                unexpectedExpenses = unexpectedExpenses.filter(expense => expense.id !== id);
+                updateDashboard();
+                renderUnexpectedExpensesList();
+            }
+            
+            function deleteBill(id) {
+                bills = bills.filter(bill => bill.id !== id);
+                renderBillsTable();
+            }
+            
+            function toggleBillStatus(id) {
+                const bill = bills.find(bill => bill.id === id);
+                if (bill) {
+                    bill.paid = !bill.paid;
+                    updateDashboard();
+                    renderBillsTable();
+                }
+            }
+            
+            async function renderIncomeList() {
+                const { data: { user } } = await supabase.auth.getUser();
+                const { data: incomes, error } = await supabase
+                    .from('receitas')
+                    .select('*')
+                    .eq('usuario_id', user.id)
+                    .order('data', { ascending: false });
+                
+                if (error) {
+                    console.error('Erro ao carregar receitas:', error);
+                    return;
+                }
+                
+                incomeList.innerHTML = incomes.map(income => `
+                    <li class="py-2 flex justify-between items-center fade-in">
+                        <div>
+                            <span class="font-medium">${income.descricao}</span>
+                            <span class="text-sm text-gray-500 ml-2">${formatCurrency(income.valor)}</span>
+                        </div>
+                        <button onclick="deleteIncome('${income.id}')" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </li>
+                `).join('');
+            }
+            
+            function renderFixedExpensesList() {
+                fixedExpensesList.innerHTML = fixedExpenses.map(expense => `
+                    <li class="py-2 flex justify-between items-center fade-in">
+                        <div>
+                            <span class="font-medium">${expense.type}</span>
+                            <span class="text-sm text-gray-500 ml-2">${formatCurrency(expense.value)}</span>
+                        </div>
+                        <button onclick="deleteFixedExpense(${expense.id})" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </li>
+                `).join('');
+            }
+            
+            function renderVariableExpensesList() {
+                variableExpensesList.innerHTML = variableExpenses.map(expense => `
+                    <li class="py-2 flex justify-between items-center fade-in">
+                        <div>
+                            <span class="font-medium">${expense.description}</span>
+                            <span class="text-sm text-gray-500 ml-2">${formatCurrency(expense.value)}</span>
+                        </div>
+                        <button onclick="deleteVariableExpense(${expense.id})" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </li>
+                `).join('');
+            }
+            
+            function renderUnexpectedExpensesList() {
+                unexpectedExpensesList.innerHTML = unexpectedExpenses.map(expense => `
+                    <li class="py-2 flex justify-between items-center fade-in">
+                        <div>
+                            <span class="font-medium">${expense.description}</span>
+                            <span class="text-sm text-gray-500 ml-2">${formatCurrency(expense.value)}</span>
+                        </div>
+                        <button onclick="deleteUnexpectedExpense(${expense.id})" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </li>
+                `).join('');
+            }
+            
+            function renderBillsTable() {
+                billsTable.innerHTML = bills.map(bill => {
+                    const dueDate = new Date(bill.dueDate);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    
+                    let statusClass = '';
+                    let statusText = '';
+                    
+                    if (bill.paid) {
+                        statusClass = 'bg-green-100 text-green-800';
+                        statusText = 'Pago';
+                    } else if (dueDate < today) {
+                        statusClass = 'bg-red-100 text-red-800';
+                        statusText = 'Atrasado';
+                    } else {
+                        statusClass = 'bg-yellow-100 text-yellow-800';
+                        statusText = 'Pendente';
+                    }
+                    
+                    return `
+                        <tr class="fade-in">
+                            <td class="px-4 py-2">${bill.description}</td>
+                            <td class="px-4 py-2 text-right">${formatCurrency(bill.value)}</td>
+                            <td class="px-4 py-2">${dueDate.toLocaleDateString('pt-BR')}</td>
+                            <td class="px-4 py-2 text-center">
+                                <span class="px-2 py-1 rounded-full text-xs ${statusClass}">${statusText}</span>
+                            </td>
+                            <td class="px-4 py-2 text-right">
+                                <button onclick="toggleBillStatus(${bill.id})" class="text-blue-500 hover:text-blue-700 mr-2">
+                                    ${bill.paid ? '<i class="fas fa-undo"></i>' : '<i class="fas fa-check"></i>'}
+                                </button>
+                                <button onclick="deleteBill(${bill.id})" class="text-red-500 hover:text-red-700">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+            
+            async function updateDashboard() {
+                const { data: { user } } = await supabase.auth.getUser();
+                
+                // Obter total de receitas
+                const { data: receitasData } = await supabase
+                    .from('receitas')
+                    .select('valor')
+                    .eq('usuario_id', user.id);
+                
+                const totalIncomeValue = receitasData?.reduce((sum, r) => sum + r.valor, 0) || 0;
+                
+                // Obter total de despesas por categoria
+                const { data: despesasData } = await supabase
+                    .from('despesas')
+                    .select('valor, categoria')
+                    .eq('usuario_id', user.id);
+                
+                const fixedExpensesTotal = despesasData
+                    ?.filter(d => d.categoria === 'necessidade')
+                    .reduce((sum, e) => sum + e.valor, 0) || 0;
+                
+                const variableExpensesTotal = despesasData
+                    ?.filter(d => d.categoria === 'desejo')
+                    .reduce((sum, e) => sum + e.valor, 0) || 0;
+                const salary = parseFloat(salaryInput.value) || 0;
+                const otherIncomesTotal = incomes.reduce((sum, income) => sum + income.value, 0);
+                const totalIncomeValue = salary + otherIncomesTotal;
+                
+                const fixedExpensesTotal = fixedExpenses.reduce((sum, expense) => sum + expense.value, 0);
+                const variableExpensesTotal = variableExpenses.reduce((sum, expense) => sum + expense.value, 0);
+                const unexpectedExpensesTotal = unexpectedExpenses.reduce((sum, expense) => sum + expense.value, 0);
+                const unpaidBillsTotal = bills.reduce((sum, bill) => sum + (!bill.paid ? bill.value : 0), 0);
+                
+                const totalExpensesValue = fixedExpensesTotal + variableExpensesTotal + unexpectedExpensesTotal + unpaidBillsTotal;
+                
+                // Apply 50-30-20 rule
+                const needs = totalIncomeValue * 0.5;
+                const wants = totalIncomeValue * 0.3;
+                const savings = totalIncomeValue * 0.2;
+                
+                // Calculate actual percentages
+                const needsSpent = fixedExpensesTotal;
+                const wantsSpent = variableExpensesTotal + unexpectedExpensesTotal;
+                
+                let needsPercent = 0;
+                let wantsPercent = 0;
+                let savingsPercent = 0;
+                
+                if (totalIncomeValue > 0) {
+                    needsPercent = Math.round((needsSpent / needs) * 100);
+                    wantsPercent = Math.round((wantsSpent / wants) * 100);
+                    savingsPercent = Math.round(((totalIncomeValue - totalExpensesValue) / savings) * 100);
+                }
+                
+                // Update UI
+                totalIncome.textContent = formatCurrency(totalIncomeValue);
+                totalExpenses.textContent = formatCurrency(totalExpensesValue);
+                currentBalance.textContent = formatCurrency(totalIncomeValue - totalExpensesValue);
+                totalSavings.textContent = formatCurrency(totalIncomeValue - totalExpensesValue);
+                
+                needsAmount.textContent = formatCurrency(needs);
+                wantsAmount.textContent = formatCurrency(wants);
+                savingsAmount.textContent = formatCurrency(savings);
+                
+                needsPercentage.textContent = `${needsPercent}%`;
+                wantsPercentage.textContent = `${wantsPercent}%`;
+                savingsPercentage.textContent = `${savingsPercent}%`;
+                
+                // Update financial status
+                if (totalIncomeValue === 0) {
+                    financialStatus.textContent = 'Adicione suas receitas e despesas para ver o status financeiro.';
+                } else {
+                    const balance = totalIncomeValue - totalExpensesValue;
+                    const balancePercentage = (balance / totalIncomeValue) * 100;
+                    
+                    if (balancePercentage >= 20) {
+                        financialStatus.textContent = 'Ótimo! Você está economizando mais do que o recomendado.';
+                    } else if (balancePercentage >= 15) {
+                        financialStatus.textContent = 'Bom! Você está próximo da meta de economias (20%).';
+                    } else if (balancePercentage >= 0) {
+                        financialStatus.textContent = 'Atenção! Você está economizando menos do que o recomendado.';
+                    } else {
+                        financialStatus.textContent = 'Urgente! Você está gastando mais do que ganha.';
+                    }
+                }
+                
+                updateChart();
+            }
+            
+            function updateChart() {
+                const salary = parseFloat(salaryInput.value) || 0;
+                const otherIncomesTotal = incomes.reduce((sum, income) => sum + income.value, 0);
+                const totalIncomeValue = salary + otherIncomesTotal;
+                
+                const fixedExpensesTotal = fixedExpenses.reduce((sum, expense) => sum + expense.value, 0);
+                const variableExpensesTotal = variableExpenses.reduce((sum, expense) => sum + expense.value, 0);
+                const unexpectedExpensesTotal = unexpectedExpenses.reduce((sum, expense) => sum + expense.value, 0);
+                const unpaidBillsTotal = bills.reduce((sum, bill) => sum + (!bill.paid ? bill.value : 0), 0);
+                
+                const totalExpensesValue = fixedExpensesTotal + variableExpensesTotal + unexpectedExpensesTotal + unpaidBillsTotal;
+                
+                // Calculate percentages for chart
+                let needsPercent = 0;
+                let wantsPercent = 0;
+                let savingsPercent = 0;
+                
+                if (totalIncomeValue > 0) {
+                    needsPercent = (fixedExpensesTotal / totalIncomeValue) * 100;
+                    wantsPercent = ((variableExpensesTotal + unexpectedExpensesTotal) / totalIncomeValue) * 100;
+                    savingsPercent = ((totalIncomeValue - totalExpensesValue) / totalIncomeValue) * 100;
+                }
+                
+                // Calculate circle dashoffset
+                const radius = 80;
+                const circumference = 2 * Math.PI * radius;
+                
+                document.getElementById('needsArc').setAttribute('stroke-dasharray', `${circumference * (needsPercent/100)} ${circumference}`);
+                document.getElementById('wantsArc').setAttribute('stroke-dasharray', `${circumference * (wantsPercent/100)} ${circumference}`);
+                document.getElementById('wantsArc').setAttribute('transform', `rotate(${needsPercent * 3.6})`);
+                document.getElementById('savingsArc').setAttribute('stroke-dasharray', `${circumference * (savingsPercent/100)} ${circumference}`);
+                document.getElementById('savingsArc').setAttribute('transform', `rotate(${(needsPercent + wantsPercent) * 3.6})`);
+            }
+            
+            function saveToLocalStorage() {
+                const data = {
+                    salary: salaryInput.value,
+                    incomes,
+                    fixedExpenses,
+                    variableExpenses,
+                    unexpectedExpenses,
+                    bills,
+                    lastUpdated: new Date().toISOString()
+                };
+                
+                localStorage.setItem('financeTrackerData', JSON.stringify(data));
+                alert('Dados salvos com sucesso no navegador!');
+            }
+            
+            async function loadData() {
+                const { data: { user } } = await supabase.auth.getUser();
+                
+                if (!user) return;
+                
+                try {
+                    // Carregar receitas
+                    const { data: receitas } = await supabase
+                        .from('receitas')
+                        .select('*')
+                        .eq('usuario_id', user.id)
+                        .order('data', { ascending: false });
+                    
+                    // Carregar despesas
+                    const { data: despesas } = await supabase
+                        .from('despesas')
+                        .select('*')
+                        .eq('usuario_id', user.id)
+                        .order('data', { ascending: false });
+                    
+                    // Mapear para arrays internos
+                    incomes = receitas || [];
+                    fixedExpenses = despesas.filter(d => d.categoria === 'necessidade') || [];
+                    variableExpenses = despesas.filter(d => d.categoria === 'desejo') || [];
+                    unexpectedExpenses = []; // Reavaliar conforme necessidades
+                    
+                    await renderIncomeList();
+                    await renderFixedExpensesList();
+                    await renderVariableExpensesList();
+                    await updateDashboard();
+                    
+                } catch (error) {
+                    console.error('Erro ao carregar dados:', error);
+                    alert('Erro ao carregar dados do servidor');
+                }
+            }
+            
+            function clearAllData() {
+                if (confirm('Tem certeza que deseja limpar todos os dados? Esta ação não pode ser desfeita.')) {
+                    salaryInput.value = '';
+                    incomes = [];
+                    fixedExpenses = [];
+                    variableExpenses = [];
+                    unexpectedExpenses = [];
+                    bills = [];
+                    
+                    renderIncomeList();
+                    renderFixedExpensesList();
+                    renderVariableExpensesList();
+                    renderUnexpectedExpensesList();
+                    renderBillsTable();
+                    updateDashboard();
+                    
+                    localStorage.removeItem('financeTrackerData');
+                    alert('Todos os dados foram removidos.');
+                }
+            }
+            
+            // Make functions available globally for event handlers in HTML
+            window.deleteIncome = deleteIncome;
+            window.deleteFixedExpense = deleteFixedExpense;
+            window.deleteVariableExpense = deleteVariableExpense;
+            window.deleteUnexpectedExpense = deleteUnexpectedExpense;
+            window.deleteBill = deleteBill;
+            window.toggleBillStatus = toggleBillStatus;
+        });
+    </script>
+</body>
+</html>
