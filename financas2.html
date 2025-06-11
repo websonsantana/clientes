@@ -6,7 +6,6 @@
     <title>Meu Controle Financeiro 50-30-20</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .chart-container {
             position: relative;
@@ -286,19 +285,7 @@
     </div>
 
     <script>
-        // Configuração do Supabase
-        const supabaseUrl = 'https://pzxixywhuhofeiipwiro.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6eGl4eXdodWhvZmVpaXB3aXJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk2NTcxMTQsImV4cCI6MjA2NTIzMzExNH0._EdPnaZ_wOw1q4VQjHJApEjMnaz9l6MdRy1S9mkYR1I';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-        document.addEventListener('DOMContentLoaded', async function() {
-            // Verificar se usuário está logado
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
-                // Redirecionar para login ou mostrar modal
-                window.location.href = '/login.html';
-                return;
-            }
+        document.addEventListener('DOMContentLoaded', function() {
             // DOM Elements
             const salaryInput = document.getElementById('salaryInput');
             const otherIncomeDesc = document.getElementById('otherIncomeDesc');
@@ -374,7 +361,7 @@
                 return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
             }
             
-            async function addIncome() {
+            function addIncome() {
                 const description = otherIncomeDesc.value.trim();
                 const value = parseFloat(otherIncomeValue.value);
                 
@@ -383,30 +370,20 @@
                     return;
                 }
                 
-                const { data, error } = await supabase
-                    .from('receitas')
-                    .insert([
-                        { 
-                            descricao: description,
-                            valor: value
-                        }
-                    ])
-                    .select();
-                
-                if (error) {
-                    console.error('Erro ao adicionar receita:', error);
-                    alert('Erro ao adicionar receita');
-                    return;
-                }
+                incomes.push({
+                    id: Date.now(),
+                    description,
+                    value
+                });
                 
                 otherIncomeDesc.value = '';
                 otherIncomeValue.value = '';
                 
-                await updateDashboard();
-                await renderIncomeList();
+                updateDashboard();
+                renderIncomeList();
             }
             
-            async function addFixedExpense() {
+            function addFixedExpense() {
                 const type = fixedExpenseType.value;
                 const value = parseFloat(fixedExpenseValue.value);
                 
@@ -415,37 +392,17 @@
                     return;
                 }
                 
-                const categoriaMap = {
-                    'Moradia': 'necessidade',
-                    'Transporte': 'necessidade',
-                    'Alimentação': 'necessidade',
-                    'Educação': 'necessidade',
-                    'Saúde': 'necessidade',
-                    'Outros': 'desejo'
-                };
-                
-                const { data, error } = await supabase
-                    .from('despesas')
-                    .insert([
-                        { 
-                            descricao: type,
-                            valor: value,
-                            categoria: categoriaMap[type] || 'desejo'
-                        }
-                    ])
-                    .select();
-                
-                if (error) {
-                    console.error('Erro ao adicionar despesa:', error);
-                    alert('Erro ao adicionar despesa');
-                    return;
-                }
+                fixedExpenses.push({
+                    id: Date.now(),
+                    type,
+                    value
+                });
                 
                 fixedExpenseType.value = '';
                 fixedExpenseValue.value = '';
                 
-                await updateDashboard();
-                await renderFixedExpensesList();
+                updateDashboard();
+                renderFixedExpensesList();
             }
             
             function addVariableExpense() {
@@ -517,22 +474,10 @@
                 renderBillsTable();
             }
             
-            async function deleteIncome(id) {
-                if (!confirm('Tem certeza que deseja excluir esta receita?')) return;
-                
-                const { error } = await supabase
-                    .from('receitas')
-                    .delete()
-                    .eq('id', id);
-                
-                if (error) {
-                    console.error('Erro ao excluir receita:', error);
-                    alert('Erro ao excluir receita');
-                    return;
-                }
-                
-                await updateDashboard();
-                await renderIncomeList();
+            function deleteIncome(id) {
+                incomes = incomes.filter(income => income.id !== id);
+                updateDashboard();
+                renderIncomeList();
             }
             
             function deleteFixedExpense(id) {
@@ -567,26 +512,14 @@
                 }
             }
             
-            async function renderIncomeList() {
-                const { data: { user } } = await supabase.auth.getUser();
-                const { data: incomes, error } = await supabase
-                    .from('receitas')
-                    .select('*')
-                    .eq('usuario_id', user.id)
-                    .order('data', { ascending: false });
-                
-                if (error) {
-                    console.error('Erro ao carregar receitas:', error);
-                    return;
-                }
-                
+            function renderIncomeList() {
                 incomeList.innerHTML = incomes.map(income => `
                     <li class="py-2 flex justify-between items-center fade-in">
                         <div>
-                            <span class="font-medium">${income.descricao}</span>
-                            <span class="text-sm text-gray-500 ml-2">${formatCurrency(income.valor)}</span>
+                            <span class="font-medium">${income.description}</span>
+                            <span class="text-sm text-gray-500 ml-2">${formatCurrency(income.value)}</span>
                         </div>
-                        <button onclick="deleteIncome('${income.id}')" class="text-red-500 hover:text-red-700">
+                        <button onclick="deleteIncome(${income.id})" class="text-red-500 hover:text-red-700">
                             <i class="fas fa-trash"></i>
                         </button>
                     </li>
@@ -676,30 +609,7 @@
                 }).join('');
             }
             
-            async function updateDashboard() {
-                const { data: { user } } = await supabase.auth.getUser();
-                
-                // Obter total de receitas
-                const { data: receitasData } = await supabase
-                    .from('receitas')
-                    .select('valor')
-                    .eq('usuario_id', user.id);
-                
-                const totalIncomeValue = receitasData?.reduce((sum, r) => sum + r.valor, 0) || 0;
-                
-                // Obter total de despesas por categoria
-                const { data: despesasData } = await supabase
-                    .from('despesas')
-                    .select('valor, categoria')
-                    .eq('usuario_id', user.id);
-                
-                const fixedExpensesTotal = despesasData
-                    ?.filter(d => d.categoria === 'necessidade')
-                    .reduce((sum, e) => sum + e.valor, 0) || 0;
-                
-                const variableExpensesTotal = despesasData
-                    ?.filter(d => d.categoria === 'desejo')
-                    .reduce((sum, e) => sum + e.valor, 0) || 0;
+            function updateDashboard() {
                 const salary = parseFloat(salaryInput.value) || 0;
                 const otherIncomesTotal = incomes.reduce((sum, income) => sum + income.value, 0);
                 const totalIncomeValue = salary + otherIncomesTotal;
@@ -814,40 +724,29 @@
                 alert('Dados salvos com sucesso no navegador!');
             }
             
-            async function loadData() {
-                const { data: { user } } = await supabase.auth.getUser();
+            function loadFromLocalStorage() {
+                const savedData = localStorage.getItem('financeTrackerData');
                 
-                if (!user) return;
-                
-                try {
-                    // Carregar receitas
-                    const { data: receitas } = await supabase
-                        .from('receitas')
-                        .select('*')
-                        .eq('usuario_id', user.id)
-                        .order('data', { ascending: false });
+                if (savedData) {
+                    const data = JSON.parse(savedData);
                     
-                    // Carregar despesas
-                    const { data: despesas } = await supabase
-                        .from('despesas')
-                        .select('*')
-                        .eq('usuario_id', user.id)
-                        .order('data', { ascending: false });
+                    salaryInput.value = data.salary || '';
+                    incomes = data.incomes || [];
+                    fixedExpenses = data.fixedExpenses || [];
+                    variableExpenses = data.variableExpenses || [];
+                    unexpectedExpenses = data.unexpectedExpenses || [];
+                    bills = data.bills || [];
                     
-                    // Mapear para arrays internos
-                    incomes = receitas || [];
-                    fixedExpenses = despesas.filter(d => d.categoria === 'necessidade') || [];
-                    variableExpenses = despesas.filter(d => d.categoria === 'desejo') || [];
-                    unexpectedExpenses = []; // Reavaliar conforme necessidades
+                    renderIncomeList();
+                    renderFixedExpensesList();
+                    renderVariableExpensesList();
+                    renderUnexpectedExpensesList();
+                    renderBillsTable();
+                    updateDashboard();
                     
-                    await renderIncomeList();
-                    await renderFixedExpensesList();
-                    await renderVariableExpensesList();
-                    await updateDashboard();
-                    
-                } catch (error) {
-                    console.error('Erro ao carregar dados:', error);
-                    alert('Erro ao carregar dados do servidor');
+                    alert('Dados carregados com sucesso!');
+                } else {
+                    alert('Nenhum dado salvo foi encontrado.');
                 }
             }
             
