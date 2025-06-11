@@ -481,19 +481,23 @@
             const email = document.getElementById('login-email').value;
             const senha = document.getElementById('login-senha').value;
             
+            console.log('Tentando login com:', email);
             const { data, error } = await supabase.auth.signInWithPassword({
                 email,
                 password: senha
             });
+            console.log('Resultado login:', { data, error });
             
             if (error) {
-                alert('Erro no login: ' + error.message);
+                alert('Erro no login: ' + error.message + '\nVerifique se você confirmou seu email.');
                 return;
             }
             
             usuarioLogado = data.user;
-            authContainer.classList.add('hidden');
-            appContainer.classList.remove('hidden');
+            if (typeof authContainer !== 'undefined' && typeof appContainer !== 'undefined') {
+                authContainer.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+            }
             carregarDados();
         }
 
@@ -501,10 +505,12 @@
             const email = document.getElementById('login-email').value;
             const senha = document.getElementById('login-senha').value;
             
+            console.log('Tentando cadastro com:', email);
             const { data, error } = await supabase.auth.signUp({
                 email,
                 password: senha
             });
+            console.log('Resultado cadastro:', { data, error });
             
             if (error) {
                 alert('Erro no cadastro: ' + error.message);
