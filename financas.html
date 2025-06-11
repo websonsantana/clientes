@@ -419,14 +419,47 @@ async function deleteVariableExpense(id){
   await renderVariableExpensesList(); await updateDashboard();
 }
 
+async function addBill(){
+  const desc=billDesc.value.trim();
+  const val=parseFloat(billValue.value);
+  const due=billDueDate.value;
+  if(!desc||isNaN(val)||val<=0||!due){alert('Preencha todos os campos');return;}
+  const {data:{user}}=await supabase.auth.getUser();
+  const {error}=await supabase.from('contas').insert({usuario_id:user.id,descricao:desc,valor:val,data_venc:due,pago:false});
+  if(error){alert(error.message);return;}
+  billDesc.value='';billValue.value='';billDueDate.value='';
+  await renderBillsTable();await updateDashboard();
+}
+
+async function renderBillsTable(){
+  const {data:{user}}=await supabase.auth.getUser();
+  const {data:bills,error}=await supabase.from('contas').select('*').eq('usuario_id',user.id).order('data_venc');
+  if(error){console.error(error);return;}
+  billsTable.innerHTML=(bills||[]).map(b=>`<tr><td class="px-4 py-2">${b.descricao}</td><td class="px-4 py-2 text-right">${formatCurrency(b.valor)}</td><td class="px-4 py-2">${new Date(b.data_venc).toLocaleDateString('pt-BR')}</td><td class="px-4 py-2 text-center"><span class="px-2 py-1 rounded-full text-xs ${b.pago?'bg-green-100 text-green-800':'bg-yellow-100 text-yellow-800'}">${b.pago?'Pago':'Pendente'}</span></td><td class="px-4 py-2 text-right"><button onclick="toggleBillStatus('${b.id}',${b.pago})" class="text-blue-500 mr-2">${b.pago?'<i class=\"fas fa-undo\"></i>':'<i class=\"fas fa-check\"></i>'}</button><button onclick="deleteBill('${b.id}')" class="text-red-500"><i class="fas fa-trash"></i></button></td></tr>`).join('');
+}
+
+async function toggleBillStatus(id,pago){
+  const {error}=await supabase.from('contas').update({pago:!pago}).eq('id',id);
+  if(error){alert(error.message);return;}
+  await renderBillsTable();await updateDashboard();
+}
+
+async function deleteBill(id){
+  const {error}=await supabase.from('contas').delete().eq('id',id);
+  if(error){alert(error.message);return;}
+  await renderBillsTable();await updateDashboard();
+}
+
 async function updateDashboard(){
   const {data:{user}}=await supabase.auth.getUser();
   const {data:receitas}=await supabase.from('receitas').select('valor').eq('usuario_id',user.id);
   const {data:despesas}=await supabase.from('despesas').select('valor,categoria').eq('usuario_id',user.id);
+  const {data:bills}=await supabase.from('contas').select('valor,pago').eq('usuario_id',user.id);
   const totalReceitas=receitas.reduce((s,r)=>s+r.valor,0);
   const totalNecess=despesas.filter(d=>d.categoria==='necessidade').reduce((s,d)=>s+d.valor,0);
   const totalDesejos=despesas.filter(d=>d.categoria==='desejo').reduce((s,d)=>s+d.valor,0);
-  const totalDespesas=totalNecess+totalDesejos;
+  const unpaidBills=(bills||[]).filter(b=>!b.pago).reduce((s,b)=>s+b.valor,0);
+  const totalDespesas=totalNecess+totalDesejos+unpaidBills;
   const saldo=totalReceitas-totalDespesas;
   currentBalance.textContent=formatCurrency(saldo);
   totalIncome.textContent=formatCurrency(totalReceitas);
@@ -440,13 +473,39 @@ async function updateDashboard(){
   needsPercentage.textContent=percNec+'%';
   wantsPercentage.textContent=percDes+'%';
   savingsPercentage.textContent=(100-percNec-percDes)+'%';
+  updateChart();
 }
+
+// ---- utilidades ----
+function formatCurrency(value){
+  return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(value||0);
+}
+
+function updateChart(){ /* TODO: implementar gráfico */ }
 
 // Exportar funções para HTML
 window.deleteIncome=deleteIncome;
 window.deleteFixedExpense=deleteFixedExpense;
 window.deleteVariableExpense=deleteVariableExpense;
-        });
-    </script>
-</body>
-</html>
+window.toggleBillStatus=toggleBillStatus;
+window.deleteBill=deleteBill;
+
+// Listener para salário
+salaryInput?.addEventListener('change', saveSalary);
+
+async function saveSalary(){
+  const val=parseFloat(salaryInput.value)||0;
+  const {data:{user}}=await supabase.auth.getUser();
+  // remove salário anterior
+  await supabase.from('receitas').delete().eq('usuario_id',user.id).eq('descricao','Salário');
+  if(val>0){
+    await supabase.from('receitas').insert({usuario_id:user.id,descricao:'Salário',valor:val});
+  }
+  await renderIncomeList(); await updateDashboard();
+}
+
+// ------- ligar botões --------
+document.getElementById('addIncomeBtn')?.addEventListener('click', addIncome);
+document.getElementById('addFixedExpenseBtn')?.addEventListener('click', addFixedExpense);
+document.getElementById('addVariableExpenseBtn')?.addEventListener('click', addVariableExpense);
+document.getElementById('addBillBtn')?.addEventListener('click', addBill);
