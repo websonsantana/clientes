@@ -477,7 +477,8 @@
             }
         }
 
-        async function fazerLogin() {
+        window.fazerLogin = async function fazerLogin() {
+    console.log('Cliquei em Entrar!');
             const email = document.getElementById('login-email').value;
             const senha = document.getElementById('login-senha').value;
             
@@ -501,7 +502,8 @@
             carregarDados();
         }
 
-        async function fazerCadastro() {
+        window.fazerCadastro = async function fazerCadastro() {
+    console.log('Cliquei em Cadastrar!');
             const email = document.getElementById('login-email').value;
             const senha = document.getElementById('login-senha').value;
             
@@ -757,5 +759,6 @@
         // Torna funções disponíveis globalmente para eventos HTML
         window.excluirTransacao = excluirTransacao;
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </body>
 </html>
