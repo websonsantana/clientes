@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard Master – Finanças</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-100">
+  <div class="container mx-auto p-6">
+    <h1 class="text-2xl font-bold mb-6">Painel Master – Visão Global</h1>
+
+    <div id="notAllowed" class="hidden text-red-600 font-medium">Acesso negado.</div>
+
+    <div id="content" class="hidden">
+      <div class="flex items-center gap-2 mb-2">
+        <label class="font-medium">Selecione o usuário:</label>
+        <button id="refreshBtn" title="Atualizar lista" class="px-2 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300">🔄</button>
+      </div>
+      <select id="userSelect" class="mb-6 px-3 py-2 border rounded w-full max-w-sm"></select>
+
+      <h2 class="text-xl font-bold mb-4">Visão Geral (Kanban)</h2>
+      <div id="kanban" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10"></div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8" id="kpiBoxes"></div>
+
+      <h2 class="text-xl font-bold mb-2">Lançamentos</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-semibold mb-2">Receitas</h3>
+          <ul id="incomeList" class="bg-white rounded shadow p-4 space-y-1 text-sm"></ul>
+        </div>
+        <div>
+          <h3 class="font-semibold mb-2">Despesas</h3>
+          <ul id="expenseList" class="bg-white rounded shadow p-4 space-y-1 text-sm"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://pzxixywhuhofeiipwiro.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6eGl4eXdodWhvZmVpaXB3aXJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk2NTcxMTQsImV4cCI6MjA2NTIzMzExNH0._EdPnaZ_wOw1q4VQjHJApEjMnaz9l6MdRy1S9mkYR1I';
+    // Liste aqui todos os e-mails que têm permissão de acesso master
+    const ADMINS = ['webson.jose@gmail.com']; // substitua/adicione os seus
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ----- Auth check -----
+    supabase.auth.getUser().then(async ({ data }) => {
+      if(!data.user){
+        // sem sessão, envie para tela de login padrão
+        window.location.replace('login.html');
+        return;
+      }
+      if (!ADMINS.includes(data.user.email)) {
+        document.getElementById('notAllowed').classList.remove('hidden');
+        return;
+      }
+      document.getElementById('content').classList.remove('hidden');
+      await loadUsers();
+      document.getElementById('refreshBtn').addEventListener('click',loadUsers);
+    });
+
+    async function loadUsers() {
+      // assumindo tabela profiles { id, email }
+      const { data: users, error } = await supabase.from('profiles').select('id, email').order('email');
+      if (error) return alert(error.message);
+      const sel = document.getElementById('userSelect');
+      sel.innerHTML = users.map(u => `<option value="${u.id}">${u.email}</option>`).join('');
+      sel.addEventListener('change', () => renderUser(sel.value));
+      if (users.length) renderUser(users[0].id);
+      renderKanban(users);
+    }
+
+    async function renderUser(uid) {
+      const { data: incAgg } = await supabase.from('receitas').select('soma:sum(valor)').eq('usuario_id', uid).single();
+      const { data: despAgg } = await supabase.from('despesas').select('soma:sum(valor)').eq('usuario_id', uid).single();
+      const { data: billsAgg } = await supabase.from('contas').select('soma:sum(valor)').eq('usuario_id', uid).single();
+      const totalR = incAgg?.soma ?? 0;
+      const totalD = (despAgg?.soma ?? 0) + (billsAgg?.soma ?? 0);
+      const saldo = totalR - totalD;
+
+      const kpi = document.getElementById('kpiBoxes');
+      kpi.innerHTML = box('Receitas', totalR, 'bg-green-500') + box('Despesas', totalD, 'bg-red-500') + box('Saldo', saldo, 'bg-blue-500');
+
+      // lists
+      const { data: recs } = await supabase.from('receitas').select('*').eq('usuario_id', uid).order('created_at', { ascending: false });
+      document.getElementById('incomeList').innerHTML = (recs || []).map(r => `<li>${r.descricao} – R$ ${r.valor}</li>`).join('');
+
+      const { data: deps } = await supabase.from('despesas').select('*').eq('usuario_id', uid).order('created_at', { ascending: false });
+      document.getElementById('expenseList').innerHTML = (deps || []).map(d => `<li>${d.descricao} – R$ ${d.valor}</li>`).join('');
+    }
+
+    async function renderKanban(users){
+      const board=document.getElementById('kanban');
+      board.innerHTML='Carregando...';
+      const cards=[];
+      for(const u of users){
+        const [incAgg, despAgg, billsAgg] = await Promise.all([
+          supabase.from('receitas').select('soma:sum(valor)',{head:false}).eq('usuario_id',u.id).single(),
+          supabase.from('despesas').select('soma:sum(valor)',{head:false}).eq('usuario_id',u.id).single(),
+          supabase.from('contas').select('soma:sum(valor)',{head:false}).eq('usuario_id',u.id).single()
+        ]);
+        const totalR=incAgg.data?.soma||0;
+        const totalD=(despAgg.data?.soma||0)+(billsAgg.data?.soma||0);
+        const saldo=totalR-totalD;
+        const color=saldo>=0?'border-green-500':'border-red-500';
+        cards.push(`<div class="p-4 bg-white rounded shadow border-t-4 ${color}">
+            <div class="font-semibold mb-1 text-sm">${u.email}</div>
+            <div class="text-xs">Receitas: <strong>${formatCurrency(totalR)}</strong></div>
+            <div class="text-xs">Despesas: <strong>${formatCurrency(totalD)}</strong></div>
+            <div class="text-xs">Saldo: <strong>${formatCurrency(saldo)}</strong></div>
+          </div>`);
+      }
+      board.innerHTML=cards.join('');
+    }
+
+    const formatCurrency = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    const box = (label, value, color) => `<div class="p-4 rounded shadow text-white ${color}"><div class="text-sm">${label}</div><div class="text-xl font-bold">${formatCurrency(value)}</div></div>`;
+  </script>
+</body>
+</html>
