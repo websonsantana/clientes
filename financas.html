@@ -509,6 +509,25 @@ document.getElementById('addIncomeBtn')?.addEventListener('click', addIncome);
 document.getElementById('addFixedExpenseBtn')?.addEventListener('click', addFixedExpense);
 document.getElementById('addVariableExpenseBtn')?.addEventListener('click', addVariableExpense);
 document.getElementById('addBillBtn')?.addEventListener('click', addBill);
+
+init();
+async function init(){
+  await loadSalary();
+  await renderIncomeList();
+  await renderFixedExpensesList();
+  await renderVariableExpensesList();
+  await renderBillsTable();
+  await updateDashboard();
+  updateChart();
+}
+
+async function loadSalary(){
+  const {data:{user}}=await supabase.auth.getUser();
+  const {data, error}=await supabase.from('receitas').select('valor').eq('usuario_id',user.id).eq('descricao','Salário').single();
+  if(!error && data){
+    salaryInput.value = data.valor;
+  }
+}
         });
     </script>
 </body>
