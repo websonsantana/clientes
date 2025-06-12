@@ -74,11 +74,13 @@
     }
 
     async function renderUser(uid) {
-      const { data: incAgg } = await supabase.from('receitas').select('soma:sum(valor)').eq('usuario_id', uid).single();
-      const { data: despAgg } = await supabase.from('despesas').select('soma:sum(valor)').eq('usuario_id', uid).single();
-      const { data: billsAgg } = await supabase.from('contas').select('soma:sum(valor)').eq('usuario_id', uid).single();
-      const totalR = incAgg?.soma ?? 0;
-      const totalD = (despAgg?.soma ?? 0) + (billsAgg?.soma ?? 0);
+      const [rec, des, con] = await Promise.all([
+        supabase.from('receitas').select('valor').eq('usuario_id', uid),
+        supabase.from('despesas').select('valor').eq('usuario_id', uid),
+        supabase.from('contas').select('valor').eq('usuario_id', uid)
+      ]);
+      const totalR = (rec.data||[]).reduce((s,r)=>s+r.valor,0);
+      const totalD = (des.data||[]).reduce((s,d)=>s+d.valor,0) + (con.data||[]).reduce((s,c)=>s+c.valor,0);
       const saldo = totalR - totalD;
 
       const kpi = document.getElementById('kpiBoxes');
@@ -97,13 +99,13 @@
       board.innerHTML='Carregando...';
       const cards=[];
       for(const u of users){
-        const [incAgg, despAgg, billsAgg] = await Promise.all([
-          supabase.from('receitas').select('soma:sum(valor)',{head:false}).eq('usuario_id',u.id).single(),
-          supabase.from('despesas').select('soma:sum(valor)',{head:false}).eq('usuario_id',u.id).single(),
-          supabase.from('contas').select('soma:sum(valor)',{head:false}).eq('usuario_id',u.id).single()
+        const [rec, des, con] = await Promise.all([
+          supabase.from('receitas').select('valor').eq('usuario_id',u.id),
+          supabase.from('despesas').select('valor').eq('usuario_id',u.id),
+          supabase.from('contas').select('valor').eq('usuario_id',u.id)
         ]);
-        const totalR=incAgg.data?.soma||0;
-        const totalD=(despAgg.data?.soma||0)+(billsAgg.data?.soma||0);
+        const totalR=(rec.data||[]).reduce((s,r)=>s+r.valor,0);
+        const totalD=((des.data||[]).reduce((s,d)=>s+d.valor,0))+((con.data||[]).reduce((s,c)=>s+c.valor,0));
         const saldo=totalR-totalD;
         const color=saldo>=0?'border-green-500':'border-red-500';
         cards.push(`<div class="p-4 bg-white rounded shadow border-t-4 ${color}">
