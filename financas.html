@@ -6,6 +6,7 @@
     <title>Meu Controle Financeiro 50-30-20</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .chart-container {
@@ -127,7 +128,8 @@
 
                 <div class="mb-6">
                     <h3 class="font-medium text-gray-700 mb-2">Custos Variáveis</h3>
-                    <div class="flex space-x-2 mb-2">
+                    <div class="flex flex-wrap gap-2 mb-2">
+                        <select id="variableCategory" class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></select>
                         <input type="text" id="variableExpenseDesc" class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Descrição">
                         <div class="relative w-32">
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-600">R$</span>
@@ -220,6 +222,8 @@
                     <h3 class="font-medium text-yellow-800 mb-2">Status Financeiro</h3>
                     <p class="text-sm text-yellow-700" id="financialStatus">Adicione suas receitas e despesas para ver o status.</p>
                 </div>
+                <canvas id="expensePie" class="w-full max-w-xs mx-auto"></canvas>
+                <canvas id="lineMeses" class="w-full max-w-xl mx-auto mt-6"></canvas>
             </div>
         </div>
 
@@ -307,6 +311,7 @@ supabase.auth.getUser().then(({data})=>{
             const addFixedExpenseBtn = document.getElementById('addFixedExpenseBtn');
             const fixedExpensesList = document.getElementById('fixedExpensesList');
             
+            const variableCategory = document.getElementById('variableCategory');
             const variableExpenseDesc = document.getElementById('variableExpenseDesc');
             const variableExpenseValue = document.getElementById('variableExpenseValue');
             const addVariableExpenseBtn = document.getElementById('addVariableExpenseBtn');
@@ -398,18 +403,21 @@ async function deleteFixedExpense(id){
 
 async function addVariableExpense(){
   const desc=variableExpenseDesc.value.trim(); const val=parseFloat(variableExpenseValue.value);
+  const catId=variableCategory.value;
+  if(catId==='new'){alert('Escolha ou crie uma categoria');return;}
   if(!desc||isNaN(val)||val<=0){alert('Descrição/valor inválido');return;}
   const {data:{user}}=await supabase.auth.getUser();
-  const {error}=await supabase.from('despesas').insert({usuario_id:user.id,descricao:desc,valor:val,categoria:'desejo'});
+  const {error}=await supabase.from('despesas').insert({usuario_id:user.id,descricao:desc,valor:val,categoria:'desejo',categoria_id:catId});
   if(error){alert(error.message);return;}
   variableExpenseDesc.value=''; variableExpenseValue.value='';
+  variableCategory.selectedIndex=0;
   await renderVariableExpensesList(); await updateDashboard();
 }
 
 async function renderVariableExpensesList(){
   const {data:{user}} = await supabase.auth.getUser();
-  const {data:despesas}=await supabase.from('despesas').select('*').eq('usuario_id',user.id).eq('categoria','desejo').order('data',{ascending:false});
-  variableExpensesList.innerHTML = (despesas||[]).map(d=>`<li class="py-2 flex justify-between items-center fade-in"><div><span class="font-medium">${d.descricao}</span><span class="text-sm text-gray-500 ml-2">${formatCurrency(d.valor)}</span></div><button onclick=\"deleteVariableExpense('${d.id}')\" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button></li>`).join('');
+  const {data:despesas}=await supabase.from('despesas').select('*,categorias(nome)').eq('usuario_id',user.id).eq('categoria','desejo').order('data',{ascending:false});
+  variableExpensesList.innerHTML = (despesas||[]).map(d=>`<li class="py-2 flex justify-between items-center fade-in"><div><span class="font-medium">${d.categorias?d.categorias.nome:''} - ${d.descricao}</span><span class="text-sm text-gray-500 ml-2">${formatCurrency(d.valor)}</span></div><button onclick=\"deleteVariableExpense('${d.id}')\" class="text-red-500 hover:text-red-700"><i class='fas fa-trash'></i></button></li>`).join('');
 }
 
 async function deleteVariableExpense(id){
@@ -417,6 +425,29 @@ async function deleteVariableExpense(id){
   const {error}=await supabase.from('despesas').delete().eq('id',id);
   if(error){alert(error.message);return;}
   await renderVariableExpensesList(); await updateDashboard();
+}
+
+async function addUnexpectedExpense(){
+  const desc=unexpectedExpenseDesc.value.trim(); const val=parseFloat(unexpectedExpenseValue.value);
+  if(!desc||isNaN(val)||val<=0){alert('Descrição/valor inválido');return;}
+  const {data:{user}}=await supabase.auth.getUser();
+  const {error}=await supabase.from('despesas').insert({usuario_id:user.id,descricao:desc,valor:val,categoria:'imprevisto'});
+  if(error){alert(error.message);return;}
+  unexpectedExpenseDesc.value=''; unexpectedExpenseValue.value='';
+  await renderUnexpectedExpensesList(); await updateDashboard();
+}
+
+async function renderUnexpectedExpensesList(){
+  const {data:{user}}=await supabase.auth.getUser();
+  const {data:despesas}=await supabase.from('despesas').select('*').eq('usuario_id',user.id).eq('categoria','imprevisto').order('data',{ascending:false});
+  unexpectedExpensesList.innerHTML=(despesas||[]).map(d=>`<li class="py-2 flex justify-between items-center fade-in"><div><span class="font-medium">${d.descricao}</span><span class="text-sm text-gray-500 ml-2">${formatCurrency(d.valor)}</span></div><button onclick=\"deleteUnexpectedExpense('${d.id}')\" class="text-red-500 hover:text-red-700"><i class='fas fa-trash'></i></button></li>`).join('');
+}
+
+async function deleteUnexpectedExpense(id){
+  if(!confirm('Excluir gasto?'))return;
+  const {error}=await supabase.from('despesas').delete().eq('id',id);
+  if(error){alert(error.message);return;}
+  await renderUnexpectedExpensesList(); await updateDashboard();
 }
 
 async function addBill(){
@@ -458,8 +489,9 @@ async function updateDashboard(){
   const totalReceitas=receitas.reduce((s,r)=>s+r.valor,0);
   const totalNecess=despesas.filter(d=>d.categoria==='necessidade').reduce((s,d)=>s+d.valor,0);
   const totalDesejos=despesas.filter(d=>d.categoria==='desejo').reduce((s,d)=>s+d.valor,0);
+  const totalImprev=despesas.filter(d=>d.categoria==='imprevisto').reduce((s,d)=>s+d.valor,0);
   const unpaidBills=(bills||[]).filter(b=>!b.pago).reduce((s,b)=>s+b.valor,0);
-  const totalDespesas=totalNecess+totalDesejos+unpaidBills;
+  const totalDespesas=totalNecess+totalDesejos+totalImprev+unpaidBills;
   const saldo=totalReceitas-totalDespesas;
   currentBalance.textContent=formatCurrency(saldo);
   totalIncome.textContent=formatCurrency(totalReceitas);
@@ -474,6 +506,7 @@ async function updateDashboard(){
   wantsPercentage.textContent=percDes+'%';
   savingsPercentage.textContent=(100-percNec-percDes)+'%';
   updateChart();
+  renderMonthlyLine();
 }
 
 // ---- utilidades ----
@@ -481,22 +514,61 @@ function formatCurrency(value){
   return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(value||0);
 }
 
-function updateChart(){ /* TODO: implementar gráfico */ }
+let pie;
+async function updateChart(){
+  const {data:{user}}=await supabase.auth.getUser();
+  const {data:receitas}=await supabase.from('receitas').select('valor').eq('usuario_id',user.id);
+  const {data:despesas}=await supabase.from('despesas').select('valor,categoria').eq('usuario_id',user.id);
+  const {data:bills}=await supabase.from('contas').select('valor,pago').eq('usuario_id',user.id);
+  const totalReceitas=receitas.reduce((s,r)=>s+r.valor,0)||1;
+  const totalNecess=despesas.filter(d=>d.categoria==='necessidade').reduce((s,d)=>s+d.valor,0);
+  const totalDesejos=despesas.filter(d=>d.categoria==='desejo').reduce((s,d)=>s+d.valor,0);
+  const totalImprev=despesas.filter(d=>d.categoria==='imprevisto').reduce((s,d)=>s+d.valor,0);
+  const unpaidBills=(bills||[]).filter(b=>!b.pago).reduce((s,b)=>s+b.valor,0);
+  const totalDespesas=totalNecess+totalDesejos+totalImprev+unpaidBills;
+  const poupanca= Math.max(totalReceitas-totalDespesas,0);
+  const data=[totalNecess,totalDesejos,poupanca];
+  const ctx=document.getElementById('expensePie');
+  if(!pie){
+    pie=new Chart(ctx,{type:'doughnut',data:{labels:['Necessidades','Desejos','Poupança'],datasets:[{data,backgroundColor:['#3B82F6','#EC4899','#10B981']}]},options:{plugins:{legend:{position:'bottom'}}}});
+  }else{
+    pie.data.datasets[0].data=data;
+    pie.update();
+  }
+}
 
-// Exportar funções para HTML
-window.deleteIncome=deleteIncome;
-window.deleteFixedExpense=deleteFixedExpense;
-window.deleteVariableExpense=deleteVariableExpense;
-window.toggleBillStatus=toggleBillStatus;
-window.deleteBill=deleteBill;
+// -------- linha mensal ----------
+let lineChart;
+async function renderMonthlyLine(){
+  const {data:{user}}=await supabase.auth.getUser();
+  const {data:rows,error}=await supabase.from('vw_resumo_mensal').select('*').eq('usuario_id',user.id).order('mes');
+  if(error){console.error(error);return;}
+  if(!rows||rows.length===0) return;
+  const labels=rows.map(r=>new Date(r.mes).toLocaleDateString('pt-BR',{month:'short',year:'2-digit'}));
+  const dataNec=rows.map(r=>r.total_necess);
+  const dataDes=rows.map(r=>r.total_desejos);
+  const dataPou=rows.map(r=>r.total_poupanca);
+  const ctx=document.getElementById('lineMeses');
+  if(!lineChart){
+    lineChart=new Chart(ctx,{type:'line',data:{labels,datasets:[
+      {label:'Necessidades',data:dataNec,borderColor:'#3B82F6',backgroundColor:'rgba(59,130,246,0.2)',tension:.3},
+      {label:'Desejos',data:dataDes,borderColor:'#EC4899',backgroundColor:'rgba(236,72,153,0.2)',tension:.3},
+      {label:'Poupança',data:dataPou,borderColor:'#10B981',backgroundColor:'rgba(16,185,129,0.2)',tension:.3}
+    ]},options:{responsive:true,plugins:{legend:{position:'bottom'}}}});
+  }else{
+    lineChart.data.labels=labels;
+    lineChart.data.datasets[0].data=dataNec;
+    lineChart.data.datasets[1].data=dataDes;
+    lineChart.data.datasets[2].data=dataPou;
+    lineChart.update();
+  }
+}
 
-// Listener para salário
+// ----- funções salário -----
 salaryInput?.addEventListener('change', saveSalary);
-
 async function saveSalary(){
   const val=parseFloat(salaryInput.value)||0;
   const {data:{user}}=await supabase.auth.getUser();
-  // remove salário anterior
   await supabase.from('receitas').delete().eq('usuario_id',user.id).eq('descricao','Salário');
   if(val>0){
     await supabase.from('receitas').insert({usuario_id:user.id,descricao:'Salário',valor:val});
@@ -508,17 +580,30 @@ async function saveSalary(){
 document.getElementById('addIncomeBtn')?.addEventListener('click', addIncome);
 document.getElementById('addFixedExpenseBtn')?.addEventListener('click', addFixedExpense);
 document.getElementById('addVariableExpenseBtn')?.addEventListener('click', addVariableExpense);
+document.getElementById('addUnexpectedExpenseBtn')?.addEventListener('click', addUnexpectedExpense);
 document.getElementById('addBillBtn')?.addEventListener('click', addBill);
 
+// Exportar para HTML
+window.deleteIncome=deleteIncome;
+window.deleteFixedExpense=deleteFixedExpense;
+window.deleteVariableExpense=deleteVariableExpense;
+window.deleteUnexpectedExpense=deleteUnexpectedExpense;
+window.toggleBillStatus=toggleBillStatus;
+window.deleteBill=deleteBill;
+
+// -------- init --------
 init();
 async function init(){
   await loadSalary();
   await renderIncomeList();
   await renderFixedExpensesList();
   await renderVariableExpensesList();
+  await renderUnexpectedExpensesList();
   await renderBillsTable();
   await updateDashboard();
-  updateChart();
+  await updateChart();
+  await renderMonthlyLine();
+  await loadCategories();
 }
 
 async function loadSalary(){
@@ -528,6 +613,34 @@ async function loadSalary(){
     salaryInput.value = data.valor;
   }
 }
+
+// -------- categorias personalizadas --------
+async function loadCategories(){
+  const {data:{user}}=await supabase.auth.getUser();
+  let {data:cats,error}=await supabase.from('categorias').select('*').eq('usuario_id',user.id).order('nome');
+  if(error){console.error(error);return;}
+  if(!cats||cats.length===0){
+    const padrao=['Transporte','Alimentação','Lazer'];
+    const inserts=padrao.map(n=>({usuario_id:user.id,nome:n,tipo:'desejo'}));
+    const {error:e2}=await supabase.from('categorias').insert(inserts);
+    if(e2) console.error(e2);
+    ({data:cats}=await supabase.from('categorias').select('*').eq('usuario_id',user.id).order('nome'));
+  }
+  const sel=document.getElementById('variableCategory');
+  sel.innerHTML=cats.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('')+`<option value="new">+ Nova</option>`;
+}
+
+document.getElementById('variableCategory')?.addEventListener('change',async e=>{
+  if(e.target.value==='new'){
+    const nome=prompt('Nome da nova categoria (desejo):');
+    if(!nome) {loadCategories();return;}
+    const {data:{user}}=await supabase.auth.getUser();
+    const {data,error}=await supabase.from('categorias').insert({usuario_id:user.id,nome:nome,tipo:'desejo'}).select().single();
+    if(error){alert(error.message);loadCategories();return;}
+    await loadCategories();
+    document.getElementById('variableCategory').value=data.id;
+  }
+});
         });
     </script>
 </body>
