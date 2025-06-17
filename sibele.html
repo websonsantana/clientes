@@ -6,6 +6,8 @@
     <title>Saúde Feminina - Gestão Completa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#D14D72">
     <style>
         :root {
             --primary: #D14D72; /* Rosa mais intenso */
@@ -1654,6 +1656,40 @@
             document.body.appendChild(notification);
             setTimeout(() => notification.remove(), 3000);
         }
+    </script>
+    <script>
+    // Service Worker para PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('sw.js');
+      });
+    }
+    // Prompt de instalação PWA
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      let btn = document.createElement('button');
+      btn.innerText = 'Instalar aplicativo';
+      btn.style.position = 'fixed';
+      btn.style.bottom = '20px';
+      btn.style.right = '20px';
+      btn.style.zIndex = '9999';
+      btn.style.background = '#D14D72';
+      btn.style.color = 'white';
+      btn.style.border = 'none';
+      btn.style.padding = '12px 20px';
+      btn.style.borderRadius = '8px';
+      btn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+      btn.onclick = function() {
+        btn.remove();
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => {
+          deferredPrompt = null;
+        });
+      };
+      document.body.appendChild(btn);
+    });
     </script>
 </body>
 </html>
