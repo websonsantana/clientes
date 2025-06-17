@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saúde Feminina - Gestão Completa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #D14D72; /* Rosa mais intenso */
+            --primary-light: #FFABAB; /* Rosa claro */
+            --primary-dark: #9D3C5E; /* Rosa escuro */
+            --secondary: #FCC8D1; /* Rosa pastel */
+            --accent: #FEF2F4; /* Rosa muito claro */
+            --text: #333333;
+            --light: #FFFFFF;
+        }
+
+        body {
+            color: var(--text);
+        }
+
+        .sidebar {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            transition: transform 0.3s ease;
+        }
+
+        .cycle-day {
+            transition: all 0.3s ease;
+        }
+        .cycle-day:hover {
+            transform: scale(1.1);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 50;
+                height: 100vh;
+                top: 0;
+                left: 0;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            font-size: 10px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Botões do menu lateral */
+        nav button {
+            transition: all 0.3s ease;
+        }
+        nav button:hover {
+            background-color: var(--primary-dark) !important;
+        }
+        nav button.bg-indigo-800 {
+            background-color: var(--primary-dark) !important;
+        }
+
+        /* Botões principais */
+        button.bg-indigo-600 {
+            background-color: var(--primary) !important;
+        }
+        button.bg-indigo-600:hover {
+            background-color: var(--primary-dark) !important;
+        }
+
+        /* Cards e elementos de destaque */
+        .bg-white {
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Destaque para dias de ciclo */
+        .bg-pink-100 {
+            background-color: var(--secondary) !important;
+        }
+        .text-pink-700 {
+            color: var(--primary-dark) !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Sidebar -->
+    <div class="sidebar bg-indigo-700 text-white w-64 space-y-6 py-7 px-2 fixed inset-y-0 left-0">
+        <div class="flex items-center justify-between px-4">
+            <h1 class="text-2xl font-bold">Saúde Feminina</h1>
+            <button id="closeSidebar" class="md:hidden text-white">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav>
+            <div class="space-y-2">
+                <button onclick="showSection('dashboard')" class="w-full flex items-center space-x-2 px-4 py-2 rounded-lg bg-primary-dark text-white transition-all">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button onclick="showSection('menstruation')" class="w-full flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-primary-dark text-white transition-all">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Ciclo Menstrual</span>
+                </button>
+                <button onclick="showSection('medications')" class="w-full flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-primary-dark text-white transition-all">
+                    <i class="fas fa-pills"></i>
+                    <span>Medicações</span>
+                </button>
+                <button onclick="showSection('exams')" class="w-full flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-primary-dark text-white transition-all">
+                    <i class="fas fa-flask"></i>
+                    <span>Exames</span>
+                </button>
+                <button onclick="showSection('appointments')" class="w-full flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-primary-dark text-white transition-all">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Consultas</span>
+                </button>
+                <button onclick="showSection('family')" class="w-full flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-primary-dark text-white transition-all">
+                    <i class="fas fa-users"></i>
+                    <span>Família</span>
+                </button>
+                <button onclick="showSection('settings')" class="w-full flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-primary-dark text-white transition-all">
+                    <i class="fas fa-cog"></i>
+                    <span>Configurações</span>
+                </button>
+            </div>
+        </nav>
+        <div class="absolute bottom-0 left-0 right-0 p-4 bg-indigo-800">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center">
+                    <i class="fas fa-user text-sm"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-medium" id="currentUser">Usuário</p>
+                    <p class="text-xs text-indigo-200">Perfil</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile header -->
+    <div class="md:hidden fixed top-0 left-0 right-0 bg-indigo-700 text-white p-4 flex justify-between items-center z-40">
+        <button id="openSidebar" class="text-white">
+            <i class="fas fa-bars"></i>
+        </button>
+        <h1 class="text-xl font-bold">Saúde Feminina</h1>
+        <div class="relative">
+            <i class="fas fa-bell"></i>
+            <div class="notification-badge hidden" id="notificationBadge">3</div>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="md:ml-64 p-4 pt-20 md:pt-4">
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="section fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Dashboard</h2>
+                <div class="text-sm text-gray-500" id="currentDate"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500">Ciclo Atual</p>
+                            <p class="text-2xl font-bold" id="cycleDay">Dia 0</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center">
+                            <i class="fas fa-calendar-alt text-pink-500"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500">Medicação Ativa</p>
+                            <p class="text-2xl font-bold" id="activeMeds">0</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                            <i class="fas fa-pills text-blue-500"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500">Próxima Consulta</p>
+                            <p class="text-xl font-bold" id="nextAppointment">Nenhuma</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                            <i class="fas fa-calendar-check text-green-500"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500">Exames Pendentes</p>
+                            <p class="text-2xl font-bold" id="pendingExams">0</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center">
+                            <i class="fas fa-flask text-yellow-500"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-white p-4 rounded-lg shadow lg:col-span-2">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-lg">Calendário Menstrual</h3>
+                        <div class="flex space-x-2">
+                            <button onclick="changeMonth(-1)" class="p-1 rounded-full hover:bg-gray-100">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <span id="currentMonthYear" class="font-medium">Mês Ano</span>
+                            <button onclick="changeMonth(1)" class="p-1 rounded-full hover:bg-gray-100">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="menstrualCalendar" class="grid grid-cols-7 gap-1 text-center">
+                        <!-- Calendar will be generated by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h3 class="font-bold text-lg mb-4">Próximos Lembretes</h3>
+                    <div id="remindersList" class="space-y-3">
+                        <div class="flex items-center p-2 bg-gray-50 rounded">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                <i class="fas fa-pills text-blue-500 text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">Tomar Paracetamol</p>
+                                <p class="text-xs text-gray-500">Hoje às 14:00</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center p-2 bg-gray-50 rounded">
+                            <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                <i class="fas fa-calendar-check text-green-500 text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">Consulta Ginecologista</p>
+                                <p class="text-xs text-gray-500">15/06 às 09:30</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menstruation Section -->
+        <div id="menstruation" class="section hidden fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Ciclo Menstrual</h2>
+                <button onclick="openAddPeriodModal()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                    <i class="fas fa-plus mr-2"></i>Adicionar Período
+                </button>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg shadow mb-6">
+                <h3 class="font-bold text-lg mb-4">Estatísticas do Ciclo</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="p-3 border rounded-lg">
+                        <p class="text-gray-500">Duração Média</p>
+                        <p class="text-xl font-bold" id="avgCycleLength">28 dias</p>
+                    </div>
+                    <div class="p-3 border rounded-lg">
+                        <p class="text-gray-500">Duração do Período</p>
+                        <p class="text-xl font-bold" id="avgPeriodLength">5 dias</p>
+                    </div>
+                    <div class="p-3 border rounded-lg">
+                        <p class="text-gray-500">Próximo Período</p>
+                        <p class="text-xl font-bold" id="nextPeriodDate">15/06/2023</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="font-bold text-lg mb-4">Histórico de Períodos</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data de Início</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data de Término</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duração</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="periodHistory" class="bg-white divide-y divide-gray-200">
+                            <!-- Period history will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medications Section -->
+        <div id="medications" class="section hidden fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Medicações</h2>
+                <button onclick="openAddMedicationModal()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                    <i class="fas fa-plus mr-2"></i>Adicionar Medicação
+                </button>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg shadow mb-6">
+                <h3 class="font-bold text-lg mb-4">Medicações Ativas</h3>
+                <div id="activeMedications" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Active medications will be loaded here -->
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="font-bold text-lg mb-4">Histórico de Medicações</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Medicação</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dosagem</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Frequência</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Período</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="medicationHistory" class="bg-white divide-y divide-gray-200">
+                            <!-- Medication history will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exams Section -->
+        <div id="exams" class="section hidden fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Exames de Rotina</h2>
+                <button onclick="openAddExamModal()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                    <i class="fas fa-plus mr-2"></i>Adicionar Exame
+                </button>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg shadow mb-6">
+                <h3 class="font-bold text-lg mb-4">Próximos Exames</h3>
+                <div id="upcomingExams" class="space-y-3">
+                    <!-- Upcoming exams will be loaded here -->
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="font-bold text-lg mb-4">Histórico de Exames</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exame</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Local</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Resultado</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="examHistory" class="bg-white divide-y divide-gray-200">
+                            <!-- Exam history will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appointments Section -->
+        <div id="appointments" class="section hidden fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Consultas Médicas</h2>
+                <button onclick="openAddAppointmentModal()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                    <i class="fas fa-plus mr-2"></i>Agendar Consulta
+                </button>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg shadow mb-6">
+                <h3 class="font-bold text-lg mb-4">Próximas Consultas</h3>
+                <div id="upcomingAppointments" class="space-y-3">
+                    <!-- Upcoming appointments will be loaded here -->
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="font-bold text-lg mb-4">Histórico de Consultas</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Especialidade</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Médico</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Local</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="appointmentHistory" class="bg-white divide-y divide-gray-200">
+                            <!-- Appointment history will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Family Section -->
+        <div id="family" class="section hidden fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Membros da Família</h2>
+                <button onclick="openAddFamilyMemberModal()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                    <i class="fas fa-plus mr-2"></i>Adicionar Membro
+                </button>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg shadow">
+                <div id="familyMembers" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Family members will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div id="settings" class="section hidden fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Configurações</h2>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg shadow mb-6">
+                <h3 class="font-bold text-lg mb-4">Configurações do Perfil</h3>
+                <form id="profileSettings">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-gray-700 mb-2">Nome</label>
+                            <input type="text" id="userName" class="w-full px-3 py-2 border rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2">Email</label>
+                            <input type="email" id="userEmail" class="w-full px-3 py-2 border rounded-lg">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2">Duração Média do Ciclo (dias)</label>
+                        <input type="number" id="avgCycleSetting" class="w-full px-3 py-2 border rounded-lg" min="21" max="45" value="28">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2">Duração Média do Período (dias)</label>
+                        <input type="number" id="avgPeriodSetting" class="w-full px-3 py-2 border rounded-lg" min="2" max="10" value="5">
+                    </div>
+                    <button type="button" onclick="saveProfileSettings()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                        Salvar Configurações
+                    </button>
+                </form>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="font-bold text-lg mb-4">Notificações</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium">Lembretes de Medicação</p>
+                            <p class="text-sm text-gray-500">Receber notificações para tomar medicação</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="medReminders" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                        </label>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium">Lembretes de Consulta</p>
+                            <p class="text-sm text-gray-500">Receber notificações antes de consultas</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="appointmentReminders" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                        </label>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium">Lembretes de Exame</p>
+                            <p class="text-sm text-gray-500">Receber notificações antes de exames</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="examReminders" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                        </label>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium">Notificações de Período</p>
+                            <p class="text-sm text-gray-500">Receber notificações sobre o ciclo menstrual</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="periodReminders" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Period Modal -->
+    <div id="addPeriodModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Adicionar Período Menstrual</h3>
+                <button onclick="closeModal('addPeriodModal')" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addPeriodForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Data de Início</label>
+                    <input type="date" id="periodStartDate" class="w-full px-3 py-2 border rounded-lg" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Data de Término</label>
+                    <input type="date" id="periodEndDate" class="w-full px-3 py-2 border rounded-lg" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Intensidade</label>
+                    <select id="periodIntensity" class="w-full px-3 py-2 border rounded-lg">
+                        <option value="light">Leve</option>
+                        <option value="medium" selected>Média</option>
+                        <option value="heavy">Forte</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Sintomas</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="symptoms" value="cramps" class="mr-2">
+                            <span>Cólicas</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="symptoms" value="headache" class="mr-2">
+                            <span>Dor de cabeça</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="symptoms" value="backache" class="mr-2">
+                            <span>Dor nas costas</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="symptoms" value="bloating" class="mr-2">
+                            <span>Inchaço</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="symptoms" value="mood_swings" class="mr-2">
+                            <span>Alterações de humor</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="symptoms" value="fatigue" class="mr-2">
+                            <span>Fadiga</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeModal('addPeriodModal')" class="px-4 py-2 border rounded-lg hover:bg-gray-100">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                        Salvar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Medication Modal -->
+    <div id="addMedicationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Adicionar Medicação</h3>
+                <button onclick="closeModal('addMedicationModal')" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addMedicationForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Nome da Medicação</label>
+                    <input type="text" id="medicationName" class="w-full px-3 py-2 border rounded-lg" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Dosagem</label>
+                    <div class="flex">
+                        <input type="number" id="medicationDosage" class="w-20 px-3 py-2 border rounded-l-lg" required>
+                        <select id="medicationUnit" class="w-24 px-3 py-2 border rounded-r-lg">
+                            <option value="mg">mg</option>
+                            <option value="g">g</option>
+                            <option value="ml">ml</option>
+                            <option value="comprimidos">comprimidos</option>
+                            <option value="gotas">gotas</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Frequência</label>
+                    <div class="flex items-center">
+                        <span class="mr-2">Tomar</span>
+                        <input type="number" id="medicationTimesPerDay" class="w-16 px-3 py-2 border rounded-lg" min="1" max="10" value="1" required>
+                        <span class="mx-2">vezes ao dia, a cada</span>
+                        <input type="number" id="medicationHoursBetween" class="w-16 px-3 py-2 border rounded-lg" min="1" max="24" value="8" required>
+                        <span class="ml-2">horas</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-gray-700 mb-2">Data de Início</label>
+                        <input type="date" id="medicationStartDate" class="w-full px-3 py-2 border rounded-lg" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">Data de Término</label>
+                        <input type="date" id="medicationEndDate" class="w-full px-3 py-2 border rounded-lg">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Instruções Adicionais</label>
+                    <textarea id="medicationInstructions" class="w-full px-3 py-2 border rounded-lg" rows="2"></textarea>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeModal('addMedicationModal')" class="px-4 py-2 border rounded-lg hover:bg-gray-100">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                        Salvar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Exam Modal -->
+    <div id="addExamModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Adicionar Exame</h3>
+                <button onclick="closeModal('addExamModal')" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addExamForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Tipo de Exame</label>
+                    <input type="text" id="examType" class="w-full px-3 py-2 border rounded-lg" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Data do Exame</label>
+                    <input type="date" id="examDate" class="w-full px-3 py-2 border rounded-lg" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Local</label>
+                    <input type="text" id="examLocation" class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Instruções de Preparo</label>
+                    <textarea id="examInstructions" class="w-full px-3 py-2 border rounded-lg" rows="3"></textarea>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeModal('addExamModal')" class="px-4 py-2 border rounded-lg hover:bg-gray-100">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                        Salvar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Appointment Modal -->
+    <div id="addAppointmentModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Agendar Consulta</h3>
+                <button onclick="closeModal('addAppointmentModal')" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addAppointmentForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Especialidade</label>
+                    <input type="text" id="appointmentSpecialty" class="w-full px-3 py-2 border rounded-lg" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Médico</label>
+                    <input type="text" id="appointmentDoctor" class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Data</label>
+                    <input type="date" id="appointmentDate" class="w-full px-3 py-2 border rounded-lg" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Hora</label>
+                    <input type="time" id="appointmentTime" class="w-full px-3 py-2 border rounded-lg" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Local</label>
+                    <input type="text" id="appointmentLocation" class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Motivo</label>
+                    <textarea id="appointmentReason" class="w-full px-3 py-2 border rounded-lg" rows="2"></textarea>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeModal('addAppointmentModal')" class="px-4 py-2 border rounded-lg hover:bg-gray-100">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                        Agendar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Family Member Modal -->
+    <div id="addFamilyMemberModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Adicionar Membro da Família</h3>
+                <button onclick="closeModal('addFamilyMemberModal')" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addFamilyMemberForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Nome</label>
+                    <input type="text" id="familyMemberName" class="w-full px-3 py-2 border rounded-lg" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Parentesco</label>
+                    <select id="familyMemberRelationship" class="w-full px-3 py-2 border rounded-lg">
+                        <option value="spouse">Cônjuge</option>
+                        <option value="child">Filho(a)</option>
+                        <option value="mother">Mãe</option>
+                        <option value="father">Pai</option>
+                        <option value="sister">Irmã</option>
+                        <option value="brother">Irmão</option>
+                        <option value="other">Outro</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Data de Nascimento</label>
+                    <input type="date" id="familyMemberBirthdate" class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Observações</label>
+                    <textarea id="familyMemberNotes" class="w-full px-3 py-2 border rounded-lg" rows="2"></textarea>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeModal('addFamilyMemberModal')" class="px-4 py-2 border rounded-lg hover:bg-gray-100">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                        Adicionar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Details Modal -->
+    <div id="viewDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold" id="detailsModalTitle">Detalhes</h3>
+                <button onclick="closeModal('viewDetailsModal')" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="detailsModalContent">
+                <!-- Content will be loaded here -->
+            </div>
+            <div class="flex justify-end mt-4">
+                <button onclick="closeModal('viewDetailsModal')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Confirmar Exclusão</h3>
+                <button onclick="closeModal('confirmationModal')" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <p id="confirmationMessage" class="mb-6">Tem certeza que deseja excluir este item?</p>
+            <div class="flex justify-end space-x-3">
+                <button onclick="closeModal('confirmationModal')" class="px-4 py-2 border rounded-lg hover:bg-gray-100">
+                    Cancelar
+                </button>
+                <button onclick="confirmDelete()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+                    Excluir
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentUser = 'user1';
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let itemToDelete = null;
+        let itemTypeToDelete = null;
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            setupEventListeners();
+            showSection('dashboard');
+            generateCalendar(currentMonth, currentYear);
+            updateDashboard();
+            loadAllData();
+            
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(e) {
+                const sidebar = document.querySelector('.sidebar');
+                const openBtn = document.getElementById('openSidebar');
+                if (window.innerWidth <= 768 && 
+                    !sidebar.contains(e.target) && 
+                    e.target !== openBtn && 
+                    !openBtn.contains(e.target)) {
+                    sidebar.classList.remove('open');
+                }
+            });
+        });
+
+        function initializeApp() {
+            // Check if localStorage is available
+            if (typeof(Storage) === "undefined") {
+                alert("Seu navegador não suporta armazenamento local. Algumas funcionalidades podem não estar disponíveis.");
+                return;
+            }
+
+            // Initialize default user if not exists
+            if (!localStorage.getItem('users')) {
+                const defaultUser = {
+                    id: 'user1',
+                    name: 'Minha Esposa',
+                    email: 'esposa@example.com',
+                    avgCycleLength: 28,
+                    avgPeriodLength: 5,
+                    notifications: {
+                        medReminders: true,
+                        appointmentReminders: true,
+                        examReminders: true,
+                        periodReminders: true
+                    }
+                };
+                localStorage.setItem('users', JSON.stringify([defaultUser]));
+                localStorage.setItem('currentUser', 'user1');
+            }
+
+            // Initialize empty arrays for data if not exists
+            const dataTypes = ['periods', 'medications', 'exams', 'appointments', 'family'];
+            dataTypes.forEach(type => {
+                if (!localStorage.getItem(type)) {
+                    localStorage.setItem(type, JSON.stringify([]));
+                }
+            });
+
+            // Set current user
+            currentUser = localStorage.getItem('currentUser') || 'user1';
+            document.getElementById('currentUser').textContent = getUserName(currentUser);
+            
+            // Update current date display
+            const now = new Date();
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('pt-BR', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+
+        function setupEventListeners() {
+            // Sidebar toggle for mobile
+            document.getElementById('openSidebar').addEventListener('click', function() {
+                document.querySelector('.sidebar').classList.add('open');
+            });
+            
+            document.getElementById('closeSidebar').addEventListener('click', function() {
+                document.querySelector('.sidebar').classList.remove('open');
+            });
+
+            // Form submissions
+            document.getElementById('addPeriodForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addPeriod();
+            });
+
+            document.getElementById('addMedicationForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addMedication();
+            });
+
+            document.getElementById('addExamForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addExam();
+            });
+
+            document.getElementById('addAppointmentForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addAppointment();
+            });
+
+            document.getElementById('addFamilyMemberForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addFamilyMember();
+            });
+        }
+
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Show the selected section
+            document.getElementById(sectionId).classList.remove('hidden');
+            
+            // Close sidebar on mobile
+            document.querySelector('.sidebar').classList.remove('open');
+            
+            // Update active nav button
+            document.querySelectorAll('nav button').forEach(button => {
+                button.classList.remove('bg-primary-dark');
+                button.classList.remove('bg-indigo-800');
+                button.classList.add('hover:bg-primary-dark');
+            });
+            
+            // Highlight current section button
+            const activeButton = document.querySelector(`button[onclick="showSection('${sectionId}')"]`);
+            if (activeButton) {
+                activeButton.classList.remove('hover:bg-primary-dark');
+                activeButton.classList.add('bg-primary-dark');
+            }
+            
+            // Load data for the section if needed
+            if (sectionId === 'menstruation') {
+                loadPeriodHistory();
+            } else if (sectionId === 'medications') {
+                loadMedications();
+            } else if (sectionId === 'exams') {
+                loadExams();
+            } else if (sectionId === 'appointments') {
+                loadAppointments();
+            } else if (sectionId === 'family') {
+                loadFamilyMembers();
+            } else if (sectionId === 'settings') {
+                loadSettings();
+            }
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function openAddPeriodModal() {
+            document.getElementById('addPeriodForm').reset();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('periodStartDate').value = today;
+            document.getElementById('periodEndDate').value = today;
+            openModal('addPeriodModal');
+        }
+
+        function openAddMedicationModal() {
+            document.getElementById('addMedicationForm').reset();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('medicationStartDate').value = today;
+            openModal('addMedicationModal');
+        }
+
+        function openAddExamModal() {
+            document.getElementById('addExamForm').reset();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('examDate').value = today;
+            openModal('addExamModal');
+        }
+
+        function openAddAppointmentModal() {
+            document.getElementById('addAppointmentForm').reset();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('appointmentDate').value = today;
+            document.getElementById('appointmentTime').value = '09:00';
+            openModal('addAppointmentModal');
+        }
+
+        function openAddFamilyMemberModal() {
+            document.getElementById('addFamilyMemberForm').reset();
+            openModal('addFamilyMemberModal');
+        }
+
+        function openViewDetailsModal(title, content) {
+            document.getElementById('detailsModalTitle').textContent = title;
+            document.getElementById('detailsModalContent').innerHTML = content;
+            openModal('viewDetailsModal');
+        }
+
+        function openConfirmationModal(itemId, itemType, message) {
+            itemToDelete = { id: itemId, type: itemType };
+            document.getElementById('confirmationMessage').textContent = message || 'Tem certeza que deseja excluir este item?';
+            openModal('confirmationModal');
+        }
+
+        function confirmDelete() {
+            if (itemToDelete) {
+                deleteItem(itemToDelete.id, itemToDelete.type);
+            }
+            closeModal('confirmationModal');
+        }
+
+        // Calendar functions
+        function generateCalendar(month, year) {
+            const calendar = document.getElementById('menstrualCalendar');
+            if (!calendar) return;
+            calendar.innerHTML = '';
+            
+            // Set month and year in the header
+            const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            document.getElementById('currentMonthYear').textContent = `${monthNames[month]} ${year}`;
+            
+            // Get first day of month and total days in month
+            const firstDay = (new Date(year, month, 1).getDay() + 6) % 7; // Seg = 0 ... Dom = 6
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            // Create day name headers
+            const dayNames = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+            dayNames.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'font-medium text-gray-500 py-1 text-sm';
+                dayHeader.textContent = day;
+                calendar.appendChild(dayHeader);
+            });
+            
+            // Add empty cells for days before the first day of the month
+            for (let i = 0; i < firstDay; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'h-10';
+                calendar.appendChild(emptyCell);
+            }
+            
+            const periods = getPeriods();
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            // Add cells for each day of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                date.setHours(0,0,0,0);
+                const dayCell = document.createElement('div');
+                dayCell.className = 'cycle-day h-10 w-10 flex items-center justify-center rounded-full cursor-pointer text-sm';
+                
+                const isPeriod = periods.some(period => {
+                    const start = new Date(period.startDate);
+                    start.setHours(0,0,0,0);
+                    const end = new Date(period.endDate);
+                    end.setHours(0,0,0,0);
+                    return date >= start && date <= end;
+                });
+                
+                if (isPeriod) {
+                    dayCell.classList.add('bg-pink-200', 'text-pink-800', 'font-bold');
+                } else if (date.getTime() === today.getTime()) {
+                    dayCell.classList.add('bg-primary', 'text-white', 'font-bold');
+                } else {
+                    dayCell.classList.add('hover:bg-gray-200');
+                }
+                
+                dayCell.textContent = day;
+                dayCell.onclick = function() {
+                    viewDayDetails(date);
+                };
+                
+                calendar.appendChild(dayCell);
+            }
+        }
+
+        function changeMonth(change) {
+            currentMonth += change;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            } else if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            generateCalendar(currentMonth, currentYear);
+        }
+
+        function viewDayDetails(date) {
+            const dateString = date.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            let content = `<p class="font-bold mb-4 text-lg">${dateString}</p>`;
+            
+            const events = [];
+            const periods = getPeriods();
+            const period = periods.find(p => {
+                const start = new Date(p.startDate); start.setHours(0,0,0,0);
+                const end = new Date(p.endDate); end.setHours(0,0,0,0);
+                return date >= start && date <= end;
+            });
+            
+            if (period) {
+                const dayOfPeriod = Math.floor((date - new Date(period.startDate)) / (1000 * 60 * 60 * 24)) + 1;
+                const totalDays = Math.floor((new Date(period.endDate) - new Date(period.startDate)) / (1000 * 60 * 60 * 24)) + 1;
+                events.push({
+                    icon: 'fa-tint', color: 'pink',
+                    title: `Período Menstrual (Dia ${dayOfPeriod}/${totalDays})`,
+                    details: `Intensidade: ${getIntensityText(period.intensity)}<br>Sintomas: ${period.symptoms.length > 0 ? period.symptoms.map(s => getSymptomText(s)).join(', ') : 'Nenhum'}`
+                });
+            }
+            
+            const medications = getMedications();
+            medications.filter(med => {
+                const start = new Date(med.startDate); start.setHours(0,0,0,0);
+                const end = med.endDate ? new Date(med.endDate) : new Date('2100-01-01'); end.setHours(0,0,0,0);
+                return date >= start && date <= end;
+            }).forEach(med => {
+                events.push({
+                    icon: 'fa-pills', color: 'blue',
+                    title: `Tomar ${med.name}`,
+                    details: `${med.dosage}${med.unit}, ${med.timesPerDay}x/dia`
+                });
+            });
+
+            const appointments = getAppointments();
+            appointments.filter(app => new Date(app.date).toDateString() === date.toDateString())
+            .forEach(app => {
+                events.push({
+                    icon: 'fa-calendar-check', color: 'green',
+                    title: `Consulta: ${app.specialty}`,
+                    details: `${app.doctor || ''} às ${app.time}`
+                });
+            });
+
+            const exams = getExams();
+            exams.filter(exam => new Date(exam.date).toDateString() === date.toDateString())
+            .forEach(exam => {
+                events.push({
+                    icon: 'fa-flask', color: 'yellow',
+                    title: `Exame: ${exam.type}`,
+                    details: `${exam.location || 'Local não informado'}`
+                });
+            });
+            
+            if (events.length === 0) {
+                content += `<p class="text-gray-500">Nenhum evento registrado para este dia.</p>`;
+            } else {
+                content += '<div class="space-y-3">';
+                events.forEach(event => {
+                    content += `
+                        <div class="flex items-start">
+                            <div class="w-8 h-8 rounded-full bg-${event.color}-100 flex-shrink-0 flex items-center justify-center mr-3 mt-1">
+                                <i class="fas ${event.icon} text-${event.color}-500 text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">${event.title}</p>
+                                <p class="text-xs text-gray-500">${event.details}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+                content += '</div>';
+            }
+            
+            openViewDetailsModal('Detalhes do Dia', content);
+        }
+
+        function getIntensityText(intensity) {
+            const map = { light: 'Leve', medium: 'Média', heavy: 'Forte' };
+            return map[intensity] || intensity;
+        }
+
+        function getSymptomText(symptom) {
+            const map = { cramps: 'Cólicas', headache: 'Dor de cabeça', backache: 'Dor nas costas', bloating: 'Inchaço', mood_swings: 'Alterações de humor', fatigue: 'Fadiga' };
+            return map[symptom] || symptom;
+        }
+
+        // Data management functions
+        function getUsers() {
+            return JSON.parse(localStorage.getItem('users')) || [];
+        }
+
+        function getUser(userId) {
+            return getUsers().find(u => u.id === userId);
+        }
+
+        function getUserName(userId) {
+            const user = getUser(userId);
+            return user ? user.name : 'Usuário';
+        }
+
+        function getAllDataForType(type) {
+            return JSON.parse(localStorage.getItem(type)) || [];
+        }
+
+        function getDataForUser(type) {
+            return getAllDataForType(type).filter(d => d.userId === currentUser);
+        }
+
+        function getPeriods() { return getDataForUser('periods'); }
+        function getMedications() { return getDataForUser('medications'); }
+        function getExams() { return getDataForUser('exams'); }
+        function getAppointments() { return getDataForUser('appointments'); }
+        function getFamilyMembers() { return getDataForUser('family'); }
+
+        function saveDataForType(type, data) {
+            const allData = getAllDataForType(type);
+            const otherUsersData = allData.filter(d => d.userId !== currentUser);
+            localStorage.setItem(type, JSON.stringify([...otherUsersData, ...data]));
+        }
+        
+        function savePeriods(periods) { saveDataForType('periods', periods); }
+        function saveMedications(meds) { saveDataForType('medications', meds); }
+        function saveExams(exams) { saveDataForType('exams', exams); }
+        function saveAppointments(apps) { saveDataForType('appointments', apps); }
+        function saveFamilyMembers(family) { saveDataForType('family', family); }
+
+        function addItem(type, item) {
+            const items = getDataForUser(type);
+            const newItem = { ...item, id: Date.now().toString(), userId: currentUser };
+            items.push(newItem);
+            saveDataForType(type, items);
+            showNotification(`${type.slice(0, -1)} adicionado com sucesso!`);
+            loadAndRender(type);
+        }
+
+        function addPeriod() {
+            const startDate = document.getElementById('periodStartDate').value;
+            const endDate = document.getElementById('periodEndDate').value;
+            if (new Date(endDate) < new Date(startDate)) {
+                alert('A data de término não pode ser anterior à data de início.');
+                return;
+            }
+            addItem('periods', {
+                startDate,
+                endDate,
+                intensity: document.getElementById('periodIntensity').value,
+                symptoms: Array.from(document.querySelectorAll('input[name="symptoms"]:checked')).map(cb => cb.value)
+            });
+            closeModal('addPeriodModal');
+        }
+
+        function addMedication() {
+            addItem('medications', {
+                name: document.getElementById('medicationName').value,
+                dosage: document.getElementById('medicationDosage').value,
+                unit: document.getElementById('medicationUnit').value,
+                timesPerDay: document.getElementById('medicationTimesPerDay').value,
+                hoursBetween: document.getElementById('medicationHoursBetween').value,
+                startDate: document.getElementById('medicationStartDate').value,
+                endDate: document.getElementById('medicationEndDate').value,
+                instructions: document.getElementById('medicationInstructions').value,
+                isActive: true
+            });
+            closeModal('addMedicationModal');
+        }
+
+        function addExam() {
+            addItem('exams', {
+                type: document.getElementById('examType').value,
+                date: document.getElementById('examDate').value,
+                location: document.getElementById('examLocation').value,
+                instructions: document.getElementById('examInstructions').value,
+                isCompleted: false
+            });
+            closeModal('addExamModal');
+        }
+
+        function addAppointment() {
+            addItem('appointments', {
+                specialty: document.getElementById('appointmentSpecialty').value,
+                doctor: document.getElementById('appointmentDoctor').value,
+                date: document.getElementById('appointmentDate').value,
+                time: document.getElementById('appointmentTime').value,
+                location: document.getElementById('appointmentLocation').value,
+                reason: document.getElementById('appointmentReason').value,
+                isCompleted: false
+            });
+            closeModal('addAppointmentModal');
+        }
+
+        function addFamilyMember() {
+            addItem('family', {
+                name: document.getElementById('familyMemberName').value,
+                relationship: document.getElementById('familyMemberRelationship').value,
+                birthdate: document.getElementById('familyMemberBirthdate').value,
+                notes: document.getElementById('familyMemberNotes').value,
+            });
+            closeModal('addFamilyMemberModal');
+        }
+
+        function deleteItem(itemId, itemType) {
+            let items = getDataForUser(itemType);
+            const updatedItems = items.filter(item => item.id !== itemId);
+            saveDataForType(itemType, updatedItems);
+            showNotification('Item excluído com sucesso!');
+            loadAndRender(itemType);
+        }
+
+        function loadAndRender(type) {
+            const pluralType = type.endsWith('y') ? type.slice(0, -1) + 'ies' : type + 's';
+            const functionName = `load${pluralType.charAt(0).toUpperCase() + pluralType.slice(1)}`;
+            if (window[functionName]) {
+                window[functionName]();
+            } else if (type === 'period') {
+                loadPeriodHistory();
+            } else if (type === 'familymember') {
+                loadFamily();
+            }
+            updateDashboard();
+        }
+
+        function saveProfileSettings() {
+            const users = getUsers();
+            const userIndex = users.findIndex(u => u.id === currentUser);
+            
+            if (userIndex !== -1) {
+                users[userIndex].name = document.getElementById('userName').value;
+                users[userIndex].email = document.getElementById('userEmail').value;
+                users[userIndex].avgCycleLength = parseInt(document.getElementById('avgCycleSetting').value);
+                users[userIndex].avgPeriodLength = parseInt(document.getElementById('avgPeriodSetting').value);
+                
+                users[userIndex].notifications = {
+                    medReminders: document.getElementById('medReminders').checked,
+                    appointmentReminders: document.getElementById('appointmentReminders').checked,
+                    examReminders: document.getElementById('examReminders').checked,
+                    periodReminders: document.getElementById('periodReminders').checked
+                };
+
+                localStorage.setItem('users', JSON.stringify(users));
+                document.getElementById('currentUser').textContent = getUserName(currentUser);
+                
+                showNotification('Configurações salvas com sucesso!');
+                updateDashboard();
+            }
+        }
+
+        function loadSettings() {
+            const user = getUser(currentUser);
+            if (user) {
+                document.getElementById('userName').value = user.name || '';
+                document.getElementById('userEmail').value = user.email || '';
+                document.getElementById('avgCycleSetting').value = user.avgCycleLength || 28;
+                document.getElementById('avgPeriodSetting').value = user.avgPeriodLength || 5;
+                document.getElementById('medReminders').checked = user.notifications?.medReminders !== false;
+                document.getElementById('appointmentReminders').checked = user.notifications?.appointmentReminders !== false;
+                document.getElementById('examReminders').checked = user.notifications?.examReminders !== false;
+                document.getElementById('periodReminders').checked = user.notifications?.periodReminders !== false;
+            }
+        }
+
+        function loadPeriodHistory() {
+            const periods = getPeriods().sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+            const historyTable = document.getElementById('periodHistory');
+            historyTable.innerHTML = '';
+            
+            if (periods.length === 0) {
+                historyTable.innerHTML = `<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">Nenhum período registrado.</td></tr>`;
+                return;
+            }
+            
+            periods.forEach(period => {
+                const startDate = new Date(period.startDate);
+                const endDate = new Date(period.endDate);
+                const duration = Math.max(1, Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1);
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">${startDate.toLocaleDateString('pt-BR')}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${endDate.toLocaleDateString('pt-BR')}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${duration} dia${duration > 1 ? 's' : ''}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <button onclick="viewPeriodDetailsById('${period.id}')" class="text-indigo-600 hover:text-indigo-900 mr-2"><i class="fas fa-eye"></i></button>
+                        <button onclick="openConfirmationModal('${period.id}', 'periods')" class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                historyTable.appendChild(row);
+            });
+            updatePeriodStatistics();
+        }
+        
+        function viewPeriodDetailsById(id) {
+            const period = getPeriods().find(p => p.id === id);
+            if(period) {
+                const date = new Date(period.startDate);
+                viewDayDetails(date);
+            }
+        }
+
+        function updatePeriodStatistics() {
+            const periods = getPeriods();
+            const user = getUser(currentUser);
+            const defaultCycle = user?.avgCycleLength || 28;
+            const defaultPeriod = user?.avgPeriodLength || 5;
+
+            if (periods.length < 2) {
+                document.getElementById('avgCycleLength').textContent = `${defaultCycle} dias (padrão)`;
+                document.getElementById('avgPeriodLength').textContent = periods.length === 1 ? `${(new Date(periods[0].endDate) - new Date(periods[0].startDate))/(1000*60*60*24)+1} dias` : `${defaultPeriod} dias (padrão)`;
+                document.getElementById('nextPeriodDate').textContent = 'Dados insuficientes';
+                return;
+            }
+
+            periods.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+            let totalPeriodLength = 0, totalCycleLength = 0, cycleCount = 0;
+            
+            for (let i = 0; i < periods.length; i++) {
+                totalPeriodLength += (new Date(periods[i].endDate) - new Date(periods[i].startDate)) / (1000 * 60 * 60 * 24) + 1;
+                if (i > 0) {
+                    const cycleLength = (new Date(periods[i].startDate) - new Date(periods[i-1].startDate)) / (1000 * 60 * 60 * 24);
+                    if (cycleLength > 15 && cycleLength < 60) {
+                        totalCycleLength += cycleLength;
+                        cycleCount++;
+                    }
+                }
+            }
+            
+            const avgPeriodLength = Math.round(totalPeriodLength / periods.length);
+            const avgCycleLength = cycleCount > 0 ? Math.round(totalCycleLength / cycleCount) : defaultCycle;
+            
+            document.getElementById('avgPeriodLength').textContent = `${avgPeriodLength} dias`;
+            document.getElementById('avgCycleLength').textContent = `${avgCycleLength} dias`;
+
+            const lastPeriod = periods[periods.length - 1];
+            const nextPeriodDate = new Date(lastPeriod.startDate);
+            nextPeriodDate.setDate(nextPeriodDate.getDate() + avgCycleLength);
+            document.getElementById('nextPeriodDate').textContent = nextPeriodDate.toLocaleDateString('pt-BR');
+        }
+
+        function loadMedications() {
+            const medications = getMedications().sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+            const activeMedsContainer = document.getElementById('activeMedications');
+            const historyTable = document.getElementById('medicationHistory');
+            
+            activeMedsContainer.innerHTML = '';
+            historyTable.innerHTML = '';
+            
+            const today = new Date(); today.setHours(0,0,0,0);
+
+            const activeMeds = medications.filter(med => {
+                const startDate = new Date(med.startDate);
+                const endDate = med.endDate ? new Date(med.endDate) : new Date('2999-12-31');
+                return today >= startDate && today <= endDate;
+            });
+
+            if (activeMeds.length === 0) activeMedsContainer.innerHTML = '<p class="text-gray-500 col-span-full">Nenhuma medicação ativa.</p>';
+            activeMeds.forEach(med => {
+                const card = document.createElement('div');
+                card.className = 'p-3 border rounded-lg';
+                card.innerHTML = `<div class="flex justify-between items-start"><div><p class="font-bold">${med.name}</p><p class="text-sm text-gray-600">${med.dosage} ${med.unit}</p><p class="text-xs text-gray-500">${med.timesPerDay}x por dia</p></div><button onclick="viewItemDetailsById('${med.id}', 'medications')" class="text-indigo-600 hover:text-indigo-900"><i class="fas fa-eye"></i></button></div>`;
+                activeMedsContainer.appendChild(card);
+            });
+
+            if (medications.length === 0) historyTable.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Nenhuma medicação registrada.</td></tr>`;
+            medications.forEach(med => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap">${med.name}</td><td class="px-6 py-4 whitespace-nowrap">${med.dosage} ${med.unit}</td><td class="px-6 py-4 whitespace-nowrap">${med.timesPerDay}x / dia</td><td class="px-6 py-4 whitespace-nowrap">${new Date(med.startDate).toLocaleDateString('pt-BR')} - ${med.endDate ? new Date(med.endDate).toLocaleDateString('pt-BR') : '...'}</td><td class="px-6 py-4 whitespace-nowrap text-sm"><button onclick="viewItemDetailsById('${med.id}', 'medications')" class="text-indigo-600 hover:text-indigo-900 mr-2"><i class="fas fa-eye"></i></button><button onclick="openConfirmationModal('${med.id}', 'medications')" class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button></td>`;
+                historyTable.appendChild(row);
+            });
+        }
+
+        function loadExams() {
+            const exams = getExams().sort((a, b) => new Date(b.date) - new Date(a.date));
+            const upcomingContainer = document.getElementById('upcomingExams');
+            const historyTable = document.getElementById('examHistory');
+            upcomingContainer.innerHTML = '';
+            historyTable.innerHTML = '';
+            const today = new Date(); today.setHours(0,0,0,0);
+            
+            const upcoming = exams.filter(e => new Date(e.date) >= today);
+            if (upcoming.length === 0) upcomingContainer.innerHTML = '<p class="text-gray-500">Nenhum exame agendado.</p>';
+            upcoming.forEach(exam => {
+                const elem = document.createElement('div');
+                elem.className = 'flex items-center justify-between p-2 bg-gray-50 rounded';
+                elem.innerHTML = `<div><p class="font-medium">${exam.type}</p><p class="text-sm text-gray-500">${new Date(exam.date).toLocaleDateString('pt-BR')} - ${exam.location || 'Local não informado'}</p></div><button onclick="viewItemDetailsById('${exam.id}', 'exams')" class="text-indigo-600 hover:text-indigo-900"><i class="fas fa-eye"></i></button>`;
+                upcomingContainer.appendChild(elem);
+            });
+
+            if (exams.length === 0) historyTable.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Nenhum exame registrado.</td></tr>`;
+            exams.forEach(exam => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap">${exam.type}</td><td class="px-6 py-4 whitespace-nowrap">${new Date(exam.date).toLocaleDateString('pt-BR')}</td><td class="px-6 py-4 whitespace-nowrap">${exam.location || 'N/A'}</td><td class="px-6 py-4 whitespace-nowrap">${exam.result || 'Pendente'}</td><td class="px-6 py-4 whitespace-nowrap text-sm"><button onclick="viewItemDetailsById('${exam.id}', 'exams')" class="text-indigo-600 hover:text-indigo-900 mr-2"><i class="fas fa-eye"></i></button><button onclick="openConfirmationModal('${exam.id}', 'exams')" class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button></td>`;
+                historyTable.appendChild(row);
+            });
+        }
+        
+        function loadAppointments() {
+            const appointments = getAppointments().sort((a, b) => new Date(a.date) - new Date(b.date));
+            const upcomingContainer = document.getElementById('upcomingAppointments');
+            const historyTable = document.getElementById('appointmentHistory');
+            upcomingContainer.innerHTML = '';
+            historyTable.innerHTML = '';
+            const today = new Date(); today.setHours(0,0,0,0);
+
+            const upcoming = appointments.filter(a => new Date(a.date) >= today);
+            if (upcoming.length === 0) upcomingContainer.innerHTML = '<p class="text-gray-500">Nenhuma consulta agendada.</p>';
+            upcoming.forEach(app => {
+                const elem = document.createElement('div');
+                elem.className = 'flex items-center justify-between p-2 bg-gray-50 rounded';
+                elem.innerHTML = `<div><p class="font-medium">${app.specialty}</p><p class="text-sm text-gray-500">${new Date(app.date).toLocaleDateString('pt-BR')} às ${app.time}</p></div><button onclick="viewItemDetailsById('${app.id}', 'appointments')" class="text-indigo-600 hover:text-indigo-900"><i class="fas fa-eye"></i></button>`;
+                upcomingContainer.appendChild(elem);
+            });
+
+            if (appointments.length === 0) historyTable.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Nenhuma consulta registrada.</td></tr>`;
+            appointments.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(app => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap">${app.specialty}</td><td class="px-6 py-4 whitespace-nowrap">${app.doctor || 'N/A'}</td><td class="px-6 py-4 whitespace-nowrap">${new Date(app.date).toLocaleDateString('pt-BR')}</td><td class="px-6 py-4 whitespace-nowrap">${app.location || 'N/A'}</td><td class="px-6 py-4 whitespace-nowrap text-sm"><button onclick="viewItemDetailsById('${app.id}', 'appointments')" class="text-indigo-600 hover:text-indigo-900 mr-2"><i class="fas fa-eye"></i></button><button onclick="openConfirmationModal('${app.id}', 'appointments')" class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button></td>`;
+                historyTable.appendChild(row);
+            });
+        }
+
+        function loadFamily() {
+            const familyMembers = getFamilyMembers();
+            const container = document.getElementById('familyMembers');
+            container.innerHTML = '';
+            if (familyMembers.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 col-span-full">Nenhum membro da família adicionado.</p>';
+                return;
+            }
+            familyMembers.forEach(member => {
+                const card = document.createElement('div');
+                card.className = 'bg-gray-50 p-4 rounded-lg';
+                card.innerHTML = `<div class="flex justify-between items-center mb-2"><h4 class="font-bold text-lg">${member.name}</h4><div class="space-x-2"><button onclick="viewItemDetailsById('${member.id}', 'family')" class="text-indigo-600 hover:text-indigo-900"><i class="fas fa-eye"></i></button><button onclick="openConfirmationModal('${member.id}', 'family')" class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button></div></div><p class="text-sm text-gray-600">${member.relationship}</p><p class="text-sm text-gray-500">${member.birthdate ? new Date(member.birthdate).toLocaleDateString('pt-BR') : ''}</p>`;
+                container.appendChild(card);
+            });
+        }
+        
+        function viewItemDetailsById(id, type) {
+            const item = getDataForUser(type).find(i => i.id === id);
+            if (!item) return;
+            let title = '', content = '';
+            switch(type) {
+                case 'medications':
+                    title = `Detalhes de ${item.name}`;
+                    content = `<p><strong>Dosagem:</strong> ${item.dosage} ${item.unit}</p><p><strong>Frequência:</strong> ${item.timesPerDay}x ao dia</p><p><strong>Período:</strong> ${new Date(item.startDate).toLocaleDateString('pt-BR')} - ${item.endDate ? new Date(item.endDate).toLocaleDateString('pt-BR') : 'Contínuo'}</p>${item.instructions ? `<p><strong>Instruções:</strong> ${item.instructions}</p>`:''}`;
+                    break;
+                case 'exams':
+                    title = `Detalhes de ${item.type}`;
+                    content = `<p><strong>Data:</strong> ${new Date(item.date).toLocaleDateString('pt-BR')}</p><p><strong>Local:</strong> ${item.location || 'N/A'}</p>${item.instructions ? `<p><strong>Preparo:</strong> ${item.instructions}</p>`:''}`;
+                    break;
+                case 'appointments':
+                    title = `Consulta de ${item.specialty}`;
+                    content = `<p><strong>Médico:</strong> ${item.doctor || 'N/A'}</p><p><strong>Data:</strong> ${new Date(item.date).toLocaleDateString('pt-BR')} às ${item.time}</p><p><strong>Local:</strong> ${item.location || 'N/A'}</p>${item.reason ? `<p><strong>Motivo:</strong> ${item.reason}</p>`:''}`;
+                    break;
+                case 'family':
+                    title = `Detalhes de ${item.name}`;
+                    content = `<p><strong>Parentesco:</strong> ${item.relationship}</p><p><strong>Nascimento:</strong> ${item.birthdate ? new Date(item.birthdate).toLocaleDateString('pt-BR') : 'N/A'}</p>${item.notes ? `<p><strong>Notas:</strong> ${item.notes}</p>`:''}`;
+                    break;
+            }
+            openViewDetailsModal(title, content);
+        }
+
+        function loadAllData() {
+            loadPeriodHistory();
+            loadMedications();
+            loadExams();
+            loadAppointments();
+            loadFamily();
+            loadSettings();
+        }
+
+        function updateDashboard() {
+            const today = new Date(); today.setHours(0,0,0,0);
+            
+            // Cycle Day
+            const periods = getPeriods().sort((a,b) => new Date(b.startDate) - new Date(a.startDate));
+            document.getElementById('cycleDay').textContent = periods.length > 0 ? `Dia ${Math.floor((today - new Date(periods[0].startDate)) / (1000 * 60 * 60 * 24)) + 1}` : 'N/A';
+
+            // Active Meds
+            const activeMeds = getMedications().filter(med => new Date(med.startDate) <= today && (!med.endDate || new Date(med.endDate) >= today));
+            document.getElementById('activeMeds').textContent = activeMeds.length;
+
+            // Next Appointment
+            const upcomingApps = getAppointments().filter(a => new Date(a.date) >= today).sort((a,b) => new Date(a.date) - new Date(b.date));
+            document.getElementById('nextAppointment').textContent = upcomingApps.length > 0 ? new Date(upcomingApps[0].date).toLocaleDateString('pt-BR') : 'Nenhuma';
+
+            // Pending Exams
+            const pendingExams = getExams().filter(e => !e.isCompleted && new Date(e.date) >= today);
+            document.getElementById('pendingExams').textContent = pendingExams.length;
+
+            updatePeriodStatistics();
+            updateRemindersList();
+            generateCalendar(currentMonth, currentYear);
+        }
+
+        function updateRemindersList() {
+            const remindersList = document.getElementById('remindersList');
+            remindersList.innerHTML = '';
+            const reminders = [];
+            const today = new Date(); today.setHours(0,0,0,0);
+
+            getAppointments().filter(a => new Date(a.date) >= today).forEach(app => reminders.push({ date: new Date(app.date), text: `Consulta: ${app.specialty}`, icon: 'fa-calendar-check', color: 'green', time: new Date(app.date).toLocaleDateString('pt-BR') + ' às ' + app.time }));
+            getExams().filter(e => new Date(e.date) >= today && !e.isCompleted).forEach(exam => reminders.push({ date: new Date(exam.date), text: `Exame: ${exam.type}`, icon: 'fa-flask', color: 'yellow', time: new Date(exam.date).toLocaleDateString('pt-BR')}));
+            getMedications().filter(med => new Date(med.startDate) <= today && (!med.endDate || new Date(med.endDate) >= today)).forEach(med => reminders.push({ date: today, text: `Tomar ${med.name}`, icon: 'fa-pills', color: 'blue', time: 'Hoje'}));
+            
+            reminders.sort((a, b) => a.date - b.date);
+
+            if (reminders.length === 0) {
+                remindersList.innerHTML = '<p class="text-gray-500 text-sm">Nenhum lembrete para os próximos dias.</p>';
+                return;
+            }
+
+            reminders.slice(0, 4).forEach(reminder => {
+                remindersList.innerHTML += `
+                    <div class="flex items-center p-2 bg-gray-50 rounded">
+                        <div class="w-8 h-8 rounded-full bg-${reminder.color}-100 flex items-center justify-center mr-3">
+                            <i class="fas ${reminder.icon} text-${reminder.color}-500 text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-sm">${reminder.text}</p>
+                            <p class="text-xs text-gray-500">${reminder.time}</p>
+                        </div>
+                    </div>`;
+            });
+        }
+        
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-5 right-5 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg fade-in';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+    </script>
+</body>
+</html>
