@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogos em Família</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Estilos personalizados */
+        .memory-card {
+            perspective: 1000px;
+            transform-style: preserve-3d;
+            transition: all 0.5s ease;
+        }
+        
+        .memory-card.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .memory-card .front, .memory-card .back {
+            backface-visibility: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .memory-card .front {
+            transform: rotateY(180deg);
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+        
+        .memory-card .back {
+            background-color: #4f46e5;
+        }
+        
+        .chess-square {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .chess-piece {
+            font-size: 2rem;
+            cursor: grab;
+        }
+        
+        .chess-piece.dragging {
+            opacity: 0.5;
+        }
+        
+        .chess-square.highlight {
+            background-color: rgba(34, 197, 94, 0.5) !important;
+        }
+        
+        .chess-square.possible-move {
+            background-color: rgba(234, 179, 8, 0.5) !important;
+        }
+        
+        .tic-tac-toe-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .tic-tac-toe-cell:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        @keyframes celebration {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .celebration {
+            animation: celebration 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-900 to-blue-800 min-h-screen text-white font-sans">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Cabeçalho -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4">Jogos em Família</h1>
+            <p class="text-xl md:text-2xl">Diversão para você, sua esposa e sua filha!</p>
+        </header>
+        
+        <!-- Menu de Jogos -->
+        <div class="flex flex-wrap justify-center gap-6 mb-12">
+            <button onclick="showGame('chess')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-lg text-xl transition-all transform hover:scale-105">
+                <i class="fas fa-chess mr-2"></i> Xadrez
+            </button>
+            <button onclick="showGame('memory')" class="bg-pink-600 hover:bg-pink-700 text-white font-bold py-4 px-8 rounded-lg text-xl transition-all transform hover:scale-105">
+                <i class="fas fa-brain mr-2"></i> Jogo da Memória
+            </button>
+            <button onclick="showGame('tic-tac-toe')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-lg text-xl transition-all transform hover:scale-105">
+                <i class="fas fa-times-circle mr-2"></i> Jogo da Velha
+            </button>
+        </div>
+        
+        <!-- Área dos Jogos -->
+        <div id="game-area" class="bg-white bg-opacity-10 rounded-xl p-6 backdrop-filter backdrop-blur-lg border border-white border-opacity-20">
+            <!-- Mensagem inicial -->
+            <div id="initial-message" class="text-center py-12">
+                <i class="fas fa-gamepad text-6xl mb-6 text-yellow-300"></i>
+                <h2 class="text-3xl font-bold mb-4">Escolha um jogo para começar!</h2>
+                <p class="text-xl opacity-80">Jogue xadrez com sua esposa, memória com sua filha ou todos juntos no jogo da velha!</p>
+            </div>
+            
+            <!-- Jogo de Xadrez -->
+            <div id="chess-game" class="hidden">
+                <div class="flex flex-col md:flex-row gap-8 items-center md:items-start">
+                    <div class="w-full md:w-auto">
+                        <h2 class="text-2xl font-bold mb-4 text-center">Xadrez</h2>
+                        <div class="chess-board bg-gray-800 grid grid-cols-8 gap-0 border-2 border-gray-700">
+                            <!-- O tabuleiro será gerado pelo JavaScript -->
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-10 p-4 rounded-lg w-full md:w-64">
+                        <h3 class="text-xl font-bold mb-4">Controles</h3>
+                        <p class="mb-4">Clique em uma peça para selecionar e depois clique em um quadrado para movê-la.</p>
+                        <div class="mb-4">
+                            <p class="font-bold">Turno atual:</p>
+                            <p id="chess-turn" class="text-xl">Brancas</p>
+                        </div>
+                        <button onclick="resetChessGame()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg w-full">
+                            Reiniciar Jogo
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Jogo da Memória -->
+            <div id="memory-game" class="hidden">
+                <h2 class="text-2xl font-bold mb-6 text-center">Jogo da Memória</h2>
+                <div class="flex justify-between items-center mb-6">
+                    <div class="text-xl">
+                        <span class="font-bold">Tentativas:</span> <span id="memory-attempts">0</span>
+                    </div>
+                    <button onclick="resetMemoryGame()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg">
+                        Reiniciar Jogo
+                    </button>
+                </div>
+                <div id="memory-board" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    <!-- As cartas serão geradas pelo JavaScript -->
+                </div>
+            </div>
+            
+            <!-- Jogo da Velha -->
+            <div id="tic-tac-toe-game" class="hidden">
+                <h2 class="text-2xl font-bold mb-6 text-center">Jogo da Velha</h2>
+                <div class="flex flex-col items-center">
+                    <div class="mb-6 text-xl">
+                        <span class="font-bold">Jogador atual:</span> <span id="tic-tac-toe-player">X</span>
+                    </div>
+                    <div class="tic-tac-toe-board grid grid-cols-3 gap-2 bg-white bg-opacity-20 p-2 rounded-lg mb-6">
+                        <!-- O tabuleiro será gerado pelo JavaScript -->
+                    </div>
+                    <button onclick="resetTicTacToeGame()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg">
+                        Reiniciar Jogo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variáveis globais
+        let currentGame = null;
+        let chessBoard = [];
+        let selectedChessPiece = null;
+        let chessTurn = 'white';
+        
+        let memoryCards = [];
+        let flippedCards = [];
+        let memoryAttempts = 0;
+        let canFlip = true;
+        
+        let ticTacToeBoard = ['', '', '', '', '', '', '', '', ''];
+        let currentPlayer = 'X';
+        let gameOver = false;
+        
+        // Mostrar jogo selecionado
+        function showGame(game) {
+            document.getElementById('initial-message').classList.add('hidden');
+            if (currentGame) {
+                document.getElementById(currentGame + '-game').classList.add('hidden');
+            }
+            
+            currentGame = game;
+            document.getElementById(game + '-game').classList.remove('hidden');
+            
+            // Inicializar o jogo selecionado
+            if (game === 'chess') {
+                initChessGame();
+            } else if (game === 'memory') {
+                initMemoryGame();
+            } else if (game === 'tic-tac-toe') {
+                initTicTacToeGame();
+            }
+        }
+        
+        // ========== JOGO DE XADREZ ==========
+        function initChessGame() {
+            const boardElement = document.querySelector('.chess-board');
+            boardElement.innerHTML = '';
+            
+            // Inicializar o tabuleiro
+            chessBoard = [
+                ['♜', '♞', '♝', '♛', '♚', '♝', '♞', '♜'],
+                ['♟', '♟', '♟', '♟', '♟', '♟', '♟', '♟'],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['♙', '♙', '♙', '♙', '♙', '♙', '♙', '♙'],
+                ['♖', '♘', '♗', '♕', '♔', '♗', '♘', '♖']
+            ];
+            
+            chessTurn = 'white';
+            document.getElementById('chess-turn').textContent = 'Brancas';
+            
+            // Criar o tabuleiro visual
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const square = document.createElement('div');
+                    square.className = `chess-square ${(row + col) % 2 === 0 ? 'bg-gray-600' : 'bg-gray-400'}`;
+                    square.dataset.row = row;
+                    square.dataset.col = col;
+                    
+                    if (chessBoard[row][col]) {
+                        const piece = document.createElement('div');
+                        piece.className = 'chess-piece';
+                        piece.textContent = chessBoard[row][col];
+                        piece.dataset.row = row;
+                        piece.dataset.col = col;
+                        piece.dataset.color = isBlackPiece(chessBoard[row][col]) ? 'black' : 'white';
+                        square.appendChild(piece);
+                    }
+                    
+                    square.addEventListener('click', handleChessSquareClick);
+                    boardElement.appendChild(square);
+                }
+            }
+        }
+        
+        function isBlackPiece(piece) {
+            return ['♜', '♞', '♝', '♛', '♚', '♟'].includes(piece);
+        }
+        
+        function handleChessSquareClick(e) {
+            const square = e.currentTarget;
+            const row = parseInt(square.dataset.row);
+            const col = parseInt(square.dataset.col);
+            
+            // Se já tiver uma peça selecionada, tentar mover
+            if (selectedChessPiece) {
+                const pieceRow = parseInt(selectedChessPiece.dataset.row);
+                const pieceCol = parseInt(selectedChessPiece.dataset.col);
+                const pieceColor = selectedChessPiece.dataset.color;
+                
+                // Verificar se é o turno do jogador
+                if ((pieceColor === 'white' && chessTurn !== 'white') || 
+                    (pieceColor === 'black' && chessTurn !== 'black')) {
+                    return;
+                }
+                
+                // Verificar movimento válido (simplificado para este exemplo)
+                if (isValidChessMove(pieceRow, pieceCol, row, col, pieceColor)) {
+                    // Mover a peça
+                    chessBoard[row][col] = chessBoard[pieceRow][pieceCol];
+                    chessBoard[pieceRow][pieceCol] = '';
+                    
+                    // Atualizar visualmente
+                    updateChessBoard();
+                    
+                    // Alternar turno
+                    chessTurn = chessTurn === 'white' ? 'black' : 'white';
+                    document.getElementById('chess-turn').textContent = chessTurn === 'white' ? 'Brancas' : 'Pretas';
+                }
+                
+                // Desselecionar peça
+                selectedChessPiece = null;
+                clearChessHighlights();
+                return;
+            }
+            
+            // Selecionar peça se houver uma no quadrado
+            const piece = square.querySelector('.chess-piece');
+            if (piece) {
+                // Verificar se é o turno do jogador
+                const pieceColor = piece.dataset.color;
+                if ((pieceColor === 'white' && chessTurn !== 'white') || 
+                    (pieceColor === 'black' && chessTurn !== 'black')) {
+                    return;
+                }
+                
+                selectedChessPiece = piece;
+                clearChessHighlights();
+                
+                // Destacar a peça selecionada
+                square.classList.add('highlight');
+                
+                // Mostrar movimentos possíveis (simplificado)
+                showPossibleChessMoves(parseInt(piece.dataset.row), parseInt(piece.dataset.col), pieceColor);
+            }
+        }
+        
+        function isValidChessMove(fromRow, fromCol, toRow, toCol, color) {
+            const piece = chessBoard[fromRow][fromCol];
+            const targetPiece = chessBoard[toRow][toCol];
+            
+            // Verificar se está tentando capturar uma peça da mesma cor
+            if (targetPiece && isBlackPiece(targetPiece) === (color === 'black')) {
+                return false;
+            }
+            
+            // Regras simplificadas para cada tipo de peça
+            if (piece === '♙' || piece === '♟') { // Peão
+                const direction = piece === '♙' ? -1 : 1;
+                
+                // Movimento para frente
+                if (fromCol === toCol && !targetPiece) {
+                    // Movimento de uma casa
+                    if (toRow === fromRow + direction) return true;
+                    // Movimento inicial de duas casas
+                    if ((piece === '♙' && fromRow === 6) || (piece === '♟' && fromRow === 1)) {
+                        if (toRow === fromRow + 2 * direction && !chessBoard[fromRow + direction][fromCol]) {
+                            return true;
+                        }
+                    }
+                }
+                
+                // Captura diagonal
+                if (Math.abs(toCol - fromCol) === 1 && toRow === fromRow + direction && targetPiece) {
+                    return true;
+                }
+                
+                return false;
+            } else if (piece === '♖' || piece === '♜') { // Torre
+                // Movimento na mesma linha ou coluna
+                if (fromRow === toRow || fromCol === toCol) {
+                    // Verificar se não há peças no caminho
+                    const rowStep = fromRow === toRow ? 0 : (toRow > fromRow ? 1 : -1);
+                    const colStep = fromCol === toCol ? 0 : (toCol > fromCol ? 1 : -1);
+                    
+                    let r = fromRow + rowStep;
+                    let c = fromCol + colStep;
+                    
+                    while (r !== toRow || c !== toCol) {
+                        if (chessBoard[r][c]) return false;
+                        r += rowStep;
+                        c += colStep;
+                    }
+                    
+                    return true;
+                }
+                return false;
+            } else if (piece === '♘' || piece === '♞') { // Cavalo
+                // Movimento em L
+                const rowDiff = Math.abs(toRow - fromRow);
+                const colDiff = Math.abs(toCol - fromCol);
+                return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
+            } else if (piece === '♗' || piece === '♝') { // Bispo
+                // Movimento diagonal
+                if (Math.abs(toRow - fromRow) === Math.abs(toCol - fromCol)) {
+                    // Verificar se não há peças no caminho
+                    const rowStep = toRow > fromRow ? 1 : -1;
+                    const colStep = toCol > fromCol ? 1 : -1;
+                    
+                    let r = fromRow + rowStep;
+                    let c = fromCol + colStep;
+                    
+                    while (r !== toRow && c !== toCol) {
+                        if (chessBoard[r][c]) return false;
+                        r += rowStep;
+                        c += colStep;
+                    }
+                    
+                    return true;
+                }
+                return false;
+            } else if (piece === '♕' || piece === '♛') { // Rainha
+                // Combinação de torre e bispo
+                return isValidChessMove(fromRow, fromCol, toRow, toCol, color, '♖') || 
+                       isValidChessMove(fromRow, fromCol, toRow, toCol, color, '♗');
+            } else if (piece === '♔' || piece === '♚') { // Rei
+                // Movimento de uma casa em qualquer direção
+                return Math.abs(toRow - fromRow) <= 1 && Math.abs(toCol - fromCol) <= 1;
+            }
+            
+            return false;
+        }
+        
+        function showPossibleChessMoves(row, col, color) {
+            const squares = document.querySelectorAll('.chess-square');
+            
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    if (isValidChessMove(row, col, r, c, color)) {
+                        const index = r * 8 + c;
+                        squares[index].classList.add('possible-move');
+                    }
+                }
+            }
+        }
+        
+        function clearChessHighlights() {
+            document.querySelectorAll('.chess-square').forEach(square => {
+                square.classList.remove('highlight', 'possible-move');
+            });
+        }
+        
+        function updateChessBoard() {
+            const squares = document.querySelectorAll('.chess-square');
+            
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const index = row * 8 + col;
+                    const square = squares[index];
+                    
+                    // Limpar o quadrado
+                    square.innerHTML = '';
+                    
+                    // Adicionar peça se houver
+                    if (chessBoard[row][col]) {
+                        const piece = document.createElement('div');
+                        piece.className = 'chess-piece';
+                        piece.textContent = chessBoard[row][col];
+                        piece.dataset.row = row;
+                        piece.dataset.col = col;
+                        piece.dataset.color = isBlackPiece(chessBoard[row][col]) ? 'black' : 'white';
+                        square.appendChild(piece);
+                    }
+                }
+            }
+        }
+        
+        function resetChessGame() {
+            initChessGame();
+        }
+        
+        // ========== JOGO DA MEMÓRIA ==========
+        function initMemoryGame() {
+            const memoryBoard = document.getElementById('memory-board');
+            memoryBoard.innerHTML = '';
+            
+            // Imagens simples para crianças
+            const emojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼'];
+            memoryCards = [...emojis, ...emojis]; // Duplica para formar pares
+            
+            // Embaralhar as cartas
+            memoryCards = memoryCards.sort(() => Math.random() - 0.5);
+            
+            flippedCards = [];
+            memoryAttempts = 0;
+            canFlip = true;
+            document.getElementById('memory-attempts').textContent = memoryAttempts;
+            
+            // Criar as cartas
+            memoryCards.forEach((emoji, index) => {
+                const card = document.createElement('div');
+                card.className = 'memory-card aspect-square bg-indigo-500 rounded-lg relative cursor-pointer';
+                card.dataset.index = index;
+                
+                const back = document.createElement('div');
+                back.className = 'back flex items-center justify-center text-4xl';
+                back.textContent = '?';
+                
+                const front = document.createElement('div');
+                front.className = 'front';
+                front.textContent = emoji;
+                
+                card.appendChild(back);
+                card.appendChild(front);
+                
+                card.addEventListener('click', flipMemoryCard);
+                memoryBoard.appendChild(card);
+            });
+        }
+        
+        function flipMemoryCard(e) {
+            if (!canFlip) return;
+            
+            const card = e.currentTarget;
+            const index = card.dataset.index;
+            
+            // Não virar cartas já viradas ou encontradas
+            if (flippedCards.includes(index) || card.classList.contains('flipped')) {
+                return;
+            }
+            
+            // Virar a carta
+            card.classList.add('flipped');
+            flippedCards.push(index);
+            
+            // Verificar se duas cartas estão viradas
+            if (flippedCards.length === 2) {
+                memoryAttempts++;
+                document.getElementById('memory-attempts').textContent = memoryAttempts;
+                
+                canFlip = false;
+                
+                // Verificar se são iguais
+                if (memoryCards[flippedCards[0]] === memoryCards[flippedCards[1]]) {
+                    // Par encontrado
+                    setTimeout(() => {
+                        document.querySelectorAll('.memory-card').forEach(c => {
+                            if (flippedCards.includes(c.dataset.index)) {
+                                c.style.visibility = 'hidden';
+                            }
+                        });
+                        
+                        flippedCards = [];
+                        canFlip = true;
+                        
+                        // Verificar se o jogo acabou
+                        checkMemoryGameEnd();
+                    }, 500);
+                } else {
+                    // Virar de volta após um tempo
+                    setTimeout(() => {
+                        flippedCards.forEach(i => {
+                            document.querySelector(`.memory-card[data-index="${i}"]`).classList.remove('flipped');
+                        });
+                        flippedCards = [];
+                        canFlip = true;
+                    }, 1000);
+                }
+            }
+        }
+        
+        function checkMemoryGameEnd() {
+            const allCards = document.querySelectorAll('.memory-card');
+            const hiddenCards = document.querySelectorAll('.memory-card[style*="visibility: hidden"]');
+            
+            if (allCards.length === hiddenCards.length) {
+                setTimeout(() => {
+                    alert(`Parabéns! Você completou o jogo em ${memoryAttempts} tentativas!`);
+                }, 500);
+            }
+        }
+        
+        function resetMemoryGame() {
+            initMemoryGame();
+        }
+        
+        // ========== JOGO DA VELHA ==========
+        function initTicTacToeGame() {
+            const board = document.querySelector('.tic-tac-toe-board');
+            board.innerHTML = '';
+            
+            ticTacToeBoard = ['', '', '', '', '', '', '', '', ''];
+            currentPlayer = 'X';
+            gameOver = false;
+            
+            document.getElementById('tic-tac-toe-player').textContent = currentPlayer;
+            
+            // Criar o tabuleiro
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'tic-tac-toe-cell bg-white bg-opacity-20 rounded-lg';
+                cell.dataset.index = i;
+                cell.addEventListener('click', handleTicTacToeClick);
+                board.appendChild(cell);
+            }
+        }
+        
+        function handleTicTacToeClick(e) {
+            if (gameOver) return;
+            
+            const cell = e.currentTarget;
+            const index = parseInt(cell.dataset.index);
+            
+            // Verificar se a célula já está ocupada
+            if (ticTacToeBoard[index] !== '') return;
+            
+            // Marcar a célula
+            ticTacToeBoard[index] = currentPlayer;
+            cell.textContent = currentPlayer;
+            
+            // Adicionar animação
+            cell.classList.add('celebration');
+            setTimeout(() => {
+                cell.classList.remove('celebration');
+            }, 500);
+            
+            // Verificar vitória
+            if (checkTicTacToeWin()) {
+                gameOver = true;
+                setTimeout(() => {
+                    alert(`Jogador ${currentPlayer} venceu!`);
+                }, 300);
+                return;
+            }
+            
+            // Verificar empate
+            if (!ticTacToeBoard.includes('')) {
+                gameOver = true;
+                setTimeout(() => {
+                    alert('Empate!');
+                }, 300);
+                return;
+            }
+            
+            // Alternar jogador
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            document.getElementById('tic-tac-toe-player').textContent = currentPlayer;
+        }
+        
+        function checkTicTacToeWin() {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // linhas
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // colunas
+                [0, 4, 8], [2, 4, 6]             // diagonais
+            ];
+            
+            return winPatterns.some(pattern => {
+                const [a, b, c] = pattern;
+                return ticTacToeBoard[a] !== '' && 
+                       ticTacToeBoard[a] === ticTacToeBoard[b] && 
+                       ticTacToeBoard[a] === ticTacToeBoard[c];
+            });
+        }
+        
+        function resetTicTacToeGame() {
+            initTicTacToeGame();
+        }
+    </script>
+</body>
+</html>
