@@ -8,6 +8,33 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Estilos personalizados */
+        .category-tab {
+            padding: 0.75rem 1.5rem;
+            margin: 0 0.5rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .category-tab:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .active-tab {
+            background-color: #4f46e5;
+        }
+        
+        .active-tab:hover {
+            background-color: #4338ca;
+        }
+        
+        .game-category {
+            transition: all 0.3s ease;
+        }
         .memory-card {
             perspective: 1000px;
             transform-style: preserve-3d;
@@ -99,16 +126,88 @@
         </header>
         
         <!-- Menu de Jogos -->
-        <div class="flex flex-wrap justify-center gap-6 mb-12">
-            <button onclick="showGame('chess')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-lg text-xl transition-all transform hover:scale-105">
-                <i class="fas fa-chess mr-2"></i> Xadrez
-            </button>
-            <button onclick="showGame('memory')" class="bg-pink-600 hover:bg-pink-700 text-white font-bold py-4 px-8 rounded-lg text-xl transition-all transform hover:scale-105">
-                <i class="fas fa-brain mr-2"></i> Jogo da Memória
-            </button>
-            <button onclick="showGame('tic-tac-toe')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-lg text-xl transition-all transform hover:scale-105">
-                <i class="fas fa-times-circle mr-2"></i> Jogo da Velha
-            </button>
+        <div class="mb-12">
+            <h2 class="text-2xl font-bold mb-4 text-center">Categorias</h2>
+            
+            <!-- Tabulação de categorias -->
+            <div class="flex justify-center mb-6">
+                <button onclick="showCategory('classic')" class="category-tab active-tab">Clássicos</button>
+                <button onclick="showCategory('kids')" class="category-tab">Infantil</button>
+                <button onclick="showCategory('puzzle')" class="category-tab">Quebra-Cabeças</button>
+                <button onclick="showCategory('card')" class="category-tab">Cartas</button>
+            </div>
+            
+            <!-- Jogos Clássicos -->
+            <div id="classic-games" class="game-category">
+                <div class="flex flex-wrap justify-center gap-6">
+                    <button onclick="showGame('chess')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-lg text-xl transition-all transform hover:scale-105">
+                        <i class="fas fa-chess mr-2"></i> Xadrez
+                    </button>
+                    <button onclick="showGame('tic-tac-toe')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-lg text-xl transition-all transform hover:scale-105">
+                        <i class="fas fa-times-circle mr-2"></i> Jogo da Velha
+                    </button>
+                    <button onclick="showGame('checkers')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg text-xl transition-all transform hover:scale-105">
+                        <i class="fas fa-border-all mr-2"></i> Damas
+                    </button>
+                    <button onclick="showGame('connect4')" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-8 rounded-lg text-xl transition-all transform hover:scale-105">
+                        <i class="fas fa-circle-notch mr-2"></i> Connect 4
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Jogos Infantis -->
+            <div id="kids-games" class="game-category hidden">
+                <div class="flex flex-wrap justify-center gap-6">
+                    <button onclick="showGame('memory')" class="bg-pink-600 hover:bg-pink-700 text-white font-bold py-4 px-8 rounded-lg text-xl transition-all transform hover:scale-105">
+                        <i class="fas fa-brain mr-2"></i> Jogo da Memória
+                    </button>
+                    <button onclick="showGame('colormatch')" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-4 px-8 rounded-lg text-xl transition-all transform hover:scale-105">
+                        <i class="fas fa-palette mr-2"></i> Combinar Cores
+                    </button>
+                    <button onclick="showGame('animalsound')" class="bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-8 rounded-lg text-xl transition-all transform hover:scale-105">
+                        <i class="fas fa-dog mr-2"></i> Sons de Animais
+                    </button>
+                    <button onclick="showGame('counting')" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 px-8 rounded-lg text-xl transition-all transform hover:scale-105">
+                        <i class="fas fa-sort-numeric-up mr-2"></i> Contar Objetos
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Quebra-Cabeças -->
+            <div id="puzzle-games" class="game-category hidden">
+                <div class="flex flex-wrap justify-center gap-6">
+                    <button onclick="showGame('sudoku')" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-4 px-8 rounded-lg text-xl transition-all transform hover:scale-105">
+                        <i class="fas fa-th mr-2"></i> Sudoku
+                    </button>
+                    <button onclick="showGame('slidingpuzzle')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg text-xl transition-all transform hover:scale-105">
+                        <i class="fas fa-puzzle-piece mr-2"></i> Puzzle Deslizante
+                    </button>
+                    <button onclick="showGame('wordsearch')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-lg text-xl transition-all transform hover:scale-105">
+                        <i class="fas fa-search mr-2"></i> Caça-Palavras
+                    </button>
+                    <button onclick="showGame('crossword')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-lg text-xl transition-all transform hover:scale-105">
+                        <i class="fas fa-font mr-2"></i> Cruzadinha
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Jogos de Cartas -->
+            <div id="card-games" class="game-category hidden">
+                <div class="flex flex-wrap justify-center gap-6">
+                    <button onclick="showGame('blackjack')" class="bg-black hover:bg-gray-900 text-white font-bold py-4 px-8 rounded-lg text-xl transition-all transform hover:scale-105">
+                        <i class="fas fa-club mr-2"></i> Blackjack
+                    </button>
+                    <button onclick="showGame('solitaire')" class="bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-8 rounded-lg text-xl transition-all transform hover:scale-105">
+                        <i class="fas fa-heart mr-2"></i> Paciência
+                    </button>
+                    <button onclick="showGame('memorycards')" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-8 rounded-lg text-xl transition-all transform hover:scale-105">
+                        <i class="fas fa-cards mr-2"></i> Memory Cards
+                    </button>
+                    <button onclick="showGame('war')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg text-xl transition-all transform hover:scale-105">
+                        <i class="fas fa-flag mr-2"></i> Guerra
+                    </button>
+                </div>
+            </div>
         </div>
         
         <!-- Área dos Jogos -->
@@ -161,6 +260,45 @@
             
             <!-- Jogo da Velha -->
             <div id="tic-tac-toe-game" class="hidden">
+            
+            <!-- Damas -->
+            <div id="checkers-game" class="hidden">
+                <h2 class="text-2xl font-bold mb-6 text-center">Damas</h2>
+                <div class="flex flex-col items-center">
+                    <div class="checkers-board bg-amber-800 grid grid-cols-8 gap-0 border-2 border-amber-900 mb-6"></div>
+                    <button onclick="resetCheckersGame()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg">
+                        Reiniciar Jogo
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Connect 4 -->
+            <div id="connect4-game" class="hidden">
+                <h2 class="text-2xl font-bold mb-6 text-center">Connect 4</h2>
+                <div class="flex flex-col items-center">
+                    <div class="connect4-board bg-blue-600 grid grid-cols-7 gap-1 p-2 rounded-lg mb-6"></div>
+                    <button onclick="resetConnect4Game()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg">
+                        Reiniciar Jogo
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Combinar Cores -->
+            <div id="colormatch-game" class="hidden">
+                <h2 class="text-2xl font-bold mb-6 text-center">Combinar Cores</h2>
+                <div class="flex flex-col items-center">
+                    <div class="color-grid grid grid-cols-3 gap-4 mb-6"></div>
+                    <button onclick="resetColorMatchGame()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg">
+                        Novo Jogo
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Sons de Animais -->
+            <div id="animalsound-game" class="hidden">
+                <h2 class="text-2xl font-bold mb-6 text-center">Sons de Animais</h2>
+                <div class="animal-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
+            </div>
                 <h2 class="text-2xl font-bold mb-6 text-center">Jogo da Velha</h2>
                 <div class="flex flex-col items-center">
                     <div class="mb-6 text-xl">
@@ -192,6 +330,23 @@
         let ticTacToeBoard = ['', '', '', '', '', '', '', '', ''];
         let currentPlayer = 'X';
         let gameOver = false;
+        
+        // Mostrar categoria selecionada
+        function showCategory(category) {
+            // Atualizar tabs ativas
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('active-tab');
+            });
+            event.target.classList.add('active-tab');
+            
+            // Esconder todas as categorias
+            document.querySelectorAll('.game-category').forEach(cat => {
+                cat.classList.add('hidden');
+            });
+            
+            // Mostrar categoria selecionada
+            document.getElementById(`${category}-games`).classList.remove('hidden');
+        }
         
         // Mostrar jogo selecionado
         function showGame(game) {
