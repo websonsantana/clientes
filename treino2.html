@@ -915,19 +915,36 @@
                 
                 // Start training program
                 document.getElementById('start-training').addEventListener('click', function() {
-                    currentLevel = document.getElementById('training-level').value;
-                    targetDistance = parseInt(document.getElementById('target-distance').value);
+                    const newLevel = document.getElementById('training-level').value;
+                    const newDistance = parseInt(document.getElementById('target-distance').value);
                     
-                    // Load appropriate program
-                    loadTrainingProgram(currentLevel, targetDistance);
-                    
-                    // Hide config modal
-                    configModal.classList.add('hidden');
-                    
-                    // Initialize first week
-                    currentWeek = 1;
-                    renderWeekSchedule(currentWeek);
-                    updateOverallProgress();
+                    // Only reset if config changed
+                    if (newLevel !== currentLevel || newDistance !== targetDistance) {
+                        currentLevel = newLevel;
+                        targetDistance = newDistance;
+                        
+                        // Reset all completed statuses when changing program
+                        if (localStorage.getItem('runningPlanData')) {
+                            localStorage.removeItem('runningPlanData');
+                        }
+                        
+                        // Load appropriate program
+                        loadTrainingProgram(currentLevel, targetDistance);
+                        
+                        // Hide config modal
+                        configModal.classList.add('hidden');
+                        
+                        // Initialize first week
+                        currentWeek = 1;
+                        renderWeekSchedule(currentWeek);
+                        updateOverallProgress();
+                        
+                        // Show confirmation
+                        alert(`Programa reconfigurado para ${targetDistance}km no nível ${currentLevel}`);
+                    } else {
+                        // Just hide modal if no changes
+                        configModal.classList.add('hidden');
+                    }
                 });
                 
                 // Configuration button
@@ -935,6 +952,9 @@
                     // Set current values in form
                     document.getElementById('training-level').value = currentLevel;
                     document.getElementById('target-distance').value = targetDistance;
+                    
+                    // Reset any selected week
+                    currentWeek = 1;
                     
                     // Show config modal
                     configModal.classList.remove('hidden');
