@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plano de Treino de Corrida para Iniciantes</title>
+    <title>Plano de Treino de Corrida Personalizado</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Custom animation for pulse effect */
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -16,6 +15,22 @@
         
         .pulse {
             animation: pulse 2s infinite;
+        }
+        
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.1); }
+            50% { transform: scale(1); }
+            75% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .heartbeat {
+            animation: heartbeat 1.5s ease-in-out infinite both;
+        }
+        
+        .glow {
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
         }
         
         /* Custom scrollbar */
@@ -37,24 +52,6 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
-        
-        /* Custom glowing effect */
-        .glow {
-            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
-        }
-        
-        /* Heart rate animation */
-        .heartbeat {
-            animation: heartbeat 1.5s ease-in-out infinite both;
-        }
-
-        @keyframes heartbeat {
-            0% { transform: scale(1); }
-            25% { transform: scale(1.1); }
-            50% { transform: scale(1); }
-            75% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
@@ -63,12 +60,12 @@
         <header class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-lg shadow-md p-6 mb-8 text-white">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <div class="mb-4 md:mb-0">
-                    <h1 class="text-3xl md:text-4xl font-bold">🏃‍♂️ Plano de Treino de Corrida</h1>
-                    <p class="text-blue-100 mt-2">Prepare-se para correr 5km em 8 semanas!</p>
+                    <h1 class="text-3xl md:text-4xl font-bold">🏃‍♂️ Meu Plano de Corrida</h1>
+                    <p class="text-blue-100 mt-2" id="program-description">Personalize seu treino para alcançar seus objetivos</p>
                 </div>
                 <div class="flex items-center space-x-2">
                     <div class="bg-white text-blue-600 px-4 py-2 rounded-full font-semibold">
-                        <span id="current-week-text">Semana 1</span> de 8
+                        <span id="current-week-text">Semana 1</span> de <span id="total-weeks">8</span>
                     </div>
                     <div class="hidden md:block">
                         <span class="bg-white text-blue-600 px-4 py-2 rounded-full font-semibold">
@@ -78,22 +75,8 @@
                 </div>
             </div>
             
-            <div class="mt-6 flex flex-wrap gap-2">
-                <div class="bg-white bg-opacity-20 px-3 py-2 rounded-full flex items-center">
-                    <i class="fas fa-signal mr-2"></i> CA: Caminhada (50-65% FCM)
-                </div>
-                <div class="bg-white bg-opacity-20 px-3 py-2 rounded-full flex items-center">
-                    <i class="fas fa-running mr-2"></i> LE: Corrida Leve (65-75% FCM)
-                </div>
-                <div class="bg-white bg-opacity-20 px-3 py-2 rounded-full flex items-center">
-                    <i class="fas fa-fire mr-2"></i> MO: Corrida Moderada (75-85% FCM)
-                </div>
-                <div class="bg-white bg-opacity-20 px-3 py-2 rounded-full flex items-center">
-                    <i class="fas fa-bolt mr-2"></i> FO: Corrida Forte (85-90% FCM)
-                </div>
-                <div class="bg-white bg-opacity-20 px-3 py-2 rounded-full flex items-center">
-                    <i class="fas fa-heartbeat mr-2"></i> MF: Corrida Muito Forte (90-100% FCM)
-                </div>
+            <div class="mt-6 flex flex-wrap gap-2" id="intensity-legend">
+                <!-- Legend items will be added by JavaScript -->
             </div>
         </header>
         
@@ -106,10 +89,10 @@
                 </div>
                 <div class="mt-2">
                     <div class="w-full bg-gray-200 rounded-full h-2.5">
-                        <div id="overall-progress" class="bg-blue-600 h-2.5 rounded-full" style="width: 12.5%"></div>
+                        <div id="overall-progress" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
                     </div>
                     <div class="text-right mt-1 text-sm text-gray-600">
-                        <span id="progress-percentage">12.5%</span> completo
+                        <span id="progress-percentage">0%</span> completo
                     </div>
                 </div>
             </div>
@@ -120,7 +103,7 @@
                     <i class="fas fa-calendar-week text-green-500"></i>
                 </div>
                 <div class="mt-2 text-2xl font-bold">
-                    <span id="completed-weeks">0</span>/8
+                    <span id="completed-weeks">0</span>/<span id="total-weeks-summary">8</span>
                 </div>
             </div>
             
@@ -130,7 +113,7 @@
                     <i class="fas fa-dumbbell text-yellow-500"></i>
                 </div>
                 <div class="mt-2 text-2xl font-bold">
-                    <span id="completed-workouts">0</span>/24
+                    <span id="completed-workouts">0</span>/<span id="total-workouts">24</span>
                 </div>
             </div>
             
@@ -139,7 +122,7 @@
                     <h3 class="text-gray-500">Meta Final</h3>
                     <i class="fas fa-flag-checkered text-red-500"></i>
                 </div>
-                <div class="mt-2 text-xl font-bold whitespace-nowrap">
+                <div class="mt-2 text-xl font-bold whitespace-nowrap" id="final-goal">
                     5K em 8 semanas
                 </div>
             </div>
@@ -152,42 +135,8 @@
                     <div class="bg-gray-800 text-white p-4 font-bold">
                         Selecione a Semana
                     </div>
-                    <div class="p-4 space-y-2">
-                        <button data-week="1" class="week-btn bg-blue-600 text-white w-full p-3 rounded-md flex justify-between items-center">
-                            <span>Semana 1</span>
-                            <span class="badge bg-white text-blue-600 px-2 py-1 rounded-full text-xs font-bold">Introdução</span>
-                        </button>
-                        
-                        <button data-week="2" class="week-btn bg-gray-200 hover:bg-blue-100 w-full p-3 rounded-md flex justify-between items-center">
-                            <span>Semana 2</span>
-                        </button>
-                        
-                        <button data-week="3" class="week-btn bg-gray-200 hover:bg-blue-100 w-full p-3 rounded-md flex justify-between items-center">
-                            <span>Semana 3</span>
-                        </button>
-                        
-                        <button data-week="4" class="week-btn bg-gray-200 hover:bg-blue-100 w-full p-3 rounded-md flex justify-between items-center">
-                            <span>Semana 4</span>
-                            <span class="badge bg-blue-100 text-blue-600 px-2 py-1 rounded-full text-xs font-bold hidden">50%</span>
-                        </button>
-                        
-                        <button data-week="5" class="week-btn bg-gray-200 hover:bg-blue-100 w-full p-3 rounded-md flex justify-between items-center">
-                            <span>Semana 5</span>
-                        </button>
-                        
-                        <button data-week="6" class="week-btn bg-gray-200 hover:bg-blue-100 w-full p-3 rounded-md flex justify-between items-center">
-                            <span>Semana 6</span>
-                        </button>
-                        
-                        <button data-week="7" class="week-btn bg-gray-200 hover:bg-blue-100 w-full p-3 rounded-md flex justify-between items-center">
-                            <span>Semana 7</span>
-                            <span class="badge bg-red-100 text-red-600 px-2 py-1 rounded-full text-xs font-bold hidden">Intenso</span>
-                        </button>
-                        
-                        <button data-week="8" class="week-btn bg-gray-200 hover:bg-blue-100 w-full p-3 rounded-md flex justify-between items-center">
-                            <span>Semana 8</span>
-                            <span class="badge bg-purple-100 text-purple-600 px-2 py-1 rounded-full text-xs font-bold hidden">PROVA 5K</span>
-                        </button>
+                    <div class="p-4 space-y-2" id="week-buttons-container">
+                        <!-- Week buttons will be added by JavaScript -->
                     </div>
                     
                     <div class="bg-gray-50 p-4 border-t">
@@ -247,6 +196,11 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Configuration Button -->
+                <button id="config-btn" class="mt-6 bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-6 rounded-lg w-full flex items-center justify-center">
+                    <i class="fas fa-cog mr-2"></i> Configurar Treino
+                </button>
             </div>
             
             <!-- Week Schedule -->
@@ -254,7 +208,7 @@
                 <div class="bg-white rounded-lg shadow-md overflow-hidden">
                     <div class="bg-blue-600 text-white p-4 font-bold flex justify-between items-center">
                         <div>
-                            <span id="selected-week-title">Semana 1</span>
+                            <span id="selected-week-title">Selecione uma semana</span>
                             <span class="text-blue-200 ml-2 font-normal text-sm">(Segunda a Domingo)</span>
                         </div>
                         <div class="flex space-x-2">
@@ -268,7 +222,10 @@
                     </div>
                     
                     <div id="week-schedule" class="divide-y">
-                        <!-- Week 1 content will be inserted here by JavaScript -->
+                        <div class="p-8 text-center text-gray-500">
+                            <i class="fas fa-running text-4xl mb-4 text-gray-300"></i>
+                            <p>Selecione um programa de treino para começar</p>
+                        </div>
                     </div>
                     
                     <div class="bg-gray-50 p-4 border-t">
@@ -290,13 +247,13 @@
                         </div>
                         <div class="bg-green-50 p-3 rounded-lg text-center">
                             <div class="text-3xl font-bold text-green-600 mb-1">
-                                <span id="current-week-rest">7</span>
+                                <span id="current-week-rest">0</span>
                             </div>
                             <div class="text-xs text-green-800">Dias de descanso</div>
                         </div>
                         <div class="bg-orange-50 p-3 rounded-lg text-center">
                             <div class="text-3xl font-bold text-orange-600 mb-1">
-                                <span id="current-week-duration">25</span>'
+                                <span id="current-week-duration">0</span>'
                             </div>
                             <div class="text-xs text-orange-800">Tempo total</div>
                         </div>
@@ -348,7 +305,7 @@
             </div>
         </div>
     </div>
-
+    
     <!-- Training Configuration Modal -->
     <div id="config-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white rounded-lg shadow-xl overflow-hidden w-full max-w-md mx-4">
@@ -374,13 +331,13 @@
                         <option value="42">42 km (Maratona)</option>
                     </select>
                 </div>
-                <button id="start-training" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg w-full">
-                    Iniciar Treino
+                <button id="start-training" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg w-full flex items-center justify-center">
+                    <i class="fas fa-play mr-2"></i> Iniciar Programa
                 </button>
             </div>
         </div>
     </div>
-
+    
     <!-- Completion Modal -->
     <div id="completion-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-lg shadow-xl overflow-hidden w-full max-w-md mx-4">
@@ -408,204 +365,322 @@
                 beginner: {
                     5: {
                         weeks: 8,
+                        description: "Programa para iniciantes correrem 5km em 8 semanas",
                         program: {
                             1: {
                                 title: "Semana 1 - Introdução",
                                 description: "Primeiro contato com o programa de treinos",
                                 days: [
                                     { day: "Segunda", workout: "3'LE, 3x 12'CA", completed: false },
-                                    { day: "Terça", workout: "DAY OFF", completed: true },
-                                    { day: "Quarta", workout: "DAY OFF", completed: true },
-                                    { day: "Quinta", workout: "DAY OFF", completed: true },
-                                    { day: "Sexta", workout: "DAY OFF", completed: true },
-                                    { day: "Sábado", workout: "DAY OFF", completed: true },
-                                    { day: "Domingo", workout: "DAY OFF", completed: true }
+                                    { day: "Terça", workout: "DAY OFF", completed: false },
+                                    { day: "Quarta", workout: "5'CA, 3x 10'LE", completed: false },
+                                    { day: "Quinta", workout: "DAY OFF", completed: false },
+                                    { day: "Sexta", workout: "5'CA, 2x 15'LE", completed: false },
+                                    { day: "Sábado", workout: "DAY OFF", completed: false },
+                                    { day: "Domingo", workout: "20'CA", completed: false }
                                 ],
                                 duration: 25
                             },
-                            // ... rest of beginner 5k program ...
+                            2: {
+                                title: "Semana 2",
+                                description: "Aumentando gradualmente a intensidade",
+                                days: [
+                                    { day: "Segunda", workout: "5'CA, 4x 8'LE", completed: false },
+                                    { day: "Terça", workout: "DAY OFF", completed: false },
+                                    { day: "Quarta", workout: "13'CA, 5'LE, 2x 2'MO", completed: false },
+                                    { day: "Quinta", workout: "DAY OFF", completed: false },
+                                    { day: "Sexta", workout: "15'CA, 3x 5'LE", completed: false },
+                                    { day: "Sábado", workout: "DAY OFF", completed: false },
+                                    { day: "Domingo", workout: "25'CA", completed: false }
+                                ],
+                                duration: 30
+                            },
+                            3: {
+                                title: "Semana 3",
+                                description: "Introdução a intervalos",
+                                days: [
+                                    { day: "Segunda", workout: "5'CA, 6x (1'LE, 1'CA)", completed: false },
+                                    { day: "Terça", workout: "DAY OFF", completed: false },
+                                    { day: "Quarta", workout: "10'CA, 3x (2'LE, 2'CA)", completed: false },
+                                    { day: "Quinta", workout: "DAY OFF", completed: false },
+                                    { day: "Sexta", workout: "5'CA, 4x (3'LE, 1'CA)", completed: false },
+                                    { day: "Sábado", workout: "DAY OFF", completed: false },
+                                    { day: "Domingo", workout: "30'CA", completed: false }
+                                ],
+                                duration: 35
+                            },
+                            4: {
+                                title: "Semana 4 - Meio Caminho",
+                                description: "Consolidação do treino",
+                                days: [
+                                    { day: "Segunda", workout: "5'CA, 5x (2'LE, 1'CA)", completed: false },
+                                    { day: "Terça", workout: "DAY OFF", completed: false },
+                                    { day: "Quarta", workout: "10'CA, 3x (3'LE, 1'CA)", completed: false },
+                                    { day: "Quinta", workout: "DAY OFF", completed: false },
+                                    { day: "Sexta", workout: "5'CA, 4x (4'LE, 1'CA)", completed: false },
+                                    { day: "Sábado", workout: "DAY OFF", completed: false },
+                                    { day: "Domingo", workout: "35'CA", completed: false }
+                                ],
+                                duration: 40
+                            },
+                            5: {
+                                title: "Semana 5",
+                                description: "Aumento de intensidade",
+                                days: [
+                                    { day: "Segunda", workout: "5'CA, 5x (3'LE, 1'CA), 4'LE, 3'CA", completed: false },
+                                    { day: "Terça", workout: "DAY OFF", completed: false },
+                                    { day: "Quarta", workout: "10'CA, 3x (4'LE, 1'CA)", completed: false },
+                                    { day: "Quinta", workout: "DAY OFF", completed: false },
+                                    { day: "Sexta", workout: "5'CA, 4x (5'LE, 1'CA)", completed: false },
+                                    { day: "Sábado", workout: "DAY OFF", completed: false },
+                                    { day: "Domingo", workout: "40'CA", completed: false }
+                                ],
+                                duration: 45
+                            },
+                            6: {
+                                title: "Semana 6",
+                                description: "Pré-prova",
+                                days: [
+                                    { day: "Segunda", workout: "5'LE, 3x 10'CA", completed: false },
+                                    { day: "Terça", workout: "10'LE, 2x 10'CA", completed: false },
+                                    { day: "Quarta", workout: "DAY OFF", completed: false },
+                                    { day: "Quinta", workout: "15'LE, 1x 15'CA", completed: false },
+                                    { day: "Sexta", workout: "DAY OFF", completed: false },
+                                    { day: "Sábado", workout: "3'CA, 2'MO, 1'FO", completed: false },
+                                    { day: "Domingo", workout: "45'CA", completed: false }
+                                ],
+                                duration: 60
+                            },
+                            7: {
+                                title: "Semana 7 - Intensa",
+                                description: "Preparação final para a prova",
+                                days: [
+                                    { day: "Segunda", workout: "5'LE, 2x 15'CA", completed: false },
+                                    { day: "Terça", workout: "10'LE, 1x 25'CA", completed: false },
+                                    { day: "Quarta", workout: "DAY OFF", completed: false },
+                                    { day: "Quinta", workout: "15'LE, 1x 20'CA", completed: false },
+                                    { day: "Sexta", workout: "DAY OFF", completed: false },
+                                    { day: "Sábado", workout: "3'CA, 2'MO, 1'FO", completed: false },
+                                    { day: "Domingo", workout: "50'CA", completed: false }
+                                ],
+                                duration: 70
+                            },
+                            8: {
+                                title: "Semana 8 - PROVA 5KM",
+                                description: "Semana da prova!",
+                                days: [
+                                    { day: "Segunda", workout: "12'LE, 3x 5'CA", completed: false },
+                                    { day: "Terça", workout: "10'LE, 2x 10'CA", completed: false },
+                                    { day: "Quarta", workout: "3'LE, 3x 12'CA", completed: false },
+                                    { day: "Quinta", workout: "DAY OFF", completed: false },
+                                    { day: "Sexta", workout: "DAY OFF", completed: false },
+                                    { day: "Sábado", workout: "PROVA 5KM", completed: false },
+                                    { day: "Domingo", workout: "DAY OFF", completed: false }
+                                ],
+                                duration: 85
+                            }
+                        }
+                    },
+                    10: {
+                        weeks: 10,
+                        description: "Programa para iniciantes correrem 10km em 10 semanas",
+                        program: {
+                            // Similar structure for 10k program
                         }
                     }
                 },
                 intermediate: {
                     5: {
                         weeks: 6,
+                        description: "Programa intermediário para correr 5km em 6 semanas",
                         program: {
-                            1: {
-                                title: "Semana 1 - Base",
-                                description: "Construindo resistência",
-                                days: [
-                                    { day: "Segunda", workout: "5'LE, 4x 8'CA", completed: false },
-                                    // ... intermediate workouts ...
-                                ],
-                                duration: 30
-                            }
+                            // Intermediate 5k program
                         }
                     },
                     10: {
                         weeks: 8,
+                        description: "Programa intermediário para correr 10km em 8 semanas",
                         program: {
-                            // ... 10k program ...
+                            // Intermediate 10k program
                         }
                     }
                 },
                 advanced: {
                     21: {
                         weeks: 12,
+                        description: "Programa avançado para meia maratona em 12 semanas",
                         program: {
-                            // ... half marathon program ...
+                            // Advanced half marathon program
                         }
                     },
                     42: {
                         weeks: 16,
+                        description: "Programa avançado para maratona em 16 semanas",
                         program: {
-                            // ... marathon program ...
+                            // Advanced marathon program
                         }
                     }
                 }
             };
 
+            // Current training data
             let trainingProgram = {};
             let currentLevel = 'beginner';
             let targetDistance = 5;
-                1: {
-                    title: "Semana 1 - Introdução",
-                    description: "Primeiro contato com o programa de treinos",
-                    days: [
-                        { day: "Segunda", workout: "3'LE, 3x 12'CA", completed: false },
-                        { day: "Terça", workout: "DAY OFF", completed: true },
-                        { day: "Quarta", workout: "DAY OFF", completed: true },
-                        { day: "Quinta", workout: "DAY OFF", completed: true },
-                        { day: "Sexta", workout: "DAY OFF", completed: true },
-                        { day: "Sábado", workout: "DAY OFF", completed: true },
-                        { day: "Domingo", workout: "DAY OFF", completed: true }
-                    ],
-                    duration: 25
-                },
-                2: {
-                    title: "Semana 2",
-                    description: "Aumentando gradualmente a intensidade",
-                    days: [
-                        { day: "Segunda", workout: "DAY OFF", completed: false },
-                        { day: "Terça", workout: "DAY OFF", completed: false },
-                        { day: "Quarta", workout: "13'CA, 5'LE, 2x 2'MO", completed: false },
-                        { day: "Quinta", workout: "DAY OFF", completed: false },
-                        { day: "Sexta", workout: "DAY OFF", completed: false },
-                        { day: "Sábado", workout: "DAY OFF", completed: false },
-                        { day: "Domingo", workout: "DAY OFF", completed: false }
-                    ],
-                    duration: 25
-                },
-                3: {
-                    title: "Semana 3",
-                    description: "Introdução a intervalos",
-                    days: [
-                        { day: "Segunda", workout: "5'CA, 6x (1x)", completed: false },
-                        { day: "Terça", workout: "DAY OFF", completed: false },
-                        { day: "Quarta", workout: "DAY OFF", completed: false },
-                        { day: "Quinta", workout: "DAY OFF", completed: false },
-                        { day: "Sexta", workout: "DAY OFF", completed: false },
-                        { day: "Sábado", workout: "3'LE, 2'CA", completed: false },
-                        { day: "Domingo", workout: "DAY OFF", completed: false }
-                    ],
-                    duration: 30
-                },
-                4: {
-                    title: "Semana 4",
-                    description: "Consolidação do treino",
-                    days: [
-                        { day: "Segunda", workout: "5'CA, 6x (1x)", completed: false },
-                        { day: "Terça", workout: "DAY OFF", completed: false },
-                        { day: "Quarta", workout: "DAY OFF", completed: false },
-                        { day: "Quinta", workout: "DAY OFF", completed: false },
-                        { day: "Sexta", workout: "DAY OFF", completed: false },
-                        { day: "Sábado", workout: "3'LE, 2'CA", completed: false },
-                        { day: "Domingo", workout: "DAY OFF", completed: false }
-                    ],
-                    duration: 30
-                },
-                5: {
-                    title: "Semana 5",
-                    description: "Aumento de intensidade",
-                    days: [
-                        { day: "Segunda", workout: "5'CA, 5x (1x), 4'LE, 3'CA", completed: false },
-                        { day: "Terça", workout: "DAY OFF", completed: false },
-                        { day: "Quarta", workout: "DAY OFF", completed: false },
-                        { day: "Quinta", workout: "DAY OFF", completed: false },
-                        { day: "Sexta", workout: "DAY OFF", completed: false },
-                        { day: "Sábado", workout: "5'LE, 5x (1x), 1x 5'CA", completed: false },
-                        { day: "Domingo", workout: "DAY OFF", completed: false }
-                    ],
-                    duration: 40
-                },
-                6: {
-                    title: "Semana 6",
-                    description: "Pré-prova",
-                    days: [
-                        { day: "Segunda", workout: "5'LE, 3x 10'CA", completed: false },
-                        { day: "Terça", workout: "10'LE, 2x 10'CA", completed: false },
-                        { day: "Quarta", workout: "DAY OFF", completed: false },
-                        { day: "Quinta", workout: "DAY OFF", completed: false },
-                        { day: "Sexta", workout: "DAY OFF", completed: false },
-                        { day: "Sábado", workout: "3'CA, 2'MO, 1'FO", completed: false },
-                        { day: "Domingo", workout: "DAY OFF", completed: false }
-                    ],
-                    duration: 60
-                },
-                7: {
-                    title: "Semana 7 - Intensa",
-                    description: "Preparação final para a prova",
-                    days: [
-                        { day: "Segunda", workout: "5'LE, 2x 15'CA", completed: false },
-                        { day: "Terça", workout: "10'LE, 1x 25'CA", completed: false },
-                        { day: "Quarta", workout: "DAY OFF", completed: false },
-                        { day: "Quinta", workout: "DAY OFF", completed: false },
-                        { day: "Sexta", workout: "DAY OFF", completed: false },
-                        { day: "Sábado", workout: "3'CA, 2'MO, 1'FO", completed: false },
-                        { day: "Domingo", workout: "DAY OFF", completed: false }
-                    ],
-                    duration: 70
-                },
-                8: {
-                    title: "Semana 8 - PROVA 5KM",
-                    description: "Semana da prova!",
-                    days: [
-                        { day: "Segunda", workout: "12'LE, 3x 5'CA", completed: false },
-                        { day: "Terça", workout: "10'LE, 2x 10'CA", completed: false },
-                        { day: "Quarta", workout: "3'LE, 3x 12'CA", completed: false },
-                        { day: "Quinta", workout: "DAY OFF", completed: false },
-                        { day: "Sexta", workout: "DAY OFF", completed: false },
-                        { day: "Sábado", workout: "PROVA 5KM", completed: false },
-                        { day: "Domingo", workout: "DAY OFF", completed: false }
-                    ],
-                    duration: 85
-                }
-            };
-            
-            // Current week
             let currentWeek = 1;
-            
-            // Load from localStorage if available
-            if (localStorage.getItem('runningPlanData')) {
-                const savedData = JSON.parse(localStorage.getItem('runningPlanData'));
-                currentWeek = savedData.currentWeek || 1;
-                
-                // Update completed status from saved data
-                for (let week in savedData.weeks) {
-                    if (trainingProgram[week]) {
-                        trainingProgram[week].days.forEach((day, index) => {
-                            if (savedData.weeks[week] && savedData.weeks[week][index] !== undefined) {
-                                day.completed = savedData.weeks[week][index];
+            let totalWorkouts = 0;
+
+            // DOM elements
+            const configModal = document.getElementById('config-modal');
+            const completionModal = document.getElementById('completion-modal');
+            const weekScheduleEl = document.getElementById('week-schedule');
+            const weekButtonsContainer = document.getElementById('week-buttons-container');
+
+            // Initialize the app
+            function initApp() {
+                // Check for saved data
+                if (localStorage.getItem('runningPlanData')) {
+                    const savedData = JSON.parse(localStorage.getItem('runningPlanData'));
+                    
+                    currentLevel = savedData.currentLevel || 'beginner';
+                    targetDistance = savedData.targetDistance || 5;
+                    currentWeek = savedData.currentWeek || 1;
+                    
+                    // Load the appropriate program
+                    loadTrainingProgram(currentLevel, targetDistance);
+                    
+                    // Update completed status from saved data
+                    if (savedData.weeks) {
+                        for (let weekNum in savedData.weeks) {
+                            if (trainingProgram[weekNum]) {
+                                trainingProgram[weekNum].days.forEach((day, index) => {
+                                    if (savedData.weeks[weekNum][index] !== undefined) {
+                                        day.completed = savedData.weeks[weekNum][index];
+                                    }
+                                });
                             }
-                        });
+                        }
                     }
+                    
+                    // Render the current week
+                    renderWeekSchedule(currentWeek);
+                    updateOverallProgress();
+                    
+                    // Hide config modal if we have a program
+                    configModal.classList.add('hidden');
+                } else {
+                    // Show config modal if no saved data
+                    configModal.classList.remove('hidden');
                 }
+                
+                // Add event listeners
+                setupEventListeners();
             }
-            
-            // Render functions
+
+            // Load the appropriate training program
+            function loadTrainingProgram(level, distance) {
+                trainingProgram = JSON.parse(JSON.stringify(trainingPrograms[level][distance].program));
+                currentLevel = level;
+                targetDistance = distance;
+                
+                // Update UI with program info
+                document.getElementById('program-description').textContent = trainingPrograms[level][distance].description;
+                document.getElementById('total-weeks').textContent = trainingPrograms[level][distance].weeks;
+                document.getElementById('total-weeks-summary').textContent = trainingPrograms[level][distance].weeks;
+                document.getElementById('final-goal').textContent = `${distance}km em ${trainingPrograms[level][distance].weeks} semanas`;
+                
+                // Calculate total workouts
+                totalWorkouts = 0;
+                for (let week in trainingProgram) {
+                    totalWorkouts += trainingProgram[week].days.filter(day => !day.workout.includes('DAY OFF')).length;
+                }
+                document.getElementById('total-workouts').textContent = totalWorkouts;
+                
+                // Create week buttons
+                createWeekButtons();
+                
+                // Update intensity legend
+                updateIntensityLegend();
+            }
+
+            // Create week navigation buttons
+            function createWeekButtons() {
+                weekButtonsContainer.innerHTML = '';
+                
+                for (let weekNum = 1; weekNum <= trainingPrograms[currentLevel][targetDistance].weeks; weekNum++) {
+                    const weekBtn = document.createElement('button');
+                    weekBtn.dataset.week = weekNum;
+                    weekBtn.className = 'week-btn bg-gray-200 hover:bg-blue-100 w-full p-3 rounded-md flex justify-between items-center';
+                    
+                    const weekText = document.createElement('span');
+                    weekText.textContent = `Semana ${weekNum}`;
+                    
+                    const badge = document.createElement('span');
+                    badge.className = 'badge hidden px-2 py-1 rounded-full text-xs font-bold';
+                    
+                    // Special badges for certain weeks
+                    if (weekNum === 1) {
+                        badge.textContent = 'Introdução';
+                        badge.className = 'badge bg-white text-blue-600 px-2 py-1 rounded-full text-xs font-bold';
+                    } else if (weekNum === Math.floor(trainingPrograms[currentLevel][targetDistance].weeks / 2)) {
+                        badge.textContent = '50%';
+                        badge.className = 'badge bg-blue-100 text-blue-600 px-2 py-1 rounded-full text-xs font-bold';
+                    } else if (weekNum === trainingPrograms[currentLevel][targetDistance].weeks - 1) {
+                        badge.textContent = 'Intenso';
+                        badge.className = 'badge bg-red-100 text-red-600 px-2 py-1 rounded-full text-xs font-bold';
+                    } else if (weekNum === trainingPrograms[currentLevel][targetDistance].weeks) {
+                        badge.textContent = `PROVA ${targetDistance}K`;
+                        badge.className = 'badge bg-purple-100 text-purple-600 px-2 py-1 rounded-full text-xs font-bold';
+                    }
+                    
+                    weekBtn.appendChild(weekText);
+                    weekBtn.appendChild(badge);
+                    weekButtonsContainer.appendChild(weekBtn);
+                    
+                    // Add click event
+                    weekBtn.addEventListener('click', function() {
+                        currentWeek = parseInt(this.dataset.week);
+                        renderWeekSchedule(currentWeek);
+                        updateOverallProgress();
+                    });
+                }
+                
+                // Highlight current week
+                updateWeekButtons();
+            }
+
+            // Update week buttons styling
+            function updateWeekButtons() {
+                document.querySelectorAll('.week-btn').forEach(btn => {
+                    const weekNum = parseInt(btn.dataset.week);
+                    
+                    // Reset all buttons
+                    btn.className = 'week-btn bg-gray-200 hover:bg-blue-100 w-full p-3 rounded-md flex justify-between items-center';
+                    
+                    // Highlight current week
+                    if (weekNum === currentWeek) {
+                        btn.className = 'week-btn bg-blue-600 text-white w-full p-3 rounded-md flex justify-between items-center';
+                    }
+                    
+                    // Check if week has any completed workouts
+                    if (weekNum !== currentWeek && trainingProgram[weekNum] && 
+                        trainingProgram[weekNum].days.some(day => day.completed)) {
+                        btn.className = 'week-btn bg-green-100 text-green-800 border border-green-200 w-full p-3 rounded-md flex justify-between items-center';
+                        
+                        // Add completion indicator
+                        const completedCount = trainingProgram[weekNum].days.filter(day => day.completed).length;
+                        const badge = btn.querySelector('.badge');
+                        if (badge) {
+                            badge.textContent = `${completedCount}/7`;
+                            badge.className = 'badge bg-green-200 text-green-700 px-2 py-1 rounded-full text-xs font-bold';
+                        }
+                    }
+                });
+            }
+
+            // Render the schedule for a specific week
             function renderWeekSchedule(weekNum) {
                 const week = trainingProgram[weekNum];
-                const weekScheduleEl = document.getElementById('week-schedule');
                 
                 // Update title
                 document.getElementById('selected-week-title').textContent = week.title;
@@ -626,16 +701,16 @@
                         <div class="flex items-start">
                             <div class="flex-shrink-0 mr-4 mt-1">
                                 ${workoutType === 'Rest' ? 
-                                    `<div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                                        <i class="fas fa-coffee text-gray-400"></i>
-                                    </div>` : 
+                                 `<div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                                      <i class="fas fa-coffee text-gray-400"></i>
+                                  </div>` :
                                  workoutType === 'Race' ?
-                                    `<div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
-                                        <i class="fas fa-flag-checkered text-purple-500"></i>
-                                    </div>` :
-                                    `<div class="w-10 h-10 rounded-full ${day.completed ? 'bg-green-100' : 'bg-blue-100'} flex items-center justify-center">
-                                        <i class="fas ${day.completed ? 'fa-check text-green-500' : 'fa-running text-blue-500'}"></i>
-                                    </div>`}
+                                 `<div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                                      <i class="fas fa-flag-checkered text-purple-500"></i>
+                                  </div>` :
+                                 `<div class="w-10 h-10 rounded-full ${day.completed ? 'bg-green-100' : 'bg-blue-100'} flex items-center justify-center">
+                                      <i class="fas ${day.completed ? 'fa-check text-green-500' : 'fa-running text-blue-500'}"></i>
+                                  </div>`}
                             </div>
                             <div class="flex-1">
                                 <h4 class="font-bold text-gray-800">${day.day}</h4>
@@ -650,10 +725,10 @@
                             </div>
                             <div class="ml-4">
                                 ${day.completed ? 
-                                    `<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Completo</span>` :
-                                    `<button data-day-index="${index}" class="complete-day-btn bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded-full">
-                                        Marcar
-                                    </button>`}
+                                 `<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Completo</span>` :
+                                 `<button data-day-index="${index}" class="complete-day-btn bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded-full">
+                                      Marcar
+                                  </button>`}
                             </div>
                         </div>
                     `;
@@ -667,7 +742,8 @@
                 // Update week buttons styling
                 updateWeekButtons();
             }
-            
+
+            // Render workout badges based on workout types
             function renderWorkoutBadges(workout) {
                 if (workout.includes('DAY OFF') || workout.includes('PROVA')) return '';
                 
@@ -682,64 +758,26 @@
                 
                 return badges;
             }
-            
-            function updateWeekButtons() {
-                document.querySelectorAll('.week-btn').forEach(btn => {
-                    const weekNum = parseInt(btn.dataset.week);
-                    
-                    // Reset all buttons
-                    btn.className = 'week-btn bg-gray-200 hover:bg-blue-100 w-full p-3 rounded-md flex justify-between items-center';
-                    
-                    // Highlight current week
-                    if (weekNum === currentWeek) {
-                        btn.className = 'week-btn bg-blue-600 text-white w-full p-3 rounded-md flex justify-between items-center';
-                    }
-                    
-                    // Show badges for special weeks
-                    if (weekNum === 1) {
-                        btn.querySelector('.badge').textContent = 'Introdução';
-                        btn.querySelector('.badge').className = 'badge bg-white text-blue-600 px-2 py-1 rounded-full text-xs font-bold';
-                    } else if (weekNum === 4) {
-                        btn.querySelector('.badge').textContent = '50%';
-                        btn.querySelector('.badge').className = 'badge bg-blue-100 text-blue-600 px-2 py-1 rounded-full text-xs font-bold';
-                    } else if (weekNum === 7) {
-                        btn.querySelector('.badge').textContent = 'Intenso';
-                        btn.querySelector('.badge').className = 'badge bg-red-100 text-red-600 px-2 py-1 rounded-full text-xs font-bold';
-                    } else if (weekNum === 8) {
-                        btn.querySelector('.badge').textContent = 'PROVA 5K';
-                        btn.querySelector('.badge').className = 'badge bg-purple-100 text-purple-600 px-2 py-1 rounded-full text-xs font-bold';
-                    }
-                    
-                    // Check if week has any completed workouts
-                    if (weekNum !== currentWeek && trainingProgram[weekNum].days.some(day => day.completed)) {
-                        btn.className = 'week-btn bg-green-100 text-green-800 border border-green-200 w-full p-3 rounded-md flex justify-between items-center';
-                        
-                        // Add completion indicator
-                        const completedCount = trainingProgram[weekNum].days.filter(day => day.completed).length;
-                        btn.querySelector('.badge').textContent = `${completedCount}/7`;
-                        btn.querySelector('.badge').className = 'badge bg-green-200 text-green-700 px-2 py-1 rounded-full text-xs font-bold';
-                    }
-                });
-            }
-            
+
+            // Update current week statistics
             function updateWeekStats(weekNum) {
                 const week = trainingProgram[weekNum];
                 const completedCount = week.days.filter(day => day.completed).length;
+                const restDays = week.days.filter(day => day.workout.includes('DAY OFF')).length;
                 
                 document.getElementById('current-week-completed').textContent = completedCount;
-                document.getElementById('current-week-rest').textContent = week.days.filter(day => day.workout.includes('DAY OFF')).length;
+                document.getElementById('current-week-rest').textContent = restDays;
                 document.getElementById('current-week-duration').textContent = week.duration;
             }
-            
+
+            // Update overall progress statistics
             function updateOverallProgress() {
-                // Calculate completed workouts
-                let totalWorkouts = 0;
+                // Calculate completed workouts and days
                 let completedWorkouts = 0;
                 let completedDays = 0;
                 
                 for (let weekNum in trainingProgram) {
                     trainingProgram[weekNum].days.forEach(day => {
-                        if (!day.workout.includes('DAY OFF')) totalWorkouts++;
                         if (day.completed) completedDays++;
                         if (!day.workout.includes('DAY OFF') && day.completed) completedWorkouts++;
                     });
@@ -747,17 +785,17 @@
                 
                 // Calculate percentages
                 const workoutPercentage = Math.round((completedWorkouts / totalWorkouts) * 100);
-                const dayPercentage = Math.round((completedDays / (7 * 8)) * 100);
+                const dayPercentage = Math.round((completedDays / (7 * trainingPrograms[currentLevel][targetDistance].weeks)) * 100);
                 
                 // Update UI
                 document.getElementById('completed-workouts').textContent = completedWorkouts;
                 document.getElementById('days-completed').textContent = completedDays;
-                const totalWeeks = trainingPrograms[currentLevel][targetDistance].weeks;
+                
                 const completedWeeks = Object.keys(trainingProgram).filter(week => 
                     trainingProgram[week].days.every(day => day.completed)
                 ).length;
                 
-                document.getElementById('completed-weeks').textContent = `${completedWeeks}/${totalWeeks}`;
+                document.getElementById('completed-weeks').textContent = `${completedWeeks}/${trainingPrograms[currentLevel][targetDistance].weeks}`;
                 
                 document.getElementById('overall-progress').style.width = `${dayPercentage}%`;
                 document.getElementById('progress-percentage').textContent = `${dayPercentage}%`;
@@ -765,54 +803,50 @@
                 document.getElementById('user-progress-bar').style.width = `${workoutPercentage}%`;
                 document.getElementById('user-progress-text').textContent = workoutPercentage;
             }
-            
-            // Event listeners
-            document.querySelectorAll('.week-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    currentWeek = parseInt(this.dataset.week);
-                    renderWeekSchedule(currentWeek);
-                    updateOverallProgress();
+
+            // Update intensity legend based on selected program
+            function updateIntensityLegend() {
+                const intensityLegend = document.getElementById('intensity-legend');
+                intensityLegend.innerHTML = '';
+                
+                // Always show these basics
+                const basicIntensities = [
+                    { code: 'CA', name: 'Caminhada', icon: 'fa-walking', color: 'green' },
+                    { code: 'LE', name: 'Corrida Leve', icon: 'fa-running', color: 'blue' }
+                ];
+                
+                // Add additional intensities based on program
+                if (currentLevel === 'intermediate' || currentLevel === 'advanced') {
+                    basicIntensities.push(
+                        { code: 'MO', name: 'Moderada', icon: 'fa-fire', color: 'yellow' },
+                        { code: 'FO', name: 'Forte', icon: 'fa-bolt', color: 'orange' }
+                    );
+                }
+                
+                if (currentLevel === 'advanced') {
+                    basicIntensities.push(
+                        { code: 'MF', name: 'Muito Forte', icon: 'fa-heartbeat', color: 'red' }
+                    );
+                }
+                
+                // Create legend items
+                basicIntensities.forEach(intensity => {
+                    const item = document.createElement('div');
+                    item.className = 'bg-white bg-opacity-20 px-3 py-2 rounded-full flex items-center';
+                    item.innerHTML = `
+                        <i class="fas ${intensity.icon} mr-2 text-${intensity.color}-300"></i>
+                        ${intensity.code}: ${intensity.name}
+                    `;
+                    intensityLegend.appendChild(item);
                 });
-            });
-            
-            document.getElementById('prev-week').addEventListener('click', function() {
-                if (currentWeek > 1) {
-                    currentWeek--;
-                    renderWeekSchedule(currentWeek);
-                    updateOverallProgress();
-                }
-            });
-            
-            document.getElementById('next-week').addEventListener('click', function() {
-                const totalWeeks = trainingPrograms[currentLevel][targetDistance].weeks;
-                if (currentWeek < totalWeeks) {
-                    currentWeek++;
-                    renderWeekSchedule(currentWeek);
-                    updateOverallProgress();
-                }
-            });
-            
-            document.addEventListener('click', function(e) {
-                if (e.target.closest('.complete-day-btn')) {
-                    const dayIndex = parseInt(e.target.closest('.complete-day-btn').dataset.dayIndex);
-                    trainingProgram[currentWeek].days[dayIndex].completed = true;
-                    
-                    // Show completion modal
-                    document.getElementById('completion-modal').classList.remove('hidden');
-                    
-                    // Re-render
-                    renderWeekSchedule(currentWeek);
-                    updateOverallProgress();
-                }
-            });
-            
-            document.getElementById('close-modal').addEventListener('click', function() {
-                document.getElementById('completion-modal').classList.add('hidden');
-            });
-            
-            document.getElementById('save-btn').addEventListener('click', function() {
+            }
+
+            // Save progress to localStorage
+            function saveProgress() {
                 // Prepare data to save
                 const saveData = {
+                    currentLevel: currentLevel,
+                    targetDistance: targetDistance,
                     currentWeek: currentWeek,
                     weeks: {}
                 };
@@ -825,38 +859,90 @@
                 localStorage.setItem('runningPlanData', JSON.stringify(saveData));
                 
                 // Show visual feedback
-                this.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Progresso Salvo!';
-                this.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                this.classList.add('bg-green-500', 'hover:bg-green-600');
+                const saveBtn = document.getElementById('save-btn');
+                saveBtn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Progresso Salvo!';
+                saveBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                saveBtn.classList.add('bg-green-500', 'hover:bg-green-600');
                 
                 setTimeout(() => {
-                    this.innerHTML = '<i class="fas fa-save mr-2"></i> Salvar Progresso';
-                    this.classList.remove('bg-green-500', 'hover:bg-green-600');
-                    this.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                    saveBtn.innerHTML = '<i class="fas fa-save mr-2"></i> Salvar Progresso';
+                    saveBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
+                    saveBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
                 }, 2000);
-            });
-            
-            // Initialize config
-            document.getElementById('start-training').addEventListener('click', function() {
-                currentLevel = document.getElementById('training-level').value;
-                targetDistance = parseInt(document.getElementById('target-distance').value);
-                
-                // Load appropriate program
-                trainingProgram = trainingPrograms[currentLevel][targetDistance].program;
-                
-                // Hide config modal
-                document.getElementById('config-modal').classList.add('hidden');
-                
-                // Initialize first week
-                currentWeek = 1;
-                renderWeekSchedule(currentWeek);
-                updateOverallProgress();
-            });
+            }
 
-            // Show config modal on load
-            document.addEventListener('DOMContentLoaded', function() {
-                document.getElementById('config-modal').classList.remove('hidden');
-            });
+            // Setup event listeners
+            function setupEventListeners() {
+                // Week navigation
+                document.getElementById('prev-week').addEventListener('click', function() {
+                    if (currentWeek > 1) {
+                        currentWeek--;
+                        renderWeekSchedule(currentWeek);
+                        updateOverallProgress();
+                    }
+                });
+                
+                document.getElementById('next-week').addEventListener('click', function() {
+                    if (currentWeek < trainingPrograms[currentLevel][targetDistance].weeks) {
+                        currentWeek++;
+                        renderWeekSchedule(currentWeek);
+                        updateOverallProgress();
+                    }
+                });
+                
+                // Mark workout as complete
+                document.addEventListener('click', function(e) {
+                    if (e.target.closest('.complete-day-btn')) {
+                        const dayIndex = parseInt(e.target.closest('.complete-day-btn').dataset.dayIndex);
+                        trainingProgram[currentWeek].days[dayIndex].completed = true;
+                        
+                        // Show completion modal
+                        completionModal.classList.remove('hidden');
+                        
+                        // Re-render
+                        renderWeekSchedule(currentWeek);
+                        updateOverallProgress();
+                    }
+                });
+                
+                // Close completion modal
+                document.getElementById('close-modal').addEventListener('click', function() {
+                    completionModal.classList.add('hidden');
+                });
+                
+                // Save progress
+                document.getElementById('save-btn').addEventListener('click', saveProgress);
+                
+                // Start training program
+                document.getElementById('start-training').addEventListener('click', function() {
+                    currentLevel = document.getElementById('training-level').value;
+                    targetDistance = parseInt(document.getElementById('target-distance').value);
+                    
+                    // Load appropriate program
+                    loadTrainingProgram(currentLevel, targetDistance);
+                    
+                    // Hide config modal
+                    configModal.classList.add('hidden');
+                    
+                    // Initialize first week
+                    currentWeek = 1;
+                    renderWeekSchedule(currentWeek);
+                    updateOverallProgress();
+                });
+                
+                // Configuration button
+                document.getElementById('config-btn').addEventListener('click', function() {
+                    // Set current values in form
+                    document.getElementById('training-level').value = currentLevel;
+                    document.getElementById('target-distance').value = targetDistance;
+                    
+                    // Show config modal
+                    configModal.classList.remove('hidden');
+                });
+            }
+
+            // Initialize the app
+            initApp();
         });
     </script>
 </body>
