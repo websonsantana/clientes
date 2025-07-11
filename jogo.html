@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alien Shooter - Online Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes alienFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .alien {
+            animation: alienFloat 3s infinite ease-in-out;
+        }
+        
+        .explosion {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-image: radial-gradient(circle, #ff0, #f80, #f00);
+            border-radius: 50%;
+            opacity: 0;
+            transform: scale(0);
+            transition: transform 0.3s, opacity 0.3s;
+        }
+        
+        .game-container {
+            background: linear-gradient(to bottom, #0a0a2a, #1a1a4a);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .bullet {
+            position: absolute;
+            width: 4px;
+            height: 20px;
+            background-color: #ff0;
+            border-radius: 2px;
+        }
+        
+        .player {
+            transition: transform 0.1s;
+        }
+        
+        .power-up {
+            animation: powerUpFloat 2s infinite ease-in-out;
+        }
+        
+        @keyframes powerUpFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-5px) rotate(10deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <div class="container mx-auto px-4 py-8">
+        <header class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold text-yellow-400 flex items-center">
+                <i class="fas fa-gamepad mr-2"></i> Alien Shooter
+            </h1>
+            <div class="flex items-center space-x-4">
+                <div class="bg-gray-800 px-4 py-2 rounded-lg">
+                    <span class="text-yellow-400 mr-2"><i class="fas fa-coins"></i></span>
+                    <span id="score">0</span>
+                </div>
+                <div class="bg-gray-800 px-4 py-2 rounded-lg">
+                    <span class="text-red-400 mr-2"><i class="fas fa-heart"></i></span>
+                    <span id="lives">3</span>
+                </div>
+            </div>
+        </header>
+        
+        <div class="game-container relative w-full h-96 md:h-[500px] rounded-xl border-2 border-purple-700 shadow-lg shadow-purple-500/20 mb-6" id="gameArea">
+            <!-- Player ship -->
+            <div class="player absolute bottom-4 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-blue-500 rounded-t-full" id="player">
+                <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-3 bg-blue-300 rounded-b-lg"></div>
+            </div>
+        </div>
+        
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-4">
+                <button id="startBtn" class="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg font-bold flex items-center">
+                    <i class="fas fa-play mr-2"></i> Start Game
+                </button>
+                <button id="pauseBtn" class="bg-yellow-600 hover:bg-yellow-700 px-6 py-3 rounded-lg font-bold flex items-center">
+                    <i class="fas fa-pause mr-2"></i> Pause
+                </button>
+            </div>
+            
+            <div class="bg-gray-800 px-6 py-3 rounded-lg">
+                <h3 class="font-bold text-purple-400 mb-2">Controls:</h3>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center">
+                        <span class="bg-gray-700 px-2 py-1 rounded mr-2">← →</span>
+                        <span>Move</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="bg-gray-700 px-2 py-1 rounded mr-2">Space</span>
+                        <span>Shoot</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gray-800 px-6 py-3 rounded-lg hidden md:block">
+                <h3 class="font-bold text-purple-400 mb-1">Power Ups:</h3>
+                <div class="flex space-x-2">
+                    <div class="text-center">
+                        <div class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-1">
+                            <i class="fas fa-bolt text-xs"></i>
+                        </div>
+                        <span class="text-xs">Rapid Fire</span>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-1">
+                            <i class="fas fa-shield-alt text-xs"></i>
+                        </div>
+                        <span class="text-xs">Shield</span>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-1">
+                            <i class="fas fa-star text-xs"></i>
+                        </div>
+                        <span class="text-xs">Points</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-8 bg-gray-800/50 p-6 rounded-xl">
+            <h2 class="text-2xl font-bold text-purple-400 mb-4 flex items-center">
+                <i class="fas fa-trophy mr-2"></i> Leaderboard
+            </h2>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="text-purple-300 border-b border-purple-900">
+                            <th class="py-2 text-left">Rank</th>
+                            <th class="py-2 text-left">Player</th>
+                            <th class="py-2 text-right">Score</th>
+                            <th class="py-2 text-right">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard">
+                        <tr class="border-b border-gray-700 hover:bg-gray-700/50">
+                            <td class="py-3 text-yellow-400">1</td>
+                            <td class="py-3">SpaceCommander</td>
+                            <td class="py-3 text-right">12,450</td>
+                            <td class="py-3 text-right">Today</td>
+                        </tr>
+                        <tr class="border-b border-gray-700 hover:bg-gray-700/50">
+                            <td class="py-3 text-gray-400">2</td>
+                            <td class="py-3">AlienHunter</td>
+                            <td class="py-3 text-right">10,200</td>
+                            <td class="py-3 text-right">Yesterday</td>
+                        </tr>
+                        <tr class="border-b border-gray-700 hover:bg-gray-700/50">
+                            <td class="py-3 text-amber-600">3</td>
+                            <td class="py-3">StarVoyager</td>
+                            <td class="py-3 text-right">9,850</td>
+                            <td class="py-3 text-right">2 days ago</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game variables
+        let gameRunning = false;
+        let gamePaused = false;
+        let score = 0;
+        let lives = 3;
+        let gameLoop;
+        let aliens = [];
+        let bullets = [];
+        let powerUps = [];
+        let playerX = 0;
+        let playerWidth = 48;
+        let gameWidth = 0;
+        let keys = {};
+        let rapidFire = false;
+        let rapidFireEndTime = 0;
+        let shieldActive = false;
+        let shieldEndTime = 0;
+        
+        // DOM elements
+        const gameArea = document.getElementById('gameArea');
+        const player = document.getElementById('player');
+        const scoreDisplay = document.getElementById('score');
+        const livesDisplay = document.getElementById('lives');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const leaderboard = document.getElementById('leaderboard');
+        
+        // Initialize game
+        function initGame() {
+            gameWidth = gameArea.offsetWidth;
+            playerX = (gameWidth - playerWidth) / 2;
+            updatePlayerPosition();
+            
+            // Event listeners
+            document.addEventListener('keydown', handleKeyDown);
+            document.addEventListener('keyup', handleKeyUp);
+            startBtn.addEventListener('click', startGame);
+            pauseBtn.addEventListener('click', togglePause);
+            
+            // Touch controls for mobile
+            gameArea.addEventListener('touchstart', handleTouchStart);
+            gameArea.addEventListener('touchmove', handleTouchMove);
+            
+            // Initial render
+            render();
+        }
+        
+        // Start game
+        function startGame() {
+            if (gameRunning) return;
+            
+            // Reset game state
+            gameRunning = true;
+            gamePaused = false;
+            score = 0;
+            lives = 3;
+            aliens = [];
+            bullets = [];
+            powerUps = [];
+            rapidFire = false;
+            shieldActive = false;
+            
+            updateDisplays();
+            
+            // Start game loop
+            gameLoop = setInterval(updateGame, 20);
+            
+            // Start alien spawner
+            setTimeout(spawnAlien, 1000);
+            
+            // Start power up spawner
+            setTimeout(spawnPowerUp, 5000);
+            
+            // Update button states
+            startBtn.disabled = true;
+            startBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+            startBtn.classList.add('bg-gray-600', 'cursor-not-allowed');
+        }
+        
+        // Toggle pause
+        function togglePause() {
+            if (!gameRunning) return;
+            
+            gamePaused = !gamePaused;
+            
+            if (gamePaused) {
+                clearInterval(gameLoop);
+                pauseBtn.innerHTML = '<i class="fas fa-play mr-2"></i> Resume';
+                pauseBtn.classList.remove('bg-yellow-600', 'hover:bg-yellow-700');
+                pauseBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+            } else {
+                gameLoop = setInterval(updateGame, 20);
+                pauseBtn.innerHTML = '<i class="fas fa-pause mr-2"></i> Pause';
+                pauseBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                pauseBtn.classList.add('bg-yellow-600', 'hover:bg-yellow-700');
+            }
+        }
+        
+        // Update game state
+        function updateGame() {
+            if (gamePaused) return;
+            
+            // Move player
+            if (keys['ArrowLeft'] && playerX > 0) {
+                playerX -= 7;
+            }
+            if (keys['ArrowRight'] && playerX < gameWidth - playerWidth) {
+                playerX += 7;
+            }
+            
+            // Shoot bullet
+            if (keys[' '] && !rapidFire) {
+                shootBullet();
+                keys[' '] = false; // Prevent continuous shooting
+            } else if (rapidFire && Date.now() % 5 === 0) {
+                shootBullet();
+            }
+            
+            // Update player position
+            updatePlayerPosition();
+            
+            // Move bullets
+            moveBullets();
+            
+            // Move aliens
+            moveAliens();
+            
+            // Move power ups
+            movePowerUps();
+            
+            // Check collisions
+            checkCollisions();
+            
+            // Check power up expiration
+            checkPowerUps();
+            
+            // Render game
+            render();
+        }
+        
+        // Update player position
+        function updatePlayerPosition() {
+            player.style.left = `${playerX}px`;
+        }
+        
+        // Shoot bullet
+        function shootBullet() {
+            const bullet = document.createElement('div');
+            bullet.className = 'bullet';
+            bullet.style.left = `${playerX + playerWidth / 2 - 2}px`;
+            bullet.style.bottom = '60px';
+            gameArea.appendChild(bullet);
+            
+            bullets.push({
+                element: bullet,
+                x: playerX + playerWidth / 2 - 2,
+                y: gameArea.offsetHeight - 60
+            });
+        }
+        
+        // Move bullets
+        function moveBullets() {
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                bullets[i].y -= 8;
+                bullets[i].element.style.bottom = `${gameArea.offsetHeight - bullets[i].y}px`;
+                
+                // Remove bullets that go off screen
+                if (bullets[i].y < 0) {
+                    gameArea.removeChild(bullets[i].element);
+                    bullets.splice(i, 1);
+                }
+            }
+        }
+        
+        // Spawn alien
+        function spawnAlien() {
+            if (!gameRunning || gamePaused) return;
+            
+            const alien = document.createElement('div');
+            alien.className = 'alien w-10 h-10 bg-green-500 rounded-full relative';
+            
+            // Add alien details
+            alien.innerHTML = `
+                <div class="absolute top-1 left-1 right-1 h-4 bg-green-600 rounded-full"></div>
+                <div class="absolute top-3 left-2 w-1 h-1 bg-red-500 rounded-full"></div>
+                <div class="absolute top-3 right-2 w-1 h-1 bg-red-500 rounded-full"></div>
+                <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-1 bg-green-700 rounded-full"></div>
+            `;
+            
+            const x = Math.random() * (gameWidth - 40);
+            alien.style.left = `${x}px`;
+            alien.style.top = '10px';
+            gameArea.appendChild(alien);
+            
+            aliens.push({
+                element: alien,
+                x: x,
+                y: 10,
+                speedX: (Math.random() - 0.5) * 2,
+                speedY: Math.random() * 1 + 1
+            });
+            
+            // Schedule next alien
+            const delay = Math.max(500, 2000 - score * 5);
+            setTimeout(spawnAlien, delay);
+        }
+        
+        // Move aliens
+        function moveAliens() {
+            for (let i = aliens.length - 1; i >= 0; i--) {
+                aliens[i].x += aliens[i].speedX;
+                aliens[i].y += aliens[i].speedY;
+                
+                // Bounce off walls
+                if (aliens[i].x <= 0 || aliens[i].x >= gameWidth - 40) {
+                    aliens[i].speedX *= -1;
+                }
+                
+                aliens[i].element.style.left = `${aliens[i].x}px`;
+                aliens[i].element.style.top = `${aliens[i].y}px`;
+                
+                // Remove aliens that go off bottom of screen
+                if (aliens[i].y > gameArea.offsetHeight) {
+                    gameArea.removeChild(aliens[i].element);
+                    aliens.splice(i, 1);
+                    loseLife();
+                }
+            }
+        }
+        
+        // Spawn power up
+        function spawnPowerUp() {
+            if (!gameRunning || gamePaused) return;
+            
+            const types = ['rapid', 'shield', 'points'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            
+            const powerUp = document.createElement('div');
+            powerUp.className = 'power-up w-6 h-6 rounded-full flex items-center justify-center';
+            
+            let icon, bgColor;
+            switch (type) {
+                case 'rapid':
+                    icon = '<i class="fas fa-bolt text-xs"></i>';
+                    bgColor = 'bg-red-500';
+                    break;
+                case 'shield':
+                    icon = '<i class="fas fa-shield-alt text-xs"></i>';
+                    bgColor = 'bg-blue-500';
+                    break;
+                case 'points':
+                    icon = '<i class="fas fa-star text-xs"></i>';
+                    bgColor = 'bg-yellow-500';
+                    break;
+            }
+            
+            powerUp.className += ` ${bgColor}`;
+            powerUp.innerHTML = icon;
+            
+            const x = Math.random() * (gameWidth - 24);
+            powerUp.style.left = `${x}px`;
+            powerUp.style.top = '10px';
+            gameArea.appendChild(powerUp);
+            
+            powerUps.push({
+                element: powerUp,
+                x: x,
+                y: 10,
+                speedY: 2,
+                type: type
+            });
+            
+            // Schedule next power up
+            setTimeout(spawnPowerUp, Math.random() * 10000 + 10000);
+        }
+        
+        // Move power ups
+        function movePowerUps() {
+            for (let i = powerUps.length - 1; i >= 0; i--) {
+                powerUps[i].y += powerUps[i].speedY;
+                powerUps[i].element.style.top = `${powerUps[i].y}px`;
+                
+                // Remove power ups that go off bottom of screen
+                if (powerUps[i].y > gameArea.offsetHeight) {
+                    gameArea.removeChild(powerUps[i].element);
+                    powerUps.splice(i, 1);
+                }
+            }
+        }
+        
+        // Check collisions
+        function checkCollisions() {
+            // Bullet-alien collisions
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                for (let j = aliens.length - 1; j >= 0; j--) {
+                    if (
+                        bullets[i].x < aliens[j].x + 40 &&
+                        bullets[i].x + 4 > aliens[j].x &&
+                        bullets[i].y < aliens[j].y + 40 &&
+                        bullets[i].y + 20 > aliens[j].y
+                    ) {
+                        // Collision detected
+                        createExplosion(aliens[j].x, aliens[j].y);
+                        gameArea.removeChild(bullets[i].element);
+                        gameArea.removeChild(aliens[j].element);
+                        bullets.splice(i, 1);
+                        aliens.splice(j, 1);
+                        addScore(100);
+                        break;
+                    }
+                }
+            }
+            
+            // Player-power up collisions
+            for (let i = powerUps.length - 1; i >= 0; i--) {
+                if (
+                    playerX < powerUps[i].x + 24 &&
+                    playerX + playerWidth > powerUps[i].x &&
+                    gameArea.offsetHeight - 60 < powerUps[i].y + 24 &&
+                    gameArea.offsetHeight - 60 + 12 > powerUps[i].y
+                ) {
+                    // Power up collected
+                    activatePowerUp(powerUps[i].type);
+                    gameArea.removeChild(powerUps[i].element);
+                    powerUps.splice(i, 1);
+                }
+            }
+            
+            // Player-alien collisions
+            if (!shieldActive) {
+                for (let i = aliens.length - 1; i >= 0; i--) {
+                    if (
+                        playerX < aliens[i].x + 40 &&
+                        playerX + playerWidth > aliens[i].x &&
+                        gameArea.offsetHeight - 60 < aliens[i].y + 40 &&
+                        gameArea.offsetHeight - 60 + 12 > aliens[i].y
+                    ) {
+                        // Collision with player
+                        createExplosion(aliens[i].x, aliens[i].y);
+                        gameArea.removeChild(aliens[i].element);
+                        aliens.splice(i, 1);
+                        loseLife();
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // Create explosion effect
+        function createExplosion(x, y) {
+            const explosion = document.createElement('div');
+            explosion.className = 'explosion';
+            explosion.style.left = `${x}px`;
+            explosion.style.top = `${y}px`;
+            gameArea.appendChild(explosion);
+            
+            // Trigger animation
+            setTimeout(() => {
+                explosion.style.opacity = '0.8';
+                explosion.style.transform = 'scale(1.5)';
+            }, 10);
+            
+            // Remove after animation
+            setTimeout(() => {
+                explosion.style.opacity = '0';
+                explosion.style.transform = 'scale(2)';
+                setTimeout(() => gameArea.removeChild(explosion), 300);
+            }, 300);
+        }
+        
+        // Activate power up
+        function activatePowerUp(type) {
+            switch (type) {
+                case 'rapid':
+                    rapidFire = true;
+                    rapidFireEndTime = Date.now() + 5000;
+                    player.classList.add('animate-pulse');
+                    setTimeout(() => {
+                        if (Date.now() >= rapidFireEndTime) {
+                            rapidFire = false;
+                            player.classList.remove('animate-pulse');
+                        }
+                    }, 5000);
+                    break;
+                case 'shield':
+                    shieldActive = true;
+                    shieldEndTime = Date.now() + 8000;
+                    player.classList.add('ring-4', 'ring-blue-400', 'ring-opacity-50');
+                    setTimeout(() => {
+                        if (Date.now() >= shieldEndTime) {
+                            shieldActive = false;
+                            player.classList.remove('ring-4', 'ring-blue-400', 'ring-opacity-50');
+                        }
+                    }, 8000);
+                    break;
+                case 'points':
+                    addScore(500);
+                    break;
+            }
+        }
+        
+        // Check power up expiration
+        function checkPowerUps() {
+            if (rapidFire && Date.now() >= rapidFireEndTime) {
+                rapidFire = false;
+                player.classList.remove('animate-pulse');
+            }
+            
+            if (shieldActive && Date.now() >= shieldEndTime) {
+                shieldActive = false;
+                player.classList.remove('ring-4', 'ring-blue-400', 'ring-opacity-50');
+            }
+        }
+        
+        // Add score
+        function addScore(points) {
+            score += points;
+            updateDisplays();
+        }
+        
+        // Lose life
+        function loseLife() {
+            lives--;
+            updateDisplays();
+            
+            if (lives <= 0) {
+                endGame();
+            }
+        }
+        
+        // Update displays
+        function updateDisplays() {
+            scoreDisplay.textContent = score.toLocaleString();
+            livesDisplay.textContent = lives;
+        }
+        
+        // End game
+        function endGame() {
+            gameRunning = false;
+            clearInterval(gameLoop);
+            
+            // Remove all aliens and bullets
+            aliens.forEach(alien => gameArea.removeChild(alien.element));
+            bullets.forEach(bullet => gameArea.removeChild(bullet.element));
+            powerUps.forEach(powerUp => gameArea.removeChild(powerUp.element));
+            aliens = [];
+            bullets = [];
+            powerUps = [];
+            
+            // Update leaderboard
+            updateLeaderboard();
+            
+            // Reset buttons
+            startBtn.disabled = false;
+            startBtn.classList.remove('bg-gray-600', 'cursor-not-allowed');
+            startBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+            
+            // Show game over message
+            const gameOver = document.createElement('div');
+            gameOver.className = 'absolute inset-0 flex items-center justify-center bg-black bg-opacity-70';
+            gameOver.innerHTML = `
+                <div class="text-center p-8 bg-gray-800 rounded-xl">
+                    <h2 class="text-3xl font-bold text-red-500 mb-4">Game Over!</h2>
+                    <p class="text-xl mb-6">Your score: <span class="text-yellow-400">${score.toLocaleString()}</span></p>
+                    <button onclick="this.parentElement.parentElement.remove();" 
+                            class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg font-bold">
+                        OK
+                    </button>
+                </div>
+            `;
+            gameArea.appendChild(gameOver);
+        }
+        
+        // Update leaderboard
+        function updateLeaderboard() {
+            // In a real game, this would send to a server
+            // For demo, we'll just update locally
+            const newEntry = `
+                <tr class="border-b border-gray-700 hover:bg-gray-700/50">
+                    <td class="py-3 ${score > 12450 ? 'text-yellow-400' : 'text-gray-400'}">${score > 12450 ? '1' : '4'}</td>
+                    <td class="py-3">You</td>
+                    <td class="py-3 text-right">${score.toLocaleString()}</td>
+                    <td class="py-3 text-right">Just now</td>
+                </tr>
+            `;
+            
+            if (score > 12450) {
+                leaderboard.innerHTML = newEntry + leaderboard.innerHTML.substring(leaderboard.innerHTML.indexOf('<tr'));
+            } else if (score > 10200) {
+                const parts = leaderboard.innerHTML.split('</tr>');
+                leaderboard.innerHTML = parts[0] + '</tr>' + newEntry + parts[1] + '</tr>' + parts[2];
+            } else if (score > 9850) {
+                const parts = leaderboard.innerHTML.split('</tr>');
+                leaderboard.innerHTML = parts[0] + '</tr>' + parts[1] + '</tr>' + newEntry + parts[2];
+            } else {
+                leaderboard.innerHTML += newEntry;
+            }
+        }
+        
+        // Handle keyboard input
+        function handleKeyDown(e) {
+            keys[e.key] = true;
+            
+            // Spacebar shooting
+            if (e.key === ' ' && gameRunning && !gamePaused) {
+                if (!rapidFire) {
+                    shootBullet();
+                }
+                e.preventDefault();
+            }
+        }
+        
+        function handleKeyUp(e) {
+            keys[e.key] = false;
+        }
+        
+        // Handle touch input
+        function handleTouchStart(e) {
+            if (gameRunning && !gamePaused) {
+                shootBullet();
+            }
+        }
+        
+        function handleTouchMove(e) {
+            if (!gameRunning || gamePaused) return;
+            
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = gameArea.getBoundingClientRect();
+            const touchX = touch.clientX - rect.left;
+            
+            playerX = Math.max(0, Math.min(gameWidth - playerWidth, touchX - playerWidth / 2));
+            updatePlayerPosition();
+        }
+        
+        // Render game (for any visual updates not handled by CSS)
+        function render() {
+            // Update shield visual if active
+            if (shieldActive) {
+                const timeLeft = shieldEndTime - Date.now();
+                const opacity = Math.min(0.5, timeLeft / 16000);
+                player.style.setProperty('--tw-ring-opacity', opacity.toString());
+            }
+        }
+        
+        // Initialize game when loaded
+        window.addEventListener('load', initGame);
+    </script>
+</body>
+</html>
