@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webson Shopping</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .search-bar {
+            box-shadow: 0 1px 2px 0 rgba(0,0,0,.2);
+        }
+        .nav-link:hover {
+            border-bottom: 3px solid #fff;
+        }
+        .carousel-item {
+            min-width: 100%;
+            transition: transform 0.5s ease;
+        }
+        .product-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Header -->
+    <header class="bg-yellow-500 py-2">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <img src="https://via.placeholder.com/180x50/f5c518/000000?text=Webson+Shopping" alt="Webson Shopping" class="h-9">
+                </div>
+
+                <!-- Search Bar -->
+                <div class="flex-1 mx-4">
+                    <div class="relative flex search-bar rounded">
+                        <input type="text" placeholder="Buscar produtos, marcas e muito mais..." class="w-full px-4 py-2 rounded-l focus:outline-none">
+                        <button class="bg-gray-200 px-4 rounded-r">
+                            <i class="fas fa-search text-gray-500"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- User Menu -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="#" class="text-sm">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Enviar para São Paulo</span>
+                    </a>
+                    <div class="relative group">
+                        <button class="text-sm">
+                            <i class="fas fa-user"></i>
+                            <span>Olá, faça seu login</span>
+                        </button>
+                        <div class="absolute hidden group-hover:block bg-white shadow-lg rounded mt-1 right-0 w-48 z-10">
+                            <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100">Minha conta</a>
+                            <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100">Compras</a>
+                            <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100">Favoritos</a>
+                            <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100 border-t">Sair</a>
+                        </div>
+                    </div>
+                    <a href="#" class="text-sm">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Carrinho</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Categories Navigation -->
+    <nav class="bg-[#232f3e] text-white">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center space-x-6 overflow-x-auto py-2 hide-scrollbar">
+                <a href="#" class="nav-link px-2 py-3 text-sm whitespace-nowrap">Categorias</a>
+                <a href="#" class="nav-link px-2 py-3 text-sm whitespace-nowrap">Ofertas</a>
+                <a href="#" class="nav-link px-2 py-3 text-sm whitespace-nowrap">Histórico</a>
+                <a href="#" class="nav-link px-2 py-3 text-sm whitespace-nowrap">Supermercado</a>
+                <a href="#" class="nav-link px-2 py-3 text-sm whitespace-nowrap">Moda</a>
+                <a href="#" class="nav-link px-2 py-3 text-sm whitespace-nowrap">Vender</a>
+                <a href="#" class="nav-link px-2 py-3 text-sm whitespace-nowrap">Contato</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-4">
+        <!-- Carousel -->
+        <div class="relative overflow-hidden rounded-lg mb-6">
+            <div class="carousel flex transition-transform duration-300" id="carousel">
+                <div class="carousel-item">
+                    <img src="https://http2.mlstatic.com/D_NQ_866385-MLA53160082696_012023-OO.webp" alt="Banner 1" class="w-full">
+                </div>
+                <div class="carousel-item">
+                    <img src="https://http2.mlstatic.com/D_NQ_966170-MLA53160082695_012023-OO.webp" alt="Banner 2" class="w-full">
+                </div>
+                <div class="carousel-item">
+                    <img src="https://http2.mlstatic.com/D_NQ_726908-MLA53160082697_012023-OO.webp" alt="Banner 3" class="w-full">
+                </div>
+            </div>
+            <button class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-md" id="prevBtn">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-md" id="nextBtn">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <div class="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
+                <span class="w-2 h-2 rounded-full bg-white opacity-50 cursor-pointer dot active" data-index="0"></span>
+                <span class="w-2 h-2 rounded-full bg-white opacity-50 cursor-pointer dot" data-index="1"></span>
+                <span class="w-2 h-2 rounded-full bg-white opacity-50 cursor-pointer dot" data-index="2"></span>
+            </div>
+        </div>
+
+        <!-- Offers Section -->
+        <section class="mb-8">
+            <h2 class="text-xl font-bold mb-4">Ofertas do dia</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <!-- Product Card 1 -->
+                <div class="product-card bg-white rounded p-3 cursor-pointer">
+                    <div class="relative mb-2">
+                        <img src="https://http2.mlstatic.com/D_NQ_NP_2X_614881-MLA53160082701_012023-F.webp" alt="Produto" class="w-full h-32 object-contain">
+                        <span class="absolute top-0 left-0 bg-yellow-600 text-white text-xs px-2 py-1 rounded-br">10% OFF</span>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600 line-clamp-2">Smartphone Samsung Galaxy A04 64GB Preto 4GB RAM</p>
+                        <p class="text-lg font-bold">R$ 799,00</p>
+                        <p class="text-xs text-gray-500">em 12x R$ 66,58 sem juros</p>
+                        <p class="text-xs text-green-600">Frete grátis</p>
+                    </div>
+                </div>
+
+                <!-- Product Card 2 -->
+                <div class="product-card bg-white rounded p-3 cursor-pointer">
+                    <div class="relative mb-2">
+                        <img src="https://http2.mlstatic.com/D_NQ_NP_2X_881627-MLA53160082699_012023-F.webp" alt="Produto" class="w-full h-32 object-contain">
+                        <span class="absolute top-0 left-0 bg-yellow-600 text-white text-xs px-2 py-1 rounded-br">15% OFF</span>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600 line-clamp-2">Notebook Lenovo IdeaPad 3i Intel Core i3 8GB 256GB SSD</p>
+                        <p class="text-lg font-bold">R$ 2.499,00</p>
+                        <p class="text-xs text-gray-500">em 12x R$ 208,25 sem juros</p>
+                        <p class="text-xs text-green-600">Frete grátis</p>
+                    </div>
+                </div>
+
+                <!-- Product Card 3 -->
+                <div class="product-card bg-white rounded p-3 cursor-pointer">
+                    <div class="relative mb-2">
+                        <img src="https://http2.mlstatic.com/D_NQ_NP_2X_953769-MLA53160082700_012023-F.webp" alt="Produto" class="w-full h-32 object-contain">
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600 line-clamp-2">Smart TV LED 50" UHD 4K Samsung 50CU7700</p>
+                        <p class="text-lg font-bold">R$ 2.399,00</p>
+                        <p class="text-xs text-gray-500">em 10x R$ 239,90 sem juros</p>
+                        <p class="text-xs text-green-600">Frete grátis</p>
+                    </div>
+                </div>
+
+                <!-- Product Card 4 -->
+                <div class="product-card bg-white rounded p-3 cursor-pointer">
+                    <div class="relative mb-2">
+                        <img src="https://http2.mlstatic.com/D_NQ_NP_2X_614881-MLA53160082701_012023-F.webp" alt="Produto" class="w-full h-32 object-contain">
+                        <span class="absolute top-0 left-0 bg-yellow-600 text-white text-xs px-2 py-1 rounded-br">5% OFF</span>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600 line-clamp-2">Fone de Ouvido Bluetooth JBL Tune 510BT</p>
+                        <p class="text-lg font-bold">R$ 229,90</p>
+                        <p class="text-xs text-gray-500">em 3x R$ 76,63 sem juros</p>
+                        <p class="text-xs text-green-600">Frete grátis</p>
+                    </div>
+                </div>
+
+                <!-- Product Card 5 -->
+                <div class="product-card bg-white rounded p-3 cursor-pointer">
+                    <div class="relative mb-2">
+                        <img src="https://http2.mlstatic.com/D_NQ_NP_2X_881627-MLA53160082699_012023-F.webp" alt="Produto" class="w-full h-32 object-contain">
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600 line-clamp-2">Câmera Digital Canon EOS Rebel T7 18-55mm</p>
+                        <p class="text-lg font-bold">R$ 2.799,00</p>
+                        <p class="text-xs text-gray-500">em 12x R$ 233,25 sem juros</p>
+                        <p class="text-xs text-green-600">Frete grátis</p>
+                    </div>
+                </div>
+
+                <!-- Product Card 6 -->
+                <div class="product-card bg-white rounded p-3 cursor-pointer">
+                    <div class="relative mb-2">
+                        <img src="https://http2.mlstatic.com/D_NQ_NP_2X_953769-MLA53160082700_012023-F.webp" alt="Produto" class="w-full h-32 object-contain">
+                        <span class="absolute top-0 left-0 bg-yellow-600 text-white text-xs px-2 py-1 rounded-br">20% OFF</span>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600 line-clamp-2">Console PlayStation 5 + Controle Extra</p>
+                        <p class="text-lg font-bold">R$ 3.999,00</p>
+                        <p class="text-xs text-gray-500">em 12x R$ 333,25 sem juros</p>
+                        <p class="text-xs text-green-600">Frete grátis</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Categories Section -->
+        <section class="mb-8">
+            <h2 class="text-xl font-bold mb-4">Categorias populares</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <a href="#" class="bg-white rounded p-4 flex flex-col items-center">
+                    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_744907-MLA45774482883_052021-F.webp" alt="Celulares" class="h-16 mb-2">
+                    <span class="text-sm text-center">Celulares</span>
+                </a>
+                <a href="#" class="bg-white rounded p-4 flex flex-col items-center">
+                    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_696993-MLA45774482884_052021-F.webp" alt="Eletrodomésticos" class="h-16 mb-2">
+                    <span class="text-sm text-center">Eletrodomésticos</span>
+                </a>
+                <a href="#" class="bg-white rounded p-4 flex flex-col items-center">
+                    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_971575-MLA45774482882_052021-F.webp" alt="TV e Vídeo" class="h-16 mb-2">
+                    <span class="text-sm text-center">TV e Vídeo</span>
+                </a>
+                <a href="#" class="bg-white rounded p-4 flex flex-col items-center">
+                    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_814187-MLA45774482881_052021-F.webp" alt="Informática" class="h-16 mb-2">
+                    <span class="text-sm text-center">Informática</span>
+                </a>
+                <a href="#" class="bg-white rounded p-4 flex flex-col items-center">
+                    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_880342-MLA45774482880_052021-F.webp" alt="Móveis" class="h-16 mb-2">
+                    <span class="text-sm text-center">Móveis</span>
+                </a>
+                <a href="#" class="bg-white rounded p-4 flex flex-col items-center">
+                    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_671534-MLA45774482879_052021-F.webp" alt="Moda" class="h-16 mb-2">
+                    <span class="text-sm text-center">Moda</span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#ebebeb] text-gray-700 py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold mb-3">Informações</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="footer-link text-sm">Sobre o Mercado Livre</a></li>
+                        <li><a href="#" class="footer-link text-sm">Informações corporativas</a></li>
+                        <li><a href="#" class="footer-link text-sm">Sustentabilidade</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold mb-3">Central de ajuda</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="footer-link text-sm">Comprar</a></li>
+                        <li><a href="#" class="footer-link text-sm">Vender</a></li>
+                        <li><a href="#" class="footer-link text-sm">Resolução de problemas</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold mb-3">Redes sociais</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-2xl"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-2xl"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-2xl"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="font-bold mb-3">Baixe o app</h3>
+                    <div class="flex space-x-2">
+                        <a href="#"><img src="https://http2.mlstatic.com/D_NQ_NP_2X_695039-MLA53069898853_122022-F.webp" alt="App Store" class="h-10"></a>
+                        <a href="#"><img src="https://http2.mlstatic.com/D_NQ_NP_2X_608537-MLA53069898852_122022-F.webp" alt="Google Play" class="h-10"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t pt-4 text-xs">
+                <p>Copyright © 2023 Webson Shopping</p>
+                <p class="mt-2">A melhor experiência de compras online</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Carousel functionality
+        const carousel = document.getElementById('carousel');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const dots = document.querySelectorAll('.dot');
+        
+        let currentIndex = 0;
+        const totalItems = document.querySelectorAll('.carousel-item').length;
+        
+        function updateCarousel() {
+            carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+            
+            // Update dots
+            dots.forEach((dot, index) => {
+                if (index === currentIndex) {
+                    dot.classList.add('active');
+                    dot.classList.remove('opacity-50');
+                } else {
+                    dot.classList.remove('active');
+                    dot.classList.add('opacity-50');
+                }
+            });
+        }
+        
+        prevBtn.addEventListener('click', () => {
+            currentIndex = (currentIndex - 1 + totalItems) % totalItems;
+            updateCarousel();
+        });
+        
+        nextBtn.addEventListener('click', () => {
+            currentIndex = (currentIndex + 1) % totalItems;
+            updateCarousel();
+        });
+        
+        dots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                currentIndex = parseInt(dot.getAttribute('data-index'));
+                updateCarousel();
+            });
+        });
+        
+        // Auto slide
+        setInterval(() => {
+            currentIndex = (currentIndex + 1) % totalItems;
+            updateCarousel();
+        }, 5000);
+    </script>
+</body>
+</html>
