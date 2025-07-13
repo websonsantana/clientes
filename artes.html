@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ateliê Sibele Santana</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fefcf9;
+      color: #3e2f1c;
+    }
+    header {
+      background-color: #c88f5c;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    nav {
+      background-color: #8a5a2f;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      padding: 10px 0;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .banner {
+      position: relative;
+      height: 300px;
+      overflow: hidden;
+    }
+    .banner img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      display: none;
+    }
+    .banner img.active {
+      display: block;
+    }
+    section {
+      padding: 30px 20px;
+    }
+    .bio {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 20px;
+    }
+    .bio img {
+      width: 200px;
+      border-radius: 12px;
+    }
+    .galeria {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+    }
+    .galeria img {
+      width: 100%;
+      border: 3px solid #d9bfa5;
+      transition: transform 0.3s;
+    }
+    .galeria img:hover {
+      transform: scale(1.05);
+    }
+    .obra-legenda {
+      font-style: italic;
+      margin-top: 5px;
+      font-size: 0.9em;
+    }
+    .loja {
+      background-color: #fff7f0;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    .footer {
+      background-color: #8a5a2f;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      margin-top: 30px;
+    }
+    button {
+      padding: 10px 15px;
+      background-color: #c88f5c;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #a8713e;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Ateliê Sibele Santana</h1>
+  <p>Arte com alma, pinceladas com emoção</p>
+</header>
+
+<nav>
+  <a href="#inicio">Início</a>
+  <a href="#galeria">Galeria</a>
+  <a href="#loja">Loja</a>
+  <a href="#contato">Contato</a>
+</nav>
+
+<div class="banner">
+  <img src="https://via.placeholder.com/1200x300?text=Obra+1" class="active">
+  <img src="https://via.placeholder.com/1200x300?text=Obra+2">
+  <img src="https://via.placeholder.com/1200x300?text=Obra+3">
+</div>
+
+<section id="inicio">
+  <h2>Sobre a Artista</h2>
+  <div class="bio">
+    <img src="https://via.placeholder.com/200x200?text=Sibele" alt="Foto da Sibele">
+    <div>
+      <p>Sou Sibele Santana, artista plástica e mãe da doce Sarah, minha eterna inspiração. Meu ateliê é meu refúgio, onde cores, emoções e histórias ganham vida nas telas.</p>
+      <button onclick="window.location='#loja'">Quero Comprar uma Obra</button>
+    </div>
+  </div>
+</section>
+
+<section id="galeria">
+  <h2>Galeria Virtual</h2>
+  <div class="galeria">
+    <div>
+      <img src="https://via.placeholder.com/400x300?text=Paisagem+1">
+      <p class="obra-legenda">"Enquanto Sarah colhia flores, essa tela nasceu."</p>
+    </div>
+    <div>
+      <img src="https://via.placeholder.com/400x300?text=Abstrato+1">
+      <p class="obra-legenda">"Explosão de sentimentos em tons vibrantes."</p>
+    </div>
+    <div>
+      <img src="https://via.placeholder.com/400x300?text=Temática+1">
+      <p class="obra-legenda">"Série Viagens Imaginárias - Lua de Sonhos."</p>
+    </div>
+  </div>
+</section>
+
+<section id="loja">
+  <h2>Loja Virtual</h2>
+  <div class="loja">
+    <p>Adquira obras originais ou encomende uma peça personalizada.</p>
+    <ul>
+      <li>🎨 Telas originais assinadas</li>
+      <li>🖼️ Impressões em alta qualidade</li>
+      <li>📬 Encomendas exclusivas via formulário</li>
+    </ul>
+    <button onclick="alert('Link para encomendas ou WhatsApp')">Fazer Encomenda</button>
+  </div>
+</section>
+
+<section id="contato">
+  <h2>Contato</h2>
+  <p>📱 <strong>WhatsApp:</strong> <a href="https://wa.me/SEUNUMEROAQUI" target="_blank">Clique para conversar</a></p>
+  <p>📸 <strong>Instagram:</strong> <a href="https://instagram.com/SEUUSUARIOAQUI" target="_blank">@ateliesibele</a></p>
+</section>
+
+<footer class="footer">
+  <p>© 2025 Ateliê Sibele Santana • Desenvolvido com carinho 💛</p>
+</footer>
+
+<script>
+  // Banner rotativo simples
+  let current = 0;
+  const slides = document.querySelectorAll('.banner img');
+
+  setInterval(() => {
+    slides[current].classList.remove('active');
+    current = (current + 1) % slides.length;
+    slides[current].classList.add('active');
+  }, 3000);
+</script>
+
+</body>
+</html>
