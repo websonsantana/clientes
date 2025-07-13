@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temu - Shop Like a Billionaire</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom CSS for elements that need more precise styling */
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+        
+        .carousel-item {
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .flash-deal {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Top Banner -->
+    <div class="bg-red-600 text-white text-center py-1 text-sm">
+        Frete grátis para pedidos acima de R$99 | Entrega rápida
+    </div>
+    
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-white shadow-md">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="#" class="text-2xl font-bold text-red-600">TEMU</a>
+                    <span class="ml-2 text-xs bg-red-600 text-white px-2 py-1 rounded">Novo no app</span>
+                </div>
+                
+                <!-- Search Bar -->
+                <div class="hidden md:flex flex-1 mx-6">
+                    <div class="relative w-full max-w-xl">
+                        <input type="text" placeholder="Pesquise por qualquer coisa" 
+                               class="w-full py-2 px-4 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <button class="absolute right-0 top-0 h-full px-4 text-gray-500">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- User Actions -->
+                <div class="flex items-center space-x-4">
+                    <a href="#" class="hidden md:block text-gray-700 hover:text-red-600">
+                        <i class="fas fa-user text-lg"></i>
+                    </a>
+                    <a href="#" class="hidden md:block text-gray-700 hover:text-red-600">
+                        <i class="fas fa-heart text-lg"></i>
+                    </a>
+                    <a href="#" class="text-gray-700 hover:text-red-600 relative">
+                        <i class="fas fa-shopping-cart text-lg"></i>
+                        <span class="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                    </a>
+                    <button class="md:hidden text-gray-700">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Search (hidden on desktop) -->
+            <div class="mt-3 md:hidden">
+                <div class="relative">
+                    <input type="text" placeholder="Pesquise por qualquer coisa" 
+                           class="w-full py-2 px-4 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500">
+                    <button class="absolute right-0 top-0 h-full px-4 text-gray-500">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Navigation -->
+            <nav class="hidden md:flex justify-center space-x-6 mt-4">
+                <div class="dropdown relative">
+                    <button class="text-gray-700 hover:text-red-600 font-medium py-2">Início</button>
+                </div>
+                <div class="dropdown relative">
+                    <button class="text-gray-700 hover:text-red-600 font-medium py-2">Categorias <i class="fas fa-chevron-down text-xs ml-1"></i></button>
+                    <div class="dropdown-menu absolute hidden bg-white shadow-lg rounded-md mt-1 py-1 w-48 z-10">
+                        <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Eletrônicos</a>
+                        <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Moda</a>
+                        <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Casa e Jardim</a>
+                        <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Beleza</a>
+                    </div>
+                </div>
+                <div class="dropdown relative">
+                    <button class="text-gray-700 hover:text-red-600 font-medium py-2">Ofertas <span class="bg-red-600 text-white text-xs px-2 py-1 rounded ml-1">HOT</span></button>
+                </div>
+                <div class="dropdown relative">
+                    <button class="text-gray-700 hover:text-red-600 font-medium py-2">Novidades</button>
+                </div>
+                <div class="dropdown relative">
+                    <button class="text-gray-700 hover:text-red-600 font-medium py-2">Temu Choice</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6">
+        <!-- Carousel -->
+        <div class="relative overflow-hidden rounded-lg mb-8 h-64 md:h-96">
+            <div id="carousel" class="flex transition-transform duration-300 ease-in-out">
+                <div class="carousel-item flex-shrink-0 w-full">
+                    <img src="https://via.placeholder.com/1200x400/FF6B6B/FFFFFF?text=Promoção+de+Verão" alt="Promoção de Verão" class="w-full h-full object-cover">
+                </div>
+                <div class="carousel-item flex-shrink-0 w-full">
+                    <img src="https://via.placeholder.com/1200x400/4ECDC4/FFFFFF?text=Até+70%+OFF" alt="Até 70% OFF" class="w-full h-full object-cover">
+                </div>
+                <div class="carousel-item flex-shrink-0 w-full">
+                    <img src="https://via.placeholder.com/1200x400/45B7D1/FFFFFF?text=Frete+Grátis" alt="Frete Grátis" class="w-full h-full object-cover">
+                </div>
+            </div>
+            <button id="prevBtn" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 rounded-full p-2 shadow-md">
+                <i class="fas fa-chevron-left text-gray-800"></i>
+            </button>
+            <button id="nextBtn" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 rounded-full p-2 shadow-md">
+                <i class="fas fa-chevron-right text-gray-800"></i>
+            </button>
+            <div class="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
+                <button class="carousel-indicator w-2 h-2 rounded-full bg-white bg-opacity-50"></button>
+                <button class="carousel-indicator w-2 h-2 rounded-full bg-white bg-opacity-50"></button>
+                <button class="carousel-indicator w-2 h-2 rounded-full bg-white"></button>
+            </div>
+        </div>
+        
+        <!-- Categories -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-4 mb-8">
+            <a href="#" class="flex flex-col items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-2">
+                    <i class="fas fa-tshirt text-red-600"></i>
+                </div>
+                <span class="text-sm text-center">Moda</span>
+            </a>
+            <a href="#" class="flex flex-col items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-2">
+                    <i class="fas fa-mobile-alt text-blue-600"></i>
+                </div>
+                <span class="text-sm text-center">Eletrônicos</span>
+            </a>
+            <a href="#" class="flex flex-col items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-2">
+                    <i class="fas fa-home text-green-600"></i>
+                </div>
+                <span class="text-sm text-center">Casa</span>
+            </a>
+            <a href="#" class="flex flex-col items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mb-2">
+                    <i class="fas fa-gamepad text-yellow-600"></i>
+                </div>
+                <span class="text-sm text-center">Brinquedos</span>
+            </a>
+            <a href="#" class="flex flex-col items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-2">
+                    <i class="fas fa-heart text-purple-600"></i>
+                </div>
+                <span class="text-sm text-center">Beleza</span>
+            </a>
+            <a href="#" class="flex flex-col items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <div class="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mb-2">
+                    <i class="fas fa-baby-carriage text-pink-600"></i>
+                </div>
+                <span class="text-sm text-center">Bebês</span>
+            </a>
+            <a href="#" class="flex flex-col items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mb-2">
+                    <i class="fas fa-utensils text-indigo-600"></i>
+                </div>
+                <span class="text-sm text-center">Cozinha</span>
+            </a>
+        </div>
+        
+        <!-- Flash Deals -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold">Ofertas Relâmpago</h2>
+                <a href="#" class="text-red-600 text-sm flex items-center">
+                    Ver tudo <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                </a>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                <div class="product-card bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flash-deal border border-red-200">
+                    <div class="relative">
+                        <img src="https://via.placeholder.com/300x300/F8B195/FFFFFF?text=Fone+Bluetooth" alt="Fone Bluetooth" class="w-full h-48 object-cover">
+                        <div class="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-1 rounded">-60%</div>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="text-sm font-medium mb-1 truncate">Fone de Ouvido Bluetooth Sem Fio</h3>
+                        <div class="flex items-center mb-1">
+                            <div class="flex text-yellow-400 text-xs">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span class="text-gray-500 text-xs ml-1">(2.4k)</span>
+                        </div>
+                        <div class="flex items-end">
+                            <span class="text-red-600 font-bold">R$ 59,90</span>
+                            <span class="text-gray-400 text-xs line-through ml-2">R$ 149,90</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flash-deal border border-red-200">
+                    <div class="relative">
+                        <img src="https://via.placeholder.com/300x300/6C5B7B/FFFFFF?text=Smartwatch" alt="Smartwatch" class="w-full h-48 object-cover">
+                        <div class="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-1 rounded">-45%</div>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="text-sm font-medium mb-1 truncate">Smartwatch Inteligente com Monitor Cardíaco</h3>
+                        <div class="flex items-center mb-1">
+                            <div class="flex text-yellow-400 text-xs">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <span class="text-gray-500 text-xs ml-1">(1.8k)</span>
+                        </div>
+                        <div class="flex items-end">
+                            <span class="text-red-600 font-bold">R$ 129,90</span>
+                            <span class="text-gray-400 text-xs line-through ml-2">R$ 239,90</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flash-deal border border-red-200">
+                    <div class="relative">
+                        <img src="https://via.placeholder.com/300x300/355C7D/FFFFFF?text=Power+Bank" alt="Power Bank" class="w-full h-48 object-cover">
+                        <div class="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-1 rounded">-55%</div>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="text-sm font-medium mb-1 truncate">Power Bank 20000mAh 3 Saídas USB</h3>
+                        <div class="flex items-center mb-1">
+                            <div class="flex text-yellow-400 text-xs">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="text-gray-500 text-xs ml-1">(3.1k)</span>
+                        </div>
+                        <div class="flex items-end">
+                            <span class="text-red-600 font-bold">R$ 79,90</span>
+                            <span class="text-gray-400 text-xs line-through ml-2">R$ 179,90</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flash-deal border border-red-200">
+                    <div class="relative">
+                        <img src="https://via.placeholder.com/300x300/C06C84/FFFFFF?text=Camiseta" alt="Camiseta" class="w-full h-48 object-cover">
+                        <div class="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-1 rounded">-70%</div>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="text-sm font-medium mb-1 truncate">Camiseta Masculina Básica 100% Algodão</h3>
+                        <div class="flex items-center mb-1">
+                            <div class="flex text-yellow-400 text-xs">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span class="text-gray-500 text-xs ml-1">(5.7k)</span>
+                        </div>
+                        <div class="flex items-end">
+                            <span class="text-red-600 font-bold">R$ 29,90</span>
+                            <span class="text-gray-400 text-xs line-through ml-2">R$ 99,90</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flash-deal border border-red-200">
+                    <div class="relative">
+                        <img src="https://via.placeholder.com/300x300/F67280/FFFFFF?text=Kit+Maquiagem" alt="Kit Maquiagem" class="w-full h-48 object-cover">
+                        <div class="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-1 rounded">-50%</div>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="text-sm font-medium mb-1 truncate">Kit Maquiagem Profissional 12 Peças</h3>
+                        <div class="flex items-center mb-1">
+                            <div class="flex text-yellow-400 text-xs">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <span class="text-gray-500 text-xs ml-1">(1.2k)</span>
+                        </div>
+                        <div class="flex items-end">
+                            <span class="text-red-600 font-bold">R$ 89,90</span>
+                            <span class="text-gray-400 text-xs line-through ml-2">R$ 179,90</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Temu Choice -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold">Temu Choice</h2>
+                <a href="#" class="text-red-600 text-sm flex items-center">
+                    Ver tudo <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                </a>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div class="product-card bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
+                    <div class="relative">
+                        <img src="https://via.placeholder.com/300x300/99B898/FFFFFF?text=Air+Fryer" alt="Air Fryer" class="w-full h-48 object-cover">
+                        <div class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">ESCOLHA</div>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="text-sm font-medium mb-1 truncate">Air Fryer 5L Digital 1500W</h3>
+                        <div class="flex items-center mb-1">
+                            <div class="flex text-yellow-400 text-xs">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span class="text-gray-500 text-xs ml-1">(4.2k)</span>
+                        </div>
+                        <div class="flex items-end">
+                            <span class="text-red-600 font-bold">R$ 399,90</span>
+                            <span class="text-gray-400 text-xs line-through ml-2">R$ 599,90</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
+                    <div class="relative">
+                        <img src="https://via.placeholder.com/300x300/FECEAB/FFFFFF?text=Robo+Aspirador" alt="Robo Aspirador" class="w-full h-48 object-cover">
+                        <div class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">ESCOLHA</div>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="text-sm font-medium mb-1 truncate">Robô Aspirador Inteligente com Mapeamento</h3>
+                        <div class="flex items-center mb-1">
+                            <div class="flex text-yellow-400 text-xs">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <span class="text-gray-500 text-xs ml-1">(3.5k)</span>
+                        </div>
+                        <div class="flex items-end">
+                            <span class="text-red-600 font-bold">R$ 799,90</span>
+                            <span class="text-gray-400 text-xs line-through ml-2">R$ 1.299,90</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
+                    <div class="relative">
+                        <img src="https://via.placeholder.com/300x300/FF847C/FFFFFF?text=Fritadeira+Elétrica" alt="Fritadeira Elétrica" class="w-full h-48 object-cover">
+                        <div class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">ESCOLHA</div>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="text-sm font-medium mb-1 truncate">Fritadeira Elétrica Sem Óleo 3.5L</h3>
+                        <div class="flex items-center mb-1">
+                            <div class="flex text-yellow-400 text-xs">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="text-gray-500 text-xs ml-1">(6.8k)</span>
+                        </div>
+                        <div class="flex items-end">
+                            <span class="text-red-600 font-bold">R$ 249,90</span>
+                            <span class="text-gray-400 text-xs line-through ml-2">R$ 399,90</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
+                    <div class="relative">
+                        <img src="https://via.placeholder.com/300x300/E84A5F/FFFFFF?text=Smartphone" alt="Smartphone" class="w-full h-48 object-cover">
+                        <div class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">ESCOLHA</div>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="text-sm font-medium mb-1 truncate">Smartphone Android 128GB 48MP Câmera</h3>
+                        <div class="flex items-center mb-1">
+                            <div class="flex text-yellow-400 text-xs">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span class="text-gray-500 text-xs ml-1">(8.3k)</span>
+                        </div>
+                        <div class="flex items-end">
+                            <span class="text-red-600 font-bold">R$ 899,90</span>
+                            <span class="text-gray-400 text-xs line-through ml-2">R$ 1.299,90</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Categories Section -->
+        <div class="mb-8">
+            <h2 class="text-xl font-bold mb-4">Compre por Categoria</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="relative rounded-lg overflow-hidden h-40">
+                    <img src="https://via.placeholder.com/600x400/F8B195/FFFFFF?text=Eletrônicos" alt="Eletrônicos" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                        <h3 class="text-white text-xl font-bold">Eletrônicos</h3>
+                    </div>
+                </div>
+                <div class="relative rounded-lg overflow-hidden h-40">
+                    <img src="https://via.placeholder.com/600x400/F67280/FFFFFF?text=Moda" alt="Moda" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                        <h3 class="text-white text-xl font-bold">Moda</h3>
+                    </div>
+                </div>
+                <div class="relative rounded-lg overflow-hidden h-40">
+                    <img src="https://via.placeholder.com/600x400/C06C84/FFFFFF?text=Casa+e+Jardim" alt="Casa e Jardim" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                        <h3 class="text-white text-xl font-bold">Casa e Jardim</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-100 text-gray-700 py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Sobre o Temu</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-red-600">Sobre Nós</a></li>
+                        <li><a href="#" class="hover:text-red-600">Trabalhe Conosco</a></li>
+                        <li><a href="#" class="hover:text-red-600">Sustentabilidade</a></li>
+                        <li><a href="#" class="hover:text-red-600">Imprensa</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Ajuda</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-red-600">Central de Ajuda</a></li>
+                        <li><a href="#" class="hover:text-red-600">Política de Devolução</a></li>
+                        <li><a href="#" class="hover:text-red-600">Frete e Entrega</a></li>
+                        <li><a href="#" class="hover:text-red-600">Rastrear Pedido</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Contato</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-red-600">Fale Conosco</a></li>
+                        <li><a href="#" class="hover:text-red-600">WhatsApp</a></li>
+                        <li><a href="#" class="hover:text-red-600">Chat Online</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Baixe o App</h3>
+                    <div class="flex space-x-2 mb-4">
+                        <a href="#"><img src="https://via.placeholder.com/120x40/000000/FFFFFF?text=App+Store" alt="App Store" class="h-10"></a>
+                        <a href="#"><img src="https://via.placeholder.com/120x40/000000/FFFFFF?text=Google+Play" alt="Google Play" class="h-10"></a>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Siga-nos</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-600 hover:text-red-600"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-gray-600 hover:text-red-600"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-gray-600 hover:text-red-600"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-gray-600 hover:text-red-600"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-300 pt-6">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-4 md:mb-0">
+                        <p class="text-sm">© 2023 Temu. Todos os direitos reservados.</p>
+                    </div>
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <a href="#" class="text-sm hover:text-red-600">Termos de Uso</a>
+                        <a href="#" class="text-sm hover:text-red-600">Política de Privacidade</a>
+                        <a href="#" class="text-sm hover:text-red-600">Cookies</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Floating Action Button -->
+    <div class="fixed bottom-6 right-6">
+        <button class="bg-red-600 text-white rounded-full p-4 shadow-lg hover:bg-red-700 transition-colors">
+            <i class="fas fa-shopping-cart text-xl"></i>
+        </button>
+    </div>
+    
+    <script>
+        // Carousel functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const carousel = document.getElementById('carousel');
+            const items = document.querySelectorAll('.carousel-item');
+            const indicators = document.querySelectorAll('.carousel-indicator');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            let currentIndex = 0;
+            const itemCount = items.length;
+            
+            function updateCarousel() {
+                carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+                
+                // Update indicators
+                indicators.forEach((indicator, index) => {
+                    if (index === currentIndex) {
+                        indicator.classList.remove('bg-opacity-50');
+                        indicator.classList.add('bg-white');
+                    } else {
+                        indicator.classList.add('bg-opacity-50');
+                        indicator.classList.remove('bg-white');
+                    }
+                });
+            }
+            
+            // Next button
+            nextBtn.addEventListener('click', () => {
+                currentIndex = (currentIndex + 1) % itemCount;
+                updateCarousel();
+            });
+            
+            // Previous button
+            prevBtn.addEventListener('click', () => {
+                currentIndex = (currentIndex - 1 + itemCount) % itemCount;
+                updateCarousel();
+            });
+            
+            // Indicator buttons
+            indicators.forEach((indicator, index) => {
+                indicator.addEventListener('click', () => {
+                    currentIndex = index;
+                    updateCarousel();
+                });
+            });
+            
+            // Auto-rotate carousel
+            setInterval(() => {
+                currentIndex = (currentIndex + 1) % itemCount;
+                updateCarousel();
+            }, 5000);
+            
+            // Mobile menu toggle (simplified for demo)
+            document.querySelector('button.md\\:hidden').addEventListener('click', function() {
+                const nav = document.querySelector('nav.hidden');
+                nav.classList.toggle('hidden');
+                nav.classList.toggle('block');
+            });
+        });
+    </script>
+</body>
+</html>
