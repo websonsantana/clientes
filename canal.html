@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfólio de Webson Santana</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: '#FFD700',
+                        dark: '#121212',
+                        darker: '#0A0A0A',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .video-thumbnail {
+            transition: transform 0.3s ease;
+        }
+        .video-thumbnail:hover {
+            transform: scale(1.03);
+        }
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: #FFD700;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .project-card {
+            box-shadow: 0 4px 6px rgba(255, 215, 0, 0.1);
+        }
+        .project-card:hover {
+            box-shadow: 0 10px 15px rgba(255, 215, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-dark text-white">
+    <!-- Header -->
+    <header class="bg-darker sticky top-0 z-50 border-b border-gold/20">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-code text-gold text-2xl"></i>
+                <h1 class="text-xl font-bold text-gold">Webson Santana</h1>
+            </div>
+            
+            <!-- Search Bar -->
+            <div class="hidden md:flex flex-1 max-w-xl mx-4">
+                <div class="relative w-full">
+                    <input type="text" placeholder="Buscar projetos..." 
+                        class="w-full bg-black/70 border border-gold/30 rounded-l-full py-2 px-4 text-white focus:outline-none focus:ring-1 focus:ring-gold">
+                    <button class="absolute right-0 top-0 h-full bg-gold/20 text-gold px-4 rounded-r-full border border-gold/30 hover:bg-gold/30">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- User Menu -->
+            <div class="flex items-center space-x-4">
+                <button class="md:hidden text-gold">
+                    <i class="fas fa-search text-xl"></i>
+                </button>
+                <div class="w-8 h-8 rounded-full bg-gold flex items-center justify-center">
+                    <span class="text-dark font-bold">WS</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="flex flex-col md:flex-row">
+        <!-- Sidebar -->
+        <aside class="w-full md:w-64 bg-darker h-screen sticky top-16 overflow-y-auto hidden md:block">
+            <nav class="py-4">
+                <div class="px-4 mb-6">
+                    <h2 class="text-gold font-semibold uppercase text-sm tracking-wider">Menu</h2>
+                </div>
+                <ul>
+                    <li class="px-4 py-2">
+                        <a href="#" class="nav-link flex items-center space-x-3 text-white hover:text-gold">
+                            <i class="fas fa-home text-gold w-6"></i>
+                            <span>Início</span>
+                        </a>
+                    </li>
+                    <li class="px-4 py-2">
+                        <a href="#" class="nav-link flex items-center space-x-3 text-white hover:text-gold">
+                            <i class="fas fa-play-circle text-gold w-6"></i>
+                            <span>Meus Vídeos</span>
+                        </a>
+                    </li>
+                    <li class="px-4 py-2">
+                        <a href="#" class="nav-link flex items-center space-x-3 text-white hover:text-gold">
+                            <i class="fas fa-laptop-code text-gold w-6"></i>
+                            <span>Projetos</span>
+                        </a>
+                    </li>
+                    <li class="px-4 py-2">
+                        <a href="#" class="nav-link flex items-center space-x-3 text-white hover:text-gold">
+                            <i class="fas fa-book text-gold w-6"></i>
+                            <span>Tutoriais</span>
+                        </a>
+                    </li>
+                    <li class="px-4 py-2">
+                        <a href="#" class="nav-link flex items-center space-x-3 text-white hover:text-gold">
+                            <i class="fas fa-envelope text-gold w-6"></i>
+                            <span>Contato</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="border-t border-gold/20 mt-6 pt-6 px-4">
+                    <h2 class="text-gold font-semibold uppercase text-sm tracking-wider mb-4">Redes Sociais</h2>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-white hover:text-gold"><i class="fab fa-github"></i></a>
+                        <a href="#" class="text-white hover:text-gold"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="text-white hover:text-gold"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-white hover:text-gold"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 p-4 md:p-6">
+            <!-- Featured Video -->
+            <section class="mb-8">
+                <div class="bg-black/30 rounded-lg overflow-hidden border border-gold/20">
+                    <div class="relative pt-[56.25%] bg-gradient-to-br from-gold/10 to-black">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <button class="bg-gold text-dark rounded-full p-4 hover:bg-gold/90 transition">
+                                <i class="fas fa-play text-2xl"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h2 class="text-xl font-bold text-gold mb-2">Meu Último Projeto: Sistema Completo em React</h2>
+                        <p class="text-gray-300 mb-4">Neste vídeo mostro todo o processo de desenvolvimento do meu mais recente projeto full-stack.</p>
+                        <div class="flex items-center text-sm text-gray-400">
+                            <span class="mr-4">1.2K visualizações</span>
+                            <span>2 semanas atrás</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Video Categories -->
+            <section class="mb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-bold text-gold">Meus Vídeos</h2>
+                    <a href="#" class="text-gold hover:underline">Ver todos</a>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <!-- Video Card 1 -->
+                    <div class="video-thumbnail bg-darker rounded-lg overflow-hidden border border-gold/10 hover:border-gold/30 transition">
+                        <div class="relative pt-[56.25%] bg-gradient-to-br from-gold/10 to-black">
+                            <span class="absolute top-2 right-2 bg-black/70 text-xs text-white px-2 py-1 rounded">12:34</span>
+                        </div>
+                        <div class="p-3">
+                            <h3 class="font-medium mb-1">Criando um Design System do Zero</h3>
+                            <p class="text-sm text-gray-400 mb-2">Tutorial completo de UI/UX</p>
+                            <div class="flex items-center text-xs text-gray-500">
+                                <span>1.5K visualizações</span>
+                                <span class="mx-1">•</span>
+                                <span>3 meses atrás</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Video Card 2 -->
+                    <div class="video-thumbnail bg-darker rounded-lg overflow-hidden border border-gold/10 hover:border-gold/30 transition">
+                        <div class="relative pt-[56.25%] bg-gradient-to-br from-gold/10 to-black">
+                            <span class="absolute top-2 right-2 bg-black/70 text-xs text-white px-2 py-1 rounded">08:21</span>
+                        </div>
+                        <div class="p-3">
+                            <h3 class="font-medium mb-1">Otimizando Performance com Next.js</h3>
+                            <p class="text-sm text-gray-400 mb-2">Dicas avançadas para desenvolvedores</p>
+                            <div class="flex items-center text-xs text-gray-500">
+                                <span>2.3K visualizações</span>
+                                <span class="mx-1">•</span>
+                                <span>5 meses atrás</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Video Card 3 -->
+                    <div class="video-thumbnail bg-darker rounded-lg overflow-hidden border border-gold/10 hover:border-gold/30 transition">
+                        <div class="relative pt-[56.25%] bg-gradient-to-br from-gold/10 to-black">
+                            <span class="absolute top-2 right-2 bg-black/70 text-xs text-white px-2 py-1 rounded">15:47</span>
+                        </div>
+                        <div class="p-3">
+                            <h3 class="font-medium mb-1">Autenticação com Firebase e React</h3>
+                            <p class="text-sm text-gray-400 mb-2">Implementação passo a passo</p>
+                            <div class="flex items-center text-xs text-gray-500">
+                                <span>3.1K visualizações</span>
+                                <span class="mx-1">•</span>
+                                <span>7 meses atrás</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Video Card 4 -->
+                    <div class="video-thumbnail bg-darker rounded-lg overflow-hidden border border-gold/10 hover:border-gold/30 transition">
+                        <div class="relative pt-[56.25%] bg-gradient-to-br from-gold/10 to-black">
+                            <span class="absolute top-2 right-2 bg-black/70 text-xs text-white px-2 py-1 rounded">22:15</span>
+                        </div>
+                        <div class="p-3">
+                            <h3 class="font-medium mb-1">Deploy Automatizado com GitHub Actions</h3>
+                            <p class="text-sm text-gray-400 mb-2">CI/CD para projetos pessoais</p>
+                            <div class="flex items-center text-xs text-gray-500">
+                                <span>4.2K visualizações</span>
+                                <span class="mx-1">•</span>
+                                <span>9 meses atrás</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Projects Section -->
+            <section class="mb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-bold text-gold">Meus Projetos</h2>
+                    <a href="#" class="text-gold hover:underline">Ver portfólio completo</a>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Project Card 1 -->
+                    <div class="project-card bg-darker rounded-lg overflow-hidden border border-gold/10 transition">
+                        <div class="h-48 bg-gradient-to-br from-gold/10 to-black flex items-center justify-center">
+                            <i class="fas fa-laptop-code text-5xl text-gold/50"></i>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-bold text-lg text-gold mb-2">E-commerce Platform</h3>
+                            <p class="text-gray-300 text-sm mb-4">Plataforma completa de e-commerce construída com React, Node.js e MongoDB.</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-gold/10 text-gold text-xs px-2 py-1 rounded">React</span>
+                                <span class="bg-gold/10 text-gold text-xs px-2 py-1 rounded">Node.js</span>
+                                <span class="bg-gold/10 text-gold text-xs px-2 py-1 rounded">MongoDB</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Project Card 2 -->
+                    <div class="project-card bg-darker rounded-lg overflow-hidden border border-gold/10 transition">
+                        <div class="h-48 bg-gradient-to-br from-gold/10 to-black flex items-center justify-center">
+                            <i class="fas fa-mobile-alt text-5xl text-gold/50"></i>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-bold text-lg text-gold mb-2">App de Finanças Pessoais</h3>
+                            <p class="text-gray-300 text-sm mb-4">Aplicativo mobile para controle financeiro desenvolvido com React Native.</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-gold/10 text-gold text-xs px-2 py-1 rounded">React Native</span>
+                                <span class="bg-gold/10 text-gold text-xs px-2 py-1 rounded">Firebase</span>
+                                <span class="bg-gold/10 text-gold text-xs px-2 py-1 rounded">Redux</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Project Card 3 -->
+                    <div class="project-card bg-darker rounded-lg overflow-hidden border border-gold/10 transition">
+                        <div class="h-48 bg-gradient-to-br from-gold/10 to-black flex items-center justify-center">
+                            <i class="fas fa-chart-line text-5xl text-gold/50"></i>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-bold text-lg text-gold mb-2">Dashboard Analytics</h3>
+                            <p class="text-gray-300 text-sm mb-4">Painel de análise de dados com visualizações interativas usando D3.js.</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-gold/10 text-gold text-xs px-2 py-1 rounded">D3.js</span>
+                                <span class="bg-gold/10 text-gold text-xs px-2 py-1 rounded">TypeScript</span>
+                                <span class="bg-gold/10 text-gold text-xs px-2 py-1 rounded">Next.js</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- About Section -->
+            <section class="bg-darker rounded-lg p-6 border border-gold/10 mb-8">
+                <h2 class="text-xl font-bold text-gold mb-4">Sobre Mim</h2>
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="md:w-1/4 flex justify-center">
+                        <div class="w-32 h-32 rounded-full bg-gradient-to-br from-gold to-gold/70 flex items-center justify-center">
+                            <span class="text-4xl font-bold text-dark">WS</span>
+                        </div>
+                    </div>
+                    <div class="md:w-3/4">
+                        <p class="text-gray-300 mb-4">
+                            Olá! Sou Webson Santana, desenvolvedor full-stack com mais de 5 anos de experiência criando soluções web modernas e eficientes.
+                        </p>
+                        <p class="text-gray-300 mb-4">
+                            Especializado em JavaScript, React, Node.js e arquitetura de sistemas escaláveis. Apaixonado por compartilhar conhecimento através de tutoriais e conteúdo técnico.
+                        </p>
+                        <div class="flex space-x-4">
+                            <a href="#" class="bg-gold text-dark px-4 py-2 rounded-lg font-medium hover:bg-gold/90 transition flex items-center">
+                                <i class="fas fa-envelope mr-2"></i> Contato
+                            </a>
+                            <a href="#" class="border border-gold text-gold px-4 py-2 rounded-lg font-medium hover:bg-gold/10 transition flex items-center">
+                                <i class="fas fa-file-download mr-2"></i> Currículo
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <div class="md:hidden fixed bottom-0 left-0 right-0 bg-darker border-t border-gold/20">
+        <div class="flex justify-around py-3">
+            <a href="#" class="text-gold flex flex-col items-center">
+                <i class="fas fa-home text-xl"></i>
+                <span class="text-xs mt-1">Início</span>
+            </a>
+            <a href="#" class="text-white hover:text-gold flex flex-col items-center">
+                <i class="fas fa-play-circle text-xl"></i>
+                <span class="text-xs mt-1">Vídeos</span>
+            </a>
+            <a href="#" class="text-white hover:text-gold flex flex-col items-center">
+                <i class="fas fa-laptop-code text-xl"></i>
+                <span class="text-xs mt-1">Projetos</span>
+            </a>
+            <a href="#" class="text-white hover:text-gold flex flex-col items-center">
+                <i class="fas fa-user text-xl"></i>
+                <span class="text-xs mt-1">Perfil</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-darker border-t border-gold/20 py-6 mt-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center space-x-2 mb-4 md:mb-0">
+                    <i class="fas fa-code text-gold text-2xl"></i>
+                    <h2 class="text-xl font-bold text-gold">Webson Santana</h2>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-gold"><i class="fab fa-github"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-gold"><i class="fab fa-linkedin"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-gold"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-gold"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+            <div class="mt-6 text-center text-gray-500 text-sm">
+                <p>© 2023 Portfólio de Webson Santana. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        
