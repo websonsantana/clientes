@@ -12,7 +12,6 @@
                 display: none;
             }
         }
-        
         .notification-badge {
             position: absolute;
             top: -5px;
@@ -27,25 +26,28 @@
             align-items: center;
             justify-content: center;
         }
-        
         .slide-in {
             animation: slideIn 0.3s forwards;
         }
-        
         .slide-out {
             animation: slideOut 0.3s forwards;
         }
-        
         @keyframes slideIn {
-            from { transform: translateX(100%); }
-            to { transform: translateX(0); }
+            from {
+                transform: translateX(100%);
+            }
+            to {
+                transform: translateX(0);
+            }
         }
-        
         @keyframes slideOut {
-            from { transform: translateX(0); }
-            to { transform: translateX(100%); }
+            from {
+                transform: translateX(0);
+            }
+            to {
+                transform: translateX(100%);
+            }
         }
-        
         .progress-bar {
             height: 6px;
             border-radius: 3px;
@@ -55,7 +57,6 @@
 </head>
 <body class="bg-gray-100 font-sans">
     <div class="max-w-md mx-auto bg-white min-h-screen relative overflow-hidden">
-        <!-- Header -->
         <header class="bg-blue-600 text-white p-4 shadow-md">
             <div class="flex justify-between items-center">
                 <div class="flex items-center space-x-2">
@@ -65,77 +66,39 @@
                 <div class="flex items-center space-x-4">
                     <div class="relative">
                         <i class="fas fa-bell text-xl cursor-pointer" id="notificationBtn"></i>
-                        <div class="notification-badge" id="notificationCount">3</div>
+                        <div class="notification-badge hidden" id="notificationCount">0</div>
                     </div>
                     <i class="fas fa-user-circle text-2xl"></i>
                 </div>
             </div>
         </header>
 
-        <!-- Notification Panel -->
         <div id="notificationPanel" class="absolute top-0 right-0 w-full max-w-md h-full bg-white shadow-lg z-10 transform translate-x-full">
             <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-blue-600 text-white">
                 <h2 class="text-lg font-bold">Notificações</h2>
                 <i class="fas fa-times cursor-pointer" id="closeNotification"></i>
             </div>
-            <div class="overflow-y-auto h-full pb-20">
-                <div class="p-4 border-b border-gray-200">
-                    <div class="flex items-start space-x-3">
-                        <div class="bg-yellow-100 p-2 rounded-full">
-                            <i class="fas fa-exclamation text-yellow-500"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-medium">Conta próxima do vencimento</h3>
-                            <p class="text-sm text-gray-500">Aluguel vence em 2 dias</p>
-                            <p class="text-xs text-gray-400">Hoje, 10:30</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="p-4 border-b border-gray-200">
-                    <div class="flex items-start space-x-3">
-                        <div class="bg-red-100 p-2 rounded-full">
-                            <i class="fas fa-exclamation-triangle text-red-500"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-medium">Conta vencida!</h3>
-                            <p class="text-sm text-gray-500">Conta de luz venceu hoje</p>
-                            <p class="text-xs text-gray-400">Hoje, 08:15</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="p-4 border-b border-gray-200">
-                    <div class="flex items-start space-x-3">
-                        <div class="bg-green-100 p-2 rounded-full">
-                            <i class="fas fa-check-circle text-green-500"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-medium">Pagamento confirmado</h3>
-                            <p class="text-sm text-gray-500">Internet paga com sucesso</p>
-                            <p class="text-xs text-gray-400">Ontem, 16:45</p>
-                        </div>
-                    </div>
-                </div>
+            <div class="overflow-y-auto h-full pb-20" id="notificationList">
+                <div class="p-4 text-gray-500 text-center" id="noNotificationsMessage">Nenhuma notificação por enquanto.</div>
             </div>
         </div>
 
-        <!-- Main Content -->
         <main class="pb-20">
-            <!-- Dashboard Summary -->
             <div class="p-4">
                 <div class="bg-white rounded-lg shadow p-4 mb-4">
                     <h2 class="text-lg font-bold mb-4 text-gray-700">Resumo Financeiro</h2>
                     <div class="grid grid-cols-3 gap-4 text-center">
                         <div>
                             <p class="text-sm text-gray-500">A pagar</p>
-                            <p class="font-bold text-red-500">R$ 0,00</p>
+                            <p class="font-bold text-red-500" id="totalPending">R$ 0,00</p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-500">Pago este mês</p>
-                            <p class="font-bold text-green-500">R$ 0,00</p>
+                            <p class="font-bold text-green-500" id="totalPaidMonth">R$ 0,00</p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-500">Saldo</p>
-                            <p class="font-bold text-blue-500">R$ 0,00</p>
+                            <p class="font-bold text-blue-500" id="currentBalance">R$ 0,00</p>
                         </div>
                     </div>
                     <div class="mt-4">
@@ -143,35 +106,32 @@
                         <div class="w-full bg-gray-200 rounded-full h-2">
                             <div class="progress-bar bg-blue-500 h-2 rounded-full" style="width: 0%"></div>
                         </div>
-                        <p class="text-xs text-gray-500 mt-1">0% das contas pagas</p>
+                        <p class="text-xs text-gray-500 mt-1" id="paidPercentageText">0% das contas pagas</p>
                     </div>
                 </div>
 
-                <!-- Upcoming Bills -->
                 <div class="bg-white rounded-lg shadow p-4 mb-4">
                     <div class="flex justify-between items-center mb-3">
                         <h2 class="text-lg font-bold text-gray-700">Próximos vencimentos</h2>
-                        <a href="#" class="text-sm text-blue-500">Ver todos</a>
+                        <a href="#" class="text-sm text-blue-500 hide-on-mobile">Ver todos</a>
                     </div>
                     <div class="space-y-3" id="upcomingBills">
-                        <!-- Bills will be added dynamically here -->
+                        <p class="text-gray-500 text-center" id="noUpcomingBillsMessage">Nenhuma conta a vencer.</p>
                     </div>
                 </div>
 
-                <!-- Recent Payments -->
                 <div class="bg-white rounded-lg shadow p-4">
                     <div class="flex justify-between items-center mb-3">
                         <h2 class="text-lg font-bold text-gray-700">Pagamentos recentes</h2>
-                        <a href="#" class="text-sm text-blue-500">Ver histórico</a>
+                        <a href="#" class="text-sm text-blue-500 hide-on-mobile">Ver histórico</a>
                     </div>
                     <div class="space-y-3" id="recentPayments">
-                        <!-- Payments will be added dynamically here -->
+                        <p class="text-gray-500 text-center" id="noRecentPaymentsMessage">Nenhum pagamento recente.</p>
                     </div>
                 </div>
             </div>
         </main>
 
-        <!-- Bottom Navigation -->
         <nav class="fixed bottom-0 w-full max-w-md bg-white border-t border-gray-200 flex justify-around py-3">
             <a href="#" class="flex flex-col items-center text-blue-500">
                 <i class="fas fa-home text-xl"></i>
@@ -182,7 +142,7 @@
                 <span class="text-xs mt-1">Relatórios</span>
             </a>
             <a href="#" class="flex flex-col items-center text-gray-500 relative">
-                <div class="bg-blue-500 text-white rounded-full p-3 -mt-8 shadow-lg">
+                <div class="bg-blue-500 text-white rounded-full p-3 -mt-8 shadow-lg cursor-pointer" id="addBillTrigger">
                     <i class="fas fa-plus text-xl"></i>
                 </div>
                 <span class="text-xs mt-2">Adicionar</span>
@@ -197,7 +157,6 @@
             </a>
         </nav>
 
-        <!-- Add Bill Modal -->
         <div id="addBillModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20 hidden">
             <div class="bg-white rounded-lg w-full max-w-md mx-4">
                 <div class="p-4 border-b border-gray-200 flex justify-between items-center">
@@ -208,19 +167,19 @@
                     <form id="billForm">
                         <div class="mb-4">
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="description">Descrição</label>
-                            <input class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="description" type="text" placeholder="Ex: Aluguel, Luz, Internet...">
+                            <input class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="description" type="text" placeholder="Ex: Aluguel, Luz, Internet..." required>
                         </div>
                         <div class="mb-4">
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="value">Valor</label>
-                            <input class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="value" type="number" step="0.01" placeholder="R$ 0,00">
+                            <input class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="value" type="number" step="0.01" placeholder="R$ 0,00" required>
                         </div>
                         <div class="mb-4">
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="dueDate">Data de vencimento</label>
-                            <input class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="dueDate" type="date">
+                            <input class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="dueDate" type="date" required>
                         </div>
                         <div class="mb-4">
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="category">Categoria</label>
-                            <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="category">
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="category" required>
                                 <option value="">Selecione uma categoria</option>
                                 <option value="Moradia">Moradia</option>
                                 <option value="Alimentação">Alimentação</option>
@@ -246,7 +205,6 @@
         if (!localStorage.getItem('financeData')) {
             localStorage.setItem('financeData', JSON.stringify({
                 bills: [],
-                paidAmount: 0,
                 balance: 0,
                 notifications: []
             }));
@@ -256,16 +214,38 @@
         const getFinanceData = () => JSON.parse(localStorage.getItem('financeData'));
         const setFinanceData = (data) => localStorage.setItem('financeData', JSON.stringify(data));
 
-        // Notification Panel Toggle
+        // DOM Elements
         const notificationBtn = document.getElementById('notificationBtn');
         const closeNotification = document.getElementById('closeNotification');
         const notificationPanel = document.getElementById('notificationPanel');
-        
+        const notificationCountBadge = document.getElementById('notificationCount');
+        const notificationList = document.getElementById('notificationList');
+        const noNotificationsMessage = document.getElementById('noNotificationsMessage');
+
+        const addBillTrigger = document.getElementById('addBillTrigger');
+        const addBillModal = document.getElementById('addBillModal');
+        const closeModal = document.getElementById('closeModal');
+        const cancelAdd = document.getElementById('cancelAdd');
+        const billForm = document.getElementById('billForm');
+
+        const totalPendingEl = document.getElementById('totalPending');
+        const totalPaidMonthEl = document.getElementById('totalPaidMonth');
+        const currentBalanceEl = document.getElementById('currentBalance');
+        const progressBar = document.querySelector('.progress-bar');
+        const paidPercentageText = document.getElementById('paidPercentageText');
+
+        const upcomingBillsContainer = document.getElementById('upcomingBills');
+        const noUpcomingBillsMessage = document.getElementById('noUpcomingBillsMessage');
+        const recentPaymentsContainer = document.getElementById('recentPayments');
+        const noRecentPaymentsMessage = document.getElementById('noRecentPaymentsMessage');
+
+        // Notification Panel Toggle
         notificationBtn.addEventListener('click', () => {
             notificationPanel.classList.remove('translate-x-full');
             notificationPanel.classList.add('slide-in');
+            markNotificationsAsRead();
         });
-        
+
         closeNotification.addEventListener('click', () => {
             notificationPanel.classList.add('slide-out');
             setTimeout(() => {
@@ -273,78 +253,269 @@
                 notificationPanel.classList.remove('slide-in', 'slide-out');
             }, 300);
         });
-        
+
         // Add Bill Modal
-        const addBillBtn = document.querySelector('nav a:nth-child(3)');
-        const addBillModal = document.getElementById('addBillModal');
-        const closeModal = document.getElementById('closeModal');
-        const cancelAdd = document.getElementById('cancelAdd');
-        
-        addBillBtn.addEventListener('click', (e) => {
+        addBillTrigger.addEventListener('click', (e) => {
             e.preventDefault();
             addBillModal.classList.remove('hidden');
         });
-        
+
         closeModal.addEventListener('click', () => {
             addBillModal.classList.add('hidden');
+            billForm.reset();
         });
-        
+
         cancelAdd.addEventListener('click', () => {
             addBillModal.classList.add('hidden');
+            billForm.reset();
         });
-        
+
         // Form submission
-        const billForm = document.getElementById('billForm');
         billForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            
-            const formData = {
-                description: document.getElementById('description').value,
-                value: parseFloat(document.getElementById('value').value),
-                dueDate: document.getElementById('dueDate').value,
-                category: document.getElementById('category').value,
+
+            const description = document.getElementById('description').value;
+            const value = parseFloat(document.getElementById('value').value);
+            const dueDate = document.getElementById('dueDate').value;
+            const category = document.getElementById('category').value;
+
+            const newBill = {
+                id: Date.now(), // Unique ID for the bill
+                description,
+                value,
+                dueDate,
+                category,
                 status: 'pending',
                 createdAt: new Date().toISOString()
             };
 
             const data = getFinanceData();
-            data.bills.push(formData);
+            data.bills.push(newBill);
             setFinanceData(data);
 
-            alert('Conta adicionada com sucesso!');
             addBillModal.classList.add('hidden');
             billForm.reset();
-            updateUI(); // Refresh the UI
+            updateUI();
         });
-        
+
+        // Mark a bill as paid
+        function markAsPaid(billId) {
+            const data = getFinanceData();
+            const billIndex = data.bills.findIndex(bill => bill.id === billId);
+
+            if (billIndex !== -1) {
+                data.bills[billIndex].status = 'paid';
+                data.bills[billIndex].paidAt = new Date().toISOString(); // Record payment date
+                data.balance -= data.bills[billIndex].value; // Deduct from balance
+                setFinanceData(data);
+                updateUI();
+            }
+        }
+
+        // Add notification
+        function addNotification(type, message, details = '') {
+            const data = getFinanceData();
+            data.notifications.unshift({ // Add to the beginning
+                id: Date.now(),
+                type,
+                message,
+                details,
+                timestamp: new Date().toISOString(),
+                read: false
+            });
+            setFinanceData(data);
+            updateUI(); // Update UI to show new notification count
+        }
+
+        // Mark notifications as read
+        function markNotificationsAsRead() {
+            const data = getFinanceData();
+            data.notifications.forEach(n => n.read = true);
+            setFinanceData(data);
+            updateUI(); // Hide the badge
+        }
+
+        // Generate notifications based on bill status
+        function generateBillNotifications() {
+            const data = getFinanceData();
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Normalize to start of day
+
+            // Clear old bill-related notifications to avoid duplicates on refresh
+            data.notifications = data.notifications.filter(n => !n.id.toString().startsWith('bill_'));
+
+            data.bills.filter(bill => bill.status === 'pending').forEach(bill => {
+                const dueDate = new Date(bill.dueDate + 'T00:00:00'); // Ensure UTC for comparison
+                const diffTime = dueDate.getTime() - today.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays === 0 && !data.notifications.some(n => n.id === `bill_due_today_${bill.id}`)) {
+                    addNotification('warning', 'Conta vence hoje!', `${bill.description} (R$ ${bill.value.toFixed(2)})`, `bill_due_today_${bill.id}`);
+                } else if (diffDays > 0 && diffDays <= 3 && !data.notifications.some(n => n.id === `bill_due_soon_${bill.id}`)) {
+                    addNotification('info', 'Conta próxima do vencimento', `${bill.description} vence em ${diffDays} dia(s)`, `bill_due_soon_${bill.id}`);
+                } else if (diffDays < 0 && !data.notifications.some(n => n.id === `bill_overdue_${bill.id}`)) {
+                    addNotification('error', 'Conta vencida!', `${bill.description} (R$ ${bill.value.toFixed(2)})`, `bill_overdue_${bill.id}`);
+                }
+            });
+            setFinanceData(data); // Save updated notifications
+        }
+
+
         // Update UI with real data
         function updateUI() {
             const data = getFinanceData();
-            
+
             // Update summary
-            const totalPending = data.bills.reduce((sum, bill) => 
-                bill.status === 'pending' ? sum + bill.value : sum, 0);
-            const totalPaid = data.bills.reduce((sum, bill) => 
-                bill.status === 'paid' ? sum + bill.value : sum, 0);
-            
-            document.querySelector('.text-red-500').textContent = `R$ ${totalPending.toFixed(2)}`;
-            document.querySelector('.text-green-500').textContent = `R$ ${totalPaid.toFixed(2)}`;
-            document.querySelector('.text-blue-500').textContent = `R$ ${data.balance.toFixed(2)}`;
-            
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+
+            const totalPending = data.bills.reduce((sum, bill) => bill.status === 'pending' ? sum + bill.value : sum, 0);
+            const totalPaidThisMonth = data.bills.reduce((sum, bill) => {
+                if (bill.status === 'paid' && bill.paidAt) {
+                    const paidDate = new Date(bill.paidAt);
+                    if (paidDate.getMonth() === currentMonth && paidDate.getFullYear() === currentYear) {
+                        return sum + bill.value;
+                    }
+                }
+                return sum;
+            }, 0);
+
+            totalPendingEl.textContent = `R$ ${totalPending.toFixed(2)}`;
+            totalPaidMonthEl.textContent = `R$ ${totalPaidThisMonth.toFixed(2)}`;
+            currentBalanceEl.textContent = `R$ ${data.balance.toFixed(2)}`; // Assuming balance is managed elsewhere or updated explicitly
+
             // Update progress bar
-            const totalBills = data.bills.length;
-            const paidPercentage = totalBills > 0 ? 
-                (data.bills.filter(b => b.status === 'paid').length / totalBills) * 100 : 0;
-            document.querySelector('.progress-bar').style.width = `${paidPercentage}%`;
-            document.querySelector('.progress-bar').nextElementSibling.textContent = 
-                `${Math.round(paidPercentage)}% das contas pagas`;
-            
-            // Update notification count
-            const notificationCount = data.notifications.filter(n => !n.read).length;
-            document.getElementById('notificationCount').textContent = notificationCount;
+            const totalBillsCount = data.bills.length;
+            const paidBillsCount = data.bills.filter(b => b.status === 'paid').length;
+            const paidPercentage = totalBillsCount > 0 ? (paidBillsCount / totalBillsCount) * 100 : 0;
+            progressBar.style.width = `${paidPercentage}%`;
+            paidPercentageText.textContent = `${Math.round(paidPercentage)}% das contas pagas`;
+
+            // Update notification count badge
+            const unreadNotifications = data.notifications.filter(n => !n.read).length;
+            if (unreadNotifications > 0) {
+                notificationCountBadge.textContent = unreadNotifications;
+                notificationCountBadge.classList.remove('hidden');
+            } else {
+                notificationCountBadge.classList.add('hidden');
+            }
+
+            // Populate notifications panel
+            notificationList.innerHTML = ''; // Clear previous notifications
+            if (data.notifications.length === 0) {
+                notificationList.appendChild(noNotificationsMessage);
+            } else {
+                data.notifications.forEach(notification => {
+                    const notificationItem = document.createElement('div');
+                    notificationItem.classList.add('p-4', 'border-b', 'border-gray-200');
+                    if (!notification.read) {
+                        notificationItem.classList.add('bg-blue-50', 'font-semibold'); // Highlight unread
+                    }
+
+                    let iconClass = '';
+                    let iconColor = '';
+                    switch (notification.type) {
+                        case 'warning':
+                            iconClass = 'fa-exclamation';
+                            iconColor = 'text-yellow-500';
+                            break;
+                        case 'error':
+                            iconClass = 'fa-exclamation-triangle';
+                            iconColor = 'text-red-500';
+                            break;
+                        case 'success':
+                            iconClass = 'fa-check-circle';
+                            iconColor = 'text-green-500';
+                            break;
+                        case 'info':
+                        default:
+                            iconClass = 'fa-info-circle';
+                            iconColor = 'text-blue-500';
+                            break;
+                    }
+
+                    const timeAgo = new Date(notification.timestamp).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+
+                    notificationItem.innerHTML = `
+                        <div class="flex items-start space-x-3">
+                            <div class="p-2 rounded-full ${iconColor.replace('text-', 'bg-')}-100">
+                                <i class="fas ${iconClass} ${iconColor}"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-medium">${notification.message}</h3>
+                                <p class="text-sm text-gray-500">${notification.details}</p>
+                                <p class="text-xs text-gray-400">${timeAgo}</p>
+                            </div>
+                        </div>
+                    `;
+                    notificationList.appendChild(notificationItem);
+                });
+            }
+
+
+            // Populate upcoming bills
+            upcomingBillsContainer.innerHTML = '';
+            const upcoming = data.bills.filter(bill => bill.status === 'pending')
+                                       .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
+                                       .slice(0, 5); // Show top 5 upcoming
+
+            if (upcoming.length === 0) {
+                upcomingBillsContainer.appendChild(noUpcomingBillsMessage);
+            } else {
+                upcoming.forEach(bill => {
+                    const billItem = document.createElement('div');
+                    billItem.classList.add('flex', 'justify-between', 'items-center', 'py-2');
+                    billItem.innerHTML = `
+                        <div>
+                            <p class="font-medium">${bill.description}</p>
+                            <p class="text-sm text-gray-500">${new Date(bill.dueDate + 'T00:00:00').toLocaleDateString('pt-BR')}</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="font-bold text-red-500">R$ ${bill.value.toFixed(2)}</span>
+                            <button class="bg-green-500 text-white px-3 py-1 rounded-md text-sm mark-as-paid-btn" data-id="${bill.id}">Pagar</button>
+                        </div>
+                    `;
+                    upcomingBillsContainer.appendChild(billItem);
+                });
+
+                // Add event listeners to "Pagar" buttons
+                document.querySelectorAll('.mark-as-paid-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const billId = parseInt(e.target.dataset.id);
+                        markAsPaid(billId);
+                        addNotification('success', 'Conta paga!', `${e.target.closest('.flex').querySelector('.font-medium').textContent} foi marcada como paga.`);
+                    });
+                });
+            }
+
+            // Populate recent payments
+            recentPaymentsContainer.innerHTML = '';
+            const recentPaid = data.bills.filter(bill => bill.status === 'paid' && bill.paidAt)
+                                         .sort((a, b) => new Date(b.paidAt) - new Date(a.paidAt))
+                                         .slice(0, 5); // Show top 5 recent
+
+            if (recentPaid.length === 0) {
+                recentPaymentsContainer.appendChild(noRecentPaymentsMessage);
+            } else {
+                recentPaid.forEach(bill => {
+                    const billItem = document.createElement('div');
+                    billItem.classList.add('flex', 'justify-between', 'items-center', 'py-2');
+                    billItem.innerHTML = `
+                        <div>
+                            <p class="font-medium">${bill.description}</p>
+                            <p class="text-sm text-gray-500">Pago em ${new Date(bill.paidAt).toLocaleDateString('pt-BR')}</p>
+                        </div>
+                        <span class="font-bold text-green-500">R$ ${bill.value.toFixed(2)}</span>
+                    `;
+                    recentPaymentsContainer.appendChild(billItem);
+                });
+            }
+
+            // Generate and update notifications (after all other updates)
+            generateBillNotifications();
         }
 
-        // Initial UI update
+        // Initial UI update and generate notifications on load
         updateUI();
     </script>
 </body>
