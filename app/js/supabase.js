@@ -2,8 +2,32 @@
 const SUPABASE_URL = 'https://dbzivosyeznhfdjzuhme.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRieml2b3N5ZXpuaGZkanp1aG1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg4MjcyODEsImV4cCI6MjA2NDQwMzI4MX0.Rejo3yWsssCNgkAeZhUZXnm9a0-SQA-FaGNkjesr7Qk';
 
+console.log('Inicializando cliente Supabase...');
+
 // Inicializa o cliente Supabase
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+    }
+});
+
+// Testa a conexão
+async function testConnection() {
+    try {
+        const { data, error } = await supabase.from('bills').select('*').limit(1);
+        if (error) throw error;
+        console.log('Conexão com o Supabase estabelecida com sucesso!');
+        return true;
+    } catch (error) {
+        console.error('Erro ao conectar ao Supabase:', error);
+        return false;
+    }
+}
+
+// Executa o teste de conexão
+testConnection();
 
 // Função para verificar se o usuário está autenticado
 async function checkAuth() {
