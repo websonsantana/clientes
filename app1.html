@@ -3,104 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contas a Pagar | Meu Financeiro</title>
+    <title>Bill Manager - Contas a Pagar</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanilla-masker@1.1.1/build/vanilla-masker.min.js"></script>
     <style>
-        @media (max-width: 640px) {
-            .hide-on-mobile {
-                display: none;
-            }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
-        .notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            width: 18px;
-            height: 18px;
-            background-color: #ef4444;
-            color: white;
-            border-radius: 50%;
-            font-size: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
         }
-        .slide-in {
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        /* Animation for notifications */
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+        
+        .notification-slide-in {
             animation: slideIn 0.3s forwards;
         }
-        .slide-out {
+        
+        .notification-slide-out {
             animation: slideOut 0.3s forwards;
         }
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-            }
-            to {
-                transform: translateX(0);
-            }
-        }
-        @keyframes slideOut {
-            from {
-                transform: translateX(0);
-            }
-            to {
-                transform: translateX(100%);
-            }
-        }
-        .progress-bar {
-            height: 6px;
-            border-radius: 3px;
-            transition: width 0.5s ease;
-        }
-        /* Style for modals */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 20;
-        }
-        .modal-content {
-            background-color: white;
-            border-radius: 0.5rem;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Calendar specific styles */
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 2px;
-            text-align: center;
-        }
-        .calendar-day {
-            padding: 8px 0;
-            border-radius: 4px;
-            cursor: pointer;
+        
+        /* Calendar day highlight */
+        .calendar-day.has-bills {
             position: relative;
-            min-height: 50px; /* Ensure enough space for indicators */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
         }
-        .calendar-day.current-month {
-            background-color: #f9fafb;
-            color: #374151;
-        }
-        .calendar-day.other-month {
-            background-color: #f3f4f6;
-            color: #9ca3af;
-        }
-        .calendar-day.has-pending::after {
+        
+        .calendar-day.has-bills::after {
             content: '';
             position: absolute;
             bottom: 4px;
@@ -108,529 +58,1503 @@
             transform: translateX(-50%);
             width: 6px;
             height: 6px;
-            background-color: #ef4444; /* Red for pending */
             border-radius: 50%;
-        }
-        .calendar-day.has-paid::before {
-            content: '';
-            position: absolute;
-            bottom: 4px;
-            left: calc(50% - 8px); /* Adjust position for two dots */
-            transform: translateX(-50%);
-            width: 6px;
-            height: 6px;
-            background-color: #22c55e; /* Green for paid */
-            border-radius: 50%;
-        }
-        .calendar-day.has-pending.has-paid::after {
-            left: calc(50% + 8px); /* Adjust position for two dots */
-        }
-        .calendar-day.selected {
-            background-color: #bfdbfe; /* Light blue for selected day */
-            border: 1px solid #3b82f6;
-        }
-        .calendar-day:hover:not(.day-name) {
-            background-color: #e0f2fe;
-        }
-        .day-name {
-            font-weight: bold;
-            color: #4b5563;
-        }
-        .calendar-header-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-        .calendar-header-nav button {
-            padding: 0.5rem;
-            background-color: #eff6ff;
-            border-radius: 0.25rem;
-            color: #1d4ed8;
-        }
-        .calendar-header-nav h3 {
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: #374151;
+            background-color: #3b82f6;
         }
     </style>
 </head>
-<body class="bg-gray-100 font-sans">
-    <div class="max-w-md mx-auto bg-white min-h-screen relative overflow-hidden">
-        <header class="bg-blue-600 text-white p-4 shadow-md">
-            <div class="flex justify-between items-center">
+<body class="bg-gray-50 font-sans">
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="bg-blue-600 text-white shadow-md">
+            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
                 <div class="flex items-center space-x-2">
-                    <i class="fas fa-wallet text-2xl"></i>
-                    <h1 class="text-xl font-bold">Meu Financeiro</h1>
+                    <i class="fas fa-file-invoice-dollar text-2xl"></i>
+                    <h1 class="text-xl font-bold">Bill Manager</h1>
                 </div>
                 <div class="flex items-center space-x-4">
+                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-blue-700 transition">
+                        <i class="fas fa-moon"></i>
+                    </button>
                     <div class="relative">
-                        <i class="fas fa-bell text-xl cursor-pointer" id="notificationBtn"></i>
-                        <div class="notification-badge hidden" id="notificationCount">0</div>
+                        <button id="notification-btn" class="p-2 rounded-full hover:bg-blue-700 transition relative">
+                            <i class="fas fa-bell"></i>
+                            <span id="notification-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                        </button>
+                        <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-72 bg-white text-gray-800 rounded-md shadow-lg z-10 max-h-96 overflow-y-auto">
+                            <div class="p-3 border-b border-gray-200 flex justify-between items-center">
+                                <h3 class="font-semibold">Notificações</h3>
+                                <button id="clear-notifications" class="text-blue-600 text-sm">Limpar tudo</button>
+                            </div>
+                            <div id="notification-list" class="divide-y divide-gray-200">
+                                <div class="p-3 text-center text-gray-500">Nenhuma notificação</div>
+                            </div>
+                        </div>
                     </div>
-                    <i class="fas fa-user-circle text-2xl"></i>
+                    <div class="relative">
+                        <button id="user-menu-btn" class="flex items-center space-x-2 focus:outline-none">
+                            <div class="h-8 w-8 rounded-full bg-blue-700 flex items-center justify-center text-white">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <span class="hidden md:inline">Usuário</span>
+                        </button>
+                        <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+                            <div class="py-1">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Perfil</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Configurações</a>
+                                <a href="#" id="logout-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sair</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </header>
 
-        <div id="notificationPanel" class="absolute top-0 right-0 w-full max-w-md h-full bg-white shadow-lg z-10 transform translate-x-full">
-            <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-blue-600 text-white">
-                <h2 class="text-lg font-bold">Notificações</h2>
-                <i class="fas fa-times cursor-pointer" id="closeNotification"></i>
-            </div>
-            <div class="overflow-y-auto h-full pb-20" id="notificationList">
-                <div class="p-4 text-gray-500 text-center" id="noNotificationsMessage">Nenhuma notificação por enquanto.</div>
-            </div>
-        </div>
-
-        <main class="pb-20">
-            <div class="p-4" id="homeSection">
-                <div class="bg-white rounded-lg shadow p-4 mb-4">
-                    <h2 class="text-lg font-bold mb-4 text-gray-700">Resumo Financeiro</h2>
-                    <div class="grid grid-cols-3 gap-4 text-center">
-                        <div>
-                            <p class="text-sm text-gray-500">A pagar</p>
-                            <p class="font-bold text-red-500" id="totalPending">R$ 0,00</p>
+        <!-- Main Content -->
+        <main class="flex-grow container mx-auto px-4 py-6">
+            <div class="flex flex-col lg:flex-row gap-6">
+                <!-- Sidebar (hidden on mobile) -->
+                <aside class="lg:w-64 bg-white rounded-lg shadow-md p-4 hidden lg:block">
+                    <nav>
+                        <ul class="space-y-2">
+                            <li>
+                                <a href="#" id="dashboard-tab" class="flex items-center space-x-3 p-3 rounded-lg bg-blue-100 text-blue-700 font-medium">
+                                    <i class="fas fa-home"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" id="bills-tab" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 text-gray-700">
+                                    <i class="fas fa-file-invoice"></i>
+                                    <span>Contas</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" id="calendar-tab" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 text-gray-700">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>Calendário</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" id="reports-tab" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 text-gray-700">
+                                    <i class="fas fa-chart-pie"></i>
+                                    <span>Relatórios</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" id="categories-tab" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 text-gray-700">
+                                    <i class="fas fa-tags"></i>
+                                    <span>Categorias</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" id="settings-tab" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 text-gray-700">
+                                    <i class="fas fa-cog"></i>
+                                    <span>Configurações</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                    
+                    <div class="mt-8">
+                        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Resumo do Mês</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <p class="text-sm text-gray-500">A pagar</p>
+                                <p class="text-lg font-semibold text-blue-600" id="monthly-pending">R$ 0,00</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Pago</p>
+                                <p class="text-lg font-semibold text-green-600" id="monthly-paid">R$ 0,00</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Atrasado</p>
+                                <p class="text-lg font-semibold text-red-600" id="monthly-overdue">R$ 0,00</p>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-sm text-gray-500">Pago este mês</p>
-                            <p class="font-bold text-green-500" id="totalPaidMonth">R$ 0,00</p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-500">Saldo</p>
-                            <p class="font-bold text-blue-500" id="currentBalance">R$ 0,00</p>
-                        </div>
                     </div>
-                    <div class="mt-4">
-                        <p class="text-sm text-gray-500 mb-1">Progresso mensal</p>
-                        <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="progress-bar bg-blue-500 h-2 rounded-full" style="width: 0%"></div>
-                        </div>
-                        <p class="text-xs text-gray-500 mt-1" id="paidPercentageText">0% das contas pagas</p>
-                    </div>
-                </div>
+                </aside>
 
-                <div class="bg-white rounded-lg shadow p-4 mb-4">
-                    <div class="flex justify-between items-center mb-3">
-                        <h2 class="text-lg font-bold text-gray-700">Próximos vencimentos</h2>
-                        <a href="#" class="text-sm text-blue-500 hide-on-mobile">Ver todos</a>
+                <!-- Main Content Area -->
+                <div class="flex-grow bg-white rounded-lg shadow-md p-4">
+                    <!-- Mobile Navigation Tabs -->
+                    <div class="lg:hidden mb-4">
+                        <div class="flex overflow-x-auto space-x-1 pb-2">
+                            <button id="mobile-dashboard-tab" class="flex-shrink-0 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg font-medium">
+                                <i class="fas fa-home mr-2"></i>Dashboard
+                            </button>
+                            <button id="mobile-bills-tab" class="flex-shrink-0 px-4 py-2 hover:bg-gray-100 rounded-lg">
+                                <i class="fas fa-file-invoice mr-2"></i>Contas
+                            </button>
+                            <button id="mobile-calendar-tab" class="flex-shrink-0 px-4 py-2 hover:bg-gray-100 rounded-lg">
+                                <i class="fas fa-calendar-alt mr-2"></i>Calendário
+                            </button>
+                        </div>
                     </div>
-                    <div class="space-y-3" id="upcomingBills">
-                        <p class="text-gray-500 text-center" id="noUpcomingBillsMessage">Nenhuma conta a vencer.</p>
-                    </div>
-                </div>
 
-                <div class="bg-white rounded-lg shadow p-4">
-                    <div class="flex justify-between items-center mb-3">
-                        <h2 class="text-lg font-bold text-gray-700">Pagamentos recentes</h2>
-                        <a href="#" class="text-sm text-blue-500 hide-on-mobile">Ver histórico</a>
+                    <!-- Dashboard Content -->
+                    <div id="dashboard-content">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-bold text-gray-800">Dashboard</h2>
+                            <button id="add-bill-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition">
+                                <i class="fas fa-plus"></i>
+                                <span>Adicionar Conta</span>
+                            </button>
+                        </div>
+
+                        <!-- Summary Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-sm text-blue-600 font-medium">A pagar</p>
+                                        <p class="text-2xl font-bold text-blue-800" id="pending-amount">R$ 0,00</p>
+                                    </div>
+                                    <div class="p-2 bg-blue-100 rounded-lg">
+                                        <i class="fas fa-clock text-blue-600"></i>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-blue-500 mt-2"><span id="pending-count">0</span> contas pendentes</p>
+                            </div>
+                            <div class="bg-green-50 p-4 rounded-lg border border-green-100">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-sm text-green-600 font-medium">Pago este mês</p>
+                                        <p class="text-2xl font-bold text-green-800" id="paid-amount">R$ 0,00</p>
+                                    </div>
+                                    <div class="p-2 bg-green-100 rounded-lg">
+                                        <i class="fas fa-check-circle text-green-600"></i>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-green-500 mt-2"><span id="paid-count">0</span> contas pagas</p>
+                            </div>
+                            <div class="bg-red-50 p-4 rounded-lg border border-red-100">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-sm text-red-600 font-medium">Atrasado</p>
+                                        <p class="text-2xl font-bold text-red-800" id="overdue-amount">R$ 0,00</p>
+                                    </div>
+                                    <div class="p-2 bg-red-100 rounded-lg">
+                                        <i class="fas fa-exclamation-circle text-red-600"></i>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-red-500 mt-2"><span id="overdue-count">0</span> contas atrasadas</p>
+                            </div>
+                        </div>
+
+                        <!-- Upcoming Bills -->
+                        <div class="mb-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-lg font-semibold text-gray-800">Próximos Vencimentos</h3>
+                                <a href="#" id="view-all-bills" class="text-sm text-blue-600 hover:underline">Ver todas</a>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
+                                <div id="upcoming-bills" class="divide-y divide-gray-200">
+                                    <div class="p-4 text-center text-gray-500">Nenhuma conta a vencer nos próximos dias</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Charts -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-3">Gastos por Categoria</h3>
+                                <div class="h-64">
+                                    <canvas id="category-chart"></canvas>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-3">Histórico Mensal</h3>
+                                <div class="h-64">
+                                    <canvas id="monthly-chart"></canvas>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="space-y-3" id="recentPayments">
-                        <p class="text-gray-500 text-center" id="noRecentPaymentsMessage">Nenhum pagamento recente.</p>
+
+                    <!-- Bills Content (hidden by default) -->
+                    <div id="bills-content" class="hidden">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-bold text-gray-800">Contas a Pagar</h2>
+                            <div class="flex space-x-2">
+                                <button id="filter-bills-btn" class="bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg flex items-center space-x-2 transition">
+                                    <i class="fas fa-filter"></i>
+                                    <span>Filtrar</span>
+                                </button>
+                                <button id="add-bill-btn-2" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition">
+                                    <i class="fas fa-plus"></i>
+                                    <span>Adicionar</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Filter Panel (hidden by default) -->
+                        <div id="filter-panel" class="hidden bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                    <select id="status-filter" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                        <option value="all">Todos</option>
+                                        <option value="pending">Pendente</option>
+                                        <option value="paid">Pago</option>
+                                        <option value="overdue">Atrasado</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+                                    <select id="category-filter" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                        <option value="all">Todas</option>
+                                        <option value="water">Água</option>
+                                        <option value="electricity">Luz</option>
+                                        <option value="rent">Aluguel</option>
+                                        <option value="internet">Internet</option>
+                                        <option value="phone">Telefone</option>
+                                        <option value="other">Outros</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Período</label>
+                                    <select id="period-filter" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                        <option value="all">Todos</option>
+                                        <option value="this-month">Este mês</option>
+                                        <option value="next-month">Próximo mês</option>
+                                        <option value="last-month">Mês passado</option>
+                                        <option value="custom">Personalizado</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mt-4 flex justify-end space-x-2">
+                                <button id="reset-filters-btn" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition">Limpar</button>
+                                <button id="apply-filters-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Aplicar</button>
+                            </div>
+                        </div>
+
+                        <!-- Bills Table -->
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vencimento</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoria</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bills-table-body" class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">Nenhuma conta cadastrada</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Calendar Content (hidden by default) -->
+                    <div id="calendar-content" class="hidden">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-bold text-gray-800">Calendário de Pagamentos</h2>
+                            <div class="flex space-x-2">
+                                <button id="prev-month-btn" class="p-2 rounded-lg hover:bg-gray-100">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button id="next-month-btn" class="p-2 rounded-lg hover:bg-gray-100">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                                <button id="today-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                                    Hoje
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow overflow-hidden">
+                            <!-- Month Header -->
+                            <div class="flex items-center justify-between px-6 py-4 border-b">
+                                <h3 id="current-month-year" class="text-xl font-semibold text-gray-800">Janeiro 2023</h3>
+                            </div>
+
+                            <!-- Weekday Headers -->
+                            <div class="grid grid-cols-7 gap-px bg-gray-200">
+                                <div class="bg-gray-100 py-2 text-center text-xs font-medium text-gray-500 uppercase">Dom</div>
+                                <div class="bg-gray-100 py-2 text-center text-xs font-medium text-gray-500 uppercase">Seg</div>
+                                <div class="bg-gray-100 py-2 text-center text-xs font-medium text-gray-500 uppercase">Ter</div>
+                                <div class="bg-gray-100 py-2 text-center text-xs font-medium text-gray-500 uppercase">Qua</div>
+                                <div class="bg-gray-100 py-2 text-center text-xs font-medium text-gray-500 uppercase">Qui</div>
+                                <div class="bg-gray-100 py-2 text-center text-xs font-medium text-gray-500 uppercase">Sex</div>
+                                <div class="bg-gray-100 py-2 text-center text-xs font-medium text-gray-500 uppercase">Sáb</div>
+                            </div>
+
+                            <!-- Calendar Grid -->
+                            <div id="calendar-grid" class="grid grid-cols-7 gap-px bg-gray-200">
+                                <!-- Days will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Bills for Selected Day -->
+                        <div id="day-bills-panel" class="mt-6 hidden">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 id="selected-day-header" class="text-lg font-semibold text-gray-800">Contas para 1 de Janeiro</h3>
+                                <button id="close-day-bills" class="text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div id="day-bills-list" class="bg-gray-50 rounded-lg border border-gray-200 divide-y divide-gray-200">
+                                <div class="p-4 text-center text-gray-500">Nenhuma conta para este dia</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <div class="p-4 hidden" id="reportsSection">
-                <div class="bg-white rounded-lg shadow p-4">
-                    <h2 class="text-lg font-bold mb-4 text-gray-700">Relatórios Financeiros</h2>
-                    <p class="text-gray-600">Conteúdo dos relatórios virá aqui. Gráficos, despesas por categoria, etc.</p>
-                    <div class="mt-4 bg-gray-100 p-4 rounded-md text-center text-gray-500">
-                        <i class="fas fa-chart-bar text-4xl mb-2"></i>
-                        <p>Gráficos e análises em breve!</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="p-4 hidden" id="calendarSection">
-                <div class="bg-white rounded-lg shadow p-4 mb-4">
-                    <div class="calendar-header-nav">
-                        <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
-                        <h3 id="currentMonthYear"></h3>
-                        <button id="nextMonth"><i class="fas fa-chevron-right"></i></button>
-                    </div>
-                    <div class="calendar-grid mb-4" id="calendarGrid">
-                        <div class="calendar-day day-name">Dom</div>
-                        <div class="calendar-day day-name">Seg</div>
-                        <div class="calendar-day day-name">Ter</div>
-                        <div class="calendar-day day-name">Qua</div>
-                        <div class="calendar-day day-name">Qui</div>
-                        <div class="calendar-day day-name">Sex</div>
-                        <div class="calendar-day day-name">Sáb</div>
-                        </div>
-                </div>
-
-                <div class="bg-white rounded-lg shadow p-4">
-                    <div class="flex justify-between items-center mb-3">
-                        <h2 class="text-lg font-bold text-gray-700" id="selectedDateBillsTitle">Contas para <span id="selectedDateDisplay"></span></h2>
-                        <button class="bg-blue-500 text-white px-3 py-1 rounded-md text-sm" id="addBillFromCalendarBtn" style="display: none;">
-                            <i class="fas fa-plus mr-1"></i>Adicionar
-                        </button>
-                    </div>
-                    <div class="space-y-3" id="billsForSelectedDate">
-                        <p class="text-gray-500 text-center" id="noBillsForSelectedDateMessage">Nenhuma conta para esta data.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="p-4 hidden" id="settingsSection">
-                <div class="bg-white rounded-lg shadow p-4">
-                    <h2 class="text-lg font-bold mb-4 text-gray-700">Configurações</h2>
-                    <p class="text-gray-600">Opções de configuração do aplicativo.</p>
-                     <div class="mt-4 bg-gray-100 p-4 rounded-md text-center text-gray-500">
-                        <i class="fas fa-cog text-4xl mb-2"></i>
-                        <p>Ajustes personalizados virão aqui!</p>
-                    </div>
-                </div>
-            </div>
-
         </main>
 
-        <nav class="fixed bottom-0 w-full max-w-md bg-white border-t border-gray-200 flex justify-around py-3">
-            <a href="#" class="flex flex-col items-center nav-item text-blue-500" data-section="homeSection">
-                <i class="fas fa-home text-xl"></i>
-                <span class="text-xs mt-1">Início</span>
-            </a>
-            <a href="#" class="flex flex-col items-center nav-item text-gray-500" data-section="reportsSection">
-                <i class="fas fa-chart-pie text-xl"></i>
-                <span class="text-xs mt-1">Relatórios</span>
-            </a>
-            <a href="#" class="flex flex-col items-center text-gray-500 relative">
-                <div class="bg-blue-500 text-white rounded-full p-3 -mt-8 shadow-lg cursor-pointer" id="addBillTrigger">
-                    <i class="fas fa-plus text-xl"></i>
-                </div>
-                <span class="text-xs mt-2">Adicionar</span>
-            </a>
-            <a href="#" class="flex flex-col items-center nav-item text-gray-500" data-section="calendarSection">
-                <i class="fas fa-calendar-alt text-xl"></i>
-                <span class="text-xs mt-1">Calendário</span>
-            </a>
-            <a href="#" class="flex flex-col items-center nav-item text-gray-500" data-section="settingsSection">
-                <i class="fas fa-cog text-xl"></i>
-                <span class="text-xs mt-1">Config</span>
-            </a>
-        </nav>
-
-        <div id="billModal" class="modal-overlay hidden">
-            <div class="modal-content">
-                <div class="p-4 border-b border-gray-200 flex justify-between items-center">
-                    <h2 class="text-lg font-bold" id="billModalTitle">Adicionar conta</h2>
-                    <i class="fas fa-times cursor-pointer" id="closeBillModal"></i>
-                </div>
-                <div class="p-4">
-                    <form id="billForm">
-                        <input type="hidden" id="billId">
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="description">Descrição</label>
-                            <input class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="description" type="text" placeholder="Ex: Aluguel, Luz, Internet..." required>
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="value">Valor</label>
-                            <input class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="value" type="number" step="0.01" placeholder="R$ 0,00" required>
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="dueDate">Data de vencimento</label>
-                            <input class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="dueDate" type="date" required>
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="category">Categoria</label>
-                            <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="category" required>
-                                <option value="">Selecione uma categoria</option>
-                                <option value="Moradia">Moradia</option>
-                                <option value="Alimentação">Alimentação</option>
-                                <option value="Transporte">Transporte</option>
-                                <option value="Lazer">Lazer</option>
-                                <option value="Saúde">Saúde</option>
-                                <option value="Educação">Educação</option>
-                                <option value="Outros">Outros</option>
-                            </select>
-                        </div>
-                        <div class="flex justify-end space-x-3">
-                            <button type="button" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700" id="cancelBillForm">Cancelar</button>
-                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Salvar</button>
-                        </div>
-                    </form>
-                </div>
+        <!-- Footer -->
+        <footer class="bg-white border-t border-gray-200 py-4">
+            <div class="container mx-auto px-4 text-center text-gray-500 text-sm">
+                <p>Bill Manager &copy; 2023 - Sistema de Gerenciamento de Contas a Pagar</p>
             </div>
-        </div>
+        </footer>
+    </div>
 
-        <div id="confirmDeleteModal" class="modal-overlay hidden">
-            <div class="modal-content">
-                <div class="p-4 border-b border-gray-200">
-                    <h2 class="text-lg font-bold">Confirmar Exclusão</h2>
+    <!-- Add Bill Modal -->
+    <div id="add-bill-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+            <div class="flex justify-between items-center border-b px-6 py-4">
+                <h3 class="text-lg font-semibold text-gray-800">Adicionar Conta</h3>
+                <button id="close-add-bill-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="add-bill-form" class="p-6">
+                <div class="mb-4">
+                    <label for="bill-name" class="block text-sm font-medium text-gray-700 mb-1">Nome da Conta</label>
+                    <input type="text" id="bill-name" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
                 </div>
-                <div class="p-4">
-                    <p class="mb-4">Tem certeza que deseja excluir esta conta?</p>
-                    <div class="flex justify-end space-x-3">
-                        <button type="button" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700" id="cancelDelete">Cancelar</button>
-                        <button type="button" class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600" id="confirmDelete">Excluir</button>
+                <div class="mb-4">
+                    <label for="bill-due-date" class="block text-sm font-medium text-gray-700 mb-1">Data de Vencimento</label>
+                    <input type="date" id="bill-due-date" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="bill-amount" class="block text-sm font-medium text-gray-700 mb-1">Valor</label>
+                    <input type="text" id="bill-amount" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="R$ 0,00" required>
+                </div>
+                <div class="mb-4">
+                    <label for="bill-category" class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+                    <select id="bill-category" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                        <option value="">Selecione uma categoria</option>
+                        <option value="water">Água</option>
+                        <option value="electricity">Luz</option>
+                        <option value="rent">Aluguel</option>
+                        <option value="internet">Internet</option>
+                        <option value="phone">Telefone</option>
+                        <option value="other">Outros</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="bill-notes" class="block text-sm font-medium text-gray-700 mb-1">Observações</label>
+                    <textarea id="bill-notes" rows="3" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                </div>
+                <div class="flex justify-end space-x-3 pt-4 border-t">
+                    <button type="button" id="cancel-add-bill" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Bill Modal -->
+    <div id="edit-bill-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+            <div class="flex justify-between items-center border-b px-6 py-4">
+                <h3 class="text-lg font-semibold text-gray-800">Editar Conta</h3>
+                <button id="close-edit-bill-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="edit-bill-form" class="p-6">
+                <input type="hidden" id="edit-bill-id">
+                <div class="mb-4">
+                    <label for="edit-bill-name" class="block text-sm font-medium text-gray-700 mb-1">Nome da Conta</label>
+                    <input type="text" id="edit-bill-name" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="edit-bill-due-date" class="block text-sm font-medium text-gray-700 mb-1">Data de Vencimento</label>
+                    <input type="date" id="edit-bill-due-date" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="edit-bill-amount" class="block text-sm font-medium text-gray-700 mb-1">Valor</label>
+                    <input type="text" id="edit-bill-amount" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="R$ 0,00" required>
+                </div>
+                <div class="mb-4">
+                    <label for="edit-bill-category" class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+                    <select id="edit-bill-category" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                        <option value="water">Água</option>
+                        <option value="electricity">Luz</option>
+                        <option value="rent">Aluguel</option>
+                        <option value="internet">Internet</option>
+                        <option value="phone">Telefone</option>
+                        <option value="other">Outros</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="edit-bill-notes" class="block text-sm font-medium text-gray-700 mb-1">Observações</label>
+                    <textarea id="edit-bill-notes" rows="3" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                </div>
+                <div class="mb-4">
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" id="edit-bill-paid" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-offset-0 focus:ring-blue-200 focus:ring-opacity-50">
+                        <span class="ml-2 text-sm text-gray-700">Marcar como pago</span>
+                    </label>
+                </div>
+                <div class="flex justify-between pt-4 border-t">
+                    <button type="button" id="delete-bill-btn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">Excluir</button>
+                    <div class="flex space-x-3">
+                        <button type="button" id="cancel-edit-bill" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition">Cancelar</button>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Salvar</button>
                     </div>
                 </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+            <div class="flex justify-between items-center border-b px-6 py-4">
+                <h3 class="text-lg font-semibold text-gray-800">Acessar Bill Manager</h3>
+            </div>
+            <form id="login-form" class="p-6">
+                <div class="mb-4">
+                    <label for="login-email" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                    <input type="email" id="login-email" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="login-password" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                    <input type="password" id="login-password" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                </div>
+                <div class="mb-4 flex items-center justify-between">
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" id="remember-me" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-offset-0 focus:ring-blue-200 focus:ring-opacity-50">
+                        <span class="ml-2 text-sm text-gray-700">Lembrar de mim</span>
+                    </label>
+                    <a href="#" id="forgot-password" class="text-sm text-blue-600 hover:underline">Esqueceu a senha?</a>
+                </div>
+                <div class="flex flex-col space-y-3 pt-4 border-t">
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Entrar</button>
+                    <button type="button" id="show-register" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition">Criar nova conta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="register-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+            <div class="flex justify-between items-center border-b px-6 py-4">
+                <h3 class="text-lg font-semibold text-gray-800">Criar nova conta</h3>
+                <button id="close-register-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="register-form" class="p-6">
+                <div class="mb-4">
+                    <label for="register-name" class="block text-sm font-medium text-gray-700 mb-1">Nome</label>
+                    <input type="text" id="register-name" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="register-email" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                    <input type="email" id="register-email" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="register-password" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                    <input type="password" id="register-password" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500" required minlength="6">
+                </div>
+                <div class="mb-4">
+                    <label for="register-confirm-password" class="block text-sm font-medium text-gray-700 mb-1">Confirmar Senha</label>
+                    <input type="password" id="register-confirm-password" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500" required minlength="6">
+                </div>
+                <div class="flex justify-between pt-4 border-t">
+                    <button type="button" id="show-login" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition">Voltar para login</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Registrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notification-toast" class="fixed bottom-4 right-4 w-72 bg-white rounded-lg shadow-lg border border-gray-200 z-50 hidden">
+        <div class="p-4">
+            <div class="flex items-start">
+                <div id="toast-icon" class="flex-shrink-0 pt-0.5">
+                    <i class="fas fa-info-circle text-blue-500"></i>
+                </div>
+                <div class="ml-3 flex-1">
+                    <h4 id="toast-title" class="text-sm font-medium text-gray-900">Notificação</h4>
+                    <p id="toast-message" class="mt-1 text-sm text-gray-500">Mensagem de notificação</p>
+                </div>
+                <button id="close-toast" class="ml-4 flex-shrink-0 text-gray-400 hover:text-gray-500">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         </div>
-
     </div>
 
     <script>
-        // Initialize data structure if not exists
-        if (!localStorage.getItem('financeData')) {
-            localStorage.setItem('financeData', JSON.stringify({
-                bills: [],
-                balance: 0,
-                notifications: []
-            }));
-        }
-
-        // Helper function to get/set data
-        const getFinanceData = () => JSON.parse(localStorage.getItem('financeData'));
-        const setFinanceData = (data) => localStorage.setItem('financeData', JSON.stringify(data));
+        // Database Simulation (would be replaced with Supabase/IndexedDB in production)
+        let bills = [];
+        let categories = ['Água', 'Luz', 'Aluguel', 'Internet', 'Telefone', 'Outros'];
+        let notifications = [];
+        let currentUser = null;
+        let currentDate = new Date();
+        let selectedDate = null;
 
         // DOM Elements
-        const notificationBtn = document.getElementById('notificationBtn');
-        const closeNotification = document.getElementById('closeNotification');
-        const notificationPanel = document.getElementById('notificationPanel');
-        const notificationCountBadge = document.getElementById('notificationCount');
-        const notificationList = document.getElementById('notificationList');
-        const noNotificationsMessage = document.getElementById('noNotificationsMessage');
-
-        const addBillTrigger = document.getElementById('addBillTrigger');
-        const billModal = document.getElementById('billModal');
-        const closeBillModal = document.getElementById('closeBillModal');
-        const cancelBillForm = document.getElementById('cancelBillForm');
-        const billForm = document.getElementById('billForm');
-        const billModalTitle = document.getElementById('billModalTitle');
-        const billIdInput = document.getElementById('billId');
-        const descriptionInput = document.getElementById('description');
-        const valueInput = document.getElementById('value');
-        const dueDateInput = document.getElementById('dueDate');
-        const categoryInput = document.getElementById('category');
-
-        const totalPendingEl = document.getElementById('totalPending');
-        const totalPaidMonthEl = document.getElementById('totalPaidMonth');
-        const currentBalanceEl = document.getElementById('currentBalance');
-        const progressBar = document.querySelector('.progress-bar');
-        const paidPercentageText = document.getElementById('paidPercentageText');
-
-        const upcomingBillsContainer = document.getElementById('upcomingBills');
-        const noUpcomingBillsMessage = document.getElementById('noUpcomingBillsMessage');
-        const recentPaymentsContainer = document.getElementById('recentPayments');
-        const noRecentPaymentsMessage = document.getElementById('noRecentPaymentsMessage');
-
-        const navItems = document.querySelectorAll('.nav-item');
-        const sections = document.querySelectorAll('main > div'); // Select all direct div children of main
-
-        const confirmDeleteModal = document.getElementById('confirmDeleteModal');
-        const cancelDeleteBtn = document.getElementById('cancelDelete');
-        const confirmDeleteBtn = document.getElementById('confirmDelete');
-        let billToDeleteId = null; // To store the ID of the bill to be deleted
-
+        const dashboardContent = document.getElementById('dashboard-content');
+        const billsContent = document.getElementById('bills-content');
+        const calendarContent = document.getElementById('calendar-content');
+        
+        // Tabs
+        const dashboardTab = document.getElementById('dashboard-tab');
+        const billsTab = document.getElementById('bills-tab');
+        const calendarTab = document.getElementById('calendar-tab');
+        const reportsTab = document.getElementById('reports-tab');
+        const categoriesTab = document.getElementById('categories-tab');
+        const settingsTab = document.getElementById('settings-tab');
+        
+        // Mobile Tabs
+        const mobileDashboardTab = document.getElementById('mobile-dashboard-tab');
+        const mobileBillsTab = document.getElementById('mobile-bills-tab');
+        const mobileCalendarTab = document.getElementById('mobile-calendar-tab');
+        
+        // Modals
+        const addBillModal = document.getElementById('add-bill-modal');
+        const editBillModal = document.getElementById('edit-bill-modal');
+        const loginModal = document.getElementById('login-modal');
+        const registerModal = document.getElementById('register-modal');
+        
+        // Forms
+        const addBillForm = document.getElementById('add-bill-form');
+        const editBillForm = document.getElementById('edit-bill-form');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        
+        // Notification elements
+        const notificationBtn = document.getElementById('notification-btn');
+        const notificationDropdown = document.getElementById('notification-dropdown');
+        const notificationList = document.getElementById('notification-list');
+        const notificationCount = document.getElementById('notification-count');
+        const clearNotificationsBtn = document.getElementById('clear-notifications');
+        const notificationToast = document.getElementById('notification-toast');
+        
         // Calendar elements
-        const calendarGrid = document.getElementById('calendarGrid');
-        const currentMonthYearEl = document.getElementById('currentMonthYear');
-        const prevMonthBtn = document.getElementById('prevMonth');
-        const nextMonthBtn = document.getElementById('nextMonth');
-        const selectedDateDisplay = document.getElementById('selectedDateDisplay');
-        const billsForSelectedDateContainer = document.getElementById('billsForSelectedDate');
-        const noBillsForSelectedDateMessage = document.getElementById('noBillsForSelectedDateMessage');
-        const addBillFromCalendarBtn = document.getElementById('addBillFromCalendarBtn');
-
-        let currentCalendarDate = new Date(); // Tracks the month displayed on the calendar
-        let selectedCalendarDate = null; // Tracks the currently selected date on the calendar
-
-        // --- Navigation Logic ---
-        function showSection(sectionId) {
-            sections.forEach(section => {
-                section.classList.add('hidden');
-            });
-            document.getElementById(sectionId).classList.remove('hidden');
-
-            // If navigating to calendar, render it
-            if (sectionId === 'calendarSection') {
-                renderCalendar(currentCalendarDate);
-                // Clear selected date bills when navigating away from calendar or to it
-                selectedCalendarDate = null;
-                updateBillsForSelectedDate();
+        const calendarGrid = document.getElementById('calendar-grid');
+        const currentMonthYear = document.getElementById('current-month-year');
+        const prevMonthBtn = document.getElementById('prev-month-btn');
+        const nextMonthBtn = document.getElementById('next-month-btn');
+        const todayBtn = document.getElementById('today-btn');
+        const dayBillsPanel = document.getElementById('day-bills-panel');
+        const dayBillsList = document.getElementById('day-bills-list');
+        const selectedDayHeader = document.getElementById('selected-day-header');
+        const closeDayBills = document.getElementById('close-day-bills');
+        
+        // Chart elements
+        const categoryChartCtx = document.getElementById('category-chart').getContext('2d');
+        const monthlyChartCtx = document.getElementById('monthly-chart').getContext('2d');
+        
+        // Initialize charts
+        let categoryChart, monthlyChart;
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in (simulated)
+            if (!currentUser) {
+                loginModal.classList.remove('hidden');
+            } else {
+                loadData();
+                renderDashboard();
+                renderCalendar();
+                updateCharts();
+                checkForDueBills();
             }
-
-            // Update active state in nav
-            navItems.forEach(item => {
-                item.classList.remove('text-blue-500');
-                item.classList.add('text-gray-500');
-            });
-            const activeNavItem = document.querySelector(`[data-section="${sectionId}"]`);
-            if (activeNavItem) {
-                activeNavItem.classList.remove('text-gray-500');
-                activeNavItem.classList.add('text-blue-500');
-            }
-        }
-
-        navItems.forEach(item => {
-            item.addEventListener('click', (e) => {
+            
+            // Initialize event listeners
+            initEventListeners();
+            initFormValidations();
+            initCurrencyMask();
+        });
+        
+        function initEventListeners() {
+            // Tab navigation
+            dashboardTab.addEventListener('click', (e) => {
                 e.preventDefault();
-                const sectionId = e.currentTarget.dataset.section;
-                if (sectionId) {
-                    showSection(sectionId);
+                showDashboard();
+            });
+            
+            billsTab.addEventListener('click', (e) => {
+                e.preventDefault();
+                showBills();
+            });
+            
+            calendarTab.addEventListener('click', (e) => {
+                e.preventDefault();
+                showCalendar();
+            });
+            
+            reportsTab.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Would show reports in a real implementation
+                showToast('Relatórios', 'Funcionalidade de relatórios será implementada em breve.');
+            });
+            
+            categoriesTab.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Would show categories in a real implementation
+                showToast('Categorias', 'Gerenciamento de categorias será implementado em breve.');
+            });
+            
+            settingsTab.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Would show settings in a real implementation
+                showToast('Configurações', 'Configurações do usuário serão implementadas em breve.');
+            });
+            
+            // Mobile tab navigation
+            mobileDashboardTab.addEventListener('click', (e) => {
+                e.preventDefault();
+                showDashboard();
+            });
+            
+            mobileBillsTab.addEventListener('click', (e) => {
+                e.preventDefault();
+                showBills();
+            });
+            
+            mobileCalendarTab.addEventListener('click', (e) => {
+                e.preventDefault();
+                showCalendar();
+            });
+            
+            // Add bill buttons
+            document.getElementById('add-bill-btn').addEventListener('click', () => {
+                showAddBillModal();
+            });
+            
+            document.getElementById('add-bill-btn-2').addEventListener('click', () => {
+                showAddBillModal();
+            });
+            
+            // Close modals
+            document.getElementById('close-add-bill-modal').addEventListener('click', () => {
+                addBillModal.classList.add('hidden');
+            });
+            
+            document.getElementById('cancel-add-bill').addEventListener('click', () => {
+                addBillModal.classList.add('hidden');
+            });
+            
+            document.getElementById('close-edit-bill-modal').addEventListener('click', () => {
+                editBillModal.classList.add('hidden');
+            });
+            
+            document.getElementById('cancel-edit-bill').addEventListener('click', () => {
+                editBillModal.classList.add('hidden');
+            });
+            
+            document.getElementById('close-day-bills').addEventListener('click', () => {
+                dayBillsPanel.classList.add('hidden');
+            });
+            
+            // Notification dropdown
+            notificationBtn.addEventListener('click', () => {
+                notificationDropdown.classList.toggle('hidden');
+                if (!notificationDropdown.classList.contains('hidden')) {
+                    markNotificationsAsRead();
                 }
             });
-        });
-
-        // Set initial section
-        showSection('homeSection');
-
-
-        // --- Notification Panel Toggle ---
-        notificationBtn.addEventListener('click', () => {
-            notificationPanel.classList.remove('translate-x-full');
-            notificationPanel.classList.add('slide-in');
-            markNotificationsAsRead();
-        });
-
-        closeNotification.addEventListener('click', () => {
-            notificationPanel.classList.add('slide-out');
-            setTimeout(() => {
-                notificationPanel.classList.add('translate-x-full');
-                notificationPanel.classList.remove('slide-in', 'slide-out');
-            }, 300);
-        });
-
-        // --- Add/Edit Bill Modal Logic ---
-        function openBillModal(bill = null) {
-            billForm.reset(); // Clear form
-            if (bill) {
-                billModalTitle.textContent = 'Editar conta';
-                billIdInput.value = bill.id;
-                descriptionInput.value = bill.description;
-                valueInput.value = bill.value;
-                dueDateInput.value = bill.dueDate;
-                categoryInput.value = bill.category;
-            } else {
-                billModalTitle.textContent = 'Adicionar conta';
-                billIdInput.value = ''; // Ensure no ID for new bills
-                // Pre-fill dueDate if a date is selected in the calendar
-                if (selectedCalendarDate) {
-                    dueDateInput.value = selectedCalendarDate.toISOString().split('T')[0];
+            
+            // Clear notifications
+            clearNotificationsBtn.addEventListener('click', () => {
+                notifications = [];
+                updateNotificationCount();
+                renderNotificationList();
+            });
+            
+            // Close toast
+            document.getElementById('close-toast').addEventListener('click', () => {
+                notificationToast.classList.add('hidden');
+            });
+            
+            // Calendar navigation
+            prevMonthBtn.addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                renderCalendar();
+            });
+            
+            nextMonthBtn.addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                renderCalendar();
+            });
+            
+            todayBtn.addEventListener('click', () => {
+                currentDate = new Date();
+                renderCalendar();
+            });
+            
+            // Form submissions
+            addBillForm.addEventListener('submit', handleAddBill);
+            editBillForm.addEventListener('submit', handleEditBill);
+            loginForm.addEventListener('submit', handleLogin);
+            registerForm.addEventListener('click', (e) => {
+                if (e.target.id === 'show-login') {
+                    e.preventDefault();
+                    registerModal.classList.add('hidden');
+                    loginModal.classList.remove('hidden');
                 }
-            }
-            billModal.classList.remove('hidden');
+            });
+            
+            document.getElementById('show-register').addEventListener('click', (e) => {
+                e.preventDefault();
+                loginModal.classList.add('hidden');
+                registerModal.classList.remove('hidden');
+            });
+            
+            document.getElementById('close-register-modal').addEventListener('click', () => {
+                registerModal.classList.add('hidden');
+            });
+            
+            registerForm.addEventListener('submit', handleRegister);
+            
+            // Logout
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                currentUser = null;
+                bills = [];
+                notifications = [];
+                loginModal.classList.remove('hidden');
+                showDashboard();
+                showToast('Logout', 'Você foi desconectado com sucesso.');
+            });
+            
+            // Theme toggle
+            document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+            
+            // View all bills
+            document.getElementById('view-all-bills').addEventListener('click', (e) => {
+                e.preventDefault();
+                showBills();
+            });
+            
+            // Filter bills
+            document.getElementById('filter-bills-btn').addEventListener('click', () => {
+                document.getElementById('filter-panel').classList.toggle('hidden');
+            });
+            
+            document.getElementById('apply-filters-btn').addEventListener('click', () => {
+                filterBills();
+                document.getElementById('filter-panel').classList.add('hidden');
+            });
+            
+            document.getElementById('reset-filters-btn').addEventListener('click', () => {
+                document.getElementById('status-filter').value = 'all';
+                document.getElementById('category-filter').value = 'all';
+                document.getElementById('period-filter').value = 'all';
+                filterBills();
+                document.getElementById('filter-panel').classList.add('hidden');
+            });
         }
-
-        addBillTrigger.addEventListener('click', (e) => {
-            e.preventDefault();
-            selectedCalendarDate = null; // Clear selected date when adding from main button
-            openBillModal();
-        });
-
-        addBillFromCalendarBtn.addEventListener('click', () => {
-            openBillModal();
-        });
-
-        closeBillModal.addEventListener('click', () => {
-            billModal.classList.add('hidden');
-        });
-
-        cancelBillForm.addEventListener('click', () => {
-            billModal.classList.add('hidden');
-        });
-
-        billForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            const id = billIdInput.value ? parseInt(billIdInput.value) : null;
-            const description = descriptionInput.value;
-            const value = parseFloat(valueInput.value);
-            const dueDate = dueDateInput.value;
-            const category = categoryInput.value;
-
-            const data = getFinanceData();
-
-            if (id) {
-                // Editing existing bill
-                const billIndex = data.bills.findIndex(bill => bill.id === id);
-                if (billIndex !== -1) {
-                    data.bills[billIndex].description = description;
-                    data.bills[billIndex].value = value;
-                    data.bills[billIndex].dueDate = dueDate;
-                    data.bills[billIndex].category = category;
-                    // Note: status, createdAt, paidAt should not be changed here
-                }
-            } else {
-                // Adding new bill
-                const newBill = {
-                    id: Date.now(), // Unique ID
-                    description,
-                    value,
-                    dueDate,
-                    category,
-                    status: 'pending',
-                    createdAt: new Date().toISOString()
-                };
-                data.bills.push(newBill);
-            }
-
-            setFinanceData(data);
-            billModal.classList.add('hidden');
-            billForm.reset();
-            updateUI(); // Refresh the UI
-            renderCalendar(currentCalendarDate); // Re-render calendar to show new/updated bills
-            if (selectedCalendarDate) {
-                updateBillsForSelectedDate(selectedCalendarDate); // Update bills for selected date
-            }
-        });
-
-        // --- Delete Bill Logic ---
-        function openConfirmDeleteModal(id) {
-            billToDeleteId = id;
-            confirmDeleteModal.classList.remove('hidden');
-        }
-
-        cancelDeleteBtn.addEventListener('click', () => {
-            confirmDeleteModal.classList.add('hidden');
-            billToDeleteId = null;
-        });
-
-        confirmDeleteBtn.addEventListener('click', () => {
-            if (billToDeleteId) {
-                const data = getFinanceData();
-                const initialLength = data.bills.length;
-                data.bills = data.bills.filter(bill => bill.id !== billToDeleteId);
-
-                if (data.bills.length < initialLength) {
-                     // Check if it was a paid bill, if so, add value back to balance (if needed for income tracking)
-                     // For now, only remove. If you want a more complex balance, you'd need to track income too.
-                    addNotification('info', 'Conta excluída', 'Uma conta foi removida do seu registro.');
-                }
-                setFinanceData(data);
-                updateUI();
-                renderCalendar(currentCalendarDate); // Re-render calendar after deletion
-                if (selectedCalendarDate) {
-                    updateBillsForSelectedDate(selectedCalendarDate); // Update bills for selected date
-                }
-            }
-            confirmDeleteModal.classList.add('hidden');
-            billToDeleteId = null;
-        });
-
-
-        // --- Bill Status Update Logic ---
-        function markAsPaid(billId) {
-            const data = getFinanceData();
-            const billIndex = data.bills.findIndex(bill => bill.id === billId);
-
-            if (billIndex !== -1 && data.bills[billIndex].status === 'pending') {
-                data.bills[billIndex].status = 'paid';
-                data.bills[billIndex].paidAt = new Date().toISOString(); // Record payment date
+        
+        function initFormValidations() {
+            // Simple form validation for register form
+            registerForm.addEventListener('submit', (e) => {
+                const password = document.getElementById('register-password').value;
+                const confirmPassword = document.getElementById('register-confirm-password').value;
                 
-                // Update balance: subtract the bill's value
-                data.balance -= data.bills[billIndex].value; 
-                
-                setFinanceData(data);
-                addNotification('success', 'Conta paga!', `${data.bills[billIndex].description} (R$ ${data.bills[billIndex].value.toFixed(2)}) foi marcada como paga.`);
-                updateUI();
-                renderCalendar(currentCalendarDate); // Re-render calendar to update status
-                if (selectedCalendarDate) {
-                    updateBillsForSelectedDate(selectedCalendarDate); // Update bills for selected date
+                if (password !== confirmPassword) {
+                    e.preventDefault();
+                    showToast('Erro', 'As senhas não coincidem.');
                 }
+            });
+        }
+        
+        function initCurrencyMask() {
+            // Apply currency mask to amount inputs
+            const amountInputs = [
+                document.getElementById('bill-amount'),
+                document.getElementById('edit-bill-amount')
+            ];
+            
+            amountInputs.forEach(input => {
+                if (input) {
+                    VMasker(input).maskMoney({
+                        precision: 2,
+                        separator: ',',
+                        delimiter: '.',
+                        unit: 'R$',
+                        zeroCents: true
+                    });
+                }
+            });
+        }
+        
+        function loadData() {
+            // Simulate loading data from database
+            if (bills.length === 0) {
+                // Add some sample bills
+                const today = new Date();
+                const nextWeek = new Date(today);
+                nextWeek.setDate(today.getDate() + 7);
+                
+                const lastWeek = new Date(today);
+                lastWeek.setDate(today.getDate() - 7);
+                
+                bills = [
+                    {
+                        id: 1,
+                        name: 'Aluguel',
+                        dueDate: formatDateForInput(today),
+                        amount: 1500.00,
+                        category: 'rent',
+                        notes: 'Pagamento mensal do aluguel',
+                        paid: false,
+                        userId: 1
+                    },
+                    {
+                        id: 2,
+                        name: 'Conta de Luz',
+                        dueDate: formatDateForInput(nextWeek),
+                        amount: 250.50,
+                        category: 'electricity',
+                        notes: 'Conta de luz do mês',
+                        paid: false,
+                        userId: 1
+                    },
+                    {
+                        id: 3,
+                        name: 'Internet',
+                        dueDate: formatDateForInput(lastWeek),
+                        amount: 99.90,
+                        category: 'internet',
+                        notes: 'Plano de 100MB',
+                        paid: true,
+                        userId: 1
+                    },
+                    {
+                        id: 4,
+                        name: 'Água',
+                        dueDate: formatDateForInput(today),
+                        amount: 85.25,
+                        category: 'water',
+                        notes: 'Conta de água',
+                        paid: false,
+                        userId: 1
+                    }
+                ];
+            }
+            
+            // Add some sample notifications
+            if (notifications.length === 0) {
+                notifications = [
+                    {
+                        id: 1,
+                        title: 'Conta vencendo hoje',
+                        message: 'A conta de Água vence hoje',
+                        date: new Date(),
+                        read: false,
+                        userId: 1
+                    },
+                    {
+                        id: 2,
+                        title: 'Conta vencendo amanhã',
+                        message: 'A conta de Luz vence amanhã',
+                        date: new Date(),
+                        read: false,
+                        userId: 1
+                    }
+                ];
             }
         }
-
-        // --- Notification Management ---
+        
+        function showDashboard() {
+            dashboardContent.classList.remove('hidden');
+            billsContent.classList.add('hidden');
+            calendarContent.classList.add('hidden');
+            
+            // Update active tab styling
+            dashboardTab.classList.add('bg-blue-100', 'text-blue-700');
+            dashboardTab.classList.remove('hover:bg-gray-100', 'text-gray-700');
+            
+            billsTab.classList.remove('bg-blue-100', 'text-blue-700');
+            billsTab.classList.add('hover:bg-gray-100', 'text-gray-700');
+            
+            calendarTab.classList.remove('bg-blue-100', 'text-blue-700');
+            calendarTab.classList.add('hover:bg-gray-100', 'text-gray-700');
+            
+            // Update mobile tab styling
+            mobileDashboardTab.classList.add('bg-blue-100', 'text-blue-700');
+            mobileDashboardTab.classList.remove('hover:bg-gray-100', 'text-gray-700');
+            
+            mobileBillsTab.classList.remove('bg-blue-100', 'text-blue-700');
+            mobileBillsTab.classList.add('hover:bg-gray-100', 'text-gray-700');
+            
+            mobileCalendarTab.classList.remove('bg-blue-100', 'text-blue-700');
+            mobileCalendarTab.classList.add('hover:bg-gray-100', 'text-gray-700');
+            
+            // Update dashboard data
+            updateDashboardSummary();
+            renderUpcomingBills();
+        }
+        
+        function showBills() {
+            dashboardContent.classList.add('hidden');
+            billsContent.classList.remove('hidden');
+            calendarContent.classList.add('hidden');
+            
+            // Update active tab styling
+            dashboardTab.classList.remove('bg-blue-100', 'text-blue-700');
+            dashboardTab.classList.add('hover:bg-gray-100', 'text-gray-700');
+            
+            billsTab.classList.add('bg-blue-100', 'text-blue-700');
+            billsTab.classList.remove('hover:bg-gray-100', 'text-gray-700');
+            
+            calendarTab.classList.remove('bg-blue-100', 'text-blue-700');
+            calendarTab.classList.add('hover:bg-gray-100', 'text-gray-700');
+            
+            // Update mobile tab styling
+            mobileDashboardTab.classList.remove('bg-blue-100', 'text-blue-700');
+            mobileDashboardTab.classList.add('hover:bg-gray-100', 'text-gray-700');
+            
+            mobileBillsTab.classList.add('bg-blue-100', 'text-blue-700');
+            mobileBillsTab.classList.remove('hover:bg-gray-100', 'text-gray-700');
+            
+            mobileCalendarTab.classList.remove('bg-blue-100', 'text-blue-700');
+            mobileCalendarTab.classList.add('hover:bg-gray-100', 'text-gray-700');
+            
+            // Render bills table
+            renderBillsTable();
+        }
+        
+        function showCalendar() {
+            dashboardContent.classList.add('hidden');
+            billsContent.classList.add('hidden');
+            calendarContent.classList.remove('hidden');
+            
+            // Update active tab styling
+            dashboardTab.classList.remove('bg-blue-100', 'text-blue-700');
+            dashboardTab.classList.add('hover:bg-gray-100', 'text-gray-700');
+            
+            billsTab.classList.remove('bg-blue-100', 'text-blue-700');
+            billsTab.classList.add('hover:bg-gray-100', 'text-gray-700');
+            
+            calendarTab.classList.add('bg-blue-100', 'text-blue-700');
+            calendarTab.classList.remove('hover:bg-gray-100', 'text-gray-700');
+            
+            // Update mobile tab styling
+            mobileDashboardTab.classList.remove('bg-blue-100', 'text-blue-700');
+            mobileDashboardTab.classList.add('hover:bg-gray-100', 'text-gray-700');
+            
+            mobileBillsTab.classList.remove('bg-blue-100', 'text-blue-700');
+            mobileBillsTab.classList.add('hover:bg-gray-100', 'text-gray-700');
+            
+            mobileCalendarTab.classList.add('bg-blue-100', 'text-blue-700');
+            mobileCalendarTab.classList.remove('hover:bg-gray-100', 'text-gray-700');
+            
+            // Render calendar
+            renderCalendar();
+        }
+        
+        function showAddBillModal() {
+            // Reset form
+            addBillForm.reset();
+            document.getElementById('bill-due-date').value = formatDateForInput(new Date());
+            addBillModal.classList.remove('hidden');
+        }
+        
+        function showEditBillModal(billId) {
+            const bill = bills.find(b => b.id === billId);
+            if (!bill) return;
+            
+            document.getElementById('edit-bill-id').value = bill.id;
+            document.getElementById('edit-bill-name').value = bill.name;
+            document.getElementById('edit-bill-due-date').value = bill.dueDate;
+            document.getElementById('edit-bill-amount').value = bill.amount.toFixed(2).replace('.', ',');
+            document.getElementById('edit-bill-category').value = bill.category;
+            document.getElementById('edit-bill-notes').value = bill.notes || '';
+            document.getElementById('edit-bill-paid').checked = bill.paid;
+            
+            editBillModal.classList.remove('hidden');
+        }
+        
+        function handleAddBill(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('bill-name').value;
+            const dueDate = document.getElementById('bill-due-date').value;
+            const amount = parseFloat(document.getElementById('bill-amount').value.replace('R$', '').replace('.', '').replace(',', '.'));
+            const category = document.getElementById('bill-category').value;
+            const notes = document.getElementById('bill-notes').value;
+            
+            const newBill = {
+                id: bills.length > 0 ? Math.max(...bills.map(b => b.id)) + 1 : 1,
+                name,
+                dueDate,
+                amount,
+                category,
+                notes,
+                paid: false,
+                userId: currentUser ? currentUser.id : 1
+            };
+            
+            bills.push(newBill);
+            addBillModal.classList.add('hidden');
+            
+            // Update UI
+            updateDashboardSummary();
+            renderUpcomingBills();
+            renderBillsTable();
+            renderCalendar();
+            updateCharts();
+            
+            // Check if this bill is due soon
+            checkBillForNotification(newBill);
+            
+            showToast('Sucesso', 'Conta adicionada com sucesso!');
+        }
+        
+        function handleEditBill(e) {
+            e.preventDefault();
+            
+            const billId = parseInt(document.getElementById('edit-bill-id').value);
+            const name = document.getElementById('edit-bill-name').value;
+            const dueDate = document.getElementById('edit-bill-due-date').value;
+            const amount = parseFloat(document.getElementById('edit-bill-amount').value.replace('R$', '').replace('.', '').replace(',', '.'));
+            const category = document.getElementById('edit-bill-category').value;
+            const notes = document.getElementById('edit-bill-notes').value;
+            const paid = document.getElementById('edit-bill-paid').checked;
+            
+            const billIndex = bills.findIndex(b => b.id === billId);
+            if (billIndex === -1) return;
+            
+            bills[billIndex] = {
+                ...bills[billIndex],
+                name,
+                dueDate,
+                amount,
+                category,
+                notes,
+                paid
+            };
+            
+            editBillModal.classList.add('hidden');
+            
+            // Update UI
+            updateDashboardSummary();
+            renderUpcomingBills();
+            renderBillsTable();
+            renderCalendar();
+            updateCharts();
+            
+            showToast('Sucesso', 'Conta atualizada com sucesso!');
+        }
+        
+        function handleDeleteBill(billId) {
+            Swal.fire({
+                title: 'Tem certeza?',
+                text: "Você não poderá reverter isso!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sim, excluir!',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    bills = bills.filter(b => b.id !== billId);
+                    
+                    // Update UI
+                    updateDashboardSummary();
+                    renderUpcomingBills();
+                    renderBillsTable();
+                    renderCalendar();
+                    updateCharts();
+                    
+                    Swal.fire(
+                        'Excluído!',
+                        'A conta foi excluída.',
+                        'success'
+                    );
+                }
+            });
+        }
+        
+        function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            // Simulate login
+            currentUser = {
+                id: 1,
+                name: 'Usuário Demo',
+                email: email
+            };
+            
+            loginModal.classList.add('hidden');
+            loadData();
+            renderDashboard();
+            renderCalendar();
+            updateCharts();
+            checkForDueBills();
+            
+            showToast('Bem-vindo', 'Login realizado com sucesso!');
+        }
+        
+        function handleRegister(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            
+            // Simulate registration
+            currentUser = {
+                id: 2,
+                name: name,
+                email: email
+            };
+            
+            registerModal.classList.add('hidden');
+            bills = [];
+            notifications = [];
+            loadData();
+            renderDashboard();
+            renderCalendar();
+            updateCharts();
+            checkForDueBills();
+            
+            showToast('Bem-vindo', 'Conta criada com sucesso!');
+        }
+        
+        function updateDashboardSummary() {
+            const now = new Date();
+            const today = formatDateForInput(now);
+            
+            const tomorrow = new Date(now);
+            tomorrow.setDate(now.getDate() + 1);
+            const tomorrowStr = formatDateForInput(tomorrow);
+            
+            // Pending bills (not paid and not overdue)
+            const pendingBills = bills.filter(bill => 
+                !bill.paid && 
+                bill.dueDate >= today
+            );
+            
+            // Paid bills
+            const paidBills = bills.filter(bill => bill.paid);
+            
+            // Overdue bills
+            const overdueBills = bills.filter(bill => 
+                !bill.paid && 
+                bill.dueDate < today
+            );
+            
+            // Calculate totals
+            const pendingTotal = pendingBills.reduce((sum, bill) => sum + bill.amount, 0);
+            const paidTotal = paidBills.reduce((sum, bill) => sum + bill.amount, 0);
+            const overdueTotal = overdueBills.reduce((sum, bill) => sum + bill.amount, 0);
+            
+            // Update UI
+            document.getElementById('pending-amount').textContent = formatCurrency(pendingTotal);
+            document.getElementById('pending-count').textContent = pendingBills.length;
+            
+            document.getElementById('paid-amount').textContent = formatCurrency(paidTotal);
+            document.getElementById('paid-count').textContent = paidBills.length;
+            
+            document.getElementById('overdue-amount').textContent = formatCurrency(overdueTotal);
+            document.getElementById('overdue-count').textContent = overdueBills.length;
+            
+            // Update monthly summary in sidebar
+            document.getElementById('monthly-pending').textContent = formatCurrency(pendingTotal);
+            document.getElementById('monthly-paid').textContent = formatCurrency(paidTotal);
+            document.getElementById('monthly-overdue').textContent = formatCurrency(overdueTotal);
+        }
+        
+        function renderUpcomingBills() {
+            const now = new Date();
+            const today = formatDateForInput(now);
+            
+            const nextWeek = new Date(now);
+            nextWeek.setDate(now.getDate() + 7);
+            const nextWeekStr = formatDateForInput(nextWeek);
+            
+            // Get upcoming bills (due today or in the next 7 days)
+            const upcomingBills = bills.filter(bill => 
+                !bill.paid && 
+                bill.dueDate >= today && 
+                bill.dueDate <= nextWeekStr
+            ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+            
+            const upcomingBillsContainer = document.getElementById('upcoming-bills');
+            upcomingBillsContainer.innerHTML = '';
+            
+            if (upcomingBills.length === 0) {
+                upcomingBillsContainer.innerHTML = '<div class="p-4 text-center text-gray-500">Nenhuma conta a vencer nos próximos dias</div>';
+                return;
+            }
+            
+            upcomingBills.forEach(bill => {
+                const billElement = document.createElement('div');
+                billElement.className = 'p-4 hover:bg-gray-100 transition cursor-pointer';
+                billElement.addEventListener('click', () => showEditBillModal(bill.id));
+                
+                const isToday = bill.dueDate === today;
+                const dueDate = new Date(bill.dueDate);
+                const dueDateStr = isToday ? 'Hoje' : formatDate(dueDate);
+                
+                billElement.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-medium text-gray-800">${bill.name}</h4>
+                            <p class="text-sm text-gray-500">${getCategoryName(bill.category)}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-semibold ${isToday ? 'text-red-600' : 'text-gray-800'}">${formatCurrency(bill.amount)}</p>
+                            <p class="text-sm ${isToday ? 'text-red-500' : 'text-gray-500'}">${dueDateStr}</p>
+                        </div>
+                    </div>
+                `;
+                
+                upcomingBillsContainer.appendChild(billElement);
+            });
+        }
+        
+        function renderBillsTable() {
+            const tableBody = document.getElementById('bills-table-body');
+            tableBody.innerHTML = '';
+            
+            if (bills.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">Nenhuma conta cadastrada</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Sort by due date (ascending)
+            const sortedBills = [...bills].sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+            
+            sortedBills.forEach(bill => {
+                const dueDate = new Date(bill.dueDate);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                let statusClass = '';
+                let statusText = '';
+                
+                if (bill.paid) {
+                    statusClass = 'bg-green-100 text-green-800';
+                    statusText = 'Pago';
+                } else if (dueDate < today) {
+                    statusClass = 'bg-red-100 text-red-800';
+                    statusText = 'Atrasado';
+                } else {
+                    statusClass = 'bg-yellow-100 text-yellow-800';
+                    statusText = 'Pendente';
+                }
+                
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="text-sm font-medium text-gray-900">${bill.name}</div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${formatDate(dueDate)}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900 font-medium">${formatCurrency(bill.amount)}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                            ${getCategoryName(bill.category)}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">
+                            ${statusText}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button class="text-blue-600 hover:text-blue-900 mr-3 edit-bill-btn" data-id="${bill.id}">Editar</button>
+                        <button class="text-red-600 hover:text-red-900 delete-bill-btn" data-id="${bill.id}">Excluir</button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Add event listeners to edit and delete buttons
+            document.querySelectorAll('.edit-bill-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const billId = parseInt(e.target.getAttribute('data-id'));
+                    showEditBillModal(billId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-bill-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const billId = parseInt(e.target.getAttribute('data-id'));
+                    handleDeleteBill(billId);
+                });
+            });
+        }
+        
+        function filterBills() {
+            const statusFilter = document.getElementById('status-filter').value;
+            const categoryFilter = document.getElementById('category-filter').value;
+            const periodFilter = document.getElementById('period-filter').value;
+            
+            const now = new Date();
+            const today = formatDateForInput(now);
+            
+            const filteredBills = bills.filter(bill => {
+                // Status filter
+                if (statusFilter === 'pending' && (bill.paid || new Date(bill.dueDate) < new Date(today))) {
+                    return false;
+                }
+                if (statusFilter === 'paid' && !bill.paid) {
+                    return false;
+                }
+                if (statusFilter === 'overdue' && (bill.paid || new Date(bill.dueDate) >= new Date(today))) {
+                    return false;
+                }
+                
+                // Category filter
+                if (categoryFilter !== 'all' && bill.category !== categoryFilter) {
+                    return false;
+                }
+                
+                // Period filter
+                if (periodFilter !== 'all') {
+                    const billDate = new Date(bill.dueDate);
+                    const billMonth = billDate.getMonth();
+                    const billYear = billDate.getFullYear();
+                    
+                    const currentMonth = now.getMonth();
+                    const currentYear = now.getFullYear();
+                    
+                    if (periodFilter === 'this-month' && (billMonth !== currentMonth || billYear !== currentYear)) {
+                        return false;
+                    }
+                    if (periodFilter === 'next-month') {
+                        let nextMonth = currentMonth + 1;
+                        let nextYear = currentYear;
+                        if (nextMonth > 11) {
+                            nextMonth = 0;
+                            nextYear++;
+                        }
+                        
+                        if (billMonth !== nextMonth || billYear !== nextYear) {
+                            return false;
+                        }
+                    }
+                    if (periodFilter === 'last-month') {
+                        let lastMonth = currentMonth - 1;
+                        let lastYear = currentYear;
+                        if (lastMonth < 0) {
+                            lastMonth = 11;
+                            lastYear--;
+                        }
+                        
+                        if (billMonth !== lastMonth || billYear !== lastYear) {
+                            return false;
+                        }
+                    }
+                }
+                
+                return true;
+            });
+            
+            renderFilteredBillsTable(filteredBills);
+        }
+        
+        function renderFilteredBillsTable(filteredBills) {
+            const tableBody = document.getElementById('bills-table-body');
+            tableBody.innerHTML = '';
+            
+            if (filteredBills.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">Nenhuma conta encontrada</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            filteredBills.forEach(bill => {
+                const dueDate = new Date(bill.dueDate);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                let statusClass = '';
+                let statusText = '';
+                
+                if (bill.paid) {
+                    statusClass = 'bg-green-100 text-green-800';
+                    statusText = 'Pago';
+                } else if (dueDate < today) {
+                    statusClass = 'bg-red-100 text-red-800';
+                    statusText = 'Atrasado';
+                } else {
+                    statusClass = 'bg-yellow-100 text-yellow-800';
+                    statusText = 'Pendente';
+                }
+                
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="text-sm font-medium text-gray-900">${bill.name}</div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${formatDate(dueDate)}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900 font-medium">${formatCurrency(bill.amount)}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                            ${getCategoryName(bill.category)}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">
+                            ${statusText}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button class="text-blue-600 hover:text-blue-900 mr-3 edit-bill-btn" data-id="${bill.id}">Editar</button>
+                        <button class="text-red-600 hover:text-red-900 delete-bill-btn" data-id="${bill.id}">Excluir</button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Add event listeners to edit and delete buttons
+            document.querySelectorAll('.edit-bill-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const billId = parseInt(e.target.getAttribute('data-id'));
+                    showEditBillModal(billId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-bill-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const billId = parseInt(e.target.getAttribute('data
+</body>
+</html>
