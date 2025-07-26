@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contas a Pagar | Meu Financeiro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @media (max-width: 640px) {
+            .hide-on-mobile {
+                display: none;
+            }
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 18px;
+            height: 18px;
+            background-color: #ef4444;
+            color: white;
+            border-radius: 50%;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .slide-in {
+            animation: slideIn 0.3s forwards;
+        }
+        
+        .slide-out {
+            animation: slideOut 0.3s forwards;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        
+        @keyframes slideOut {
+            from { transform: translateX(0); }
+            to { transform: translateX(100%); }
+        }
+        
+        .progress-bar {
+            height: 6px;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="max-w-md mx-auto bg-white min-h-screen relative overflow-hidden">
+        <!-- Header -->
+        <header class="bg-blue-600 text-white p-4 shadow-md">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-wallet text-2xl"></i>
+                    <h1 class="text-xl font-bold">Meu Financeiro</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <i class="fas fa-bell text-xl cursor-pointer" id="notificationBtn"></i>
+                        <div class="notification-badge" id="notificationCount">3</div>
+                    </div>
+                    <i class="fas fa-user-circle text-2xl"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Notification Panel -->
+        <div id="notificationPanel" class="absolute top-0 right-0 w-full max-w-md h-full bg-white shadow-lg z-10 transform translate-x-full">
+            <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-blue-600 text-white">
+                <h2 class="text-lg font-bold">Notificações</h2>
+                <i class="fas fa-times cursor-pointer" id="closeNotification"></i>
+            </div>
+            <div class="overflow-y-auto h-full pb-20">
+                <div class="p-4 border-b border-gray-200">
+                    <div class="flex items-start space-x-3">
+                        <div class="bg-yellow-100 p-2 rounded-full">
+                            <i class="fas fa-exclamation text-yellow-500"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-medium">Conta próxima do vencimento</h3>
+                            <p class="text-sm text-gray-500">Aluguel vence em 2 dias</p>
+                            <p class="text-xs text-gray-400">Hoje, 10:30</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 border-b border-gray-200">
+                    <div class="flex items-start space-x-3">
+                        <div class="bg-red-100 p-2 rounded-full">
+                            <i class="fas fa-exclamation-triangle text-red-500"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-medium">Conta vencida!</h3>
+                            <p class="text-sm text-gray-500">Conta de luz venceu hoje</p>
+                            <p class="text-xs text-gray-400">Hoje, 08:15</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 border-b border-gray-200">
+                    <div class="flex items-start space-x-3">
+                        <div class="bg-green-100 p-2 rounded-full">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-medium">Pagamento confirmado</h3>
+                            <p class="text-sm text-gray-500">Internet paga com sucesso</p>
+                            <p class="text-xs text-gray-400">Ontem, 16:45</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="pb-20">
+            <!-- Dashboard Summary -->
+            <div class="p-4">
+                <div class="bg-white rounded-lg shadow p-4 mb-4">
+                    <h2 class="text-lg font-bold mb-4 text-gray-700">Resumo Financeiro</h2>
+                    <div class="grid grid-cols-3 gap-4 text-center">
+                        <div>
+                            <p class="text-sm text-gray-500">A pagar</p>
+                            <p class="font-bold text-red-500">R$ 0,00</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Pago este mês</p>
+                            <p class="font-bold text-green-500">R$ 0,00</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Saldo</p>
+                            <p class="font-bold text-blue-500">R$ 0,00</p>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-sm text-gray-500 mb-1">Progresso mensal</p>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="progress-bar bg-blue-500 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">0% das contas pagas</p>
+                    </div>
+                </div>
+
+                <!-- Upcoming Bills -->
+                <div class="bg-white rounded-lg shadow p-4 mb-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-lg font-bold text-gray-700">Próximos vencimentos</h2>
+                        <a href="#" class="text-sm text-blue-500">Ver todos</a>
+                    </div>
+                    <div class="space-y-3" id="upcomingBills">
+                        <!-- Bills will be added dynamically here -->
+                    </div>
+                </div>
+
+                <!-- Recent Payments -->
+                <div class="bg-white rounded-lg shadow p-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-lg font-bold text-gray-700">Pagamentos recentes</h2>
+                        <a href="#" class="text-sm text-blue-500">Ver histórico</a>
+                    </div>
+                    <div class="space-y-3" id="recentPayments">
+                        <!-- Payments will be added dynamically here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="fixed bottom-0 w-full max-w-md bg-white border-t border-gray-200 flex justify-around py-3">
+            <a href="#" class="flex flex-col items-center text-blue-500">
+                <i class="fas fa-home text-xl"></i>
+                <span class="text-xs mt-1">Início</span>
+            </a>
+            <a href="#" class="flex flex-col items-center text-gray-500">
+                <i class="fas fa-chart-pie text-xl"></i>
+                <span class="text-xs mt-1">Relatórios</span>
+            </a>
+            <a href="#" class="flex flex-col items-center text-gray-500 relative">
+                <div class="bg-blue-500 text-white rounded-full p-3 -mt-8 shadow-lg">
+                    <i class="fas fa-plus text-xl"></i>
+                </div>
+                <span class="text-xs mt-2">Adicionar</span>
+            </a>
+            <a href="#" class="flex flex-col items-center text-gray-500">
+                <i class="fas fa-calendar-alt text-xl"></i>
+                <span class="text-xs mt-1">Calendário</span>
+            </a>
+            <a href="#" class="flex flex-col items-center text-gray-500">
+                <i class="fas fa-cog text-xl"></i>
+                <span class="text-xs mt-1">Config</span>
+            </a>
+        </nav>
+
+        <!-- Add Bill Modal -->
+        <div id="addBillModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20 hidden">
+            <div class="bg-white rounded-lg w-full max-w-md mx-4">
+                <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                    <h2 class="text-lg font-bold">Adicionar conta</h2>
+                    <i class="fas fa-times cursor-pointer" id="closeModal"></i>
+                </div>
+                <div class="p-4">
+                    <form id="billForm">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="description">Descrição</label>
+                            <input class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="description" type="text" placeholder="Ex: Aluguel, Luz, Internet...">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="value">Valor</label>
+                            <input class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="value" type="number" step="0.01" placeholder="R$ 0,00">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="dueDate">Data de vencimento</label>
+                            <input class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="dueDate" type="date">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="category">Categoria</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="category">
+                                <option value="">Selecione uma categoria</option>
+                                <option value="Moradia">Moradia</option>
+                                <option value="Alimentação">Alimentação</option>
+                                <option value="Transporte">Transporte</option>
+                                <option value="Lazer">Lazer</option>
+                                <option value="Saúde">Saúde</option>
+                                <option value="Educação">Educação</option>
+                                <option value="Outros">Outros</option>
+                            </select>
+                        </div>
+                        <div class="flex justify-end space-x-3">
+                            <button type="button" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700" id="cancelAdd">Cancelar</button>
+                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Salvar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize data structure if not exists
+        if (!localStorage.getItem('financeData')) {
+            localStorage.setItem('financeData', JSON.stringify({
+                bills: [],
+                paidAmount: 0,
+                balance: 0,
+                notifications: []
+            }));
+        }
+
+        // Helper function to get/set data
+        const getFinanceData = () => JSON.parse(localStorage.getItem('financeData'));
+        const setFinanceData = (data) => localStorage.setItem('financeData', JSON.stringify(data));
+
+        // Notification Panel Toggle
+        const notificationBtn = document.getElementById('notificationBtn');
+        const closeNotification = document.getElementById('closeNotification');
+        const notificationPanel = document.getElementById('notificationPanel');
+        
+        notificationBtn.addEventListener('click', () => {
+            notificationPanel.classList.remove('translate-x-full');
+            notificationPanel.classList.add('slide-in');
+        });
+        
+        closeNotification.addEventListener('click', () => {
+            notificationPanel.classList.add('slide-out');
+            setTimeout(() => {
+                notificationPanel.classList.add('translate-x-full');
+                notificationPanel.classList.remove('slide-in', 'slide-out');
+            }, 300);
+        });
+        
+        // Add Bill Modal
+        const addBillBtn = document.querySelector('nav a:nth-child(3)');
+        const addBillModal = document.getElementById('addBillModal');
+        const closeModal = document.getElementById('closeModal');
+        const cancelAdd = document.getElementById('cancelAdd');
+        
+        addBillBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            addBillModal.classList.remove('hidden');
+        });
+        
+        closeModal.addEventListener('click', () => {
+            addBillModal.classList.add('hidden');
+        });
+        
+        cancelAdd.addEventListener('click', () => {
+            addBillModal.classList.add('hidden');
+        });
+        
+        // Form submission
+        const billForm = document.getElementById('billForm');
+        billForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                description: document.getElementById('description').value,
+                value: parseFloat(document.getElementById('value').value),
+                dueDate: document.getElementById('dueDate').value,
+                category: document.getElementById('category').value,
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+
+            const data = getFinanceData();
+            data.bills.push(formData);
+            setFinanceData(data);
+
+            alert('Conta adicionada com sucesso!');
+            addBillModal.classList.add('hidden');
+            billForm.reset();
+            updateUI(); // Refresh the UI
+        });
+        
+        // Update UI with real data
+        function updateUI() {
+            const data = getFinanceData();
+            
+            // Update summary
+            const totalPending = data.bills.reduce((sum, bill) => 
+                bill.status === 'pending' ? sum + bill.value : sum, 0);
+            const totalPaid = data.bills.reduce((sum, bill) => 
+                bill.status === 'paid' ? sum + bill.value : sum, 0);
+            
+            document.querySelector('.text-red-500').textContent = `R$ ${totalPending.toFixed(2)}`;
+            document.querySelector('.text-green-500').textContent = `R$ ${totalPaid.toFixed(2)}`;
+            document.querySelector('.text-blue-500').textContent = `R$ ${data.balance.toFixed(2)}`;
+            
+            // Update progress bar
+            const totalBills = data.bills.length;
+            const paidPercentage = totalBills > 0 ? 
+                (data.bills.filter(b => b.status === 'paid').length / totalBills) * 100 : 0;
+            document.querySelector('.progress-bar').style.width = `${paidPercentage}%`;
+            document.querySelector('.progress-bar').nextElementSibling.textContent = 
+                `${Math.round(paidPercentage)}% das contas pagas`;
+            
+            // Update notification count
+            const notificationCount = data.notifications.filter(n => !n.read).length;
+            document.getElementById('notificationCount').textContent = notificationCount;
+        }
+
+        // Initial UI update
+        updateUI();
+    </script>
+</body>
+</html>
