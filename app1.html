@@ -73,6 +73,86 @@
             max-width: 400px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+
+        /* Calendar specific styles */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+            text-align: center;
+        }
+        .calendar-day {
+            padding: 8px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            min-height: 50px; /* Ensure enough space for indicators */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .calendar-day.current-month {
+            background-color: #f9fafb;
+            color: #374151;
+        }
+        .calendar-day.other-month {
+            background-color: #f3f4f6;
+            color: #9ca3af;
+        }
+        .calendar-day.has-pending::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background-color: #ef4444; /* Red for pending */
+            border-radius: 50%;
+        }
+        .calendar-day.has-paid::before {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: calc(50% - 8px); /* Adjust position for two dots */
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background-color: #22c55e; /* Green for paid */
+            border-radius: 50%;
+        }
+        .calendar-day.has-pending.has-paid::after {
+            left: calc(50% + 8px); /* Adjust position for two dots */
+        }
+        .calendar-day.selected {
+            background-color: #bfdbfe; /* Light blue for selected day */
+            border: 1px solid #3b82f6;
+        }
+        .calendar-day:hover:not(.day-name) {
+            background-color: #e0f2fe;
+        }
+        .day-name {
+            font-weight: bold;
+            color: #4b5563;
+        }
+        .calendar-header-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .calendar-header-nav button {
+            padding: 0.5rem;
+            background-color: #eff6ff;
+            border-radius: 0.25rem;
+            color: #1d4ed8;
+        }
+        .calendar-header-nav h3 {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #374151;
+        }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
@@ -163,12 +243,32 @@
             </div>
 
             <div class="p-4 hidden" id="calendarSection">
+                <div class="bg-white rounded-lg shadow p-4 mb-4">
+                    <div class="calendar-header-nav">
+                        <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                        <h3 id="currentMonthYear"></h3>
+                        <button id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="calendar-grid mb-4" id="calendarGrid">
+                        <div class="calendar-day day-name">Dom</div>
+                        <div class="calendar-day day-name">Seg</div>
+                        <div class="calendar-day day-name">Ter</div>
+                        <div class="calendar-day day-name">Qua</div>
+                        <div class="calendar-day day-name">Qui</div>
+                        <div class="calendar-day day-name">Sex</div>
+                        <div class="calendar-day day-name">Sáb</div>
+                        </div>
+                </div>
+
                 <div class="bg-white rounded-lg shadow p-4">
-                    <h2 class="text-lg font-bold mb-4 text-gray-700">Calendário de Contas</h2>
-                    <p class="text-gray-600">Visão mensal das suas contas e pagamentos.</p>
-                     <div class="mt-4 bg-gray-100 p-4 rounded-md text-center text-gray-500">
-                        <i class="fas fa-calendar-days text-4xl mb-2"></i>
-                        <p>Integração com calendário em desenvolvimento!</p>
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-lg font-bold text-gray-700" id="selectedDateBillsTitle">Contas para <span id="selectedDateDisplay"></span></h2>
+                        <button class="bg-blue-500 text-white px-3 py-1 rounded-md text-sm" id="addBillFromCalendarBtn" style="display: none;">
+                            <i class="fas fa-plus mr-1"></i>Adicionar
+                        </button>
+                    </div>
+                    <div class="space-y-3" id="billsForSelectedDate">
+                        <p class="text-gray-500 text-center" id="noBillsForSelectedDateMessage">Nenhuma conta para esta data.</p>
                     </div>
                 </div>
             </div>
@@ -324,6 +424,18 @@
         const confirmDeleteBtn = document.getElementById('confirmDelete');
         let billToDeleteId = null; // To store the ID of the bill to be deleted
 
+        // Calendar elements
+        const calendarGrid = document.getElementById('calendarGrid');
+        const currentMonthYearEl = document.getElementById('currentMonthYear');
+        const prevMonthBtn = document.getElementById('prevMonth');
+        const nextMonthBtn = document.getElementById('nextMonth');
+        const selectedDateDisplay = document.getElementById('selectedDateDisplay');
+        const billsForSelectedDateContainer = document.getElementById('billsForSelectedDate');
+        const noBillsForSelectedDateMessage = document.getElementById('noBillsForSelectedDateMessage');
+        const addBillFromCalendarBtn = document.getElementById('addBillFromCalendarBtn');
+
+        let currentCalendarDate = new Date(); // Tracks the month displayed on the calendar
+        let selectedCalendarDate = null; // Tracks the currently selected date on the calendar
 
         // --- Navigation Logic ---
         function showSection(sectionId) {
@@ -331,6 +443,14 @@
                 section.classList.add('hidden');
             });
             document.getElementById(sectionId).classList.remove('hidden');
+
+            // If navigating to calendar, render it
+            if (sectionId === 'calendarSection') {
+                renderCalendar(currentCalendarDate);
+                // Clear selected date bills when navigating away from calendar or to it
+                selectedCalendarDate = null;
+                updateBillsForSelectedDate();
+            }
 
             // Update active state in nav
             navItems.forEach(item => {
@@ -386,12 +506,21 @@
             } else {
                 billModalTitle.textContent = 'Adicionar conta';
                 billIdInput.value = ''; // Ensure no ID for new bills
+                // Pre-fill dueDate if a date is selected in the calendar
+                if (selectedCalendarDate) {
+                    dueDateInput.value = selectedCalendarDate.toISOString().split('T')[0];
+                }
             }
             billModal.classList.remove('hidden');
         }
 
         addBillTrigger.addEventListener('click', (e) => {
             e.preventDefault();
+            selectedCalendarDate = null; // Clear selected date when adding from main button
+            openBillModal();
+        });
+
+        addBillFromCalendarBtn.addEventListener('click', () => {
             openBillModal();
         });
 
@@ -442,6 +571,10 @@
             billModal.classList.add('hidden');
             billForm.reset();
             updateUI(); // Refresh the UI
+            renderCalendar(currentCalendarDate); // Re-render calendar to show new/updated bills
+            if (selectedCalendarDate) {
+                updateBillsForSelectedDate(selectedCalendarDate); // Update bills for selected date
+            }
         });
 
         // --- Delete Bill Logic ---
@@ -468,6 +601,10 @@
                 }
                 setFinanceData(data);
                 updateUI();
+                renderCalendar(currentCalendarDate); // Re-render calendar after deletion
+                if (selectedCalendarDate) {
+                    updateBillsForSelectedDate(selectedCalendarDate); // Update bills for selected date
+                }
             }
             confirmDeleteModal.classList.add('hidden');
             billToDeleteId = null;
@@ -489,239 +626,11 @@
                 setFinanceData(data);
                 addNotification('success', 'Conta paga!', `${data.bills[billIndex].description} (R$ ${data.bills[billIndex].value.toFixed(2)}) foi marcada como paga.`);
                 updateUI();
+                renderCalendar(currentCalendarDate); // Re-render calendar to update status
+                if (selectedCalendarDate) {
+                    updateBillsForSelectedDate(selectedCalendarDate); // Update bills for selected date
+                }
             }
         }
 
         // --- Notification Management ---
-        function addNotification(type, message, details = '', customId = null) {
-            const data = getFinanceData();
-            const id = customId || Date.now();
-
-            // Prevent duplicate notifications if a customId is provided
-            if (customId && data.notifications.some(n => n.id === customId)) {
-                return;
-            }
-
-            data.notifications.unshift({ // Add to the beginning
-                id: id,
-                type,
-                message,
-                details,
-                timestamp: new Date().toISOString(),
-                read: false
-            });
-            setFinanceData(data);
-            updateUI(); // Update UI to show new notification count
-        }
-
-        function markNotificationsAsRead() {
-            const data = getFinanceData();
-            data.notifications.forEach(n => n.read = true);
-            setFinanceData(data);
-            updateUI(); // Hide the badge
-        }
-
-        function generateBillNotifications() {
-            const data = getFinanceData();
-            const today = new Date();
-            today.setHours(0, 0, 0, 0); // Normalize to start of day
-
-            // Filter out old bill-related notifications for re-evaluation
-            data.notifications = data.notifications.filter(n => !n.id.toString().startsWith('bill_'));
-
-            data.bills.filter(bill => bill.status === 'pending').forEach(bill => {
-                const dueDate = new Date(bill.dueDate + 'T00:00:00'); // Ensure UTC for comparison
-                const diffTime = dueDate.getTime() - today.getTime();
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-                if (diffDays === 0) {
-                    addNotification('warning', 'Conta vence hoje!', `${bill.description} (R$ ${bill.value.toFixed(2)})`, `bill_due_today_${bill.id}`);
-                } else if (diffDays > 0 && diffDays <= 3) {
-                    addNotification('info', 'Conta próxima do vencimento', `${bill.description} vence em ${diffDays} dia(s)`, `bill_due_soon_${bill.id}`);
-                } else if (diffDays < 0) {
-                    addNotification('error', 'Conta vencida!', `${bill.description} (R$ ${bill.value.toFixed(2)})`, `bill_overdue_${bill.id}`);
-                }
-            });
-            setFinanceData(data); // Save updated notifications
-        }
-
-
-        // --- UI Update Function ---
-        function updateUI() {
-            const data = getFinanceData();
-
-            // Update summary
-            const currentMonth = new Date().getMonth();
-            const currentYear = new Date().getFullYear();
-
-            const totalPending = data.bills.reduce((sum, bill) => bill.status === 'pending' ? sum + bill.value : sum, 0);
-            const totalPaidThisMonth = data.bills.reduce((sum, bill) => {
-                if (bill.status === 'paid' && bill.paidAt) {
-                    const paidDate = new Date(bill.paidAt);
-                    if (paidDate.getMonth() === currentMonth && paidDate.getFullYear() === currentYear) {
-                        return sum + bill.value;
-                    }
-                }
-                return sum;
-            }, 0);
-
-            totalPendingEl.textContent = `R$ ${totalPending.toFixed(2).replace('.', ',')}`;
-            totalPaidMonthEl.textContent = `R$ ${totalPaidThisMonth.toFixed(2).replace('.', ',')}`;
-            currentBalanceEl.textContent = `R$ ${data.balance.toFixed(2).replace('.', ',')}`;
-
-            // Update progress bar
-            const totalBillsCount = data.bills.length;
-            const paidBillsCount = data.bills.filter(b => b.status === 'paid').length;
-            const paidPercentage = totalBillsCount > 0 ? (paidBillsCount / totalBillsCount) * 100 : 0;
-            progressBar.style.width = `${paidPercentage}%`;
-            paidPercentageText.textContent = `${Math.round(paidPercentage)}% das contas pagas`;
-
-            // Update notification count badge
-            const unreadNotifications = data.notifications.filter(n => !n.read).length;
-            if (unreadNotifications > 0) {
-                notificationCountBadge.textContent = unreadNotifications;
-                notificationCountBadge.classList.remove('hidden');
-            } else {
-                notificationCountBadge.classList.add('hidden');
-            }
-
-            // Populate notifications panel
-            notificationList.innerHTML = ''; // Clear previous notifications
-            if (data.notifications.length === 0) {
-                notificationList.appendChild(noNotificationsMessage);
-            } else {
-                data.notifications.forEach(notification => {
-                    const notificationItem = document.createElement('div');
-                    notificationItem.classList.add('p-4', 'border-b', 'border-gray-200');
-                    if (!notification.read) {
-                        notificationItem.classList.add('bg-blue-50', 'font-semibold'); // Highlight unread
-                    }
-
-                    let iconClass = '';
-                    let iconColor = '';
-                    switch (notification.type) {
-                        case 'warning':
-                            iconClass = 'fa-exclamation';
-                            iconColor = 'text-yellow-500';
-                            break;
-                        case 'error':
-                            iconClass = 'fa-exclamation-triangle';
-                            iconColor = 'text-red-500';
-                            break;
-                        case 'success':
-                            iconClass = 'fa-check-circle';
-                            iconColor = 'text-green-500';
-                            break;
-                        case 'info':
-                        default:
-                            iconClass = 'fa-info-circle';
-                            iconColor = 'text-blue-500';
-                            break;
-                    }
-
-                    const timeAgo = new Date(notification.timestamp).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
-
-                    notificationItem.innerHTML = `
-                        <div class="flex items-start space-x-3">
-                            <div class="p-2 rounded-full ${iconColor.replace('text-', 'bg-')}-100">
-                                <i class="fas ${iconClass} ${iconColor}"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-medium">${notification.message}</h3>
-                                <p class="text-sm text-gray-500">${notification.details}</p>
-                                <p class="text-xs text-gray-400">${timeAgo}</p>
-                            </div>
-                        </div>
-                    `;
-                    notificationList.appendChild(notificationItem);
-                });
-            }
-
-
-            // Populate upcoming bills
-            upcomingBillsContainer.innerHTML = '';
-            const upcoming = data.bills.filter(bill => bill.status === 'pending')
-                                       .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-
-            if (upcoming.length === 0) {
-                upcomingBillsContainer.appendChild(noUpcomingBillsMessage);
-            } else {
-                noUpcomingBillsMessage.remove(); // Remove if bills exist
-                upcoming.forEach(bill => {
-                    const billItem = document.createElement('div');
-                    billItem.classList.add('flex', 'justify-between', 'items-center', 'py-2', 'border-b', 'border-gray-100');
-                    billItem.innerHTML = `
-                        <div class="flex-1">
-                            <p class="font-medium">${bill.description}</p>
-                            <p class="text-sm text-gray-500">${new Date(bill.dueDate + 'T00:00:00').toLocaleDateString('pt-BR')}</p>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="font-bold text-red-500">R$ ${bill.value.toFixed(2).replace('.', ',')}</span>
-                            <button class="bg-green-500 text-white px-3 py-1 rounded-md text-sm mark-as-paid-btn" data-id="${bill.id}">Pagar</button>
-                            <button class="bg-blue-500 text-white px-2 py-1 rounded-md text-sm edit-bill-btn" data-id="${bill.id}">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="bg-red-500 text-white px-2 py-1 rounded-md text-sm delete-bill-btn" data-id="${bill.id}">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
-                    `;
-                    upcomingBillsContainer.appendChild(billItem);
-                });
-
-                // Add event listeners to "Pagar", "Editar" and "Excluir" buttons
-                document.querySelectorAll('.mark-as-paid-btn').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const billId = parseInt(e.target.dataset.id);
-                        markAsPaid(billId);
-                    });
-                });
-                document.querySelectorAll('.edit-bill-btn').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const billId = parseInt(e.target.dataset.id);
-                        const billToEdit = data.bills.find(b => b.id === billId);
-                        if (billToEdit) {
-                            openBillModal(billToEdit);
-                        }
-                    });
-                });
-                document.querySelectorAll('.delete-bill-btn').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const billId = parseInt(e.target.dataset.id);
-                        openConfirmDeleteModal(billId);
-                    });
-                });
-            }
-
-            // Populate recent payments
-            recentPaymentsContainer.innerHTML = '';
-            const recentPaid = data.bills.filter(bill => bill.status === 'paid' && bill.paidAt)
-                                         .sort((a, b) => new Date(b.paidAt) - new Date(a.paidAt));
-
-            if (recentPaid.length === 0) {
-                recentPaymentsContainer.appendChild(noRecentPaymentsMessage);
-            } else {
-                noRecentPaymentsMessage.remove(); // Remove if payments exist
-                recentPaid.forEach(bill => {
-                    const billItem = document.createElement('div');
-                    billItem.classList.add('flex', 'justify-between', 'items-center', 'py-2', 'border-b', 'border-gray-100');
-                    billItem.innerHTML = `
-                        <div class="flex-1">
-                            <p class="font-medium">${bill.description}</p>
-                            <p class="text-sm text-gray-500">Pago em ${new Date(bill.paidAt).toLocaleDateString('pt-BR')}</p>
-                        </div>
-                        <span class="font-bold text-green-500">R$ ${bill.value.toFixed(2).replace('.', ',')}</span>
-                    `;
-                    recentPaymentsContainer.appendChild(billItem);
-                });
-            }
-
-            // Generate and update notifications (after all other updates)
-            generateBillNotifications();
-        }
-
-        // Initial UI update and generate notifications on load
-        updateUI();
-    </script>
-</body>
-</html>
