@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X9 Ultra2 - Gerenciador de Relógio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        .watch-preview {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect x="20" y="40" width="160" height="120" rx="20" fill="black"/><circle cx="100" cy="100" r="70" fill="%23222"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .custom-file-input::-webkit-file-upload-button {
+            visibility: hidden;
+        }
+        .custom-file-input::before {
+            content: 'Selecionar Imagem';
+            display: inline-block;
+            background: linear-gradient(to bottom, #f9f9f9, #e3e3e3);
+            border: 1px solid #999;
+            border-radius: 3px;
+            padding: 8px 16px;
+            outline: none;
+            white-space: nowrap;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 12px;
+            color: #333;
+        }
+        .custom-file-input:hover::before {
+            border-color: black;
+        }
+        .custom-file-input:active::before {
+            background: -webkit-linear-gradient(top, #e3e3e3, #f9f9f9);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="flex flex-col items-center mb-8">
+            <div class="flex items-center space-x-2 mb-4">
+                <i class="fas fa-bluetooth-b text-blue-500 text-3xl"></i>
+                <h1 class="text-3xl font-bold text-gray-800">X9 Ultra2 Manager</h1>
+            </div>
+            <p class="text-gray-600 text-center max-w-md">Conecte seu relógio via Bluetooth e personalize seu mostrador com imagens incríveis!</p>
+        </header>
+
+        <!-- Connection Status -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-8 transition-all duration-300 hover:shadow-lg">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <div class="relative mr-4">
+                        <div class="w-16 h-16 watch-preview rounded-full border-4 border-blue-200"></div>
+                        <div id="connection-status" class="absolute -bottom-1 -right-1 w-5 h-5 bg-red-500 rounded-full border-2 border-white"></div>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-800">Status da Conexão</h2>
+                        <p id="connection-text" class="text-gray-600">Relógio não conectado</p>
+                    </div>
+                </div>
+                <button id="connect-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-full flex items-center space-x-2 transition-all duration-300 transform hover:scale-105">
+                    <i class="fas fa-bluetooth-b"></i>
+                    <span>Conectar Relógio</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Watch Preview -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Pré-visualização</h2>
+                <div class="flex justify-center">
+                    <div class="relative">
+                        <div id="watch-face" class="w-64 h-64 watch-preview rounded-full border-8 border-gray-200 shadow-inner flex items-center justify-center">
+                            <p id="preview-text" class="text-white text-center text-sm px-4">Nenhuma imagem selecionada</p>
+                        </div>
+                        <div class="absolute -bottom-4 -right-4 bg-blue-500 text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-center space-x-4">
+                    <button id="test-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-full transition-all disabled:opacity-50" disabled>
+                        <i class="fas fa-eye mr-2"></i>Testar no Relógio
+                    </button>
+                    <button id="apply-btn" class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-full transition-all transform hover:scale-105 disabled:opacity-50" disabled>
+                        <i class="fas fa-check mr-2"></i>Aplicar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Image Upload -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Enviar Nova Imagem</h2>
+                <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center mb-6 hover:border-blue-400 transition-all duration-300">
+                    <i class="fas fa-cloud-upload-alt text-4xl text-blue-400 mb-4"></i>
+                    <p class="text-gray-600 mb-4">Arraste e solte sua imagem aqui ou</p>
+                    <input type="file" id="image-upload" accept="image/*" class="hidden custom-file-input">
+                    <label for="image-upload" class="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-full inline-block transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-folder-open mr-2"></i>Selecionar Arquivo
+                    </label>
+                    <p class="text-xs text-gray-500 mt-4">Formatos suportados: JPG, PNG. Tamanho recomendado: 240x240px</p>
+                </div>
+                
+                <!-- Image Adjustments -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 mb-2">Brilho</label>
+                        <input type="range" id="brightness-slider" min="0" max="200" value="100" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">Contraste</label>
+                        <input type="range" id="contrast-slider" min="0" max="200" value="100" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div class="flex space-x-4">
+                        <button id="rotate-left" class="bg-gray-200 hover:bg-gray-300 text-gray-800 p-2 rounded-full">
+                            <i class="fas fa-undo"></i>
+                        </button>
+                        <button id="rotate-right" class="bg-gray-200 hover:bg-gray-300 text-gray-800 p-2 rounded-full">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                        <button id="reset-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded-full">
+                            <i class="fas fa-sync-alt mr-2"></i>Redefinir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gallery -->
+        <div class="mt-12 bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Galeria de Mostradores</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <!-- Sample watch faces -->
+                <div class="watch-face-item bg-gray-100 rounded-lg p-2 cursor-pointer hover:shadow-md transition-all" data-img="watch1">
+                    <div class="w-full h-24 bg-gradient-to-br from-blue-400 to-purple-500 rounded-md mb-2"></div>
+                    <p class="text-xs text-center text-gray-700">Azul Gradiente</p>
+                </div>
+                <div class="watch-face-item bg-gray-100 rounded-lg p-2 cursor-pointer hover:shadow-md transition-all" data-img="watch2">
+                    <div class="w-full h-24 bg-gradient-to-br from-red-400 to-orange-500 rounded-md mb-2"></div>
+                    <p class="text-xs text-center text-gray-700">Vermelho Fogo</p>
+                </div>
+                <div class="watch-face-item bg-gray-100 rounded-lg p-2 cursor-pointer hover:shadow-md transition-all" data-img="watch3">
+                    <div class="w-full h-24 bg-gradient-to-br from-green-400 to-teal-500 rounded-md mb-2"></div>
+                    <p class="text-xs text-center text-gray-700">Verde Natureza</p>
+                </div>
+                <div class="watch-face-item bg-gray-100 rounded-lg p-2 cursor-pointer hover:shadow-md transition-all" data-img="watch4">
+                    <div class="w-full h-24 bg-black rounded-md mb-2 flex items-center justify-center">
+                        <i class="fas fa-moon text-yellow-300 text-xl"></i>
+                    </div>
+                    <p class="text-xs text-center text-gray-700">Noturno</p>
+                </div>
+                <div class="watch-face-item bg-gray-100 rounded-lg p-2 cursor-pointer hover:shadow-md transition-all" data-img="watch5">
+                    <div class="w-full h-24 bg-white border border-gray-300 rounded-md mb-2 flex items-center justify-center">
+                        <i class="fas fa-cloud-sun text-blue-400 text-xl"></i>
+                    </div>
+                    <p class="text-xs text-center text-gray-700">Claro</p>
+                </div>
+                <div class="watch-face-item bg-gray-100 rounded-lg p-2 cursor-pointer hover:shadow-md transition-all" data-img="watch6">
+                    <div class="w-full h-24 bg-gradient-to-br from-pink-400 to-red-500 rounded-md mb-2"></div>
+                    <p class="text-xs text-center text-gray-700">Rosa Vibrante</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Connection Modal -->
+        <div id="connection-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold text-gray-800">Conectar Relógio</h3>
+                    <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <p class="text-gray-600">Procurando dispositivos Bluetooth próximos...</p>
+                    <div id="devices-list" class="max-h-60 overflow-y-auto border rounded-lg p-2">
+                        <!-- Devices will be listed here -->
+                        <div class="p-3 hover:bg-gray-100 rounded cursor-pointer flex items-center">
+                            <i class="fas fa-spinner fa-spin mr-3 text-blue-500"></i>
+                            <span>Procurando dispositivos...</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button id="cancel-connect" class="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-full">Cancelar</button>
+                        <button id="refresh-devices" class="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 flex items-center">
+                            <i class="fas fa-sync-alt mr-2"></i>Atualizar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transfer Modal -->
+        <div id="transfer-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold text-gray-800">Enviando Imagem</h3>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <div class="w-12 h-12 watch-preview rounded-full border-2 border-gray-200"></div>
+                            <div class="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border border-white"></div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="h-4 bg-gray-200 rounded-full overflow-hidden">
+                                <div id="transfer-progress" class="h-full bg-blue-500 rounded-full" style="width: 0%"></div>
+                            </div>
+                            <p id="transfer-status" class="text-sm text-gray-600 mt-1">Preparando para enviar...</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-end pt-4">
+                        <button id="cancel-transfer" class="px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const connectBtn = document.getElementById('connect-btn');
+        const connectionStatus = document.getElementById('connection-status');
+        const connectionText = document.getElementById('connection-text');
+        const connectionModal = document.getElementById('connection-modal');
+        const closeModal = document.getElementById('close-modal');
+        const cancelConnect = document.getElementById('cancel-connect');
+        const refreshDevices = document.getElementById('refresh-devices');
+        const devicesList = document.getElementById('devices-list');
+        const imageUpload = document.getElementById('image-upload');
+        const watchFace = document.getElementById('watch-face');
+        const previewText = document.getElementById('preview-text');
+        const brightnessSlider = document.getElementById('brightness-slider');
+        const contrastSlider = document.getElementById('contrast-slider');
+        const rotateLeft = document.getElementById('rotate-left');
+        const rotateRight = document.getElementById('rotate-right');
+        const resetBtn = document.getElementById('reset-btn');
+        const testBtn = document.getElementById('test-btn');
+        const applyBtn = document.getElementById('apply-btn');
+        const transferModal = document.getElementById('transfer-modal');
+        const transferProgress = document.getElementById('transfer-progress');
+        const transferStatus = document.getElementById('transfer-status');
+        const cancelTransfer = document.getElementById('cancel-transfer');
+        const watchFaceItems = document.querySelectorAll('.watch-face-item');
+
+        // State
+        let isConnected = false;
+        let currentRotation = 0;
+        let currentBrightness = 100;
+        let currentContrast = 100;
+        let selectedImage = null;
+        let transferInterval = null;
+
+        // Event Listeners
+        connectBtn.addEventListener('click', toggleConnectionModal);
+        closeModal.addEventListener('click', () => connectionModal.classList.add('hidden'));
+        cancelConnect.addEventListener('click', () => connectionModal.classList.add('hidden'));
+        refreshDevices.addEventListener('click', refreshBluetoothDevices);
+        imageUpload.addEventListener('change', handleImageUpload);
+        brightnessSlider.addEventListener('input', updateImageFilters);
+        contrastSlider.addEventListener('input', updateImageFilters);
+        rotateLeft.addEventListener('click', () => rotateImage(-90));
+        rotateRight.addEventListener('click', () => rotateImage(90));
+        resetBtn.addEventListener('click', resetImageSettings);
+        testBtn.addEventListener('click', testWatchFace);
+        applyBtn.addEventListener('click', applyWatchFace);
+        cancelTransfer.addEventListener('click', cancelImageTransfer);
+        
+        // Add click event to watch face items
+        watchFaceItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const imgType = this.getAttribute('data-img');
+                applyPresetWatchFace(imgType);
+            });
+        });
+
+        // Functions
+        function toggleConnectionModal() {
+            if (connectionModal.classList.contains('hidden')) {
+                connectionModal.classList.remove('hidden');
+                refreshBluetoothDevices();
+            } else {
+                connectionModal.classList.add('hidden');
+            }
+        }
+
+        function refreshBluetoothDevices() {
+            // Simulate Bluetooth device discovery
+            devicesList.innerHTML = `
+                <div class="p-3 hover:bg-gray-100 rounded cursor-pointer flex items-center">
+                    <i class="fas fa-spinner fa-spin mr-3 text-blue-500"></i>
+                    <span>Procurando dispositivos...</span>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                // Simulated devices
+                devicesList.innerHTML = `
+                    <div class="device-item p-3 hover:bg-gray-100 rounded cursor-pointer flex items-center border-b border-gray-100" data-device="X9 Ultra2 #1234">
+                        <i class="fas fa-bluetooth-b mr-3 text-blue-500"></i>
+                        <div>
+                            <div class="font-medium">X9 Ultra2 #1234</div>
+                            <div class="text-xs text-gray-500">Dispositivo de relógio</div>
+                        </div>
+                    </div>
+                    <div class="device-item p-3 hover:bg-gray-100 rounded cursor-pointer flex items-center border-b border-gray-100" data-device="Fones JBL">
+                        <i class="fas fa-headphones mr-3 text-purple-500"></i>
+                        <div>
+                            <div class="font-medium">Fones JBL</div>
+                            <div class="text-xs text-gray-500">Áudio</div>
+                        </div>
+                    </div>
+                    <div class="device-item p-3 hover:bg-gray-100 rounded cursor-pointer flex items-center" data-device="X9 Ultra2 #5678">
+                        <i class="fas fa-bluetooth-b mr-3 text-blue-500"></i>
+                        <div>
+                            <div class="font-medium">X9 Ultra2 #5678</div>
+                            <div class="text-xs text-gray-500">Dispositivo de relógio</div>
+                        </div>
+                    </div>
+                `;
+                
+                // Add click event to device items
+                document.querySelectorAll('.device-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const deviceName = this.getAttribute('data-device');
+                        connectToDevice(deviceName);
+                    });
+                });
+            }, 2000);
+        }
+
+        function connectToDevice(deviceName) {
+            // Simulate connection process
+            devicesList.innerHTML = `
+                <div class="p-3 rounded flex items-center">
+      
