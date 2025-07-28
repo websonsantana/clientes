@@ -6,6 +6,7 @@
     <title>Vila Frios - Gestão de Produção</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .sidebar {
             transition: all 0.3s ease;
@@ -56,6 +57,7 @@
             height: 100%;
             overflow: auto;
             background-color: rgba(0,0,0,0.4);
+            animation: fadeIn 0.3s forwards;
         }
         .modal-content {
             background-color: #fefefe;
@@ -66,6 +68,33 @@
             max-width: 700px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            animation: slideIn 0.3s forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .hidden-content {
+            display: none;
+        }
+        .nav-item.active {
+            background-color: #1e3a8a; /* Darker blue for active state */
         }
         @media (max-width: 768px) {
             .sidebar {
@@ -88,7 +117,6 @@
 </head>
 <body class="bg-gray-50">
     <div class="flex h-screen overflow-hidden">
-        <!-- Sidebar -->
         <div class="sidebar bg-blue-800 text-white w-64 flex flex-col">
             <div class="p-4 flex items-center border-b border-blue-700">
                 <i class="fas fa-utensils text-2xl mr-3"></i>
@@ -100,37 +128,37 @@
                         <div class="text-xs uppercase text-blue-200 mb-2">Menu Principal</div>
                         <ul>
                             <li class="mb-1">
-                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700 active" id="dashboard-link">
+                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700 active" data-content="dashboard-content">
                                     <i class="fas fa-tachometer-alt mr-3"></i>
                                     <span class="nav-text">Dashboard</span>
                                 </a>
                             </li>
                             <li class="mb-1">
-                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" id="products-link">
+                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" data-content="products-content">
                                     <i class="fas fa-box-open mr-3"></i>
                                     <span class="nav-text">Produtos</span>
                                 </a>
                             </li>
                             <li class="mb-1">
-                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" id="suppliers-link">
+                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" data-content="suppliers-content">
                                     <i class="fas fa-truck mr-3"></i>
                                     <span class="nav-text">Fornecedores</span>
                                 </a>
                             </li>
                             <li class="mb-1">
-                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" id="employees-link">
+                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" data-content="employees-content">
                                     <i class="fas fa-users mr-3"></i>
                                     <span class="nav-text">Colaboradores</span>
                                 </a>
                             </li>
                             <li class="mb-1">
-                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" id="production-link">
+                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" data-content="production-content">
                                     <i class="fas fa-industry mr-3"></i>
                                     <span class="nav-text">Produção</span>
                                 </a>
                             </li>
                             <li class="mb-1">
-                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" id="reports-link">
+                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" data-content="reports-content">
                                     <i class="fas fa-chart-bar mr-3"></i>
                                     <span class="nav-text">Relatórios</span>
                                 </a>
@@ -141,13 +169,13 @@
                         <div class="text-xs uppercase text-blue-200 mb-2">Configurações</div>
                         <ul>
                             <li class="mb-1">
-                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" id="goals-link">
+                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" data-content="goals-content">
                                     <i class="fas fa-bullseye mr-3"></i>
                                     <span class="nav-text">Metas</span>
                                 </a>
                             </li>
                             <li class="mb-1">
-                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" id="users-link">
+                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" data-content="users-content">
                                     <i class="fas fa-user-shield mr-3"></i>
                                     <span class="nav-text">Usuários</span>
                                 </a>
@@ -167,9 +195,7 @@
             </div>
         </div>
 
-        <!-- Main Content -->
         <div class="content flex-1 overflow-auto">
-            <!-- Top Navigation -->
             <header class="bg-white shadow-sm">
                 <div class="flex justify-between items-center p-4">
                     <div class="flex items-center">
@@ -193,16 +219,14 @@
                 </div>
             </header>
 
-            <!-- Page Content -->
             <main class="p-6">
-                <!-- Dashboard Content (default view) -->
                 <div id="dashboard-content">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                         <div class="bg-white p-6 rounded-lg shadow">
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-gray-500">Produção Hoje</p>
-                                    <h3 class="text-2xl font-bold">1,248 kg</h3>
+                                    <h3 class="text-2xl font-bold" id="daily-production">1,248 kg</h3>
                                 </div>
                                 <div class="p-3 rounded-full bg-blue-100 text-blue-600">
                                     <i class="fas fa-industry"></i>
@@ -216,8 +240,8 @@
                         <div class="bg-white p-6 rounded-lg shadow">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-gray-500">Perdas</p>
-                                    <h3 class="text-2xl font-bold">48 kg</h3>
+                                    <p class="text-gray-500">Perdas Hoje</p>
+                                    <h3 class="text-2xl font-bold" id="daily-losses">48 kg</h3>
                                 </div>
                                 <div class="p-3 rounded-full bg-red-100 text-red-600">
                                     <i class="fas fa-percentage"></i>
@@ -231,8 +255,8 @@
                         <div class="bg-white p-6 rounded-lg shadow">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-gray-500">Rentabilidade</p>
-                                    <h3 class="text-2xl font-bold">72%</h3>
+                                    <p class="text-gray-500">Rentabilidade Média</p>
+                                    <h3 class="text-2xl font-bold" id="avg-profitability">72%</h3>
                                 </div>
                                 <div class="p-3 rounded-full bg-green-100 text-green-600">
                                     <i class="fas fa-chart-line"></i>
@@ -247,7 +271,7 @@
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-gray-500">Meta Mensal</p>
-                                    <h3 class="text-2xl font-bold">78%</h3>
+                                    <h3 class="text-2xl font-bold" id="monthly-goal-progress">78%</h3>
                                 </div>
                                 <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
                                     <i class="fas fa-bullseye"></i>
@@ -255,7 +279,7 @@
                             </div>
                             <div class="mt-4">
                                 <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                    <div class="bg-yellow-500 h-2.5 rounded-full" style="width: 78%"></div>
+                                    <div class="bg-yellow-500 h-2.5 rounded-full" style="width: 78%" id="monthly-goal-bar"></div>
                                 </div>
                             </div>
                         </div>
@@ -280,7 +304,7 @@
                                 <h2 class="text-lg font-semibold">Top Produtos</h2>
                                 <button class="text-blue-600 text-sm font-medium">Ver todos</button>
                             </div>
-                            <div class="space-y-4">
+                            <div class="space-y-4" id="top-products-list">
                                 <div class="flex items-center">
                                     <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
                                         <i class="fas fa-hamburger text-blue-600"></i>
@@ -307,32 +331,6 @@
                                         <p class="text-sm text-green-500">+8%</p>
                                     </div>
                                 </div>
-                                <div class="flex items-center">
-                                    <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
-                                        <i class="fas fa-bread-slice text-yellow-600"></i>
-                                    </div>
-                                    <div class="flex-grow">
-                                        <p class="font-medium">Pão Integral</p>
-                                        <p class="text-sm text-gray-500">R$ 6,20/kg</p>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="font-medium">742 kg</p>
-                                        <p class="text-sm text-red-500">-3%</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center">
-                                    <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
-                                        <i class="fas fa-cheese text-purple-600"></i>
-                                    </div>
-                                    <div class="flex-grow">
-                                        <p class="font-medium">Queijo Minas</p>
-                                        <p class="text-sm text-gray-500">R$ 18,90/kg</p>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="font-medium">689 kg</p>
-                                        <p class="text-sm text-green-500">+15%</p>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -351,19 +349,19 @@
                                         <th>Peso Bruto</th>
                                         <th>Peso Líquido</th>
                                         <th>Retraço</th>
-                                        <th>Perdas</th>
-                                        <th>Rentabilidade</th>
+                                        <th>Perdas (%)</th>
+                                        <th>Rentabilidade (%)</th>
                                         <th>Ações</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="production-table-body">
                                     <tr>
                                         <td>15/06/2023</td>
                                         <td>Hambúrguer Artesanal</td>
                                         <td>150 kg</td>
                                         <td>142 kg</td>
                                         <td>5 kg</td>
-                                        <td>3 kg (2%)</td>
+                                        <td>2%</td>
                                         <td>75%</td>
                                         <td>
                                             <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
@@ -376,154 +374,64 @@
                                         <td>200 kg</td>
                                         <td>192 kg</td>
                                         <td>6 kg</td>
-                                        <td>2 kg (1%)</td>
+                                        <td>1%</td>
                                         <td>82%</td>
                                         <td>
                                             <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
                                             <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td>14/06/2023</td>
-                                        <td>Pão Integral</td>
-                                        <td>180 kg</td>
-                                        <td>175 kg</td>
-                                        <td>3 kg</td>
-                                        <td>2 kg (1.1%)</td>
-                                        <td>68%</td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>14/06/2023</td>
-                                        <td>Queijo Minas</td>
-                                        <td>120 kg</td>
-                                        <td>115 kg</td>
-                                        <td>4 kg</td>
-                                        <td>1 kg (0.8%)</td>
-                                        <td>79%</td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
                                 </tbody>
                             </table>
-                        </div>
-                        <div class="flex justify-between items-center mt-4">
-                            <div class="text-sm text-gray-500">Mostrando 1 a 4 de 124 registros</div>
-                            <div class="flex space-x-2">
-                                <button class="px-3 py-1 border rounded text-gray-700">Anterior</button>
-                                <button class="px-3 py-1 border rounded bg-blue-600 text-white">1</button>
-                                <button class="px-3 py-1 border rounded text-gray-700">2</button>
-                                <button class="px-3 py-1 border rounded text-gray-700">3</button>
-                                <button class="px-3 py-1 border rounded text-gray-700">Próximo</button>
-                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Products Content -->
-                <div id="products-content" class="hidden">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-semibold">Gestão de Produtos</h2>
-                        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="new-product-btn">Novo Produto</button>
-                    </div>
+                <div id="products-content" class="hidden-content">
                     <div class="bg-white p-6 rounded-lg shadow mb-6">
-                        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                            <div class="mb-4 md:mb-0">
-                                <div class="relative">
-                                    <input type="text" placeholder="Pesquisar produtos..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-64">
-                                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                                </div>
-                            </div>
-                            <div class="flex space-x-2">
-                                <select class="border rounded px-3 py-2 text-sm">
-                                    <option>Todos os tipos</option>
-                                    <option>Carnes</option>
-                                    <option>Laticínios</option>
-                                    <option>Pães</option>
-                                    <option>Outros</option>
-                                </select>
-                                <button class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">
-                                    <i class="fas fa-filter"></i>
-                                    <span class="ml-2">Filtrar</span>
-                                </button>
-                                <button class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">
-                                    <i class="fas fa-download"></i>
-                                    <span class="ml-2">Exportar</span>
-                                </button>
-                            </div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold">Gestão de Produtos</h2>
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="new-product-btn">Novo Produto</button>
+                        </div>
+                        <div class="mb-4 flex items-center space-x-4">
+                            <input type="text" placeholder="Pesquisar produto..." class="flex-1 pl-4 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <button class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
+                                <i class="fas fa-filter mr-2"></i>Filtrar
+                            </button>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="data-table">
                                 <thead>
                                     <tr>
-                                        <th>Código</th>
+                                        <th>ID</th>
                                         <th>Nome</th>
-                                        <th>Tipo</th>
-                                        <th>Custo/kg</th>
-                                        <th>Preço/kg</th>
-                                        <th>Margem</th>
-                                        <th>Estoque</th>
-                                        <th>Status</th>
+                                        <th>Unidade</th>
+                                        <th>Custo Padrão (R$/kg)</th>
+                                        <th>Preço Venda (R$/kg)</th>
+                                        <th>Rendimento Esperado (%)</th>
                                         <th>Ações</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="products-table-body">
                                     <tr>
-                                        <td>PROD001</td>
+                                        <td>001</td>
                                         <td>Hambúrguer Artesanal</td>
-                                        <td>Carnes</td>
-                                        <td>R$ 7,50</td>
-                                        <td>R$ 12,80</td>
-                                        <td>41%</td>
-                                        <td>256 kg</td>
-                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Ativo</span></td>
+                                        <td>Kg</td>
+                                        <td>8.50</td>
+                                        <td>12.80</td>
+                                        <td>95%</td>
                                         <td>
                                             <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
                                             <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>PROD002</td>
+                                        <td>002</td>
                                         <td>Peito de Frango</td>
-                                        <td>Carnes</td>
-                                        <td>R$ 5,20</td>
-                                        <td>R$ 8,50</td>
-                                        <td>39%</td>
-                                        <td>184 kg</td>
-                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Ativo</span></td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>PROD003</td>
-                                        <td>Pão Integral</td>
-                                        <td>Pães</td>
-                                        <td>R$ 3,80</td>
-                                        <td>R$ 6,20</td>
-                                        <td>39%</td>
-                                        <td>125 kg</td>
-                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Ativo</span></td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>PROD004</td>
-                                        <td>Queijo Minas</td>
-                                        <td>Laticínios</td>
-                                        <td>R$ 12,50</td>
-                                        <td>R$ 18,90</td>
-                                        <td>34%</td>
-                                        <td>89 kg</td>
-                                        <td><span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">Estoque baixo</span></td>
+                                        <td>Kg</td>
+                                        <td>6.00</td>
+                                        <td>8.50</td>
+                                        <td>98%</td>
                                         <td>
                                             <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
                                             <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
@@ -532,113 +440,39 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="flex justify-between items-center mt-4">
-                            <div class="text-sm text-gray-500">Mostrando 1 a 4 de 24 registros</div>
-                            <div class="flex space-x-2">
-                                <button class="px-3 py-1 border rounded text-gray-700">Anterior</button>
-                                <button class="px-3 py-1 border rounded bg-blue-600 text-white">1</button>
-                                <button class="px-3 py-1 border rounded text-gray-700">2</button>
-                                <button class="px-3 py-1 border rounded text-gray-700">3</button>
-                                <button class="px-3 py-1 border rounded text-gray-700">Próximo</button>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
-                <!-- Suppliers Content -->
-                <div id="suppliers-content" class="hidden">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-semibold">Gestão de Fornecedores</h2>
-                        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="new-supplier-btn">Novo Fornecedor</button>
-                    </div>
+                <div id="suppliers-content" class="hidden-content">
                     <div class="bg-white p-6 rounded-lg shadow mb-6">
-                        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                            <div class="mb-4 md:mb-0">
-                                <div class="relative">
-                                    <input type="text" placeholder="Pesquisar fornecedores..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-64">
-                                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                                </div>
-                            </div>
-                            <div class="flex space-x-2">
-                                <select class="border rounded px-3 py-2 text-sm">
-                                    <option>Todos os tipos</option>
-                                    <option>Carnes</option>
-                                    <option>Laticínios</option>
-                                    <option>Grãos</option>
-                                    <option>Outros</option>
-                                </select>
-                                <button class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">
-                                    <i class="fas fa-filter"></i>
-                                    <span class="ml-2">Filtrar</span>
-                                </button>
-                                <button class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">
-                                    <i class="fas fa-download"></i>
-                                    <span class="ml-2">Exportar</span>
-                                </button>
-                            </div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold">Gestão de Fornecedores</h2>
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="new-supplier-btn">Novo Fornecedor</button>
+                        </div>
+                        <div class="mb-4 flex items-center space-x-4">
+                            <input type="text" placeholder="Pesquisar fornecedor..." class="flex-1 pl-4 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                         <div class="overflow-x-auto">
                             <table class="data-table">
                                 <thead>
                                     <tr>
-                                        <th>Código</th>
-                                        <th>Nome</th>
-                                        <th>Tipo</th>
+                                        <th>ID</th>
+                                        <th>Empresa</th>
                                         <th>Contato</th>
                                         <th>Telefone</th>
                                         <th>Email</th>
-                                        <th>Status</th>
+                                        <th>Produtos Fornecidos</th>
                                         <th>Ações</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="suppliers-table-body">
                                     <tr>
-                                        <td>FORN001</td>
-                                        <td>Frigorífico Boi Feliz</td>
-                                        <td>Carnes</td>
+                                        <td>S01</td>
+                                        <td>Frigorífico Aurora</td>
                                         <td>João Silva</td>
                                         <td>(11) 98765-4321</td>
-                                        <td>joao@boifeliz.com.br</td>
-                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Ativo</span></td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>FORN002</td>
-                                        <td>Laticínios Santa Fé</td>
-                                        <td>Laticínios</td>
-                                        <td>Maria Souza</td>
-                                        <td>(11) 91234-5678</td>
-                                        <td>maria@santafe.com.br</td>
-                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Ativo</span></td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>FORN003</td>
-                                        <td>Moinho Trigo Bom</td>
-                                        <td>Grãos</td>
-                                        <td>Carlos Oliveira</td>
-                                        <td>(11) 92345-6789</td>
-                                        <td>carlos@trigobom.com.br</td>
-                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Ativo</span></td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>FORN004</td>
-                                        <td>Embalagens Forte</td>
-                                        <td>Outros</td>
-                                        <td>Ana Costa</td>
-                                        <td>(11) 93456-7890</td>
-                                        <td>ana@embalagensforte.com.br</td>
-                                        <td><span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">Inativo</span></td>
+                                        <td>joao@aurora.com</td>
+                                        <td>Carne Bovina, Aves</td>
                                         <td>
                                             <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
                                             <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
@@ -647,108 +481,43 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="flex justify-between items-center mt-4">
-                            <div class="text-sm text-gray-500">Mostrando 1 a 4 de 12 registros</div>
-                            <div class="flex space-x-2">
-                                <button class="px-3 py-1 border rounded text-gray-700">Anterior</button>
-                                <button class="px-3 py-1 border rounded bg-blue-600 text-white">1</button>
-                                <button class="px-3 py-1 border rounded text-gray-700">2</button>
-                                <button class="px-3 py-1 border rounded text-gray-700">3</button>
-                                <button class="px-3 py-1 border rounded text-gray-700">Próximo</button>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
-                <!-- Employees Content -->
-                <div id="employees-content" class="hidden">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-semibold">Gestão de Colaboradores</h2>
-                        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="new-employee-btn">Novo Colaborador</button>
-                    </div>
+                <div id="employees-content" class="hidden-content">
                     <div class="bg-white p-6 rounded-lg shadow mb-6">
-                        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                            <div class="mb-4 md:mb-0">
-                                <div class="relative">
-                                    <input type="text" placeholder="Pesquisar colaboradores..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-64">
-                                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                                </div>
-                            </div>
-                            <div class="flex space-x-2">
-                                <select class="border rounded px-3 py-2 text-sm">
-                                    <option>Todos os setores</option>
-                                    <option>Produção</option>
-                                    <option>Qualidade</option>
-                                    <option>Administrativo</option>
-                                    <option>Outros</option>
-                                </select>
-                                <button class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">
-                                    <i class="fas fa-filter"></i>
-                                    <span class="ml-2">Filtrar</span>
-                                </button>
-                                <button class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">
-                                    <i class="fas fa-download"></i>
-                                    <span class="ml-2">Exportar</span>
-                                </button>
-                            </div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold">Gestão de Colaboradores</h2>
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="new-employee-btn">Novo Colaborador</button>
+                        </div>
+                        <div class="mb-4 flex items-center space-x-4">
+                            <input type="text" placeholder="Pesquisar colaborador..." class="flex-1 pl-4 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <select class="border rounded px-3 py-1 text-sm">
+                                <option>Todos os Cargos</option>
+                                <option>Operador</option>
+                                <option>Supervisor</option>
+                                <option>Gerente</option>
+                            </select>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="data-table">
                                 <thead>
                                     <tr>
-                                        <th>Matrícula</th>
+                                        <th>ID</th>
                                         <th>Nome</th>
-                                        <th>Setor</th>
                                         <th>Cargo</th>
-                                        <th>Admissão</th>
-                                        <th>Status</th>
+                                        <th>Telefone</th>
+                                        <th>Email</th>
                                         <th>Ações</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="employees-table-body">
                                     <tr>
-                                        <td>EMP001</td>
-                                        <td>Roberto Almeida</td>
-                                        <td>Produção</td>
-                                        <td>Operador</td>
-                                        <td>15/03/2020</td>
-                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Ativo</span></td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>EMP002</td>
-                                        <td>Fernanda Lima</td>
-                                        <td>Qualidade</td>
-                                        <td>Inspetora</td>
-                                        <td>22/07/2021</td>
-                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Ativo</span></td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>EMP003</td>
-                                        <td>Carlos Mendes</td>
-                                        <td>Produção</td>
-                                        <td>Supervisor</td>
-                                        <td>10/05/2019</td>
-                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Ativo</span></td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>EMP004</td>
-                                        <td>Patrícia Gomes</td>
-                                        <td>Administrativo</td>
-                                        <td>Assistente</td>
-                                        <td>03/11/2022</td>
-                                        <td><span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">Férias</span></td>
+                                        <td>E01</td>
+                                        <td>Maria Souza</td>
+                                        <td>Operadora de Produção</td>
+                                        <td>(11) 91234-5678</td>
+                                        <td>maria.s@vilafrios.com</td>
                                         <td>
                                             <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
                                             <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
@@ -757,51 +526,37 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="flex justify-between items-center mt-4">
-                            <div class="text-sm text-gray-500">Mostrando 1 a 4 de 18 registros</div>
-                            <div class="flex space-x-2">
-                                <button class="px-3 py-1 border rounded text-gray-700">Anterior</button>
-                                <button class="px-3 py-1 border rounded bg-blue-600 text-white">1</button>
-                                <button class="px-3 py-1 border rounded text-gray-700">2</button>
-                                <button class="px-3 py-1 border rounded text-gray-700">3</button>
-                                <button class="px-3 py-1 border rounded text-gray-700">Próximo</button>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
-                <!-- Production Content -->
-                <div id="production-content" class="hidden">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-semibold">Registro de Produção</h2>
-                        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="new-production-btn2">Nova Produção</button>
-                    </div>
+                <div id="production-content" class="hidden-content">
                     <div class="bg-white p-6 rounded-lg shadow mb-6">
-                        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                            <div class="mb-4 md:mb-0">
-                                <div class="relative">
-                                    <input type="text" placeholder="Pesquisar produções..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-64">
-                                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                                </div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold">Registro de Produção</h2>
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="add-production-record-btn">Adicionar Registro</button>
+                        </div>
+                        <div class="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label for="prod-filter-date" class="block text-sm font-medium text-gray-700">Data:</label>
+                                <input type="date" id="prod-filter-date" class="mt-1 block w-full border rounded-lg p-2">
                             </div>
-                            <div class="flex space-x-2">
-                                <select class="border rounded px-3 py-2 text-sm">
-                                    <option>Todos os produtos</option>
-                                    <option>Hambúrguer Artesanal</option>
-                                    <option>Peito de Frango</option>
-                                    <option>Pão Integral</option>
-                                    <option>Queijo Minas</option>
-                                </select>
-                                <input type="date" class="border rounded px-3 py-2 text-sm">
-                                <button class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">
-                                    <i class="fas fa-filter"></i>
-                                    <span class="ml-2">Filtrar</span>
-                                </button>
-                                <button class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">
-                                    <i class="fas fa-download"></i>
-                                    <span class="ml-2">Exportar</span>
-                                </button>
+                            <div>
+                                <label for="prod-filter-product" class="block text-sm font-medium text-gray-700">Produto:</label>
+                                <select id="prod-filter-product" class="mt-1 block w-full border rounded-lg p-2">
+                                    <option value="">Todos os Produtos</option>
+                                    </select>
                             </div>
+                            <div>
+                                <label for="prod-filter-employee" class="block text-sm font-medium text-gray-700">Colaborador:</label>
+                                <select id="prod-filter-employee" class="mt-1 block w-full border rounded-lg p-2">
+                                    <option value="">Todos os Colaboradores</option>
+                                    </select>
+                            </div>
+                        </div>
+                        <div class="flex justify-end mb-4">
+                            <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 mr-2" id="export-production-data">
+                                <i class="fas fa-file-excel mr-2"></i>Exportar
+                            </button>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="data-table">
@@ -813,68 +568,90 @@
                                         <th>Peso Bruto</th>
                                         <th>Peso Líquido</th>
                                         <th>Retraço</th>
-                                        <th>Perdas</th>
-                                        <th>Rentabilidade</th>
-                                        <th>Responsável</th>
+                                        <th>Perdas (%)</th>
+                                        <th>Custo Mat. Prima (R$)</th>
+                                        <th>Rentabilidade (%)</th>
                                         <th>Ações</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="detailed-production-table-body">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="reports-content" class="hidden-content">
+                    <div class="bg-white p-6 rounded-lg shadow mb-6">
+                        <h2 class="text-lg font-semibold mb-4">Relatórios Gerenciais</h2>
+                        <div class="mb-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div>
+                                <label for="report-type" class="block text-sm font-medium text-gray-700">Tipo de Relatório:</label>
+                                <select id="report-type" class="mt-1 block w-full border rounded-lg p-2">
+                                    <option value="production-summary">Sumário de Produção</option>
+                                    <option value="losses-analysis">Análise de Perdas</option>
+                                    <option value="profitability-breakdown">Rentabilidade por Produto</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="report-start-date" class="block text-sm font-medium text-gray-700">Data Inicial:</label>
+                                <input type="date" id="report-start-date" class="mt-1 block w-full border rounded-lg p-2">
+                            </div>
+                            <div>
+                                <label for="report-end-date" class="block text-sm font-medium text-gray-700">Data Final:</label>
+                                <input type="date" id="report-end-date" class="mt-1 block w-full border rounded-lg p-2">
+                            </div>
+                        </div>
+                        <div class="flex justify-end mb-4">
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="generate-report-btn">
+                                <i class="fas fa-play mr-2"></i>Gerar Relatório
+                            </button>
+                            <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 ml-2" id="export-report-btn">
+                                <i class="fas fa-file-download mr-2"></i>Exportar
+                            </button>
+                        </div>
+                        <div id="report-output" class="border rounded-lg p-4 bg-gray-50 min-h-[300px]">
+                            <p class="text-gray-600 text-center py-10">Selecione as opções e gere um relatório.</p>
+                            </div>
+                    </div>
+                </div>
+
+                <div id="goals-content" class="hidden-content">
+                    <div class="bg-white p-6 rounded-lg shadow mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold">Definição de Metas</h2>
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="add-goal-btn">Nova Meta</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
                                     <tr>
-                                        <td>15/06/2023</td>
-                                        <td>Hambúrguer Artesanal</td>
-                                        <td>LOT23061501</td>
-                                        <td>150 kg</td>
-                                        <td>142 kg</td>
-                                        <td>5 kg</td>
-                                        <td>3 kg (2%)</td>
-                                        <td>75%</td>
-                                        <td>Roberto Almeida</td>
+                                        <th>Período</th>
+                                        <th>Tipo de Meta</th>
+                                        <th>Referência</th>
+                                        <th>Valor Alvo</th>
+                                        <th>Progresso Atual</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="goals-table-body">
+                                    <tr>
+                                        <td>Mensal (Jul/2025)</td>
+                                        <td>Produção Total (kg)</td>
+                                        <td>Todos</td>
+                                        <td>3000 kg</td>
+                                        <td>2345 kg (78%)</td>
                                         <td>
                                             <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
                                             <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>15/06/2023</td>
-                                        <td>Peito de Frango</td>
-                                        <td>LOT23061502</td>
-                                        <td>200 kg</td>
-                                        <td>192 kg</td>
-                                        <td>6 kg</td>
-                                        <td>2 kg (1%)</td>
-                                        <td>82%</td>
-                                        <td>Carlos Mendes</td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>14/06/2023</td>
-                                        <td>Pão Integral</td>
-                                        <td>LOT23061401</td>
-                                        <td>180 kg</td>
-                                        <td>175 kg</td>
-                                        <td>3 kg</td>
-                                        <td>2 kg (1.1%)</td>
-                                        <td>68%</td>
-                                        <td>Fernanda Lima</td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>14/06/2023</td>
-                                        <td>Queijo Minas</td>
-                                        <td>LOT23061402</td>
-                                        <td>120 kg</td>
-                                        <td>115 kg</td>
-                                        <td>4 kg</td>
-                                        <td>1 kg (0.8%)</td>
-                                        <td>79%</td>
-                                        <td>Roberto Almeida</td>
+                                        <td>Trimestral (Q3/2025)</td>
+                                        <td>Perda Máxima (%)</td>
+                                        <td>Todos</td>
+                                        <td>2%</td>
+                                        <td>1.8% (atingida)</td>
                                         <td>
                                             <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
                                             <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
@@ -883,309 +660,44 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="flex justify-between items-center mt-4">
-                            <div class="text-sm text-gray-500">Mostrando 1 a 4 de 124 registros</div>
-                            <div class="flex space-x-2">
-                                <button class="px-3 py-1 border rounded text-gray-700">Anterior</button>
-                                <button class="px-3 py-1 border rounded bg-blue-600 text-white">1</button>
-                                <button class="px-3 py-1 border rounded text-gray-700">2</button>
-                                <button class="px-3 py-1 border rounded text-gray-700">3</button>
-                                <button class="px-3 py-1 border rounded text-gray-700">Próximo</button>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
-                <!-- Reports Content -->
-                <div id="reports-content" class="hidden">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-semibold">Relatórios e Indicadores</h2>
-                        <div class="flex space-x-2">
-                            <button class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">
-                                <i class="fas fa-file-pdf"></i>
-                                <span class="ml-2">PDF</span>
-                            </button>
-                            <button class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">
-                                <i class="fas fa-file-excel"></i>
-                                <span class="ml-2">Excel</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                        <div class="bg-white p-6 rounded-lg shadow">
-                            <div class="flex justify-between items-center mb-4">
-                                <h2 class="text-lg font-semibold">Rentabilidade por Produto</h2>
-                                <select class="border rounded px-3 py-1 text-sm">
-                                    <option>Últimos 30 dias</option>
-                                    <option>Últimos 7 dias</option>
-                                    <option>Este mês</option>
-                                    <option>Mês passado</option>
-                                </select>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="profitabilityChart"></canvas>
-                            </div>
-                        </div>
-                        <div class="bg-white p-6 rounded-lg shadow">
-                            <div class="flex justify-between items-center mb-4">
-                                <h2 class="text-lg font-semibold">Perdas por Setor</h2>
-                                <select class="border rounded px-3 py-1 text-sm">
-                                    <option>Últimos 30 dias</option>
-                                    <option>Últimos 7 dias</option>
-                                    <option>Este mês</option>
-                                    <option>Mês passado</option>
-                                </select>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="lossesChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
+                <div id="users-content" class="hidden-content">
                     <div class="bg-white p-6 rounded-lg shadow mb-6">
                         <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-lg font-semibold">Evolução de Produção</h2>
-                            <div class="flex space-x-2">
-                                <select class="border rounded px-3 py-1 text-sm">
-                                    <option>Últimos 6 meses</option>
-                                    <option>Últimos 3 meses</option>
-                                    <option>Este ano</option>
-                                    <option>Ano passado</option>
-                                </select>
-                                <select class="border rounded px-3 py-1 text-sm">
-                                    <option>Todos os produtos</option>
-                                    <option>Hambúrguer Artesanal</option>
-                                    <option>Peito de Frango</option>
-                                    <option>Pão Integral</option>
-                                    <option>Queijo Minas</option>
-                                </select>
-                            </div>
+                            <h2 class="text-lg font-semibold">Gerenciamento de Usuários</h2>
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="new-user-btn">Novo Usuário</button>
                         </div>
-                        <div class="chart-container" style="height: 400px;">
-                            <canvas id="productionEvolutionChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-lg font-semibold">Metas vs Realizado</h2>
+                        <div class="mb-4 flex items-center space-x-4">
+                            <input type="text" placeholder="Pesquisar usuário..." class="flex-1 pl-4 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <select class="border rounded px-3 py-1 text-sm">
-                                <option>Este mês</option>
-                                <option>Mês passado</option>
-                                <option>Trimestre atual</option>
-                                <option>Ano atual</option>
+                                <option>Todos os Perfis</option>
+                                <option>Administrador</option>
+                                <option>Gerente de Produção</option>
+                                <option>Operador de Produção</option>
+                                <option>Leitor</option>
                             </select>
                         </div>
-                        <div class="chart-container" style="height: 350px;">
-                            <canvas id="goalsChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Goals Content -->
-                <div id="goals-content" class="hidden">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-semibold">Gestão de Metas</h2>
-                        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="new-goal-btn">Nova Meta</button>
-                    </div>
-                    <div class="bg-white p-6 rounded-lg shadow mb-6">
-                        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                            <div class="mb-4 md:mb-0">
-                                <div class="relative">
-                                    <input type="text" placeholder="Pesquisar metas..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-64">
-                                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                                </div>
-                            </div>
-                            <div class="flex space-x-2">
-                                <select class="border rounded px-3 py-2 text-sm">
-                                    <option>Todos os tipos</option>
-                                    <option>Produção</option>
-                                    <option>Perdas</option>
-                                    <option>Rentabilidade</option>
-                                    <option>Outros</option>
-                                </select>
-                                <select class="border rounded px-3 py-2 text-sm">
-                                    <option>Todos os status</option>
-                                    <option>Ativo</option>
-                                    <option>Inativo</option>
-                                    <option>Concluído</option>
-                                </select>
-                                <button class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">
-                                    <i class="fas fa-filter"></i>
-                                    <span class="ml-2">Filtrar</span>
-                                </button>
-                            </div>
-                        </div>
                         <div class="overflow-x-auto">
                             <table class="data-table">
                                 <thead>
                                     <tr>
-                                        <th>Código</th>
-                                        <th>Descrição</th>
-                                        <th>Tipo</th>
-                                        <th>Período</th>
-                                        <th>Meta</th>
-                                        <th>Realizado</th>
-                                        <th>% Atingido</th>
-                                        <th>Status</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>META001</td>
-                                        <td>Redução de perdas</td>
-                                        <td>Perdas</td>
-                                        <td>Jun/2023</td>
-                                        <td>≤ 2%</td>
-                                        <td>1.8%</td>
-                                        <td>90%</td>
-                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Em andamento</span></td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>META002</td>
-                                        <td>Aumento produção</td>
-                                        <td>Produção</td>
-                                        <td>Jun/2023</td>
-                                        <td>5,000 kg</td>
-                                        <td>3,856 kg</td>
-                                        <td>77%</td>
-                                        <td><span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">Em andamento</span></td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>META003</td>
-                                        <td>Rentabilidade média</td>
-                                        <td>Rentabilidade</td>
-                                        <td>2º Trim/2023</td>
-                                        <td>≥ 75%</td>
-                                        <td>73%</td>
-                                        <td>97%</td>
-                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Em andamento</span></td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>META004</td>
-                                        <td>Treinamentos</td>
-                                        <td>Outros</td>
-                                        <td>Jan-Jun/2023</td>
-                                        <td>100%</td>
-                                        <td>100%</td>
-                                        <td>100%</td>
-                                        <td><span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">Concluído</span></td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="flex justify-between items-center mt-4">
-                            <div class="text-sm text-gray-500">Mostrando 1 a 4 de 8 registros</div>
-                            <div class="flex space-x-2">
-                                <button class="px-3 py-1 border rounded text-gray-700">Anterior</button>
-                                <button class="px-3 py-1 border rounded bg-blue-600 text-white">1</button>
-                                <button class="px-3 py-1 border rounded text-gray-700">2</button>
-                                <button class="px-3 py-1 border rounded text-gray-700">Próximo</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Users Content -->
-                <div id="users-content" class="hidden">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-semibold">Gestão de Usuários</h2>
-                        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="new-user-btn">Novo Usuário</button>
-                    </div>
-                    <div class="bg-white p-6 rounded-lg shadow mb-6">
-                        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                            <div class="mb-4 md:mb-0">
-                                <div class="relative">
-                                    <input type="text" placeholder="Pesquisar usuários..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-64">
-                                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                                </div>
-                            </div>
-                            <div class="flex space-x-2">
-                                <select class="border rounded px-3 py-2 text-sm">
-                                    <option>Todos os perfis</option>
-                                    <option>Administrador</option>
-                                    <option>Gerente</option>
-                                    <option>Supervisor</option>
-                                    <option>Operador</option>
-                                </select>
-                                <select class="border rounded px-3 py-2 text-sm">
-                                    <option>Todos os status</option>
-                                    <option>Ativo</option>
-                                    <option>Inativo</option>
-                                </select>
-                                <button class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">
-                                    <i class="fas fa-filter"></i>
-                                    <span class="ml-2">Filtrar</span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
+                                        <th>ID</th>
                                         <th>Nome</th>
                                         <th>Email</th>
-                                        <th>Perfil</th>
-                                        <th>Último Acesso</th>
+                                        <th>Perfil de Acesso</th>
                                         <th>Status</th>
                                         <th>Ações</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="users-table-body">
                                     <tr>
+                                        <td>U01</td>
                                         <td>Admin User</td>
-                                        <td>admin@foodpro.com.br</td>
+                                        <td>admin@vilafrios.com</td>
                                         <td>Administrador</td>
-                                        <td>15/06/2023 14:30</td>
-                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Ativo</span></td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Gerente Produção</td>
-                                        <td>gerente@foodpro.com.br</td>
-                                        <td>Gerente</td>
-                                        <td>15/06/2023 10:15</td>
-                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Ativo</span></td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Supervisor Qualidade</td>
-                                        <td>supervisor@foodpro.com.br</td>
-                                        <td>Supervisor</td>
-                                        <td>14/06/2023 16:45</td>
-                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Ativo</span></td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Operador 1</td>
-                                        <td>operador1@foodpro.com.br</td>
-                                        <td>Operador</td>
-                                        <td>14/06/2023 07:30</td>
-                                        <td><span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">Inativo</span></td>
+                                        <td>Ativo</td>
                                         <td>
                                             <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
                                             <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
@@ -1193,16 +705,6 @@
                                     </tr>
                                 </tbody>
                             </table>
-                        </div>
-                        <div class="flex justify-between items-center mt-4">
-                            <div class="text-sm text-gray-500">Mostrando 1 a 4 de 12 registros</div>
-                            <div class="flex space-x-2">
-                                <button class="px-3 py-1 border rounded text-gray-700">Anterior</button>
-                                <button class="px-3 py-1 border rounded bg-blue-600 text-white">1</button>
-                                <button class="px-3 py-1 border rounded text-gray-700">2</button>
-                                <button class="px-3 py-1 border rounded text-gray-700">3</button>
-                                <button class="px-3 py-1 border rounded text-gray-700">Próximo</button>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1210,119 +712,937 @@
         </div>
     </div>
 
-    <!-- Modal for New Production -->
-    <div id="production-modal" class="modal">
+    <div id="newProductionModal" class="modal">
         <div class="modal-content">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-semibold">Registrar Nova Produção</h2>
-                <span class="close-modal cursor-pointer text-2xl">&times;</span>
-            </div>
-            <form id="production-form">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label for="production-date" class="block text-sm font-medium text-gray-700 mb-1">Data</label>
-                        <input type="date" id="production-date" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    <div>
-                        <label for="production-product" class="block text-sm font-medium text-gray-700 mb-1">Produto</label>
-                        <select id="production-product" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">Selecione um produto</option>
-                            <option value="PROD001">Hambúrguer Artesanal</option>
-                            <option value="PROD002">Peito de Frango</option>
-                            <option value="PROD003">Pão Integral</option>
-                            <option value="PROD004">Queijo Minas</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="production-lot" class="block text-sm font-medium text-gray-700 mb-1">Lote</label>
-                        <input type="text" id="production-lot" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Número do lote">
-                    </div>
-                    <div>
-                        <label for="production-responsible" class="block text-sm font-medium text-gray-700 mb-1">Responsável</label>
-                        <select id="production-responsible" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">Selecione um responsável</option>
-                            <option value="EMP001">Roberto Almeida</option>
-                            <option value="EMP002">Fernanda Lima</option>
-                            <option value="EMP003">Carlos Mendes</option>
-                        </select>
-                    </div>
+            <span class="close-button" id="closeProductionModal">&times;</span>
+            <h2 class="text-xl font-semibold mb-4">Registrar Nova Produção</h2>
+            <form id="production-form" class="space-y-4">
+                <div>
+                    <label for="prod-date" class="block text-sm font-medium text-gray-700">Data:</label>
+                    <input type="date" id="prod-date" class="mt-1 block w-full border rounded-md p-2" required>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div>
-                        <label for="production-gross" class="block text-sm font-medium text-gray-700 mb-1">Peso Bruto (kg)</label>
-                        <input type="number" step="0.01" id="production-gross" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00">
-                    </div>
-                    <div>
-                        <label for="production-net" class="block text-sm font-medium text-gray-700 mb-1">Peso Líquido (kg)</label>
-                        <input type="number" step="0.01" id="production-net" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00">
-                    </div>
-                    <div>
-                        <label for="production-retrace" class="block text-sm font-medium text-gray-700 mb-1">Retraço (kg)</label>
-                        <input type="number" step="0.01" id="production-retrace" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00">
-                    </div>
+                <div>
+                    <label for="prod-product" class="block text-sm font-medium text-gray-700">Produto:</label>
+                    <select id="prod-product" class="mt-1 block w-full border rounded-md p-2" required>
+                        <option value="">Selecione um Produto</option>
+                        <option value="Hambúrguer Artesanal" data-cost="8.50" data-price="12.80">Hambúrguer Artesanal</option>
+                        <option value="Peito de Frango" data-cost="6.00" data-price="8.50">Peito de Frango</option>
+                        <option value="Pão Integral" data-cost="4.00" data-price="6.20">Pão Integral</option>
+                        <option value="Queijo Minas" data-cost="12.00" data-price="18.90">Queijo Minas</option>
+                    </select>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div>
-                        <label for="production-loss" class="block text-sm font-medium text-gray-700 mb-1">Perdas (kg)</label>
-                        <input type="number" step="0.01" id="production-loss" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" readonly>
-                    </div>
-                    <div>
-                        <label for="production-profitability" class="block text-sm font-medium text-gray-700 mb-1">Rentabilidade (%)</label>
-                        <input type="number" step="0.01" id="production-profitability" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" readonly>
-                    </div>
+                <div>
+                    <label for="prod-lot" class="block text-sm font-medium text-gray-700">Número do Lote:</label>
+                    <input type="text" id="prod-lot" class="mt-1 block w-full border rounded-md p-2">
                 </div>
-                <div class="flex justify-end space-x-3">
-                    <button type="button" class="close-modal px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100">Cancelar</button>
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Salvar</button>
+                <div>
+                    <label for="prod-employee" class="block text-sm font-medium text-gray-700">Colaborador Responsável:</label>
+                    <select id="prod-employee" class="mt-1 block w-full border rounded-md p-2" required>
+                        <option value="">Selecione um Colaborador</option>
+                        <option value="Maria Souza">Maria Souza</option>
+                        <option value="Carlos Almeida">Carlos Almeida</option>
+                    </select>
                 </div>
+                <div>
+                    <label for="prod-gross-weight" class="block text-sm font-medium text-gray-700">Peso Bruto (kg):</label>
+                    <input type="number" id="prod-gross-weight" step="0.01" class="mt-1 block w-full border rounded-md p-2" required>
+                </div>
+                <div>
+                    <label for="prod-net-weight" class="block text-sm font-medium text-gray-700">Peso Líquido (kg):</label>
+                    <input type="number" id="prod-net-weight" step="0.01" class="mt-1 block w-full border rounded-md p-2" required>
+                </div>
+                <div>
+                    <label for="prod-shrinkage" class="block text-sm font-medium text-gray-700">Retraço (kg):</label>
+                    <input type="number" id="prod-shrinkage" step="0.01" class="mt-1 block w-full border rounded-md p-2" value="0">
+                </div>
+                <div id="raw-materials-section">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Matérias-Primas Utilizadas:</label>
+                    <div id="raw-materials-list" class="space-y-2 mb-2">
+                        </div>
+                    <button type="button" id="add-raw-material-btn" class="bg-gray-200 text-gray-700 px-3 py-1 rounded-md text-sm hover:bg-gray-300">Adicionar Matéria-Prima</button>
+                </div>
+                <div>
+                    <label for="prod-notes" class="block text-sm font-medium text-gray-700">Observações:</label>
+                    <textarea id="prod-notes" rows="3" class="mt-1 block w-full border rounded-md p-2"></textarea>
+                </div>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full">Salvar Produção</button>
             </form>
         </div>
     </div>
 
-    <!-- Modal for New Product -->
-    <div id="product-modal" class="modal">
+    <div id="genericModal" class="modal">
         <div class="modal-content">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-semibold">Cadastrar Novo Produto</h2>
-                <span class="close-modal cursor-pointer text-2xl">&times;</span>
-            </div>
-            <form id="product-form">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label for="product-code" class="block text-sm font-medium text-gray-700 mb-1">Código</label>
-                        <input type="text" id="product-code" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Código do produto">
+            <span class="close-button" id="closeGenericModal">&times;</span>
+            <h2 class="text-xl font-semibold mb-4" id="generic-modal-title">Adicionar Novo Item</h2>
+            <form id="generic-form" class="space-y-4">
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full">Salvar</button>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const content = document.querySelector('.content');
+        const pageTitle = document.getElementById('page-title');
+        const navItems = document.querySelectorAll('.nav-item');
+        const mainContent = document.querySelector('main');
+
+        // Modals
+        const newProductionModal = document.getElementById('newProductionModal');
+        const closeProductionModal = document.getElementById('closeProductionModal');
+        const newProductionBtn = document.getElementById('new-production-btn');
+        const addProductionRecordBtn = document.getElementById('add-production-record-btn');
+        const productionForm = document.getElementById('production-form');
+        const productionTableBody = document.getElementById('production-table-body');
+        const detailedProductionTableBody = document.getElementById('detailed-production-table-body');
+        const addRawMaterialBtn = document.getElementById('add-raw-material-btn');
+        const rawMaterialsList = document.getElementById('raw-materials-list');
+
+        const genericModal = document.getElementById('genericModal');
+        const closeGenericModal = document.getElementById('closeGenericModal');
+        const genericModalTitle = document.getElementById('generic-modal-title');
+        const genericForm = document.getElementById('generic-form');
+
+        // Placeholder Data (replace with actual backend data)
+        let productionData = [
+            { id: 'prod001', date: '2023-07-27', product: 'Hambúrguer Artesanal', lot: 'L001', employee: 'Maria Souza', gross: 150, net: 142, shrinkage: 5, rawMaterialCost: 850 },
+            { id: 'prod002', date: '2023-07-27', product: 'Peito de Frango', lot: 'L002', employee: 'Carlos Almeida', gross: 200, net: 192, shrinkage: 6, rawMaterialCost: 1200 },
+            { id: 'prod003', date: '2023-07-26', product: 'Hambúrguer Artesanal', lot: 'L003', employee: 'Maria Souza', gross: 140, net: 135, shrinkage: 3, rawMaterialCost: 800 },
+            { id: 'prod004', date: '2023-07-26', product: 'Queijo Minas', lot: 'L004', employee: 'Carlos Almeida', gross: 100, net: 95, shrinkage: 2, rawMaterialCost: 600 }
+        ];
+
+        let productsData = [
+            { id: 'P001', name: 'Hambúrguer Artesanal', unit: 'Kg', standardCost: 8.50, sellingPrice: 12.80, expectedYield: 95 },
+            { id: 'P002', name: 'Peito de Frango', unit: 'Kg', standardCost: 6.00, sellingPrice: 8.50, expectedYield: 98 },
+            { id: 'P003', name: 'Pão Integral', unit: 'Kg', standardCost: 4.00, sellingPrice: 6.20, expectedYield: 99 },
+            { id: 'P004', name: 'Queijo Minas', unit: 'Kg', standardCost: 12.00, sellingPrice: 18.90, expectedYield: 97 }
+        ];
+
+        let suppliersData = [
+            { id: 'S01', company: 'Frigorífico Aurora', contact: 'João Silva', phone: '(11) 98765-4321', email: 'joao@aurora.com', products: 'Carne Bovina, Aves' }
+        ];
+
+        let employeesData = [
+            { id: 'E01', name: 'Maria Souza', role: 'Operadora de Produção', phone: '(11) 91234-5678', email: 'maria.s@vilafrios.com' },
+            { id: 'E02', name: 'Carlos Almeida', role: 'Supervisor de Produção', phone: '(11) 99876-5432', email: 'carlos.a@vilafrios.com' }
+        ];
+
+        let goalsData = [
+            { id: 'G01', period: 'Mensal (Jul/2025)', type: 'Produção Total (kg)', reference: 'Todos', targetValue: 3000, currentValue: 2345, progress: '78%' },
+            { id: 'G02', period: 'Trimestral (Q3/2025)', type: 'Perda Máxima (%)', reference: 'Todos', targetValue: 2, currentValue: 1.8, progress: 'atingida' }
+        ];
+
+        let usersData = [
+            { id: 'U01', name: 'Admin User', email: 'admin@vilafrios.com', profile: 'Administrador', status: 'Ativo' }
+        ];
+
+
+        // Chart.js instance
+        let productionChart;
+
+        // --- Sidebar Toggle ---
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            if (sidebar.classList.contains('collapsed')) {
+                content.style.marginLeft = '70px';
+            } else {
+                content.style.marginLeft = '256px';
+            }
+        });
+
+        // --- Navigation and Content Switching ---
+        navItems.forEach(item => {
+            item.addEventListener('click', function(event) {
+                event.preventDefault();
+                // Remove active class from all
+                navItems.forEach(nav => nav.classList.remove('active'));
+                // Add active class to clicked item
+                this.classList.add('active');
+
+                const targetContentId = this.dataset.content;
+                const targetContent = document.getElementById(targetContentId);
+
+                // Hide all content sections
+                document.querySelectorAll('main > div').forEach(div => {
+                    div.classList.add('hidden-content');
+                });
+
+                // Show target content
+                targetContent.classList.remove('hidden-content');
+                pageTitle.textContent = this.querySelector('.nav-text').textContent;
+
+                // Load data specific to the section
+                if (targetContentId === 'dashboard-content') {
+                    renderDashboard();
+                    updateProductionChart();
+                } else if (targetContentId === 'products-content') {
+                    renderProductsTable();
+                } else if (targetContentId === 'suppliers-content') {
+                    renderSuppliersTable();
+                } else if (targetContentId === 'employees-content') {
+                    renderEmployeesTable();
+                } else if (targetContentId === 'production-content') {
+                    renderDetailedProductionTable();
+                    populateProductionFilters();
+                } else if (targetContentId === 'goals-content') {
+                    renderGoalsTable();
+                } else if (targetContentId === 'users-content') {
+                    renderUsersTable();
+                }
+            });
+        });
+
+        // --- Dashboard Functions ---
+        function calculateProductionMetrics() {
+            const today = new Date().toISOString().slice(0, 10);
+            let dailyProduction = 0;
+            let dailyLosses = 0;
+            let totalProfitability = 0;
+            let profitableProductionsCount = 0;
+
+            productionData.forEach(prod => {
+                const losses = prod.gross - prod.net - prod.shrinkage;
+                const lossesPercentage = (losses / prod.gross) * 100;
+                let profitability = 0;
+
+                const productInfo = productsData.find(p => p.name === prod.product);
+                if (productInfo) {
+                    const costOfGoods = prod.rawMaterialCost; // Simplified: just raw material cost for demo
+                    const revenue = prod.net * productInfo.sellingPrice;
+                    if (revenue > 0) {
+                        profitability = ((revenue - costOfGoods) / revenue) * 100;
+                    }
+                }
+
+                if (prod.date === today) {
+                    dailyProduction += prod.net;
+                    dailyLosses += losses;
+                }
+                if (!isNaN(profitability) && profitability >= 0) { // Only count valid profitability
+                    totalProfitability += profitability;
+                    profitableProductionsCount++;
+                }
+            });
+
+            const avgProfitability = profitableProductionsCount > 0 ? (totalProfitability / profitableProductionsCount) : 0;
+
+            document.getElementById('daily-production').textContent = `${dailyProduction.toFixed(2)} kg`;
+            document.getElementById('daily-losses').textContent = `${dailyLosses.toFixed(2)} kg`;
+            document.getElementById('avg-profitability').textContent = `${avgProfitability.toFixed(2)}%`;
+
+            // Monthly Goal (example - would come from goalsData)
+            const monthlyGoal = goalsData.find(g => g.type === 'Produção Total (kg)' && g.period.includes('Jul/2025'));
+            if (monthlyGoal) {
+                const progress = (monthlyGoal.currentValue / monthlyGoal.targetValue) * 100;
+                document.getElementById('monthly-goal-progress').textContent = `${progress.toFixed(0)}%`;
+                document.getElementById('monthly-goal-bar').style.width = `${Math.min(progress, 100)}%`;
+            } else {
+                document.getElementById('monthly-goal-progress').textContent = `N/A`;
+                document.getElementById('monthly-goal-bar').style.width = `0%`;
+            }
+
+            renderTopProducts();
+        }
+
+        function renderTopProducts() {
+            const productAggregates = {}; // { productName: { totalNet: 0, totalLosses: 0, totalProfit: 0, count: 0 } }
+
+            productionData.forEach(prod => {
+                if (!productAggregates[prod.product]) {
+                    productAggregates[prod.product] = { totalNet: 0, totalLosses: 0, totalProfitability: 0, count: 0 };
+                }
+                const losses = prod.gross - prod.net - prod.shrinkage;
+                const productInfo = productsData.find(p => p.name === prod.product);
+                let profitability = 0;
+                if (productInfo) {
+                    const costOfGoods = prod.rawMaterialCost;
+                    const revenue = prod.net * productInfo.sellingPrice;
+                    if (revenue > 0) {
+                        profitability = ((revenue - costOfGoods) / revenue) * 100;
+                    }
+                }
+
+                productAggregates[prod.product].totalNet += prod.net;
+                productAggregates[prod.product].totalLosses += losses;
+                productAggregates[prod.product].totalProfitability += profitability;
+                productAggregates[prod.product].count++;
+            });
+
+            const sortedProducts = Object.entries(productAggregates)
+                .map(([name, data]) => ({
+                    name,
+                    totalNet: data.totalNet,
+                    avgLosses: data.totalLosses / data.count,
+                    avgProfitability: data.totalProfitability / data.count,
+                    productInfo: productsData.find(p => p.name === name)
+                }))
+                .sort((a, b) => b.totalNet - a.totalNet) // Sort by total production
+                .slice(0, 4); // Top 4 products
+
+            topProductsList.innerHTML = '';
+            sortedProducts.forEach(product => {
+                const productIcon = getProductIcon(product.name);
+                const priceText = product.productInfo ? `R$ ${product.productInfo.sellingPrice.toFixed(2)}/kg` : '';
+                const profitColor = product.avgProfitability >= 0 ? 'text-green-500' : 'text-red-500';
+                const profitArrow = product.avgProfitability >= 0 ? 'fa-caret-up' : 'fa-caret-down';
+
+                topProductsList.innerHTML += `
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                            <i class="fas ${productIcon} text-blue-600"></i>
+                        </div>
+                        <div class="flex-grow">
+                            <p class="font-medium">${product.name}</p>
+                            <p class="text-sm text-gray-500">${priceText}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-medium">${product.totalNet.toFixed(2)} kg</p>
+                            <p class="text-sm ${profitColor}"><i class="fas ${profitArrow}"></i> ${product.avgProfitability.toFixed(1)}%</p>
+                        </div>
                     </div>
-                    <div>
-                        <label for="product-name" class="block text-sm font-medium text-gray-700 mb-1">Nome</label>
-                        <input type="text" id="product-name" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nome do produto">
-                    </div>
-                    <div>
-                        <label for="product-type" class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
-                        <select id="product-type" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">Selecione um tipo</option>
-                            <option value="Carnes">Carnes</option>
-                            <option value="Laticínios">Laticínios</option>
-                            <option value="Pães">Pães</option>
-                            <option value="Outros">Outros</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="product-supplier" class="block text-sm font-medium text-gray-700 mb-1">Fornecedor</label>
-                        <select id="product-supplier" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">Selecione um fornecedor</option>
-                            <option value="FORN001">Frigorífico Boi Feliz</option>
-                            <option value="FORN002">Laticínios Santa Fé</option>
-                            <option value="FORN003">Moinho Trigo Bom</option>
-                        </select>
-                    </div>
+                `;
+            });
+        }
+
+        function getProductIcon(productName) {
+            switch (productName) {
+                case 'Hambúrguer Artesanal': return 'fa-hamburger';
+                case 'Peito de Frango': return 'fa-drumstick-bite';
+                case 'Pão Integral': return 'fa-bread-slice';
+                case 'Queijo Minas': return 'fa-cheese';
+                default: return 'fa-box-open';
+            }
+        }
+
+        function updateProductionChart() {
+            const ctx = document.getElementById('productionChart').getContext('2d');
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6); // Last 7 days including today
+
+            const dates = [];
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(sevenDaysAgo);
+                d.setDate(sevenDaysAgo.getDate() + i);
+                dates.push(d.toISOString().slice(0, 10));
+            }
+
+            const dailyProduction = dates.map(date => {
+                let total = 0;
+                productionData.filter(p => p.date === date).forEach(p => total += p.net);
+                return total;
+            });
+
+            const dailyLosses = dates.map(date => {
+                let totalLoss = 0;
+                productionData.filter(p => p.date === date).forEach(p => totalLoss += (p.gross - p.net - p.shrinkage));
+                return totalLoss;
+            });
+
+            if (productionChart) {
+                productionChart.destroy(); // Destroy previous chart instance
+            }
+
+            productionChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates.map(d => new Date(d).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })),
+                    datasets: [
+                        {
+                            label: 'Produção Líquida (kg)',
+                            data: dailyProduction,
+                            borderColor: 'rgb(59, 130, 246)',
+                            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                            tension: 0.1,
+                            fill: true
+                        },
+                        {
+                            label: 'Perdas (kg)',
+                            data: dailyLosses,
+                            borderColor: 'rgb(239, 68, 68)',
+                            backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                            tension: 0.1,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw.toFixed(2)} kg`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- Production Modals and Forms ---
+        newProductionBtn.addEventListener('click', () => {
+            openProductionModal();
+        });
+
+        addProductionRecordBtn.addEventListener('click', () => {
+            openProductionModal();
+        });
+
+        closeProductionModal.addEventListener('click', () => {
+            newProductionModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target == newProductionModal) {
+                newProductionModal.style.display = 'none';
+            }
+            if (event.target == genericModal) {
+                genericModal.style.display = 'none';
+            }
+        });
+
+        function openProductionModal() {
+            newProductionModal.style.display = 'block';
+            productionForm.reset(); // Clear form
+            rawMaterialsList.innerHTML = ''; // Clear raw materials
+            addRawMaterialInput(); // Add first raw material input
+        }
+
+        addRawMaterialBtn.addEventListener('click', () => {
+            addRawMaterialInput();
+        });
+
+        function addRawMaterialInput(materialName = '', quantity = '') {
+            const div = document.createElement('div');
+            div.className = 'flex items-center space-x-2';
+            div.innerHTML = `
+                <input type="text" placeholder="Nome Matéria-Prima" value="${materialName}" class="flex-grow border rounded-md p-2 raw-material-name" required>
+                <input type="number" step="0.01" placeholder="Quantidade (kg/un)" value="${quantity}" class="w-28 border rounded-md p-2 raw-material-quantity" required>
+                <input type="number" step="0.01" placeholder="Custo (R$)" class="w-28 border rounded-md p-2 raw-material-cost" required>
+                <button type="button" class="remove-raw-material-btn text-red-600 hover:text-red-800 p-2">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            rawMaterialsList.appendChild(div);
+
+            div.querySelector('.remove-raw-material-btn').addEventListener('click', (e) => {
+                e.target.closest('div').remove();
+            });
+        }
+
+        productionForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const prodDate = document.getElementById('prod-date').value;
+            const prodProductSelect = document.getElementById('prod-product');
+            const prodProduct = prodProductSelect.value;
+            const prodLot = document.getElementById('prod-lot').value;
+            const prodEmployee = document.getElementById('prod-employee').value;
+            const prodGrossWeight = parseFloat(document.getElementById('prod-gross-weight').value);
+            const prodNetWeight = parseFloat(document.getElementById('prod-net-weight').value);
+            const prodShrinkage = parseFloat(document.getElementById('prod-shrinkage').value);
+
+            let totalRawMaterialCost = 0;
+            document.querySelectorAll('.raw-material-cost').forEach(input => {
+                totalRawMaterialCost += parseFloat(input.value) || 0;
+            });
+
+            const losses = prodGrossWeight - prodNetWeight - prodShrinkage;
+            const lossesPercentage = ((losses / prodGrossWeight) * 100).toFixed(1);
+
+            const productInfo = productsData.find(p => p.name === prodProduct);
+            let profitability = 0;
+            if (productInfo) {
+                const revenue = prodNetWeight * productInfo.sellingPrice;
+                if (revenue > 0) {
+                    profitability = ((revenue - totalRawMaterialCost) / revenue) * 100;
+                }
+            }
+
+            const newProductionRecord = {
+                id: `prod${Date.now()}`, // Simple unique ID for demo
+                date: prodDate,
+                product: prodProduct,
+                lot: prodLot,
+                employee: prodEmployee,
+                gross: prodGrossWeight,
+                net: prodNetWeight,
+                shrinkage: prodShrinkage,
+                rawMaterialCost: totalRawMaterialCost,
+                lossesPercentage: lossesPercentage,
+                profitability: profitability.toFixed(1)
+            };
+
+            productionData.unshift(newProductionRecord); // Add to beginning for "latest" view
+            renderDetailedProductionTable(); // Refresh the table
+            renderDashboard(); // Update dashboard metrics
+
+            newProductionModal.style.display = 'none';
+            alert('Produção registrada com sucesso!');
+        });
+
+        // --- Render Tables ---
+        function renderDetailedProductionTable() {
+            detailedProductionTableBody.innerHTML = ''; // Clear existing rows
+
+            const filterDate = document.getElementById('prod-filter-date').value;
+            const filterProduct = document.getElementById('prod-filter-product').value;
+            const filterEmployee = document.getElementById('prod-filter-employee').value;
+
+            const filteredData = productionData.filter(prod => {
+                let matchDate = true;
+                if (filterDate) {
+                    matchDate = prod.date === filterDate;
+                }
+                let matchProduct = true;
+                if (filterProduct) {
+                    matchProduct = prod.product === filterProduct;
+                }
+                let matchEmployee = true;
+                if (filterEmployee) {
+                    matchEmployee = prod.employee === filterEmployee;
+                }
+                return matchDate && matchProduct && matchEmployee;
+            });
+
+
+            filteredData.forEach(prod => {
+                const row = detailedProductionTableBody.insertRow();
+                row.innerHTML = `
+                    <td>${new Date(prod.date).toLocaleDateString('pt-BR')}</td>
+                    <td>${prod.product}</td>
+                    <td>${prod.lot || '-'}</td>
+                    <td>${prod.gross.toFixed(2)} kg</td>
+                    <td>${prod.net.toFixed(2)} kg</td>
+                    <td>${prod.shrinkage.toFixed(2)} kg</td>
+                    <td>${prod.lossesPercentage}%</td>
+                    <td>R$ ${prod.rawMaterialCost.toFixed(2)}</td>
+                    <td>${prod.profitability}%</td>
+                    <td>
+                        <button class="text-blue-600 hover:text-blue-800 mr-2" onclick="editProduction('${prod.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="text-red-600 hover:text-red-800" onclick="deleteProduction('${prod.id}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+            });
+        }
+
+        function populateProductionFilters() {
+            const productFilter = document.getElementById('prod-filter-product');
+            const employeeFilter = document.getElementById('prod-filter-employee');
+
+            // Clear previous options (keep default "Todos")
+            productFilter.innerHTML = '<option value="">Todos os Produtos</option>';
+            employeeFilter.innerHTML = '<option value="">Todos os Colaboradores</option>';
+
+            const uniqueProducts = [...new Set(productsData.map(p => p.name))];
+            uniqueProducts.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product;
+                option.textContent = product;
+                productFilter.appendChild(option);
+            });
+
+            const uniqueEmployees = [...new Set(employeesData.map(e => e.name))];
+            uniqueEmployees.forEach(employee => {
+                const option = document.createElement('option');
+                option.value = employee;
+                option.textContent = employee;
+                employeeFilter.appendChild(option);
+            });
+
+            // Add event listeners for filters
+            document.getElementById('prod-filter-date').addEventListener('change', renderDetailedProductionTable);
+            document.getElementById('prod-filter-product').addEventListener('change', renderDetailedProductionTable);
+            document.getElementById('prod-filter-employee').addEventListener('change', renderDetailedProductionTable);
+        }
+
+        // Dummy functions for edit/delete (would interact with backend)
+        function editProduction(id) {
+            alert(`Editar produção com ID: ${id}`);
+            // Logic to load production data into the modal for editing
+        }
+        function deleteProduction(id) {
+            if (confirm(`Tem certeza que deseja excluir a produção com ID: ${id}?`)) {
+                productionData = productionData.filter(p => p.id !== id);
+                renderDetailedProductionTable();
+                renderDashboard();
+            }
+        }
+
+        // Generic Modal Handlers for other sections
+        function openGenericModal(type, title, formHtml, onSubmitCallback) {
+            genericModalTitle.textContent = title;
+            genericForm.innerHTML = formHtml + '<button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full">Salvar</button>';
+            genericForm.onsubmit = (e) => {
+                e.preventDefault();
+                onSubmitCallback(e);
+                genericModal.style.display = 'none';
+            };
+            genericModal.style.display = 'block';
+        }
+
+        closeGenericModal.addEventListener('click', () => {
+            genericModal.style.display = 'none';
+        });
+
+        // --- Products Section ---
+        document.getElementById('new-product-btn').addEventListener('click', () => {
+            const formHtml = `
+                <div>
+                    <label for="product-name" class="block text-sm font-medium text-gray-700">Nome do Produto:</label>
+                    <input type="text" id="product-name" class="mt-1 block w-full border rounded-md p-2" required>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div>
-                        <label for="product-cost" class="block text-sm font-medium text-gray-700 mb-1">Custo por kg (R$)</label>
-                        <input type="number" step="0.01" id="product-cost" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00">
-                    </div>
-                    <div>
-                        <label for="product-price" class="block text-sm font-medium text-gray-700 mb-1">Preço por kg (R$)</label>
-                        <input type="number" step="
+                <div>
+                    <label for="product-unit" class="block text-sm font-medium text-gray-700">Unidade de Medida:</label>
+                    <input type="text" id="product-unit" class="mt-1 block w-full border rounded-md p-2" placeholder="Ex: Kg, Un" required>
+                </div>
+                <div>
+                    <label for="product-cost" class="block text-sm font-medium text-gray-700">Custo Padrão (R$/kg/un):</label>
+                    <input type="number" id="product-cost" step="0.01" class="mt-1 block w-full border rounded-md p-2" required>
+                </div>
+                <div>
+                    <label for="product-price" class="block text-sm font-medium text-gray-700">Preço Venda (R$/kg/un):</label>
+                    <input type="number" id="product-price" step="0.01" class="mt-1 block w-full border rounded-md p-2" required>
+                </div>
+                <div>
+                    <label for="product-yield" class="block text-sm font-medium text-gray-700">Rendimento Esperado (%):</label>
+                    <input type="number" id="product-yield" step="0.01" class="mt-1 block w-full border rounded-md p-2" required>
+                </div>
+            `;
+            openGenericModal('product', 'Novo Produto', formHtml, (e) => {
+                const newProduct = {
+                    id: `P${Date.now()}`,
+                    name: document.getElementById('product-name').value,
+                    unit: document.getElementById('product-unit').value,
+                    standardCost: parseFloat(document.getElementById('product-cost').value),
+                    sellingPrice: parseFloat(document.getElementById('product-price').value),
+                    expectedYield: parseFloat(document.getElementById('product-yield').value)
+                };
+                productsData.push(newProduct);
+                renderProductsTable();
+                alert('Produto adicionado!');
+            });
+        });
+
+        function renderProductsTable() {
+            const productsTableBody = document.getElementById('products-table-body');
+            productsTableBody.innerHTML = '';
+            productsData.forEach(product => {
+                const row = productsTableBody.insertRow();
+                row.innerHTML = `
+                    <td>${product.id}</td>
+                    <td>${product.name}</td>
+                    <td>${product.unit}</td>
+                    <td>${product.standardCost.toFixed(2)}</td>
+                    <td>${product.sellingPrice.toFixed(2)}</td>
+                    <td>${product.expectedYield}%</td>
+                    <td>
+                        <button class="text-blue-600 hover:text-blue-800 mr-2" onclick="editProduct('${product.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="text-red-600 hover:text-red-800" onclick="deleteProduct('${product.id}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+            });
+        }
+        function editProduct(id) { alert(`Editar produto com ID: ${id}`); }
+        function deleteProduct(id) { if (confirm(`Excluir produto ${id}?`)) { productsData = productsData.filter(p => p.id !== id); renderProductsTable(); } }
+
+        // --- Suppliers Section ---
+        document.getElementById('new-supplier-btn').addEventListener('click', () => {
+            const formHtml = `
+                <div><label for="supplier-company">Empresa:</label><input type="text" id="supplier-company" class="mt-1 block w-full border rounded-md p-2" required></div>
+                <div><label for="supplier-contact">Contato:</label><input type="text" id="supplier-contact" class="mt-1 block w-full border rounded-md p-2"></div>
+                <div><label for="supplier-phone">Telefone:</label><input type="text" id="supplier-phone" class="mt-1 block w-full border rounded-md p-2"></div>
+                <div><label for="supplier-email">Email:</label><input type="email" id="supplier-email" class="mt-1 block w-full border rounded-md p-2"></div>
+                <div><label for="supplier-products">Produtos Fornecidos:</label><input type="text" id="supplier-products" class="mt-1 block w-full border rounded-md p-2"></div>
+            `;
+            openGenericModal('supplier', 'Novo Fornecedor', formHtml, (e) => {
+                const newSupplier = {
+                    id: `S${Date.now()}`, company: document.getElementById('supplier-company').value,
+                    contact: document.getElementById('supplier-contact').value, phone: document.getElementById('supplier-phone').value,
+                    email: document.getElementById('supplier-email').value, products: document.getElementById('supplier-products').value
+                };
+                suppliersData.push(newSupplier); renderSuppliersTable(); alert('Fornecedor adicionado!');
+            });
+        });
+        function renderSuppliersTable() {
+            const suppliersTableBody = document.getElementById('suppliers-table-body');
+            suppliersTableBody.innerHTML = '';
+            suppliersData.forEach(supplier => {
+                const row = suppliersTableBody.insertRow();
+                row.innerHTML = `
+                    <td>${supplier.id}</td><td>${supplier.company}</td><td>${supplier.contact}</td>
+                    <td>${supplier.phone}</td><td>${supplier.email}</td><td>${supplier.products}</td>
+                    <td>
+                        <button class="text-blue-600 hover:text-blue-800 mr-2" onclick="editSupplier('${supplier.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="text-red-600 hover:text-red-800" onclick="deleteSupplier('${supplier.id}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+            });
+        }
+        function editSupplier(id) { alert(`Editar fornecedor com ID: ${id}`); }
+        function deleteSupplier(id) { if (confirm(`Excluir fornecedor ${id}?`)) { suppliersData = suppliersData.filter(s => s.id !== id); renderSuppliersTable(); } }
+
+        // --- Employees Section ---
+        document.getElementById('new-employee-btn').addEventListener('click', () => {
+            const formHtml = `
+                <div><label for="employee-name">Nome:</label><input type="text" id="employee-name" class="mt-1 block w-full border rounded-md p-2" required></div>
+                <div><label for="employee-role">Cargo:</label><input type="text" id="employee-role" class="mt-1 block w-full border rounded-md p-2" required></div>
+                <div><label for="employee-phone">Telefone:</label><input type="text" id="employee-phone" class="mt-1 block w-full border rounded-md p-2"></div>
+                <div><label for="employee-email">Email:</label><input type="email" id="employee-email" class="mt-1 block w-full border rounded-md p-2"></div>
+            `;
+            openGenericModal('employee', 'Novo Colaborador', formHtml, (e) => {
+                const newEmployee = {
+                    id: `E${Date.now()}`, name: document.getElementById('employee-name').value,
+                    role: document.getElementById('employee-role').value, phone: document.getElementById('employee-phone').value,
+                    email: document.getElementById('employee-email').value
+                };
+                employeesData.push(newEmployee); renderEmployeesTable(); alert('Colaborador adicionado!');
+            });
+        });
+        function renderEmployeesTable() {
+            const employeesTableBody = document.getElementById('employees-table-body');
+            employeesTableBody.innerHTML = '';
+            employeesData.forEach(employee => {
+                const row = employeesTableBody.insertRow();
+                row.innerHTML = `
+                    <td>${employee.id}</td><td>${employee.name}</td><td>${employee.role}</td>
+                    <td>${employee.phone}</td><td>${employee.email}</td>
+                    <td>
+                        <button class="text-blue-600 hover:text-blue-800 mr-2" onclick="editEmployee('${employee.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="text-red-600 hover:text-red-800" onclick="deleteEmployee('${employee.id}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+            });
+        }
+        function editEmployee(id) { alert(`Editar colaborador com ID: ${id}`); }
+        function deleteEmployee(id) { if (confirm(`Excluir colaborador ${id}?`)) { employeesData = employeesData.filter(e => e.id !== id); renderEmployeesTable(); } }
+
+        // --- Goals Section ---
+        document.getElementById('add-goal-btn').addEventListener('click', () => {
+            const formHtml = `
+                <div><label for="goal-period">Período:</label><input type="text" id="goal-period" class="mt-1 block w-full border rounded-md p-2" placeholder="Ex: Mensal (Jul/2025)" required></div>
+                <div><label for="goal-type">Tipo de Meta:</label>
+                    <select id="goal-type" class="mt-1 block w-full border rounded-md p-2">
+                        <option value="Produção Total (kg)">Produção Total (kg)</option>
+                        <option value="Perda Máxima (%)">Perda Máxima (%)</option>
+                        <option value="Rentabilidade Média (%)">Rentabilidade Média (%)</option>
+                    </select>
+                </div>
+                <div><label for="goal-reference">Referência (Ex: Todos, Produto X):</label><input type="text" id="goal-reference" class="mt-1 block w-full border rounded-md p-2" value="Todos"></div>
+                <div><label for="goal-value">Valor Alvo:</label><input type="number" step="0.01" id="goal-value" class="mt-1 block w-full border rounded-md p-2" required></div>
+            `;
+            openGenericModal('goal', 'Nova Meta', formHtml, (e) => {
+                const newGoal = {
+                    id: `G${Date.now()}`, period: document.getElementById('goal-period').value,
+                    type: document.getElementById('goal-type').value, reference: document.getElementById('goal-reference').value,
+                    targetValue: parseFloat(document.getElementById('goal-value').value),
+                    currentValue: 0, progress: '0%' // Will be calculated by backend
+                };
+                goalsData.push(newGoal); renderGoalsTable(); alert('Meta adicionada!');
+            });
+        });
+        function renderGoalsTable() {
+            const goalsTableBody = document.getElementById('goals-table-body');
+            goalsTableBody.innerHTML = '';
+            goalsData.forEach(goal => {
+                const row = goalsTableBody.insertRow();
+                row.innerHTML = `
+                    <td>${goal.period}</td><td>${goal.type}</td><td>${goal.reference}</td>
+                    <td>${goal.targetValue}${goal.type.includes('(kg)') ? ' kg' : '%'}</td><td>${goal.currentValue} ${goal.type.includes('(kg)') ? ' kg' : '%'} (${goal.progress})</td>
+                    <td>
+                        <button class="text-blue-600 hover:text-blue-800 mr-2" onclick="editGoal('${goal.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="text-red-600 hover:text-red-800" onclick="deleteGoal('${goal.id}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+            });
+        }
+        function editGoal(id) { alert(`Editar meta com ID: ${id}`); }
+        function deleteGoal(id) { if (confirm(`Excluir meta ${id}?`)) { goalsData = goalsData.filter(g => g.id !== id); renderGoalsTable(); } }
+
+        // --- Users Section ---
+        document.getElementById('new-user-btn').addEventListener('click', () => {
+            const formHtml = `
+                <div><label for="user-name">Nome:</label><input type="text" id="user-name" class="mt-1 block w-full border rounded-md p-2" required></div>
+                <div><label for="user-email">Email:</label><input type="email" id="user-email" class="mt-1 block w-full border rounded-md p-2" required></div>
+                <div><label for="user-password">Senha:</label><input type="password" id="user-password" class="mt-1 block w-full border rounded-md p-2" required></div>
+                <div><label for="user-profile">Perfil de Acesso:</label>
+                    <select id="user-profile" class="mt-1 block w-full border rounded-md p-2">
+                        <option value="Administrador">Administrador</option>
+                        <option value="Gerente de Produção">Gerente de Produção</option>
+                        <option value="Operador de Produção">Operador de Produção</option>
+                        <option value="Leitor">Leitor</option>
+                    </select>
+                </div>
+            `;
+            openGenericModal('user', 'Novo Usuário', formHtml, (e) => {
+                const newUser = {
+                    id: `U${Date.now()}`, name: document.getElementById('user-name').value,
+                    email: document.getElementById('user-email').value, profile: document.getElementById('user-profile').value,
+                    status: 'Ativo' // Default status
+                };
+                usersData.push(newUser); renderUsersTable(); alert('Usuário adicionado!');
+            });
+        });
+        function renderUsersTable() {
+            const usersTableBody = document.getElementById('users-table-body');
+            usersTableBody.innerHTML = '';
+            usersData.forEach(user => {
+                const row = usersTableBody.insertRow();
+                row.innerHTML = `
+                    <td>${user.id}</td><td>${user.name}</td><td>${user.email}</td>
+                    <td>${user.profile}</td><td>${user.status}</td>
+                    <td>
+                        <button class="text-blue-600 hover:text-blue-800 mr-2" onclick="editUser('${user.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="text-red-600 hover:text-red-800" onclick="deleteUser('${user.id}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+            });
+        }
+        function editUser(id) { alert(`Editar usuário com ID: ${id}`); }
+        function deleteUser(id) { if (confirm(`Excluir usuário ${id}?`)) { usersData = usersData.filter(u => u.id !== id); renderUsersTable(); } }
+
+        // --- Reports Section ---
+        document.getElementById('generate-report-btn').addEventListener('click', generateReport);
+        document.getElementById('export-report-btn').addEventListener('click', exportReport);
+
+        function generateReport() {
+            const reportType = document.getElementById('report-type').value;
+            const startDate = document.getElementById('report-start-date').value;
+            const endDate = document.getElementById('report-end-date').value;
+            const reportOutput = document.getElementById('report-output');
+
+            let filteredProductions = productionData.filter(p => {
+                const prodDate = new Date(p.date);
+                const start = startDate ? new Date(startDate) : null;
+                const end = endDate ? new Date(endDate) : null;
+                return (!start || prodDate >= start) && (!end || prodDate <= end);
+            });
+
+            let reportContent = `<h3 class="text-lg font-semibold mb-2">Relatório Gerado:</h3>`;
+            reportContent += `<p class="text-sm mb-4">Período: ${startDate || 'Início'} a ${endDate || 'Fim'}</p>`;
+
+            if (reportType === 'production-summary') {
+                let totalGross = 0;
+                let totalNet = 0;
+                let totalLosses = 0;
+
+                filteredProductions.forEach(p => {
+                    totalGross += p.gross;
+                    totalNet += p.net;
+                    totalLosses += (p.gross - p.net - p.shrinkage);
+                });
+
+                reportContent += `<p><strong>Produção Total Bruta:</strong> ${totalGross.toFixed(2)} kg</p>`;
+                reportContent += `<p><strong>Produção Total Líquida:</strong> ${totalNet.toFixed(2)} kg</p>`;
+                reportContent += `<p><strong>Total de Perdas:</strong> ${totalLosses.toFixed(2)} kg</p>`;
+                reportContent += `<p><strong>Porcentagem Média de Perdas:</strong> ${totalGross > 0 ? ((totalLosses / totalGross) * 100).toFixed(2) : 0}%</p>`;
+
+            } else if (reportType === 'losses-analysis') {
+                reportContent += `<h4 class="font-medium mb-2">Análise Detalhada de Perdas por Produto:</h4>`;
+                const productLosses = {};
+                filteredProductions.forEach(p => {
+                    const losses = p.gross - p.net - p.shrinkage;
+                    if (!productLosses[p.product]) {
+                        productLosses[p.product] = { totalLosses: 0, totalGross: 0 };
+                    }
+                    productLosses[p.product].totalLosses += losses;
+                    productLosses[p.product].totalGross += p.gross;
+                });
+
+                if (Object.keys(productLosses).length === 0) {
+                    reportContent += '<p class="text-gray-500">Nenhum dado de perda para o período.</p>';
+                } else {
+                    reportContent += `<table class="data-table"><thead><tr><th>Produto</th><th>Total Perdas (kg)</th><th>% sobre Bruto</th></tr></thead><tbody>`;
+                    for (const product in productLosses) {
+                        const lossPercent = (productLosses[product].totalGross > 0) ? ((productLosses[product].totalLosses / productLosses[product].totalGross) * 100).toFixed(2) : 0;
+                        reportContent += `<tr><td>${product}</td><td>${productLosses[product].totalLosses.toFixed(2)}</td><td>${lossPercent}%</td></tr>`;
+                    }
+                    reportContent += `</tbody></table>`;
+                }
+
+            } else if (reportType === 'profitability-breakdown') {
+                reportContent += `<h4 class="font-medium mb-2">Rentabilidade por Produto:</h4>`;
+                const productProfitability = {};
+                filteredProductions.forEach(p => {
+                    const productInfo = productsData.find(prod => prod.name === p.product);
+                    if (productInfo) {
+                        const costOfGoods = p.rawMaterialCost;
+                        const revenue = p.net * productInfo.sellingPrice;
+                        let profitability = 0;
+                        if (revenue > 0) {
+                            profitability = ((revenue - costOfGoods) / revenue) * 100;
+                        }
+
+                        if (!productProfitability[p.product]) {
+                            productProfitability[p.product] = { totalProfitability: 0, count: 0 };
+                        }
+                        productProfitability[p.product].totalProfitability += profitability;
+                        productProfitability[p.product].count++;
+                    }
+                });
+
+                if (Object.keys(productProfitability).length === 0) {
+                    reportContent += '<p class="text-gray-500">Nenhum dado de rentabilidade para o período.</p>';
+                } else {
+                    reportContent += `<table class="data-table"><thead><tr><th>Produto</th><th>Rentabilidade Média (%)</th></tr></thead><tbody>`;
+                    for (const product in productProfitability) {
+                        const avgProfit = (productProfitability[product].count > 0) ? (productProfitability[product].totalProfitability / productProfitability[product].count).toFixed(2) : 0;
+                        reportContent += `<tr><td>${product}</td><td>${avgProfit}%</td></tr>`;
+                    }
+                    reportContent += `</tbody></table>`;
+                }
+            }
+
+            reportOutput.innerHTML = reportContent;
+        }
+
+        function exportReport() {
+            const reportContent = document.getElementById('report-output').innerHTML;
+            if (!reportContent.includes('Relatório Gerado')) {
+                alert('Gere um relatório primeiro para exportar.');
+                return;
+            }
+
+            // A simpler way for a demo: open in a new window for print/save
+            const newWindow = window.open();
+            newWindow.document.write(`
+                <html>
+                <head>
+                    <title>Relatório Vila Frios</title>
+                    <link rel="stylesheet" href="https://cdn.tailwindcss.com">
+                    <style>
+                        body { font-family: sans-serif; padding: 20px; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+                        h1, h2, h3 { color: #333; }
+                    </style>
+                </head>
+                <body>
+                    <h1>Relatório Vila Frios</h1>
+                    ${reportContent}
+                </body>
+                </html>
+            `);
+            newWindow.document.close();
+            newWindow.print(); // Opens print dialog
+            // For actual CSV/Excel export, you'd need server-side processing or a client-side library.
+        }
+
+        // Initial render on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDashboard(); // Render dashboard first
+            updateProductionChart();
+        });
+
+    </script>
 </body>
 </html>
