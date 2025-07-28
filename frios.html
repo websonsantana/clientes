@@ -3,50 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1e3a8a">
+    <meta name="description" content="Sistema de Gestão de Produção - Vila Frios">
     <title>Vila Frios - Gestão de Produção</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --primary-light: #3b82f6;
+            --secondary-color: #047857;
+            --accent-color: #d97706;
+            --dark-color: #1f2937;
+            --light-color: #f9fafb;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: #374151;
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+        
+        h1, h2, h3, h4 {
+            font-weight: 600;
+            color: #111827;
+        }
+        
         .sidebar {
             transition: all 0.3s ease;
+            background-color: var(--primary-color);
         }
+        
         .sidebar.collapsed {
             width: 70px;
         }
-        .sidebar.collapsed .nav-text {
-            display: none;
-        }
+        
+        .sidebar.collapsed .nav-text,
         .sidebar.collapsed .logo-text {
             display: none;
         }
+        
         .sidebar.collapsed .nav-item {
             justify-content: center;
         }
+        
         .content {
             transition: all 0.3s ease;
         }
+        
         .chart-container {
             position: relative;
             height: 300px;
             width: 100%;
         }
+        
         .data-table {
             width: 100%;
             border-collapse: collapse;
+            border-radius: 0.5rem;
+            overflow: hidden;
         }
+        
         .data-table th, .data-table td {
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #e2e8f0;
         }
+        
         .data-table th {
-            background-color: #f8fafc;
-            font-weight: 600;
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 500;
         }
+        
+        .data-table tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+        
         .data-table tr:hover {
-            background-color: #f8fafc;
+            background-color: #f3f4f6;
         }
+        
         .modal {
             display: none;
             position: fixed;
@@ -59,6 +99,7 @@
             background-color: rgba(0,0,0,0.4);
             animation: fadeIn 0.3s forwards;
         }
+        
         .modal-content {
             background-color: #fefefe;
             margin: 5% auto;
@@ -70,57 +111,184 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             animation: slideIn 0.3s forwards;
         }
+        
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
+        
         @keyframes slideIn {
             from { transform: translateY(-20px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
+        
         .close-button {
             color: #aaa;
             float: right;
             font-size: 28px;
             font-weight: bold;
         }
+        
         .close-button:hover,
         .close-button:focus {
             color: black;
             text-decoration: none;
             cursor: pointer;
         }
+        
         .hidden-content {
             display: none;
         }
+        
         .nav-item.active {
-            background-color: #1e3a8a; /* Darker blue for active state */
+            background-color: #1d4ed8;
         }
+        
+        .card {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+        
+        .form-control {
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            transition: all 0.2s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .action-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Mobile Styles */
         @media (max-width: 768px) {
             .sidebar {
-                width: 70px;
+                position: fixed;
+                z-index: 100;
+                height: 100vh;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
             }
-            .sidebar .nav-text {
-                display: none;
+            
+            .sidebar.active {
+                transform: translateX(0);
             }
-            .sidebar .logo-text {
-                display: none;
-            }
-            .sidebar .nav-item {
-                justify-content: center;
-            }
+            
             .content {
-                margin-left: 70px;
+                margin-left: 0;
+                width: 100%;
             }
+            
+            header {
+                padding: 0.75rem;
+            }
+            
+            .search-input, .header-icons {
+                display: none;
+            }
+            
+            .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-4 {
+                grid-template-columns: repeat(1, 1fr);
+            }
+            
+            .overflow-x-auto {
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            button, .btn {
+                padding: 0.75rem 1rem;
+                min-width: 44px;
+                min-height: 44px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 1rem auto;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            
+            html {
+                font-size: 14px;
+            }
+            
+            input, select, textarea {
+                font-size: 16px;
+            }
+        }
+        
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            z-index: 90;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 99;
         }
     </style>
 </head>
 <body class="bg-gray-50">
     <div class="flex h-screen overflow-hidden">
-        <div class="sidebar bg-blue-800 text-white w-64 flex flex-col">
+        <div class="sidebar w-64 flex flex-col">
             <div class="p-4 flex items-center border-b border-blue-700">
-                <i class="fas fa-utensils text-2xl mr-3"></i>
-                <span class="logo-text text-xl font-bold">Vila Frios</span>
+                <i class="fas fa-utensils text-2xl mr-3 text-white"></i>
+                <span class="logo-text text-xl font-bold text-white">Vila Frios</span>
             </div>
             <div class="flex-grow overflow-y-auto">
                 <div class="p-4">
@@ -128,37 +296,37 @@
                         <div class="text-xs uppercase text-blue-200 mb-2">Menu Principal</div>
                         <ul>
                             <li class="mb-1">
-                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700 active" data-content="dashboard-content">
+                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700 active text-white" data-content="dashboard-content">
                                     <i class="fas fa-tachometer-alt mr-3"></i>
                                     <span class="nav-text">Dashboard</span>
                                 </a>
                             </li>
                             <li class="mb-1">
-                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" data-content="products-content">
+                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700 text-white" data-content="products-content">
                                     <i class="fas fa-box-open mr-3"></i>
                                     <span class="nav-text">Produtos</span>
                                 </a>
                             </li>
                             <li class="mb-1">
-                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" data-content="suppliers-content">
+                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700 text-white" data-content="suppliers-content">
                                     <i class="fas fa-truck mr-3"></i>
                                     <span class="nav-text">Fornecedores</span>
                                 </a>
                             </li>
                             <li class="mb-1">
-                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" data-content="employees-content">
+                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700 text-white" data-content="employees-content">
                                     <i class="fas fa-users mr-3"></i>
                                     <span class="nav-text">Colaboradores</span>
                                 </a>
                             </li>
                             <li class="mb-1">
-                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" data-content="production-content">
+                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700 text-white" data-content="production-content">
                                     <i class="fas fa-industry mr-3"></i>
                                     <span class="nav-text">Produção</span>
                                 </a>
                             </li>
                             <li class="mb-1">
-                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" data-content="reports-content">
+                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700 text-white" data-content="reports-content">
                                     <i class="fas fa-chart-bar mr-3"></i>
                                     <span class="nav-text">Relatórios</span>
                                 </a>
@@ -169,13 +337,13 @@
                         <div class="text-xs uppercase text-blue-200 mb-2">Configurações</div>
                         <ul>
                             <li class="mb-1">
-                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" data-content="goals-content">
+                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700 text-white" data-content="goals-content">
                                     <i class="fas fa-bullseye mr-3"></i>
                                     <span class="nav-text">Metas</span>
                                 </a>
                             </li>
                             <li class="mb-1">
-                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" data-content="users-content">
+                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700 text-white" data-content="users-content">
                                     <i class="fas fa-user-shield mr-3"></i>
                                     <span class="nav-text">Usuários</span>
                                 </a>
@@ -188,7 +356,7 @@
                 <div class="flex items-center">
                     <img src="https://via.placeholder.com/40" alt="User" class="rounded-full mr-2">
                     <div>
-                        <div class="text-sm font-medium">Admin User</div>
+                        <div class="text-sm font-medium text-white">Admin User</div>
                         <div class="text-xs text-blue-200">Administrador</div>
                     </div>
                 </div>
@@ -205,14 +373,14 @@
                         <h1 class="text-xl font-semibold text-gray-800" id="page-title">Dashboard</h1>
                     </div>
                     <div class="flex items-center space-x-4">
-                        <div class="relative">
+                        <div class="relative search-input">
                             <input type="text" placeholder="Pesquisar..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
                         </div>
-                        <button class="p-2 text-gray-500 hover:text-gray-700">
+                        <button class="p-2 text-gray-500 hover:text-gray-700 header-icons">
                             <i class="fas fa-bell"></i>
                         </button>
-                        <button class="p-2 text-gray-500 hover:text-gray-700">
+                        <button class="p-2 text-gray-500 hover:text-gray-700 header-icons">
                             <i class="fas fa-cog"></i>
                         </button>
                     </div>
@@ -222,56 +390,62 @@
             <main class="p-6">
                 <div id="dashboard-content">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                        <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="card p-6">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-gray-500">Produção Hoje</p>
-                                    <h3 class="text-2xl font-bold" id="daily-production">1,248 kg</h3>
+                                    <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Produção Hoje</p>
+                                    <h3 class="text-2xl font-semibold" id="daily-production">1,248 kg</h3>
                                 </div>
                                 <div class="p-3 rounded-full bg-blue-100 text-blue-600">
                                     <i class="fas fa-industry"></i>
                                 </div>
                             </div>
-                            <div class="mt-4">
-                                <span class="text-green-500 text-sm font-medium"><i class="fas fa-caret-up"></i> 12%</span>
-                                <span class="text-gray-500 text-sm ml-2">vs ontem</span>
+                            <div class="mt-4 flex items-center text-sm">
+                                <span class="text-green-500 font-medium flex items-center">
+                                    <i class="fas fa-caret-up mr-1"></i> 12%
+                                </span>
+                                <span class="text-gray-500 ml-2">vs ontem</span>
                             </div>
                         </div>
-                        <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="card p-6">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-gray-500">Perdas Hoje</p>
-                                    <h3 class="text-2xl font-bold" id="daily-losses">48 kg</h3>
+                                    <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Perdas Hoje</p>
+                                    <h3 class="text-2xl font-semibold" id="daily-losses">48 kg</h3>
                                 </div>
                                 <div class="p-3 rounded-full bg-red-100 text-red-600">
                                     <i class="fas fa-percentage"></i>
                                 </div>
                             </div>
-                            <div class="mt-4">
-                                <span class="text-red-500 text-sm font-medium"><i class="fas fa-caret-down"></i> 5%</span>
-                                <span class="text-gray-500 text-sm ml-2">vs ontem</span>
+                            <div class="mt-4 flex items-center text-sm">
+                                <span class="text-red-500 font-medium flex items-center">
+                                    <i class="fas fa-caret-down mr-1"></i> 5%
+                                </span>
+                                <span class="text-gray-500 ml-2">vs ontem</span>
                             </div>
                         </div>
-                        <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="card p-6">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-gray-500">Rentabilidade Média</p>
-                                    <h3 class="text-2xl font-bold" id="avg-profitability">72%</h3>
+                                    <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Rentabilidade Média</p>
+                                    <h3 class="text-2xl font-semibold" id="avg-profitability">72%</h3>
                                 </div>
                                 <div class="p-3 rounded-full bg-green-100 text-green-600">
                                     <i class="fas fa-chart-line"></i>
                                 </div>
                             </div>
-                            <div class="mt-4">
-                                <span class="text-green-500 text-sm font-medium"><i class="fas fa-caret-up"></i> 3%</span>
-                                <span class="text-gray-500 text-sm ml-2">vs ontem</span>
+                            <div class="mt-4 flex items-center text-sm">
+                                <span class="text-green-500 font-medium flex items-center">
+                                    <i class="fas fa-caret-up mr-1"></i> 3%
+                                </span>
+                                <span class="text-gray-500 ml-2">vs ontem</span>
                             </div>
                         </div>
-                        <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="card p-6">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-gray-500">Meta Mensal</p>
-                                    <h3 class="text-2xl font-bold" id="monthly-goal-progress">78%</h3>
+                                    <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Meta Mensal</p>
+                                    <h3 class="text-2xl font-semibold" id="monthly-goal-progress">78%</h3>
                                 </div>
                                 <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
                                     <i class="fas fa-bullseye"></i>
@@ -286,10 +460,10 @@
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                        <div class="bg-white p-6 rounded-lg shadow lg:col-span-2">
+                        <div class="card p-6 lg:col-span-2">
                             <div class="flex justify-between items-center mb-4">
                                 <h2 class="text-lg font-semibold">Desempenho de Produção (7 dias)</h2>
-                                <select class="border rounded px-3 py-1 text-sm">
+                                <select class="border rounded px-3 py-1 text-sm form-control">
                                     <option>Últimos 7 dias</option>
                                     <option>Últimos 30 dias</option>
                                     <option>Este mês</option>
@@ -299,7 +473,7 @@
                                 <canvas id="productionChart"></canvas>
                             </div>
                         </div>
-                        <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="card p-6">
                             <div class="flex justify-between items-center mb-4">
                                 <h2 class="text-lg font-semibold">Top Produtos</h2>
                                 <button class="text-blue-600 text-sm font-medium">Ver todos</button>
@@ -335,10 +509,10 @@
                         </div>
                     </div>
 
-                    <div class="bg-white p-6 rounded-lg shadow mb-6">
+                    <div class="card p-6 mb-6">
                         <div class="flex justify-between items-center mb-4">
                             <h2 class="text-lg font-semibold">Últimas Produções</h2>
-                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="new-production-btn">Nova Produção</button>
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 btn btn-primary" id="new-production-btn">Nova Produção</button>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="data-table">
@@ -364,8 +538,8 @@
                                         <td>2%</td>
                                         <td>75%</td>
                                         <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2 action-btn"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800 action-btn"><i class="fas fa-trash"></i></button>
                                         </td>
                                     </tr>
                                     <tr>
@@ -377,8 +551,8 @@
                                         <td>1%</td>
                                         <td>82%</td>
                                         <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2 action-btn"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800 action-btn"><i class="fas fa-trash"></i></button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -387,403 +561,30 @@
                     </div>
                 </div>
 
-                <div id="products-content" class="hidden-content">
-                    <div class="bg-white p-6 rounded-lg shadow mb-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-lg font-semibold">Gestão de Produtos</h2>
-                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="new-product-btn">Novo Produto</button>
-                        </div>
-                        <div class="mb-4 flex items-center space-x-4">
-                            <input type="text" placeholder="Pesquisar produto..." class="flex-1 pl-4 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <button class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
-                                <i class="fas fa-filter mr-2"></i>Filtrar
-                            </button>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Nome</th>
-                                        <th>Unidade</th>
-                                        <th>Custo Padrão (R$/kg)</th>
-                                        <th>Preço Venda (R$/kg)</th>
-                                        <th>Rendimento Esperado (%)</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="products-table-body">
-                                    <tr>
-                                        <td>001</td>
-                                        <td>Hambúrguer Artesanal</td>
-                                        <td>Kg</td>
-                                        <td>8.50</td>
-                                        <td>12.80</td>
-                                        <td>95%</td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>002</td>
-                                        <td>Peito de Frango</td>
-                                        <td>Kg</td>
-                                        <td>6.00</td>
-                                        <td>8.50</td>
-                                        <td>98%</td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+                <!-- Outras seções de conteúdo (products-content, suppliers-content, etc.) -->
+                <!-- Mantenha o restante do seu HTML existente aqui -->
+                <!-- ... -->
 
-                <div id="suppliers-content" class="hidden-content">
-                    <div class="bg-white p-6 rounded-lg shadow mb-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-lg font-semibold">Gestão de Fornecedores</h2>
-                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="new-supplier-btn">Novo Fornecedor</button>
-                        </div>
-                        <div class="mb-4 flex items-center space-x-4">
-                            <input type="text" placeholder="Pesquisar fornecedor..." class="flex-1 pl-4 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Empresa</th>
-                                        <th>Contato</th>
-                                        <th>Telefone</th>
-                                        <th>Email</th>
-                                        <th>Produtos Fornecidos</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="suppliers-table-body">
-                                    <tr>
-                                        <td>S01</td>
-                                        <td>Frigorífico Aurora</td>
-                                        <td>João Silva</td>
-                                        <td>(11) 98765-4321</td>
-                                        <td>joao@aurora.com</td>
-                                        <td>Carne Bovina, Aves</td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="employees-content" class="hidden-content">
-                    <div class="bg-white p-6 rounded-lg shadow mb-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-lg font-semibold">Gestão de Colaboradores</h2>
-                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="new-employee-btn">Novo Colaborador</button>
-                        </div>
-                        <div class="mb-4 flex items-center space-x-4">
-                            <input type="text" placeholder="Pesquisar colaborador..." class="flex-1 pl-4 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <select class="border rounded px-3 py-1 text-sm">
-                                <option>Todos os Cargos</option>
-                                <option>Operador</option>
-                                <option>Supervisor</option>
-                                <option>Gerente</option>
-                            </select>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Nome</th>
-                                        <th>Cargo</th>
-                                        <th>Telefone</th>
-                                        <th>Email</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="employees-table-body">
-                                    <tr>
-                                        <td>E01</td>
-                                        <td>Maria Souza</td>
-                                        <td>Operadora de Produção</td>
-                                        <td>(11) 91234-5678</td>
-                                        <td>maria.s@vilafrios.com</td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="production-content" class="hidden-content">
-                    <div class="bg-white p-6 rounded-lg shadow mb-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-lg font-semibold">Registro de Produção</h2>
-                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="add-production-record-btn">Adicionar Registro</button>
-                        </div>
-                        <div class="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label for="prod-filter-date" class="block text-sm font-medium text-gray-700">Data:</label>
-                                <input type="date" id="prod-filter-date" class="mt-1 block w-full border rounded-lg p-2">
-                            </div>
-                            <div>
-                                <label for="prod-filter-product" class="block text-sm font-medium text-gray-700">Produto:</label>
-                                <select id="prod-filter-product" class="mt-1 block w-full border rounded-lg p-2">
-                                    <option value="">Todos os Produtos</option>
-                                    </select>
-                            </div>
-                            <div>
-                                <label for="prod-filter-employee" class="block text-sm font-medium text-gray-700">Colaborador:</label>
-                                <select id="prod-filter-employee" class="mt-1 block w-full border rounded-lg p-2">
-                                    <option value="">Todos os Colaboradores</option>
-                                    </select>
-                            </div>
-                        </div>
-                        <div class="flex justify-end mb-4">
-                            <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 mr-2" id="export-production-data">
-                                <i class="fas fa-file-excel mr-2"></i>Exportar
-                            </button>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Data</th>
-                                        <th>Produto</th>
-                                        <th>Lote</th>
-                                        <th>Peso Bruto</th>
-                                        <th>Peso Líquido</th>
-                                        <th>Retraço</th>
-                                        <th>Perdas (%)</th>
-                                        <th>Custo Mat. Prima (R$)</th>
-                                        <th>Rentabilidade (%)</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="detailed-production-table-body">
-                                    </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="reports-content" class="hidden-content">
-                    <div class="bg-white p-6 rounded-lg shadow mb-6">
-                        <h2 class="text-lg font-semibold mb-4">Relatórios Gerenciais</h2>
-                        <div class="mb-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <div>
-                                <label for="report-type" class="block text-sm font-medium text-gray-700">Tipo de Relatório:</label>
-                                <select id="report-type" class="mt-1 block w-full border rounded-lg p-2">
-                                    <option value="production-summary">Sumário de Produção</option>
-                                    <option value="losses-analysis">Análise de Perdas</option>
-                                    <option value="profitability-breakdown">Rentabilidade por Produto</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="report-start-date" class="block text-sm font-medium text-gray-700">Data Inicial:</label>
-                                <input type="date" id="report-start-date" class="mt-1 block w-full border rounded-lg p-2">
-                            </div>
-                            <div>
-                                <label for="report-end-date" class="block text-sm font-medium text-gray-700">Data Final:</label>
-                                <input type="date" id="report-end-date" class="mt-1 block w-full border rounded-lg p-2">
-                            </div>
-                        </div>
-                        <div class="flex justify-end mb-4">
-                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="generate-report-btn">
-                                <i class="fas fa-play mr-2"></i>Gerar Relatório
-                            </button>
-                            <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 ml-2" id="export-report-btn">
-                                <i class="fas fa-file-download mr-2"></i>Exportar
-                            </button>
-                        </div>
-                        <div id="report-output" class="border rounded-lg p-4 bg-gray-50 min-h-[300px]">
-                            <p class="text-gray-600 text-center py-10">Selecione as opções e gere um relatório.</p>
-                            </div>
-                    </div>
-                </div>
-
-                <div id="goals-content" class="hidden-content">
-                    <div class="bg-white p-6 rounded-lg shadow mb-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-lg font-semibold">Definição de Metas</h2>
-                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="add-goal-btn">Nova Meta</button>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Período</th>
-                                        <th>Tipo de Meta</th>
-                                        <th>Referência</th>
-                                        <th>Valor Alvo</th>
-                                        <th>Progresso Atual</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="goals-table-body">
-                                    <tr>
-                                        <td>Mensal (Jul/2025)</td>
-                                        <td>Produção Total (kg)</td>
-                                        <td>Todos</td>
-                                        <td>3000 kg</td>
-                                        <td>2345 kg (78%)</td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Trimestral (Q3/2025)</td>
-                                        <td>Perda Máxima (%)</td>
-                                        <td>Todos</td>
-                                        <td>2%</td>
-                                        <td>1.8% (atingida)</td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="users-content" class="hidden-content">
-                    <div class="bg-white p-6 rounded-lg shadow mb-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-lg font-semibold">Gerenciamento de Usuários</h2>
-                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="new-user-btn">Novo Usuário</button>
-                        </div>
-                        <div class="mb-4 flex items-center space-x-4">
-                            <input type="text" placeholder="Pesquisar usuário..." class="flex-1 pl-4 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <select class="border rounded px-3 py-1 text-sm">
-                                <option>Todos os Perfis</option>
-                                <option>Administrador</option>
-                                <option>Gerente de Produção</option>
-                                <option>Operador de Produção</option>
-                                <option>Leitor</option>
-                            </select>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Nome</th>
-                                        <th>Email</th>
-                                        <th>Perfil de Acesso</th>
-                                        <th>Status</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="users-table-body">
-                                    <tr>
-                                        <td>U01</td>
-                                        <td>Admin User</td>
-                                        <td>admin@vilafrios.com</td>
-                                        <td>Administrador</td>
-                                        <td>Ativo</td>
-                                        <td>
-                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
             </main>
         </div>
     </div>
 
-    <div id="newProductionModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" id="closeProductionModal">&times;</span>
-            <h2 class="text-xl font-semibold mb-4">Registrar Nova Produção</h2>
-            <form id="production-form" class="space-y-4">
-                <div>
-                    <label for="prod-date" class="block text-sm font-medium text-gray-700">Data:</label>
-                    <input type="date" id="prod-date" class="mt-1 block w-full border rounded-md p-2" required>
-                </div>
-                <div>
-                    <label for="prod-product" class="block text-sm font-medium text-gray-700">Produto:</label>
-                    <select id="prod-product" class="mt-1 block w-full border rounded-md p-2" required>
-                        <option value="">Selecione um Produto</option>
-                        <option value="Hambúrguer Artesanal" data-cost="8.50" data-price="12.80">Hambúrguer Artesanal</option>
-                        <option value="Peito de Frango" data-cost="6.00" data-price="8.50">Peito de Frango</option>
-                        <option value="Pão Integral" data-cost="4.00" data-price="6.20">Pão Integral</option>
-                        <option value="Queijo Minas" data-cost="12.00" data-price="18.90">Queijo Minas</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="prod-lot" class="block text-sm font-medium text-gray-700">Número do Lote:</label>
-                    <input type="text" id="prod-lot" class="mt-1 block w-full border rounded-md p-2">
-                </div>
-                <div>
-                    <label for="prod-employee" class="block text-sm font-medium text-gray-700">Colaborador Responsável:</label>
-                    <select id="prod-employee" class="mt-1 block w-full border rounded-md p-2" required>
-                        <option value="">Selecione um Colaborador</option>
-                        <option value="Maria Souza">Maria Souza</option>
-                        <option value="Carlos Almeida">Carlos Almeida</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="prod-gross-weight" class="block text-sm font-medium text-gray-700">Peso Bruto (kg):</label>
-                    <input type="number" id="prod-gross-weight" step="0.01" class="mt-1 block w-full border rounded-md p-2" required>
-                </div>
-                <div>
-                    <label for="prod-net-weight" class="block text-sm font-medium text-gray-700">Peso Líquido (kg):</label>
-                    <input type="number" id="prod-net-weight" step="0.01" class="mt-1 block w-full border rounded-md p-2" required>
-                </div>
-                <div>
-                    <label for="prod-shrinkage" class="block text-sm font-medium text-gray-700">Retraço (kg):</label>
-                    <input type="number" id="prod-shrinkage" step="0.01" class="mt-1 block w-full border rounded-md p-2" value="0">
-                </div>
-                <div id="raw-materials-section">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Matérias-Primas Utilizadas:</label>
-                    <div id="raw-materials-list" class="space-y-2 mb-2">
-                        </div>
-                    <button type="button" id="add-raw-material-btn" class="bg-gray-200 text-gray-700 px-3 py-1 rounded-md text-sm hover:bg-gray-300">Adicionar Matéria-Prima</button>
-                </div>
-                <div>
-                    <label for="prod-notes" class="block text-sm font-medium text-gray-700">Observações:</label>
-                    <textarea id="prod-notes" rows="3" class="mt-1 block w-full border rounded-md p-2"></textarea>
-                </div>
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full">Salvar Produção</button>
-            </form>
-        </div>
-    </div>
+    <!-- Botão de menu mobile -->
+    <button class="mobile-menu-btn" id="mobile-menu-toggle">
+        <i class="fas fa-bars text-xl"></i>
+    </button>
 
-    <div id="genericModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" id="closeGenericModal">&times;</span>
-            <h2 class="text-xl font-semibold mb-4" id="generic-modal-title">Adicionar Novo Item</h2>
-            <form id="generic-form" class="space-y-4">
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full">Salvar</button>
-            </form>
-        </div>
-    </div>
+    <!-- Overlay para menu mobile -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
+    <!-- Modais (mantenha seus modais existentes) -->
+    <!-- ... -->
 
     <script>
         const sidebar = document.querySelector('.sidebar');
         const sidebarToggle = document.getElementById('sidebar-toggle');
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
         const content = document.querySelector('.content');
         const pageTitle = document.getElementById('page-title');
         const navItems = document.querySelectorAll('.nav-item');
@@ -838,7 +639,6 @@
             { id: 'U01', name: 'Admin User', email: 'admin@vilafrios.com', profile: 'Administrador', status: 'Ativo' }
         ];
 
-
         // Chart.js instance
         let productionChart;
 
@@ -850,6 +650,27 @@
             } else {
                 content.style.marginLeft = '256px';
             }
+        });
+
+        // Menu mobile
+        mobileMenuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            sidebarOverlay.style.display = sidebar.classList.contains('active') ? 'block' : 'none';
+        });
+
+        sidebarOverlay.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            sidebarOverlay.style.display = 'none';
+        });
+
+        // Fechar menu ao clicar em um item (mobile)
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                    sidebarOverlay.style.display = 'none';
+                }
+            });
         });
 
         // --- Navigation and Content Switching ---
@@ -950,9 +771,6 @@
             const productAggregates = {}; // { productName: { totalNet: 0, totalLosses: 0, totalProfit: 0, count: 0 } }
 
             productionData.forEach(prod => {
-                if (!productAggregates[prod.product]) {
-                    productAggregates[prod.product] = { totalNet: 0, totalLosses: 0, totalProfitability: 0, count: 0 };
-                }
                 const losses = prod.gross - prod.net - prod.shrinkage;
                 const productInfo = productsData.find(p => p.name === prod.product);
                 let profitability = 0;
@@ -964,6 +782,9 @@
                     }
                 }
 
+                if (!productAggregates[prod.product]) {
+                    productAggregates[prod.product] = { totalNet: 0, totalLosses: 0, totalProfitability: 0, count: 0 };
+                }
                 productAggregates[prod.product].totalNet += prod.net;
                 productAggregates[prod.product].totalLosses += losses;
                 productAggregates[prod.product].totalProfitability += profitability;
@@ -1125,10 +946,10 @@
             const div = document.createElement('div');
             div.className = 'flex items-center space-x-2';
             div.innerHTML = `
-                <input type="text" placeholder="Nome Matéria-Prima" value="${materialName}" class="flex-grow border rounded-md p-2 raw-material-name" required>
-                <input type="number" step="0.01" placeholder="Quantidade (kg/un)" value="${quantity}" class="w-28 border rounded-md p-2 raw-material-quantity" required>
-                <input type="number" step="0.01" placeholder="Custo (R$)" class="w-28 border rounded-md p-2 raw-material-cost" required>
-                <button type="button" class="remove-raw-material-btn text-red-600 hover:text-red-800 p-2">
+                <input type="text" placeholder="Nome Matéria-Prima" value="${materialName}" class="flex-grow border rounded-md p-2 raw-material-name form-control" required>
+                <input type="number" step="0.01" placeholder="Quantidade (kg/un)" value="${quantity}" class="w-28 border rounded-md p-2 raw-material-quantity form-control" required>
+                <input type="number" step="0.01" placeholder="Custo (R$)" class="w-28 border rounded-md p-2 raw-material-cost form-control" required>
+                <button type="button" class="remove-raw-material-btn text-red-600 hover:text-red-800 p-2 action-btn">
                     <i class="fas fa-times"></i>
                 </button>
             `;
@@ -1228,8 +1049,8 @@
                     <td>R$ ${prod.rawMaterialCost.toFixed(2)}</td>
                     <td>${prod.profitability}%</td>
                     <td>
-                        <button class="text-blue-600 hover:text-blue-800 mr-2" onclick="editProduction('${prod.id}')"><i class="fas fa-edit"></i></button>
-                        <button class="text-red-600 hover:text-red-800" onclick="deleteProduction('${prod.id}')"><i class="fas fa-trash"></i></button>
+                        <button class="text-blue-600 hover:text-blue-800 mr-2 action-btn" onclick="editProduction('${prod.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="text-red-600 hover:text-red-800 action-btn" onclick="deleteProduction('${prod.id}')"><i class="fas fa-trash"></i></button>
                     </td>
                 `;
             });
@@ -1281,7 +1102,7 @@
         // Generic Modal Handlers for other sections
         function openGenericModal(type, title, formHtml, onSubmitCallback) {
             genericModalTitle.textContent = title;
-            genericForm.innerHTML = formHtml + '<button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full">Salvar</button>';
+            genericForm.innerHTML = formHtml + '<button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full btn btn-primary">Salvar</button>';
             genericForm.onsubmit = (e) => {
                 e.preventDefault();
                 onSubmitCallback(e);
@@ -1299,23 +1120,23 @@
             const formHtml = `
                 <div>
                     <label for="product-name" class="block text-sm font-medium text-gray-700">Nome do Produto:</label>
-                    <input type="text" id="product-name" class="mt-1 block w-full border rounded-md p-2" required>
+                    <input type="text" id="product-name" class="mt-1 block w-full border rounded-md p-2 form-control" required>
                 </div>
                 <div>
                     <label for="product-unit" class="block text-sm font-medium text-gray-700">Unidade de Medida:</label>
-                    <input type="text" id="product-unit" class="mt-1 block w-full border rounded-md p-2" placeholder="Ex: Kg, Un" required>
+                    <input type="text" id="product-unit" class="mt-1 block w-full border rounded-md p-2 form-control" placeholder="Ex: Kg, Un" required>
                 </div>
                 <div>
                     <label for="product-cost" class="block text-sm font-medium text-gray-700">Custo Padrão (R$/kg/un):</label>
-                    <input type="number" id="product-cost" step="0.01" class="mt-1 block w-full border rounded-md p-2" required>
+                    <input type="number" id="product-cost" step="0.01" class="mt-1 block w-full border rounded-md p-2 form-control" required>
                 </div>
                 <div>
                     <label for="product-price" class="block text-sm font-medium text-gray-700">Preço Venda (R$/kg/un):</label>
-                    <input type="number" id="product-price" step="0.01" class="mt-1 block w-full border rounded-md p-2" required>
+                    <input type="number" id="product-price" step="0.01" class="mt-1 block w-full border rounded-md p-2 form-control" required>
                 </div>
                 <div>
                     <label for="product-yield" class="block text-sm font-medium text-gray-700">Rendimento Esperado (%):</label>
-                    <input type="number" id="product-yield" step="0.01" class="mt-1 block w-full border rounded-md p-2" required>
+                    <input type="number" id="product-yield" step="0.01" class="mt-1 block w-full border rounded-md p-2 form-control" required>
                 </div>
             `;
             openGenericModal('product', 'Novo Produto', formHtml, (e) => {
@@ -1346,8 +1167,8 @@
                     <td>${product.sellingPrice.toFixed(2)}</td>
                     <td>${product.expectedYield}%</td>
                     <td>
-                        <button class="text-blue-600 hover:text-blue-800 mr-2" onclick="editProduct('${product.id}')"><i class="fas fa-edit"></i></button>
-                        <button class="text-red-600 hover:text-red-800" onclick="deleteProduct('${product.id}')"><i class="fas fa-trash"></i></button>
+                        <button class="text-blue-600 hover:text-blue-800 mr-2 action-btn" onclick="editProduct('${product.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="text-red-600 hover:text-red-800 action-btn" onclick="deleteProduct('${product.id}')"><i class="fas fa-trash"></i></button>
                     </td>
                 `;
             });
@@ -1358,11 +1179,11 @@
         // --- Suppliers Section ---
         document.getElementById('new-supplier-btn').addEventListener('click', () => {
             const formHtml = `
-                <div><label for="supplier-company">Empresa:</label><input type="text" id="supplier-company" class="mt-1 block w-full border rounded-md p-2" required></div>
-                <div><label for="supplier-contact">Contato:</label><input type="text" id="supplier-contact" class="mt-1 block w-full border rounded-md p-2"></div>
-                <div><label for="supplier-phone">Telefone:</label><input type="text" id="supplier-phone" class="mt-1 block w-full border rounded-md p-2"></div>
-                <div><label for="supplier-email">Email:</label><input type="email" id="supplier-email" class="mt-1 block w-full border rounded-md p-2"></div>
-                <div><label for="supplier-products">Produtos Fornecidos:</label><input type="text" id="supplier-products" class="mt-1 block w-full border rounded-md p-2"></div>
+                <div><label for="supplier-company">Empresa:</label><input type="text" id="supplier-company" class="mt-1 block w-full border rounded-md p-2 form-control" required></div>
+                <div><label for="supplier-contact">Contato:</label><input type="text" id="supplier-contact" class="mt-1 block w-full border rounded-md p-2 form-control"></div>
+                <div><label for="supplier-phone">Telefone:</label><input type="text" id="supplier-phone" class="mt-1 block w-full border rounded-md p-2 form-control"></div>
+                <div><label for="supplier-email">Email:</label><input type="email" id="supplier-email" class="mt-1 block w-full border rounded-md p-2 form-control"></div>
+                <div><label for="supplier-products">Produtos Fornecidos:</label><input type="text" id="supplier-products" class="mt-1 block w-full border rounded-md p-2 form-control"></div>
             `;
             openGenericModal('supplier', 'Novo Fornecedor', formHtml, (e) => {
                 const newSupplier = {
@@ -1382,8 +1203,8 @@
                     <td>${supplier.id}</td><td>${supplier.company}</td><td>${supplier.contact}</td>
                     <td>${supplier.phone}</td><td>${supplier.email}</td><td>${supplier.products}</td>
                     <td>
-                        <button class="text-blue-600 hover:text-blue-800 mr-2" onclick="editSupplier('${supplier.id}')"><i class="fas fa-edit"></i></button>
-                        <button class="text-red-600 hover:text-red-800" onclick="deleteSupplier('${supplier.id}')"><i class="fas fa-trash"></i></button>
+                        <button class="text-blue-600 hover:text-blue-800 mr-2 action-btn" onclick="editSupplier('${supplier.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="text-red-600 hover:text-red-800 action-btn" onclick="deleteSupplier('${supplier.id}')"><i class="fas fa-trash"></i></button>
                     </td>
                 `;
             });
@@ -1394,10 +1215,10 @@
         // --- Employees Section ---
         document.getElementById('new-employee-btn').addEventListener('click', () => {
             const formHtml = `
-                <div><label for="employee-name">Nome:</label><input type="text" id="employee-name" class="mt-1 block w-full border rounded-md p-2" required></div>
-                <div><label for="employee-role">Cargo:</label><input type="text" id="employee-role" class="mt-1 block w-full border rounded-md p-2" required></div>
-                <div><label for="employee-phone">Telefone:</label><input type="text" id="employee-phone" class="mt-1 block w-full border rounded-md p-2"></div>
-                <div><label for="employee-email">Email:</label><input type="email" id="employee-email" class="mt-1 block w-full border rounded-md p-2"></div>
+                <div><label for="employee-name">Nome:</label><input type="text" id="employee-name" class="mt-1 block w-full border rounded-md p-2 form-control" required></div>
+                <div><label for="employee-role">Cargo:</label><input type="text" id="employee-role" class="mt-1 block w-full border rounded-md p-2 form-control" required></div>
+                <div><label for="employee-phone">Telefone:</label><input type="text" id="employee-phone" class="mt-1 block w-full border rounded-md p-2 form-control"></div>
+                <div><label for="employee-email">Email:</label><input type="email" id="employee-email" class="mt-1 block w-full border rounded-md p-2 form-control"></div>
             `;
             openGenericModal('employee', 'Novo Colaborador', formHtml, (e) => {
                 const newEmployee = {
@@ -1417,8 +1238,8 @@
                     <td>${employee.id}</td><td>${employee.name}</td><td>${employee.role}</td>
                     <td>${employee.phone}</td><td>${employee.email}</td>
                     <td>
-                        <button class="text-blue-600 hover:text-blue-800 mr-2" onclick="editEmployee('${employee.id}')"><i class="fas fa-edit"></i></button>
-                        <button class="text-red-600 hover:text-red-800" onclick="deleteEmployee('${employee.id}')"><i class="fas fa-trash"></i></button>
+                        <button class="text-blue-600 hover:text-blue-800 mr-2 action-btn" onclick="editEmployee('${employee.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="text-red-600 hover:text-red-800 action-btn" onclick="deleteEmployee('${employee.id}')"><i class="fas fa-trash"></i></button>
                     </td>
                 `;
             });
@@ -1429,16 +1250,16 @@
         // --- Goals Section ---
         document.getElementById('add-goal-btn').addEventListener('click', () => {
             const formHtml = `
-                <div><label for="goal-period">Período:</label><input type="text" id="goal-period" class="mt-1 block w-full border rounded-md p-2" placeholder="Ex: Mensal (Jul/2025)" required></div>
+                <div><label for="goal-period">Período:</label><input type="text" id="goal-period" class="mt-1 block w-full border rounded-md p-2 form-control" placeholder="Ex: Mensal (Jul/2025)" required></div>
                 <div><label for="goal-type">Tipo de Meta:</label>
-                    <select id="goal-type" class="mt-1 block w-full border rounded-md p-2">
+                    <select id="goal-type" class="mt-1 block w-full border rounded-md p-2 form-control">
                         <option value="Produção Total (kg)">Produção Total (kg)</option>
                         <option value="Perda Máxima (%)">Perda Máxima (%)</option>
                         <option value="Rentabilidade Média (%)">Rentabilidade Média (%)</option>
                     </select>
                 </div>
-                <div><label for="goal-reference">Referência (Ex: Todos, Produto X):</label><input type="text" id="goal-reference" class="mt-1 block w-full border rounded-md p-2" value="Todos"></div>
-                <div><label for="goal-value">Valor Alvo:</label><input type="number" step="0.01" id="goal-value" class="mt-1 block w-full border rounded-md p-2" required></div>
+                <div><label for="goal-reference">Referência (Ex: Todos, Produto X):</label><input type="text" id="goal-reference" class="mt-1 block w-full border rounded-md p-2 form-control" value="Todos"></div>
+                <div><label for="goal-value">Valor Alvo:</label><input type="number" step="0.01" id="goal-value" class="mt-1 block w-full border rounded-md p-2 form-control" required></div>
             `;
             openGenericModal('goal', 'Nova Meta', formHtml, (e) => {
                 const newGoal = {
@@ -1459,8 +1280,8 @@
                     <td>${goal.period}</td><td>${goal.type}</td><td>${goal.reference}</td>
                     <td>${goal.targetValue}${goal.type.includes('(kg)') ? ' kg' : '%'}</td><td>${goal.currentValue} ${goal.type.includes('(kg)') ? ' kg' : '%'} (${goal.progress})</td>
                     <td>
-                        <button class="text-blue-600 hover:text-blue-800 mr-2" onclick="editGoal('${goal.id}')"><i class="fas fa-edit"></i></button>
-                        <button class="text-red-600 hover:text-red-800" onclick="deleteGoal('${goal.id}')"><i class="fas fa-trash"></i></button>
+                        <button class="text-blue-600 hover:text-blue-800 mr-2 action-btn" onclick="editGoal('${goal.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="text-red-600 hover:text-red-800 action-btn" onclick="deleteGoal('${goal.id}')"><i class="fas fa-trash"></i></button>
                     </td>
                 `;
             });
@@ -1471,11 +1292,11 @@
         // --- Users Section ---
         document.getElementById('new-user-btn').addEventListener('click', () => {
             const formHtml = `
-                <div><label for="user-name">Nome:</label><input type="text" id="user-name" class="mt-1 block w-full border rounded-md p-2" required></div>
-                <div><label for="user-email">Email:</label><input type="email" id="user-email" class="mt-1 block w-full border rounded-md p-2" required></div>
-                <div><label for="user-password">Senha:</label><input type="password" id="user-password" class="mt-1 block w-full border rounded-md p-2" required></div>
+                <div><label for="user-name">Nome:</label><input type="text" id="user-name" class="mt-1 block w-full border rounded-md p-2 form-control" required></div>
+                <div><label for="user-email">Email:</label><input type="email" id="user-email" class="mt-1 block w-full border rounded-md p-2 form-control" required></div>
+                <div><label for="user-password">Senha:</label><input type="password" id="user-password" class="mt-1 block w-full border rounded-md p-2 form-control" required></div>
                 <div><label for="user-profile">Perfil de Acesso:</label>
-                    <select id="user-profile" class="mt-1 block w-full border rounded-md p-2">
+                    <select id="user-profile" class="mt-1 block w-full border rounded-md p-2 form-control">
                         <option value="Administrador">Administrador</option>
                         <option value="Gerente de Produção">Gerente de Produção</option>
                         <option value="Operador de Produção">Operador de Produção</option>
@@ -1501,8 +1322,8 @@
                     <td>${user.id}</td><td>${user.name}</td><td>${user.email}</td>
                     <td>${user.profile}</td><td>${user.status}</td>
                     <td>
-                        <button class="text-blue-600 hover:text-blue-800 mr-2" onclick="editUser('${user.id}')"><i class="fas fa-edit"></i></button>
-                        <button class="text-red-600 hover:text-red-800" onclick="deleteUser('${user.id}')"><i class="fas fa-trash"></i></button>
+                        <button class="text-blue-600 hover:text-blue-800 mr-2 action-btn" onclick="editUser('${user.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="text-red-600 hover:text-red-800 action-btn" onclick="deleteUser('${user.id}')"><i class="fas fa-trash"></i></button>
                     </td>
                 `;
             });
@@ -1634,15 +1455,75 @@
             `);
             newWindow.document.close();
             newWindow.print(); // Opens print dialog
-            // For actual CSV/Excel export, you'd need server-side processing or a client-side library.
+        }
+
+        // Feedback tátil para botões
+        document.querySelectorAll('button, a').forEach(btn => {
+            btn.addEventListener('touchstart', () => {
+                btn.style.transform = 'scale(0.98)';
+            });
+            
+            btn.addEventListener('touchend', () => {
+                btn.style.transform = 'scale(1)';
+            });
+        });
+
+        // Prevenir zoom duplo toque em botões
+        document.addEventListener('dblclick', (e) => {
+            if (['BUTTON', 'A'].includes(e.target.tagName)) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Melhorar a experiência de formulários em mobile
+        document.querySelectorAll('input, select, textarea').forEach(input => {
+            input.addEventListener('focus', () => {
+                if (window.innerWidth <= 768) {
+                    // Rolagem suave para o campo em foco
+                    setTimeout(() => {
+                        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300);
+                }
+            });
+        });
+
+        // Detectar mudança de orientação
+        window.addEventListener('orientationchange', () => {
+            // Recarregar gráficos ao mudar a orientação
+            if (productionChart) {
+                productionChart.destroy();
+                updateProductionChart();
+            }
+        });
+
+        // Carregamento otimizado para mobile
+        if ('connection' in navigator) {
+            if (navigator.connection.saveData || navigator.connection.effectiveType.includes('2g')) {
+                // Otimizações para conexões lentas
+                document.querySelectorAll('img, iframe, video').forEach(media => {
+                    media.loading = 'lazy';
+                });
+            }
         }
 
         // Initial render on page load
         document.addEventListener('DOMContentLoaded', () => {
             renderDashboard(); // Render dashboard first
             updateProductionChart();
+            
+            // Verificar se é mobile e ajustar o menu
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('collapsed');
+                sidebar.classList.add('active');
+                content.style.marginLeft = '0';
+            }
         });
 
+        // Função auxiliar para renderizar o dashboard
+        function renderDashboard() {
+            calculateProductionMetrics();
+            renderTopProducts();
+        }
     </script>
 </body>
 </html>
