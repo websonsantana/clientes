@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodPro Manager - Gestão de Produção Alimentícia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+        .sidebar.collapsed {
+            width: 70px;
+        }
+        .sidebar.collapsed .nav-text {
+            display: none;
+        }
+        .sidebar.collapsed .logo-text {
+            display: none;
+        }
+        .sidebar.collapsed .nav-item {
+            justify-content: center;
+        }
+        .content {
+            transition: all 0.3s ease;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .data-table th, .data-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .data-table th {
+            background-color: #f8fafc;
+            font-weight: 600;
+        }
+        .data-table tr:hover {
+            background-color: #f8fafc;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 50;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 700px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+            .sidebar .nav-text {
+                display: none;
+            }
+            .sidebar .logo-text {
+                display: none;
+            }
+            .sidebar .nav-item {
+                justify-content: center;
+            }
+            .content {
+                margin-left: 70px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="sidebar bg-blue-800 text-white w-64 flex flex-col">
+            <div class="p-4 flex items-center border-b border-blue-700">
+                <i class="fas fa-utensils text-2xl mr-3"></i>
+                <span class="logo-text text-xl font-bold">FoodPro Manager</span>
+            </div>
+            <div class="flex-grow overflow-y-auto">
+                <div class="p-4">
+                    <div class="mb-6">
+                        <div class="text-xs uppercase text-blue-200 mb-2">Menu Principal</div>
+                        <ul>
+                            <li class="mb-1">
+                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700 active" id="dashboard-link">
+                                    <i class="fas fa-tachometer-alt mr-3"></i>
+                                    <span class="nav-text">Dashboard</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" id="products-link">
+                                    <i class="fas fa-box-open mr-3"></i>
+                                    <span class="nav-text">Produtos</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" id="suppliers-link">
+                                    <i class="fas fa-truck mr-3"></i>
+                                    <span class="nav-text">Fornecedores</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" id="employees-link">
+                                    <i class="fas fa-users mr-3"></i>
+                                    <span class="nav-text">Colaboradores</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" id="production-link">
+                                    <i class="fas fa-industry mr-3"></i>
+                                    <span class="nav-text">Produção</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" id="reports-link">
+                                    <i class="fas fa-chart-bar mr-3"></i>
+                                    <span class="nav-text">Relatórios</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="mb-6">
+                        <div class="text-xs uppercase text-blue-200 mb-2">Configurações</div>
+                        <ul>
+                            <li class="mb-1">
+                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" id="goals-link">
+                                    <i class="fas fa-bullseye mr-3"></i>
+                                    <span class="nav-text">Metas</span>
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <a href="#" class="nav-item flex items-center p-2 rounded hover:bg-blue-700" id="users-link">
+                                    <i class="fas fa-user-shield mr-3"></i>
+                                    <span class="nav-text">Usuários</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 border-t border-blue-700">
+                <div class="flex items-center">
+                    <img src="https://via.placeholder.com/40" alt="User" class="rounded-full mr-2">
+                    <div>
+                        <div class="text-sm font-medium">Admin User</div>
+                        <div class="text-xs text-blue-200">Administrador</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content flex-1 overflow-auto">
+            <!-- Top Navigation -->
+            <header class="bg-white shadow-sm">
+                <div class="flex justify-between items-center p-4">
+                    <div class="flex items-center">
+                        <button id="sidebar-toggle" class="mr-4 text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h1 class="text-xl font-semibold text-gray-800" id="page-title">Dashboard</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <input type="text" placeholder="Pesquisar..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                        <button class="p-2 text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-bell"></i>
+                        </button>
+                        <button class="p-2 text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="p-6">
+                <!-- Dashboard Content (default view) -->
+                <div id="dashboard-content">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-500">Produção Hoje</p>
+                                    <h3 class="text-2xl font-bold">1,248 kg</h3>
+                                </div>
+                                <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                                    <i class="fas fa-industry"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <span class="text-green-500 text-sm font-medium"><i class="fas fa-caret-up"></i> 12%</span>
+                                <span class="text-gray-500 text-sm ml-2">vs ontem</span>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-500">Perdas</p>
+                                    <h3 class="text-2xl font-bold">48 kg</h3>
+                                </div>
+                                <div class="p-3 rounded-full bg-red-100 text-red-600">
+                                    <i class="fas fa-percentage"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <span class="text-red-500 text-sm font-medium"><i class="fas fa-caret-down"></i> 5%</span>
+                                <span class="text-gray-500 text-sm ml-2">vs ontem</span>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-500">Rentabilidade</p>
+                                    <h3 class="text-2xl font-bold">72%</h3>
+                                </div>
+                                <div class="p-3 rounded-full bg-green-100 text-green-600">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <span class="text-green-500 text-sm font-medium"><i class="fas fa-caret-up"></i> 3%</span>
+                                <span class="text-gray-500 text-sm ml-2">vs ontem</span>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-500">Meta Mensal</p>
+                                    <h3 class="text-2xl font-bold">78%</h3>
+                                </div>
+                                <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                                    <i class="fas fa-bullseye"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-yellow-500 h-2.5 rounded-full" style="width: 78%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                        <div class="bg-white p-6 rounded-lg shadow lg:col-span-2">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-lg font-semibold">Desempenho de Produção (7 dias)</h2>
+                                <select class="border rounded px-3 py-1 text-sm">
+                                    <option>Últimos 7 dias</option>
+                                    <option>Últimos 30 dias</option>
+                                    <option>Este mês</option>
+                                </select>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="productionChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-lg font-semibold">Top Produtos</h2>
+                                <button class="text-blue-600 text-sm font-medium">Ver todos</button>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                        <i class="fas fa-hamburger text-blue-600"></i>
+                                    </div>
+                                    <div class="flex-grow">
+                                        <p class="font-medium">Hambúrguer Artesanal</p>
+                                        <p class="text-sm text-gray-500">R$ 12,80/kg</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-medium">1,024 kg</p>
+                                        <p class="text-sm text-green-500">+12%</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                        <i class="fas fa-drumstick-bite text-green-600"></i>
+                                    </div>
+                                    <div class="flex-grow">
+                                        <p class="font-medium">Peito de Frango</p>
+                                        <p class="text-sm text-gray-500">R$ 8,50/kg</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-medium">856 kg</p>
+                                        <p class="text-sm text-green-500">+8%</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
+                                        <i class="fas fa-bread-slice text-yellow-600"></i>
+                                    </div>
+                                    <div class="flex-grow">
+                                        <p class="font-medium">Pão Integral</p>
+                                        <p class="text-sm text-gray-500">R$ 6,20/kg</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-medium">742 kg</p>
+                                        <p class="text-sm text-red-500">-3%</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+                                        <i class="fas fa-cheese text-purple-600"></i>
+                                    </div>
+                                    <div class="flex-grow">
+                                        <p class="font-medium">Queijo Minas</p>
+                                        <p class="text-sm text-gray-500">R$ 18,90/kg</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-medium">689 kg</p>
+                                        <p class="text-sm text-green-500">+15%</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold">Últimas Produções</h2>
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="new-production-btn">Nova Produção</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Produto</th>
+                                        <th>Peso Bruto</th>
+                                        <th>Peso Líquido</th>
+                                        <th>Retraço</th>
+                                        <th>Perdas</th>
+                                        <th>Rentabilidade</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>15/06/2023</td>
+                                        <td>Hambúrguer Artesanal</td>
+                                        <td>150 kg</td>
+                                        <td>142 kg</td>
+                                        <td>5 kg</td>
+                                        <td>3 kg (2%)</td>
+                                        <td>75%</td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>15/06/2023</td>
+                                        <td>Peito de Frango</td>
+                                        <td>200 kg</td>
+                                        <td>192 kg</td>
+                                        <td>6 kg</td>
+                                        <td>2 kg (1%)</td>
+                                        <td>82%</td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>14/06/2023</td>
+                                        <td>Pão Integral</td>
+                                        <td>180 kg</td>
+                                        <td>175 kg</td>
+                                        <td>3 kg</td>
+                                        <td>2 kg (1.1%)</td>
+                                        <td>68%</td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>14/06/2023</td>
+                                        <td>Queijo Minas</td>
+                                        <td>120 kg</td>
+                                        <td>115 kg</td>
+                                        <td>4 kg</td>
+                                        <td>1 kg (0.8%)</td>
+                                        <td>79%</td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="flex justify-between items-center mt-4">
+                            <div class="text-sm text-gray-500">Mostrando 1 a 4 de 124 registros</div>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 border rounded text-gray-700">Anterior</button>
+                                <button class="px-3 py-1 border rounded bg-blue-600 text-white">1</button>
+                                <button class="px-3 py-1 border rounded text-gray-700">2</button>
+                                <button class="px-3 py-1 border rounded text-gray-700">3</button>
+                                <button class="px-3 py-1 border rounded text-gray-700">Próximo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products Content -->
+                <div id="products-content" class="hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-semibold">Gestão de Produtos</h2>
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="new-product-btn">Novo Produto</button>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow mb-6">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                            <div class="mb-4 md:mb-0">
+                                <div class="relative">
+                                    <input type="text" placeholder="Pesquisar produtos..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-64">
+                                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <select class="border rounded px-3 py-2 text-sm">
+                                    <option>Todos os tipos</option>
+                                    <option>Carnes</option>
+                                    <option>Laticínios</option>
+                                    <option>Pães</option>
+                                    <option>Outros</option>
+                                </select>
+                                <button class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">
+                                    <i class="fas fa-filter"></i>
+                                    <span class="ml-2">Filtrar</span>
+                                </button>
+                                <button class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">
+                                    <i class="fas fa-download"></i>
+                                    <span class="ml-2">Exportar</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Nome</th>
+                                        <th>Tipo</th>
+                                        <th>Custo/kg</th>
+                                        <th>Preço/kg</th>
+                                        <th>Margem</th>
+                                        <th>Estoque</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>PROD001</td>
+                                        <td>Hambúrguer Artesanal</td>
+                                        <td>Carnes</td>
+                                        <td>R$ 7,50</td>
+                                        <td>R$ 12,80</td>
+                                        <td>41%</td>
+                                        <td>256 kg</td>
+                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Ativo</span></td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>PROD002</td>
+                                        <td>Peito de Frango</td>
+                                        <td>Carnes</td>
+                                        <td>R$ 5,20</td>
+                                        <td>R$ 8,50</td>
+                                        <td>39%</td>
+                                        <td>184 kg</td>
+                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Ativo</span></td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>PROD003</td>
+                                        <td>Pão Integral</td>
+                                        <td>Pães</td>
+                                        <td>R$ 3,80</td>
+                                        <td>R$ 6,20</td>
+                                        <td>39%</td>
+                                        <td>125 kg</td>
+                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Ativo</span></td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>PROD004</td>
+                                        <td>Queijo Minas</td>
+                                        <td>Laticínios</td>
+                                        <td>R$ 12,50</td>
+                                        <td>R$ 18,90</td>
+                                        <td>34%</td>
+                                        <td>89 kg</td>
+                                        <td><span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">Estoque baixo</span></td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="flex justify-between items-center mt-4">
+                            <div class="text-sm text-gray-500">Mostrando 1 a 4 de 24 registros</div>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 border rounded text-gray-700">Anterior</button>
+                                <button class="px-3 py-1 border rounded bg-blue-600 text-white">1</button>
+                                <button class="px-3 py-1 border rounded text-gray-700">2</button>
+                                <button class="px-3 py-1 border rounded text-gray-700">3</button>
+                                <button class="px-3 py-1 border rounded text-gray-700">Próximo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Suppliers Content -->
+                <div id="suppliers-content" class="hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-semibold">Gestão de Fornecedores</h2>
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="new-supplier-btn">Novo Fornecedor</button>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow mb-6">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                            <div class="mb-4 md:mb-0">
+                                <div class="relative">
+                                    <input type="text" placeholder="Pesquisar fornecedores..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-64">
+                                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <select class="border rounded px-3 py-2 text-sm">
+                                    <option>Todos os tipos</option>
+                                    <option>Carnes</option>
+                                    <option>Laticínios</option>
+                                    <option>Grãos</option>
+                                    <option>Outros</option>
+                                </select>
+                                <button class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">
+                                    <i class="fas fa-filter"></i>
+                                    <span class="ml-2">Filtrar</span>
+                                </button>
+                                <button class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">
+                                    <i class="fas fa-download"></i>
+                                    <span class="ml-2">Exportar</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Nome</th>
+                                        <th>Tipo</th>
+                                        <th>Contato</th>
+                                        <th>Telefone</th>
+                                        <th>Email</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>FORN001</td>
+                                        <td>Frigorífico Boi Feliz</td>
+                                        <td>Carnes</td>
+                                        <td>João Silva</td>
+                                        <td>(11) 98765-4321</td>
+                                        <td>joao@boifeliz.com.br</td>
+                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Ativo</span></td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>FORN002</td>
+                                        <td>Laticínios Santa Fé</td>
+                                        <td>Laticínios</td>
+                                        <td>Maria Souza</td>
+                                        <td>(11) 91234-5678</td>
+                                        <td>maria@santafe.com.br</td>
+                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Ativo</span></td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>FORN003</td>
+                                        <td>Moinho Trigo Bom</td>
+                                        <td>Grãos</td>
+                                        <td>Carlos Oliveira</td>
+                                        <td>(11) 92345-6789</td>
+                                        <td>carlos@trigobom.com.br</td>
+                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Ativo</span></td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>FORN004</td>
+                                        <td>Embalagens Forte</td>
+                                        <td>Outros</td>
+                                        <td>Ana Costa</td>
+                                        <td>(11) 93456-7890</td>
+                                        <td>ana@embalagensforte.com.br</td>
+                                        <td><span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">Inativo</span></td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="flex justify-between items-center mt-4">
+                            <div class="text-sm text-gray-500">Mostrando 1 a 4 de 12 registros</div>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 border rounded text-gray-700">Anterior</button>
+                                <button class="px-3 py-1 border rounded bg-blue-600 text-white">1</button>
+                                <button class="px-3 py-1 border rounded text-gray-700">2</button>
+                                <button class="px-3 py-1 border rounded text-gray-700">3</button>
+                                <button class="px-3 py-1 border rounded text-gray-700">Próximo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Employees Content -->
+                <div id="employees-content" class="hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-semibold">Gestão de Colaboradores</h2>
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="new-employee-btn">Novo Colaborador</button>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow mb-6">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                            <div class="mb-4 md:mb-0">
+                                <div class="relative">
+                                    <input type="text" placeholder="Pesquisar colaboradores..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-64">
+                                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <select class="border rounded px-3 py-2 text-sm">
+                                    <option>Todos os setores</option>
+                                    <option>Produção</option>
+                                    <option>Qualidade</option>
+                                    <option>Administrativo</option>
+                                    <option>Outros</option>
+                                </select>
+                                <button class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">
+                                    <i class="fas fa-filter"></i>
+                                    <span class="ml-2">Filtrar</span>
+                                </button>
+                                <button class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">
+                                    <i class="fas fa-download"></i>
+                                    <span class="ml-2">Exportar</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Matrícula</th>
+                                        <th>Nome</th>
+                                        <th>Setor</th>
+                                        <th>Cargo</th>
+                                        <th>Admissão</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>EMP001</td>
+                                        <td>Roberto Almeida</td>
+                                        <td>Produção</td>
+                                        <td>Operador</td>
+                                        <td>15/03/2020</td>
+                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Ativo</span></td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>EMP002</td>
+                                        <td>Fernanda Lima</td>
+                                        <td>Qualidade</td>
+                                        <td>Inspetora</td>
+                                        <td>22/07/2021</td>
+                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Ativo</span></td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>EMP003</td>
+                                        <td>Carlos Mendes</td>
+                                        <td>Produção</td>
+                                        <td>Supervisor</td>
+                                        <td>10/05/2019</td>
+                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Ativo</span></td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>EMP004</td>
+                                        <td>Patrícia Gomes</td>
+                                        <td>Administrativo</td>
+                                        <td>Assistente</td>
+                                        <td>03/11/2022</td>
+                                        <td><span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">Férias</span></td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="flex justify-between items-center mt-4">
+                            <div class="text-sm text-gray-500">Mostrando 1 a 4 de 18 registros</div>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 border rounded text-gray-700">Anterior</button>
+                                <button class="px-3 py-1 border rounded bg-blue-600 text-white">1</button>
+                                <button class="px-3 py-1 border rounded text-gray-700">2</button>
+                                <button class="px-3 py-1 border rounded text-gray-700">3</button>
+                                <button class="px-3 py-1 border rounded text-gray-700">Próximo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Production Content -->
+                <div id="production-content" class="hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-semibold">Registro de Produção</h2>
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="new-production-btn2">Nova Produção</button>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow mb-6">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                            <div class="mb-4 md:mb-0">
+                                <div class="relative">
+                                    <input type="text" placeholder="Pesquisar produções..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-64">
+                                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <select class="border rounded px-3 py-2 text-sm">
+                                    <option>Todos os produtos</option>
+                                    <option>Hambúrguer Artesanal</option>
+                                    <option>Peito de Frango</option>
+                                    <option>Pão Integral</option>
+                                    <option>Queijo Minas</option>
+                                </select>
+                                <input type="date" class="border rounded px-3 py-2 text-sm">
+                                <button class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">
+                                    <i class="fas fa-filter"></i>
+                                    <span class="ml-2">Filtrar</span>
+                                </button>
+                                <button class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">
+                                    <i class="fas fa-download"></i>
+                                    <span class="ml-2">Exportar</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Produto</th>
+                                        <th>Lote</th>
+                                        <th>Peso Bruto</th>
+                                        <th>Peso Líquido</th>
+                                        <th>Retraço</th>
+                                        <th>Perdas</th>
+                                        <th>Rentabilidade</th>
+                                        <th>Responsável</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>15/06/2023</td>
+                                        <td>Hambúrguer Artesanal</td>
+                                        <td>LOT23061501</td>
+                                        <td>150 kg</td>
+                                        <td>142 kg</td>
+                                        <td>5 kg</td>
+                                        <td>3 kg (2%)</td>
+                                        <td>75%</td>
+                                        <td>Roberto Almeida</td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>15/06/2023</td>
+                                        <td>Peito de Frango</td>
+                                        <td>LOT23061502</td>
+                                        <td>200 kg</td>
+                                        <td>192 kg</td>
+                                        <td>6 kg</td>
+                                        <td>2 kg (1%)</td>
+                                        <td>82%</td>
+                                        <td>Carlos Mendes</td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>14/06/2023</td>
+                                        <td>Pão Integral</td>
+                                        <td>LOT23061401</td>
+                                        <td>180 kg</td>
+                                        <td>175 kg</td>
+                                        <td>3 kg</td>
+                                        <td>2 kg (1.1%)</td>
+                                        <td>68%</td>
+                                        <td>Fernanda Lima</td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>14/06/2023</td>
+                                        <td>Queijo Minas</td>
+                                        <td>LOT23061402</td>
+                                        <td>120 kg</td>
+                                        <td>115 kg</td>
+                                        <td>4 kg</td>
+                                        <td>1 kg (0.8%)</td>
+                                        <td>79%</td>
+                                        <td>Roberto Almeida</td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="flex justify-between items-center mt-4">
+                            <div class="text-sm text-gray-500">Mostrando 1 a 4 de 124 registros</div>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 border rounded text-gray-700">Anterior</button>
+                                <button class="px-3 py-1 border rounded bg-blue-600 text-white">1</button>
+                                <button class="px-3 py-1 border rounded text-gray-700">2</button>
+                                <button class="px-3 py-1 border rounded text-gray-700">3</button>
+                                <button class="px-3 py-1 border rounded text-gray-700">Próximo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports Content -->
+                <div id="reports-content" class="hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-semibold">Relatórios e Indicadores</h2>
+                        <div class="flex space-x-2">
+                            <button class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">
+                                <i class="fas fa-file-pdf"></i>
+                                <span class="ml-2">PDF</span>
+                            </button>
+                            <button class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">
+                                <i class="fas fa-file-excel"></i>
+                                <span class="ml-2">Excel</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-lg font-semibold">Rentabilidade por Produto</h2>
+                                <select class="border rounded px-3 py-1 text-sm">
+                                    <option>Últimos 30 dias</option>
+                                    <option>Últimos 7 dias</option>
+                                    <option>Este mês</option>
+                                    <option>Mês passado</option>
+                                </select>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="profitabilityChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-lg font-semibold">Perdas por Setor</h2>
+                                <select class="border rounded px-3 py-1 text-sm">
+                                    <option>Últimos 30 dias</option>
+                                    <option>Últimos 7 dias</option>
+                                    <option>Este mês</option>
+                                    <option>Mês passado</option>
+                                </select>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="lossesChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold">Evolução de Produção</h2>
+                            <div class="flex space-x-2">
+                                <select class="border rounded px-3 py-1 text-sm">
+                                    <option>Últimos 6 meses</option>
+                                    <option>Últimos 3 meses</option>
+                                    <option>Este ano</option>
+                                    <option>Ano passado</option>
+                                </select>
+                                <select class="border rounded px-3 py-1 text-sm">
+                                    <option>Todos os produtos</option>
+                                    <option>Hambúrguer Artesanal</option>
+                                    <option>Peito de Frango</option>
+                                    <option>Pão Integral</option>
+                                    <option>Queijo Minas</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="chart-container" style="height: 400px;">
+                            <canvas id="productionEvolutionChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold">Metas vs Realizado</h2>
+                            <select class="border rounded px-3 py-1 text-sm">
+                                <option>Este mês</option>
+                                <option>Mês passado</option>
+                                <option>Trimestre atual</option>
+                                <option>Ano atual</option>
+                            </select>
+                        </div>
+                        <div class="chart-container" style="height: 350px;">
+                            <canvas id="goalsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Goals Content -->
+                <div id="goals-content" class="hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-semibold">Gestão de Metas</h2>
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="new-goal-btn">Nova Meta</button>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow mb-6">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                            <div class="mb-4 md:mb-0">
+                                <div class="relative">
+                                    <input type="text" placeholder="Pesquisar metas..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-64">
+                                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <select class="border rounded px-3 py-2 text-sm">
+                                    <option>Todos os tipos</option>
+                                    <option>Produção</option>
+                                    <option>Perdas</option>
+                                    <option>Rentabilidade</option>
+                                    <option>Outros</option>
+                                </select>
+                                <select class="border rounded px-3 py-2 text-sm">
+                                    <option>Todos os status</option>
+                                    <option>Ativo</option>
+                                    <option>Inativo</option>
+                                    <option>Concluído</option>
+                                </select>
+                                <button class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">
+                                    <i class="fas fa-filter"></i>
+                                    <span class="ml-2">Filtrar</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Descrição</th>
+                                        <th>Tipo</th>
+                                        <th>Período</th>
+                                        <th>Meta</th>
+                                        <th>Realizado</th>
+                                        <th>% Atingido</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>META001</td>
+                                        <td>Redução de perdas</td>
+                                        <td>Perdas</td>
+                                        <td>Jun/2023</td>
+                                        <td>≤ 2%</td>
+                                        <td>1.8%</td>
+                                        <td>90%</td>
+                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Em andamento</span></td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>META002</td>
+                                        <td>Aumento produção</td>
+                                        <td>Produção</td>
+                                        <td>Jun/2023</td>
+                                        <td>5,000 kg</td>
+                                        <td>3,856 kg</td>
+                                        <td>77%</td>
+                                        <td><span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">Em andamento</span></td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>META003</td>
+                                        <td>Rentabilidade média</td>
+                                        <td>Rentabilidade</td>
+                                        <td>2º Trim/2023</td>
+                                        <td>≥ 75%</td>
+                                        <td>73%</td>
+                                        <td>97%</td>
+                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Em andamento</span></td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>META004</td>
+                                        <td>Treinamentos</td>
+                                        <td>Outros</td>
+                                        <td>Jan-Jun/2023</td>
+                                        <td>100%</td>
+                                        <td>100%</td>
+                                        <td>100%</td>
+                                        <td><span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">Concluído</span></td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="flex justify-between items-center mt-4">
+                            <div class="text-sm text-gray-500">Mostrando 1 a 4 de 8 registros</div>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 border rounded text-gray-700">Anterior</button>
+                                <button class="px-3 py-1 border rounded bg-blue-600 text-white">1</button>
+                                <button class="px-3 py-1 border rounded text-gray-700">2</button>
+                                <button class="px-3 py-1 border rounded text-gray-700">Próximo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users Content -->
+                <div id="users-content" class="hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-semibold">Gestão de Usuários</h2>
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="new-user-btn">Novo Usuário</button>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow mb-6">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                            <div class="mb-4 md:mb-0">
+                                <div class="relative">
+                                    <input type="text" placeholder="Pesquisar usuários..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-64">
+                                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <select class="border rounded px-3 py-2 text-sm">
+                                    <option>Todos os perfis</option>
+                                    <option>Administrador</option>
+                                    <option>Gerente</option>
+                                    <option>Supervisor</option>
+                                    <option>Operador</option>
+                                </select>
+                                <select class="border rounded px-3 py-2 text-sm">
+                                    <option>Todos os status</option>
+                                    <option>Ativo</option>
+                                    <option>Inativo</option>
+                                </select>
+                                <button class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">
+                                    <i class="fas fa-filter"></i>
+                                    <span class="ml-2">Filtrar</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Email</th>
+                                        <th>Perfil</th>
+                                        <th>Último Acesso</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Admin User</td>
+                                        <td>admin@foodpro.com.br</td>
+                                        <td>Administrador</td>
+                                        <td>15/06/2023 14:30</td>
+                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Ativo</span></td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Gerente Produção</td>
+                                        <td>gerente@foodpro.com.br</td>
+                                        <td>Gerente</td>
+                                        <td>15/06/2023 10:15</td>
+                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Ativo</span></td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Supervisor Qualidade</td>
+                                        <td>supervisor@foodpro.com.br</td>
+                                        <td>Supervisor</td>
+                                        <td>14/06/2023 16:45</td>
+                                        <td><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Ativo</span></td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Operador 1</td>
+                                        <td>operador1@foodpro.com.br</td>
+                                        <td>Operador</td>
+                                        <td>14/06/2023 07:30</td>
+                                        <td><span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">Inativo</span></td>
+                                        <td>
+                                            <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="flex justify-between items-center mt-4">
+                            <div class="text-sm text-gray-500">Mostrando 1 a 4 de 12 registros</div>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 border rounded text-gray-700">Anterior</button>
+                                <button class="px-3 py-1 border rounded bg-blue-600 text-white">1</button>
+                                <button class="px-3 py-1 border rounded text-gray-700">2</button>
+                                <button class="px-3 py-1 border rounded text-gray-700">3</button>
+                                <button class="px-3 py-1 border rounded text-gray-700">Próximo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal for New Production -->
+    <div id="production-modal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Registrar Nova Produção</h2>
+                <span class="close-modal cursor-pointer text-2xl">&times;</span>
+            </div>
+            <form id="production-form">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="production-date" class="block text-sm font-medium text-gray-700 mb-1">Data</label>
+                        <input type="date" id="production-date" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="production-product" class="block text-sm font-medium text-gray-700 mb-1">Produto</label>
+                        <select id="production-product" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Selecione um produto</option>
+                            <option value="PROD001">Hambúrguer Artesanal</option>
+                            <option value="PROD002">Peito de Frango</option>
+                            <option value="PROD003">Pão Integral</option>
+                            <option value="PROD004">Queijo Minas</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="production-lot" class="block text-sm font-medium text-gray-700 mb-1">Lote</label>
+                        <input type="text" id="production-lot" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Número do lote">
+                    </div>
+                    <div>
+                        <label for="production-responsible" class="block text-sm font-medium text-gray-700 mb-1">Responsável</label>
+                        <select id="production-responsible" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Selecione um responsável</option>
+                            <option value="EMP001">Roberto Almeida</option>
+                            <option value="EMP002">Fernanda Lima</option>
+                            <option value="EMP003">Carlos Mendes</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label for="production-gross" class="block text-sm font-medium text-gray-700 mb-1">Peso Bruto (kg)</label>
+                        <input type="number" step="0.01" id="production-gross" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00">
+                    </div>
+                    <div>
+                        <label for="production-net" class="block text-sm font-medium text-gray-700 mb-1">Peso Líquido (kg)</label>
+                        <input type="number" step="0.01" id="production-net" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00">
+                    </div>
+                    <div>
+                        <label for="production-retrace" class="block text-sm font-medium text-gray-700 mb-1">Retraço (kg)</label>
+                        <input type="number" step="0.01" id="production-retrace" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label for="production-loss" class="block text-sm font-medium text-gray-700 mb-1">Perdas (kg)</label>
+                        <input type="number" step="0.01" id="production-loss" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" readonly>
+                    </div>
+                    <div>
+                        <label for="production-profitability" class="block text-sm font-medium text-gray-700 mb-1">Rentabilidade (%)</label>
+                        <input type="number" step="0.01" id="production-profitability" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" readonly>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" class="close-modal px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100">Cancelar</button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for New Product -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Cadastrar Novo Produto</h2>
+                <span class="close-modal cursor-pointer text-2xl">&times;</span>
+            </div>
+            <form id="product-form">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="product-code" class="block text-sm font-medium text-gray-700 mb-1">Código</label>
+                        <input type="text" id="product-code" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Código do produto">
+                    </div>
+                    <div>
+                        <label for="product-name" class="block text-sm font-medium text-gray-700 mb-1">Nome</label>
+                        <input type="text" id="product-name" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nome do produto">
+                    </div>
+                    <div>
+                        <label for="product-type" class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+                        <select id="product-type" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Selecione um tipo</option>
+                            <option value="Carnes">Carnes</option>
+                            <option value="Laticínios">Laticínios</option>
+                            <option value="Pães">Pães</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="product-supplier" class="block text-sm font-medium text-gray-700 mb-1">Fornecedor</label>
+                        <select id="product-supplier" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Selecione um fornecedor</option>
+                            <option value="FORN001">Frigorífico Boi Feliz</option>
+                            <option value="FORN002">Laticínios Santa Fé</option>
+                            <option value="FORN003">Moinho Trigo Bom</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label for="product-cost" class="block text-sm font-medium text-gray-700 mb-1">Custo por kg (R$)</label>
+                        <input type="number" step="0.01" id="product-cost" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00">
+                    </div>
+                    <div>
+                        <label for="product-price" class="block text-sm font-medium text-gray-700 mb-1">Preço por kg (R$)</label>
+                        <input type="number" step="
+</body>
+</html>
