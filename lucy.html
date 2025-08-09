@@ -3,24 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dra. Lucy Freitas | Psicóloga Clínica</title>
+    <title>Dra. Lucy Freitas | Psicóloga Familiar</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
         
         :root {
-            --primary: #8FB3B0;
-            --secondary: #F5E6D8;
-            --accent: #D4A59A;
-            --dark: #4A4A4A;
-            --light: #F9F9F9;
+            --primary: #F4C2C2; /* Rosa Bebê */
+            --secondary: #F8F0E5; /* Bege Acolhedor */
+            --accent: #FFB6C1; /* Rosa mais vibrante */
+            --dark: #4B4B4B; /* Cinza Escuro */
+            --light: #FFFFFF; /* Branco */
         }
         
         body {
             font-family: 'Montserrat', sans-serif;
             color: var(--dark);
             background-color: var(--light);
+            scroll-behavior: smooth;
         }
         
         h1, h2, h3, h4 {
@@ -56,15 +57,18 @@
         .btn-primary {
             background-color: var(--primary);
             transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
         .btn-primary:hover {
-            background-color: #7a9e9b;
+            background-color: var(--accent);
             transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
         }
         
         .specialty-card {
             transition: all 0.3s ease;
+            border-left: 5px solid var(--primary);
         }
         
         .specialty-card:hover {
@@ -78,6 +82,7 @@
         
         .book-card:hover {
             transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
         
         .modal {
@@ -86,9 +91,10 @@
         
         .calendar-day {
             transition: all 0.2s ease;
+            cursor: pointer;
         }
         
-        .calendar-day:hover:not(.disabled) {
+        .calendar-day:not(.disabled):hover {
             background-color: var(--primary);
             color: white;
         }
@@ -96,18 +102,22 @@
         .calendar-day.selected {
             background-color: var(--primary);
             color: white;
+            font-weight: 600;
         }
         
         .calendar-day.disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            background-color: #f2f2f2;
         }
         
         .calendar-time {
             transition: all 0.2s ease;
+            border: 1px solid var(--primary);
+            color: var(--primary);
         }
         
-        .calendar-time:hover:not(.disabled) {
+        .calendar-time:not(.disabled):hover {
             background-color: var(--primary);
             color: white;
         }
@@ -120,11 +130,15 @@
         .calendar-time.disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            background-color: #f2f2f2;
+            color: #999;
+            border-color: #ccc;
         }
         
         .form-input:focus {
             outline: none;
             box-shadow: 0 0 0 2px var(--primary);
+            border-color: transparent;
         }
         
         @media (max-width: 768px) {
@@ -143,7 +157,6 @@
     </style>
 </head>
 <body>
-    <!-- Header/Navigation -->
     <header class="bg-white shadow-sm sticky top-0 z-50">
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center">
@@ -166,7 +179,6 @@
             </div>
         </div>
         
-        <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden bg-white py-4 px-4 shadow-lg">
             <a href="#home" class="block py-2 text-gray-700 hover:text-primary">Início</a>
             <a href="#about" class="block py-2 text-gray-700 hover:text-primary">Sobre</a>
@@ -177,24 +189,23 @@
         </div>
     </header>
 
-    <!-- Hero Section -->
     <section id="home" class="hero py-20">
         <div class="container mx-auto px-4">
-            <div class="hero-content flex items-center">
-                <div class="hero-text md:w-1/2">
-                    <h2 class="text-4xl md:text-5xl font-bold mb-4">Cuidando da sua saúde emocional</h2>
-                    <p class="text-xl mb-6">Psicoterapia individual e em grupo com abordagem humanizada e acolhedora.</p>
+            <div class="hero-content flex flex-wrap items-center -mx-4">
+                <div class="hero-text md:w-1/2 px-4 mb-8 md:mb-0">
+                    <h2 class="text-4xl md:text-5xl font-bold mb-4">Cuidando da sua saúde familiar</h2>
+                    <p class="text-xl mb-6">Psicoterapia familiar e de casal com abordagem humanizada e acolhedora.</p>
                     <div class="mb-8">
                         <h3 class="text-2xl font-semibold mb-2">Especialidades:</h3>
                         <ul class="space-y-2">
-                            <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2"></i> Terapia Cognitivo-Comportamental</li>
+                            <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2"></i> Terapia Familiar</li>
                             <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2"></i> Terapia de Casal</li>
                             <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2"></i> Psicoterapia para Adolescentes</li>
                         </ul>
                     </div>
                     <a href="#appointment" class="btn-primary text-white py-3 px-8 rounded-full font-semibold inline-block">Agendar Consulta</a>
                 </div>
-                <div class="hero-image md:w-1/2 flex justify-center mt-10 md:mt-0">
+                <div class="hero-image md:w-1/2 px-4 flex justify-center mt-10 md:mt-0">
                     <div class="relative">
                         <img src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" alt="Dra. Lucy Freitas" class="rounded-lg shadow-xl w-full max-w-md">
                         <div class="absolute -bottom-5 -right-5 bg-primary text-white py-2 px-4 rounded-lg shadow-lg">
@@ -206,8 +217,9 @@
             </div>
         </div>
     </section>
+    
+    <hr class="my-12 border-t border-gray-200">
 
-    <!-- About Section -->
     <section id="about" class="py-20 bg-secondary">
         <div class="container mx-auto px-4">
             <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Sobre Mim</h2>
@@ -217,21 +229,21 @@
                 </div>
                 <div class="md:w-2/3 md:pl-12">
                     <h3 class="text-2xl font-semibold mb-4">Minha Trajetória</h3>
-                    <p class="mb-6">Sou a Dra. Lucy Freitas, psicóloga clínica com mais de 15 anos de experiência ajudando pessoas a superarem desafios emocionais e alcançarem seu potencial máximo. Minha abordagem é centrada no paciente, combinando técnicas comprovadas com um atendimento humanizado e acolhedor.</p>
+                    <p class="mb-6">Sou a Dra. Lucy Freitas, psicóloga familiar com mais de 15 anos de experiência ajudando famílias e casais a superarem desafios emocionais e fortalecerem seus laços. Minha abordagem é centrada na pessoa, combinando técnicas comprovadas com um atendimento humanizado e acolhedor.</p>
                     
                     <h3 class="text-2xl font-semibold mb-4">Formação Acadêmica</h3>
                     <ul class="space-y-4 mb-8">
                         <li class="flex items-start">
                             <i class="fas fa-graduation-cap text-primary mt-1 mr-3"></i>
                             <div>
-                                <p class="font-semibold">Doutorado em Psicologia Clínica</p>
+                                <p class="font-semibold">Doutorado em Psicologia Familiar e de Casal</p>
                                 <p class="text-gray-600">Universidade de São Paulo (USP), 2015</p>
                             </div>
                         </li>
                         <li class="flex items-start">
                             <i class="fas fa-graduation-cap text-primary mt-1 mr-3"></i>
                             <div>
-                                <p class="font-semibold">Mestrado em Terapia Cognitivo-Comportamental</p>
+                                <p class="font-semibold">Mestrado em Terapia Sistêmica</p>
                                 <p class="text-gray-600">Pontifícia Universidade Católica (PUC), 2010</p>
                             </div>
                         </li>
@@ -245,14 +257,14 @@
                     </ul>
                     
                     <h3 class="text-2xl font-semibold mb-4">Áreas de Atuação</h3>
-                    <p class="mb-4">Atendo adultos, adolescentes e casais, com foco em:</p>
+                    <p class="mb-4">Atendo famílias, casais e adolescentes, com foco em:</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="bg-white p-4 rounded-lg shadow-sm">
-                            <h4 class="font-semibold text-primary mb-2"><i class="fas fa-user mr-2"></i> Individuais</h4>
-                            <p>Ansiedade, depressão, autoestima, luto, TOC e desenvolvimento pessoal.</p>
+                            <h4 class="font-semibold text-primary mb-2"><i class="fas fa-users-cog mr-2"></i> Terapia Familiar</h4>
+                            <p>Conflitos entre pais e filhos, comunicação, divórcio e luto familiar.</p>
                         </div>
                         <div class="bg-white p-4 rounded-lg shadow-sm">
-                            <h4 class="font-semibold text-primary mb-2"><i class="fas fa-users mr-2"></i> Casais</h4>
+                            <h4 class="font-semibold text-primary mb-2"><i class="fas fa-heart mr-2"></i> Terapia de Casal</h4>
                             <p>Conflitos conjugais, comunicação, terapia sexual e reconstrução de relacionamentos.</p>
                         </div>
                         <div class="bg-white p-4 rounded-lg shadow-sm">
@@ -260,8 +272,8 @@
                             <p>Problemas escolares, bullying, identidade, ansiedade social e orientação vocacional.</p>
                         </div>
                         <div class="bg-white p-4 rounded-lg shadow-sm">
-                            <h4 class="font-semibold text-primary mb-2"><i class="fas fa-briefcase mr-2"></i> Corporativo</h4>
-                            <p>Estresse ocupacional, burnout, liderança e desenvolvimento de equipes.</p>
+                            <h4 class="font-semibold text-primary mb-2"><i class="fas fa-user mr-2"></i> Individual</h4>
+                            <p>Ansiedade, depressão, autoestima, luto e desenvolvimento pessoal.</p>
                         </div>
                     </div>
                 </div>
@@ -269,28 +281,27 @@
         </div>
     </section>
 
-    <!-- Specialties Section -->
+    <hr class="my-12 border-t border-gray-200">
+
     <section id="specialties" class="py-20 bg-white">
         <div class="container mx-auto px-4">
             <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Minhas Especialidades</h2>
-            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">Ofereço abordagens personalizadas para atender às necessidades específicas de cada paciente.</p>
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">Ofereço abordagens personalizadas para atender às necessidades específicas de cada paciente e família.</p>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Specialty 1 -->
                 <div class="specialty-card bg-secondary rounded-lg p-6 shadow-md">
                     <div class="text-primary text-4xl mb-4">
-                        <i class="fas fa-brain"></i>
+                        <i class="fas fa-users-cog"></i>
                     </div>
-                    <h3 class="text-xl font-semibold mb-3">Terapia Cognitivo-Comportamental</h3>
-                    <p class="text-gray-700 mb-4">Abordagem focada na identificação e modificação de padrões de pensamento disfuncionais que influenciam emoções e comportamentos.</p>
+                    <h3 class="text-xl font-semibold mb-3">Terapia Familiar</h3>
+                    <p class="text-gray-700 mb-4">Abordagem focada na dinâmica e nos padrões de comunicação da família, buscando soluções para conflitos e crises.</p>
                     <ul class="space-y-2 text-sm">
-                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Eficaz para ansiedade e depressão</li>
-                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Técnicas práticas e objetivas</li>
-                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Resultados em médio prazo</li>
+                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Conflitos entre gerações</li>
+                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Aconselhamento parental</li>
+                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Luto e mudanças familiares</li>
                     </ul>
                 </div>
                 
-                <!-- Specialty 2 -->
                 <div class="specialty-card bg-secondary rounded-lg p-6 shadow-md">
                     <div class="text-primary text-4xl mb-4">
                         <i class="fas fa-heart"></i>
@@ -304,10 +315,9 @@
                     </ul>
                 </div>
                 
-                <!-- Specialty 3 -->
                 <div class="specialty-card bg-secondary rounded-lg p-6 shadow-md">
                     <div class="text-primary text-4xl mb-4">
-                        <i class="fas fa-user-friends"></i>
+                        <i class="fas fa-child"></i>
                     </div>
                     <h3 class="text-xl font-semibold mb-3">Psicoterapia para Adolescentes</h3>
                     <p class="text-gray-700 mb-4">Acompanhamento especializado para jovens, abordando questões específicas dessa fase de desenvolvimento.</p>
@@ -318,7 +328,19 @@
                     </ul>
                 </div>
                 
-                <!-- Specialty 4 -->
+                <div class="specialty-card bg-secondary rounded-lg p-6 shadow-md">
+                    <div class="text-primary text-4xl mb-4">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Terapia Cognitivo-Comportamental</h3>
+                    <p class="text-gray-700 mb-4">Abordagem focada na identificação e modificação de padrões de pensamento disfuncionais que influenciam emoções e comportamentos.</p>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Eficaz para ansiedade e depressão</li>
+                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Técnicas práticas e objetivas</li>
+                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Resultados em médio prazo</li>
+                    </ul>
+                </div>
+                
                 <div class="specialty-card bg-secondary rounded-lg p-6 shadow-md">
                     <div class="text-primary text-4xl mb-4">
                         <i class="fas fa-seedling"></i>
@@ -332,7 +354,6 @@
                     </ul>
                 </div>
                 
-                <!-- Specialty 5 -->
                 <div class="specialty-card bg-secondary rounded-lg p-6 shadow-md">
                     <div class="text-primary text-4xl mb-4">
                         <i class="fas fa-bed"></i>
@@ -345,32 +366,18 @@
                         <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Restrição de sono</li>
                     </ul>
                 </div>
-                
-                <!-- Specialty 6 -->
-                <div class="specialty-card bg-secondary rounded-lg p-6 shadow-md">
-                    <div class="text-primary text-4xl mb-4">
-                        <i class="fas fa-briefcase"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-3">Orientação Profissional</h3>
-                    <p class="text-gray-700 mb-4">Ajuda na escolha e transição de carreira, identificando habilidades, interesses e valores pessoais.</p>
-                    <ul class="space-y-2 text-sm">
-                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Avaliação de perfil</li>
-                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Planejamento de carreira</li>
-                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Preparação para mudanças</li>
-                    </ul>
-                </div>
             </div>
         </div>
     </section>
 
-    <!-- Publications Section -->
+    <hr class="my-12 border-t border-gray-200">
+
     <section id="publications" class="py-20 bg-secondary">
         <div class="container mx-auto px-4">
             <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Minhas Publicações</h2>
             <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">Livros e artigos que escrevi para compartilhar conhecimento e ajudar mais pessoas.</p>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Book 1 -->
                 <div class="book-card bg-white rounded-lg overflow-hidden shadow-lg cursor-pointer" onclick="openModal('modal1')">
                     <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" alt="Capa do livro Emoções em Equilíbrio" class="w-full h-64 object-cover">
                     <div class="p-6">
@@ -378,14 +385,13 @@
                         <p class="text-gray-600">Técnicas de regulação emocional para o dia a dia</p>
                         <div class="mt-4 flex justify-between items-center">
                             <span class="text-primary font-semibold">R$ 49,90</span>
-                            <button class="text-primary hover:text-primary-dark">
+                            <button class="text-primary hover:text-accent">
                                 <i class="fas fa-info-circle"></i> Detalhes
                             </button>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Book 2 -->
                 <div class="book-card bg-white rounded-lg overflow-hidden shadow-lg cursor-pointer" onclick="openModal('modal2')">
                     <img src="https://images.unsplash.com/photo-1589998059171-988d887df646?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1476&q=80" alt="Capa do livro Amor em Tempos Modernos" class="w-full h-64 object-cover">
                     <div class="p-6">
@@ -393,14 +399,13 @@
                         <p class="text-gray-600">Como construir relacionamentos saudáveis hoje</p>
                         <div class="mt-4 flex justify-between items-center">
                             <span class="text-primary font-semibold">R$ 59,90</span>
-                            <button class="text-primary hover:text-primary-dark">
+                            <button class="text-primary hover:text-accent">
                                 <i class="fas fa-info-circle"></i> Detalhes
                             </button>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Book 3 -->
                 <div class="book-card bg-white rounded-lg overflow-hidden shadow-lg cursor-pointer" onclick="openModal('modal3')">
                     <img src="https://images.unsplash.com/photo-1541963463532-d68292c34b19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1376&q=80" alt="Capa do livro A Jornada do Autoconhecimento" class="w-full h-64 object-cover">
                     <div class="p-6">
@@ -408,7 +413,7 @@
                         <p class="text-gray-600">Um guia prático para entender a si mesmo</p>
                         <div class="mt-4 flex justify-between items-center">
                             <span class="text-primary font-semibold">R$ 45,90</span>
-                            <button class="text-primary hover:text-primary-dark">
+                            <button class="text-primary hover:text-accent">
                                 <i class="fas fa-info-circle"></i> Detalhes
                             </button>
                         </div>
@@ -417,13 +422,11 @@
             </div>
             
             <div class="mt-12 text-center">
-                <a href="#" class="inline-block px-6 py-3 bg-primary text-white rounded-full font-semibold hover:bg-primary-dark">Ver Todos os Artigos</a>
+                <a href="#" class="inline-block px-6 py-3 bg-primary text-white rounded-full font-semibold hover:bg-accent">Ver Todos os Artigos</a>
             </div>
         </div>
     </section>
 
-    <!-- Book Modals -->
-    <!-- Modal 1 -->
     <div id="modal1" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div class="p-6">
@@ -449,7 +452,7 @@
                         <p class="text-gray-700 mb-6">Este livro oferece um guia prático para entender e regular as emoções no dia a dia. Com técnicas baseadas na Terapia Cognitivo-Comportamental e Mindfulness, a autora apresenta estratégias para lidar com a ansiedade, estresse e desregulação emocional, promovendo maior equilíbrio e bem-estar.</p>
                         
                         <div class="flex flex-wrap gap-4">
-                            <a href="#" class="px-4 py-2 bg-primary text-white rounded-full hover:bg-primary-dark flex items-center">
+                            <a href="#" class="px-4 py-2 bg-primary text-white rounded-full hover:bg-accent flex items-center">
                                 <i class="fas fa-shopping-cart mr-2"></i> Comprar na Amazon
                             </a>
                             <a href="#" class="px-4 py-2 border border-primary text-primary rounded-full hover:bg-secondary flex items-center">
@@ -462,7 +465,6 @@
         </div>
     </div>
 
-    <!-- Modal 2 -->
     <div id="modal2" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div class="p-6">
@@ -488,7 +490,7 @@
                         <p class="text-gray-700 mb-6">Nesta obra, a psicóloga Lucy Freitas explora os desafios dos relacionamentos amorosos na era digital. Com base em sua experiência clínica e pesquisas atualizadas, o livro oferece insights sobre comunicação, conflitos, intimidade e como construir relacionamentos saudáveis e duradouros em um mundo de conexões superficiais.</p>
                         
                         <div class="flex flex-wrap gap-4">
-                            <a href="#" class="px-4 py-2 bg-primary text-white rounded-full hover:bg-primary-dark flex items-center">
+                            <a href="#" class="px-4 py-2 bg-primary text-white rounded-full hover:bg-accent flex items-center">
                                 <i class="fas fa-shopping-cart mr-2"></i> Comprar na Amazon
                             </a>
                             <a href="#" class="px-4 py-2 border border-primary text-primary rounded-full hover:bg-secondary flex items-center">
@@ -501,7 +503,6 @@
         </div>
     </div>
 
-    <!-- Modal 3 -->
     <div id="modal3" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div class="p-6">
@@ -527,7 +528,7 @@
                         <p class="text-gray-700 mb-6">Um guia transformador que acompanha o leitor em uma jornada de descoberta pessoal. Através de exercícios práticos, reflexões e técnicas psicológicas, a autora ajuda a identificar padrões, crenças limitantes e potenciais, promovendo um profundo processo de autoconhecimento e crescimento pessoal.</p>
                         
                         <div class="flex flex-wrap gap-4">
-                            <a href="#" class="px-4 py-2 bg-primary text-white rounded-full hover:bg-primary-dark flex items-center">
+                            <a href="#" class="px-4 py-2 bg-primary text-white rounded-full hover:bg-accent flex items-center">
                                 <i class="fas fa-shopping-cart mr-2"></i> Comprar na Amazon
                             </a>
                             <a href="#" class="px-4 py-2 border border-primary text-primary rounded-full hover:bg-secondary flex items-center">
@@ -540,7 +541,8 @@
         </div>
     </div>
 
-    <!-- Appointment Section -->
+    <hr class="my-12 border-t border-gray-200">
+
     <section id="appointment" class="py-20 bg-white">
         <div class="container mx-auto px-4">
             <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Agende sua Consulta</h2>
@@ -565,11 +567,11 @@
                     <div class="mb-6">
                         <label class="block text-gray-700 mb-2">Selecione o Mês:</label>
                         <div class="flex justify-between items-center mb-4">
-                            <button id="prev-month" class="text-primary hover:text-primary-dark">
+                            <button id="prev-month" class="text-primary hover:text-accent">
                                 <i class="fas fa-chevron-left"></i>
                             </button>
-                            <h4 id="current-month" class="font-semibold">Junho 2023</h4>
-                            <button id="next-month" class="text-primary hover:text-primary-dark">
+                            <h4 id="current-month" class="font-semibold"></h4>
+                            <button id="next-month" class="text-primary hover:text-accent">
                                 <i class="fas fa-chevron-right"></i>
                             </button>
                         </div>
@@ -585,15 +587,13 @@
                         </div>
                         
                         <div id="calendar-days" class="grid grid-cols-7 gap-2">
-                            <!-- Calendar days will be populated by JavaScript -->
-                        </div>
+                            </div>
                     </div>
                     
                     <div class="mb-6">
                         <label class="block text-gray-700 mb-2">Horários Disponíveis:</label>
                         <div id="time-slots" class="grid grid-cols-2 md:grid-cols-3 gap-2">
-                            <!-- Time slots will be populated by JavaScript -->
-                        </div>
+                            </div>
                     </div>
                 </div>
                 
@@ -601,29 +601,33 @@
                     <h3 class="text-xl font-semibold mb-6 text-center">Seus Dados</h3>
                     
                     <form id="appointment-form">
+                        <input type="hidden" id="selected-date">
+                        <input type="hidden" id="selected-time">
+                        <input type="hidden" id="selected-type" value="Presencial">
+
                         <div class="mb-4">
                             <label for="name" class="block text-gray-700 mb-2">Nome Completo:</label>
-                            <input type="text" id="name" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary" required>
+                            <input type="text" id="name" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg" required>
                         </div>
                         
                         <div class="mb-4">
                             <label for="email" class="block text-gray-700 mb-2">E-mail:</label>
-                            <input type="email" id="email" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary" required>
+                            <input type="email" id="email" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg" required>
                         </div>
                         
                         <div class="mb-4">
                             <label for="phone" class="block text-gray-700 mb-2">Telefone:</label>
-                            <input type="tel" id="phone" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary" required>
+                            <input type="tel" id="phone" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg" required>
                         </div>
                         
                         <div class="mb-4">
                             <label for="cpf" class="block text-gray-700 mb-2">CPF:</label>
-                            <input type="text" id="cpf" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary" required>
+                            <input type="text" id="cpf" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg" required>
                         </div>
                         
                         <div class="mb-6">
                             <label for="notes" class="block text-gray-700 mb-2">Observações (opcional):</label>
-                            <textarea id="notes" rows="3" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary"></textarea>
+                            <textarea id="notes" rows="3" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg"></textarea>
                         </div>
                         
                         <div class="mb-4">
@@ -632,7 +636,7 @@
                         </div>
                         
                         <div class="flex flex-col sm:flex-row gap-4 mt-8">
-                            <button type="submit" class="flex-1 py-3 px-6 bg-primary text-white rounded-full font-semibold hover:bg-primary-dark">
+                            <button type="submit" class="flex-1 py-3 px-6 bg-primary text-white rounded-full font-semibold hover:bg-accent">
                                 Confirmar Agendamento
                             </button>
                             <button type="button" class="flex-1 py-3 px-6 border border-primary text-primary rounded-full font-semibold hover:bg-secondary">
@@ -645,7 +649,6 @@
         </div>
     </section>
 
-    <!-- Confirmation Modal -->
     <div id="confirmation-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-lg max-w-md w-full mx-4 p-6">
             <div class="text-center">
@@ -654,17 +657,17 @@
                 </div>
                 <h3 class="text-2xl font-bold mb-4">Agendamento Confirmado!</h3>
                 <div id="appointment-details" class="text-gray-700 mb-6">
-                    <!-- Appointment details will be populated by JavaScript -->
-                </div>
+                    </div>
                 <p class="text-gray-600 mb-6">Você receberá um e-mail com os detalhes da consulta e instruções para o atendimento.</p>
-                <button onclick="closeModal('confirmation-modal')" class="px-6 py-2 bg-primary text-white rounded-full font-semibold hover:bg-primary-dark">
+                <button onclick="closeModal('confirmation-modal')" class="px-6 py-2 bg-primary text-white rounded-full font-semibold hover:bg-accent">
                     Fechar
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Contact Section -->
+    <hr class="my-12 border-t border-gray-200">
+
     <section id="contact" class="py-20 bg-secondary">
         <div class="container mx-auto px-4">
             <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Entre em Contato</h2>
@@ -677,25 +680,25 @@
                     <form id="contact-form">
                         <div class="mb-4">
                             <label for="contact-name" class="block text-gray-700 mb-2">Nome:</label>
-                            <input type="text" id="contact-name" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary" required>
+                            <input type="text" id="contact-name" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg" required>
                         </div>
                         
                         <div class="mb-4">
                             <label for="contact-email" class="block text-gray-700 mb-2">E-mail:</label>
-                            <input type="email" id="contact-email" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary" required>
+                            <input type="email" id="contact-email" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg" required>
                         </div>
                         
                         <div class="mb-4">
                             <label for="contact-subject" class="block text-gray-700 mb-2">Assunto:</label>
-                            <input type="text" id="contact-subject" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary" required>
+                            <input type="text" id="contact-subject" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg" required>
                         </div>
                         
                         <div class="mb-6">
                             <label for="contact-message" class="block text-gray-700 mb-2">Mensagem:</label>
-                            <textarea id="contact-message" rows="4" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary" required></textarea>
+                            <textarea id="contact-message" rows="4" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg" required></textarea>
                         </div>
                         
-                        <button type="submit" class="w-full py-3 bg-primary text-white rounded-full font-semibold hover:bg-primary-dark">
+                        <button type="submit" class="w-full py-3 bg-primary text-white rounded-full font-semibold hover:bg-accent">
                             Enviar Mensagem
                         </button>
                     </form>
@@ -754,16 +757,16 @@
                         <h3 class="text-xl font-semibold mb-4">Redes Sociais</h3>
                         
                         <div class="flex justify-center space-x-6">
-                            <a href="#" class="text-primary text-2xl hover:text-primary-dark">
+                            <a href="#" class="text-primary text-2xl hover:text-accent">
                                 <i class="fab fa-facebook"></i>
                             </a>
-                            <a href="#" class="text-primary text-2xl hover:text-primary-dark">
+                            <a href="#" class="text-primary text-2xl hover:text-accent">
                                 <i class="fab fa-instagram"></i>
                             </a>
-                            <a href="#" class="text-primary text-2xl hover:text-primary-dark">
+                            <a href="#" class="text-primary text-2xl hover:text-accent">
                                 <i class="fab fa-linkedin"></i>
                             </a>
-                            <a href="#" class="text-primary text-2xl hover:text-primary-dark">
+                            <a href="#" class="text-primary text-2xl hover:text-accent">
                                 <i class="fab fa-youtube"></i>
                             </a>
                         </div>
@@ -779,7 +782,6 @@
         </div>
     </section>
 
-    <!-- Admin Login Modal -->
     <div id="admin-login-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-lg max-w-md w-full mx-4 p-6">
             <div class="text-center mb-6">
@@ -790,15 +792,15 @@
             <form id="admin-login-form">
                 <div class="mb-4">
                     <label for="admin-email" class="block text-gray-700 mb-2">E-mail:</label>
-                    <input type="email" id="admin-email" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary" required>
+                    <input type="email" id="admin-email" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg" required>
                 </div>
                 
                 <div class="mb-6">
                     <label for="admin-password" class="block text-gray-700 mb-2">Senha:</label>
-                    <input type="password" id="admin-password" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary" required>
+                    <input type="password" id="admin-password" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg" required>
                 </div>
                 
-                <button type="submit" class="w-full py-3 bg-primary text-white rounded-full font-semibold hover:bg-primary-dark mb-4">
+                <button type="submit" class="w-full py-3 bg-primary text-white rounded-full font-semibold hover:bg-accent mb-4">
                     Entrar
                 </button>
                 
@@ -809,7 +811,6 @@
         </div>
     </div>
 
-    <!-- Admin Dashboard (hidden by default) -->
     <div id="admin-dashboard" class="hidden fixed inset-0 bg-gray-100 z-50 overflow-y-auto">
         <div class="container mx-auto px-4 py-8">
             <div class="flex justify-between items-center mb-8">
@@ -947,7 +948,7 @@
                             <option>Online</option>
                         </select>
                         <input type="date" class="border border-gray-300 rounded-lg px-4 py-2">
-                        <button class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark">
+                        <button class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-accent">
                             <i class="fas fa-filter mr-2"></i>Filtrar
                         </button>
                     </div>
@@ -964,8 +965,7 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <!-- More appointment rows would be here -->
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </div>
@@ -973,7 +973,6 @@
         </div>
     </div>
 
-    <!-- Footer -->
     <footer class="bg-primary text-white py-12">
         <div class="container mx-auto px-4">
             <div class="flex flex-col md:flex-row justify-between">
@@ -984,8 +983,8 @@
                         </div>
                         <h3 class="text-xl font-bold">Dra. Lucy Freitas</h3>
                     </div>
-                    <p class="mb-4">Psicóloga Clínica - CRP 12/34567</p>
-                    <p>Atendimento humanizado e especializado para adultos, adolescentes e casais.</p>
+                    <p class="mb-4">Psicóloga Familiar - CRP 12/34567</p>
+                    <p>Atendimento humanizado e especializado para famílias, casais e adolescentes.</p>
                 </div>
                 
                 <div class="mb-8 md:mb-0">
@@ -1043,7 +1042,6 @@
                     <a href="#" class="text-white hover:underline">Política de Privacidade</a>
                 </div>
                 
-                <!-- Admin login link (would be hidden in production or properly secured) -->
                 <div class="mt-4">
                     <button onclick="openModal('admin-login-modal')" class="text-white hover:underline text-sm">
                         <i class="fas fa-lock mr-1"></i> Área Administrativa
@@ -1106,14 +1104,25 @@
         // Admin dashboard functions
         document.getElementById('admin-login-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            closeModal('admin-login-modal');
-            document.getElementById('admin-dashboard').classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
+            // In a real app, you would validate credentials here
+            const email = document.getElementById('admin-email').value;
+            const password = document.getElementById('admin-password').value;
+
+            // Simple simulated login
+            if (email === 'admin@lucy.com.br' && password === '12345') {
+                closeModal('admin-login-modal');
+                document.getElementById('admin-dashboard').classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                alert('E-mail ou senha incorretos.');
+            }
         });
 
         document.getElementById('logout-btn').addEventListener('click', function() {
             document.getElementById('admin-dashboard').classList.add('hidden');
             document.body.style.overflow = 'auto';
+            document.getElementById('admin-email').value = '';
+            document.getElementById('admin-password').value = '';
         });
 
         document.getElementById('close-admin-btn').addEventListener('click', function() {
@@ -1123,77 +1132,174 @@
 
         // Calendar functionality
         const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-        const days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
         
-        let currentDate = new Date();
-        let currentMonth = currentDate.getMonth();
-        let currentYear = currentDate.getFullYear();
+        let today = new Date();
+        let currentMonth = today.getMonth();
+        let currentYear = today.getFullYear();
         
+        const calendarDays = document.getElementById('calendar-days');
+        const currentMonthDisplay = document.getElementById('current-month');
+        const timeSlotsContainer = document.getElementById('time-slots');
+        const selectedDateInput = document.getElementById('selected-date');
+        const selectedTimeInput = document.getElementById('selected-time');
+
+        const availableTimes = ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00", "18:00"];
+        const bookedTimes = {
+            // Simulated booked dates and times
+            '2023-5-15': ["10:00", "14:00"],
+            '2023-5-20': ["09:00"],
+        };
+
         function renderCalendar() {
+            currentMonthDisplay.textContent = `${months[currentMonth]} ${currentYear}`;
+            
             const firstDay = new Date(currentYear, currentMonth, 1).getDay();
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-            const daysInLastMonth = new Date(currentYear, currentMonth, 0).getDate();
             
-            document.getElementById('current-month').textContent = `${months[currentMonth]} ${currentYear}`;
-            
-            let calendarDays = document.getElementById('calendar-days');
             calendarDays.innerHTML = '';
             
-            // Previous month days
-            for (let i = firstDay; i > 0; i--) {
-                const dayElement = document.createElement('div');
-                dayElement.className = 'calendar-day disabled text-gray-400 text-center py-2 rounded-lg';
-                dayElement.textContent = daysInLastMonth - i + 1;
-                calendarDays.appendChild(dayElement);
+            // Fill initial blank days
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'py-2';
+                calendarDays.appendChild(emptyDay);
             }
-            
-            // Current month days
+
+            // Render days of the current month
             for (let i = 1; i <= daysInMonth; i++) {
-                const dayElement = document.createElement('div');
-                dayElement.className = 'calendar-day text-center py-2 rounded-lg cursor-pointer';
+                const dayElement = document.createElement('button');
+                dayElement.type = 'button';
+                dayElement.className = 'calendar-day text-center py-2 rounded-lg';
                 dayElement.textContent = i;
                 
-                // Mark today
-                if (i === currentDate.getDate() && currentMonth === currentDate.getMonth() && currentYear === currentDate.getFullYear()) {
-                    dayElement.classList.add('bg-primary', 'text-white');
-                }
+                const dayDate = new Date(currentYear, currentMonth, i);
                 
-                // Mark weekends differently
-                const dayOfWeek = new Date(currentYear, currentMonth, i).getDay();
-                if (dayOfWeek === 0 || dayOfWeek === 6) {
-                    dayElement.classList.add('bg-secondary');
-                }
-                
-                // Mark booked days (simulated)
-                if ((i === 15 || i === 20 || i === 25) && currentMonth === 5 && currentYear === 2023) {
-                    dayElement.classList.add('disabled', 'bg-red-100', 'line-through');
-                }
-                
-                dayElement.addEventListener('click', function() {
-                    if (!this.classList.contains('disabled')) {
-                        document.querySelectorAll('.calendar-day').forEach(day => {
-                            day.classList.remove('selected');
-                        });
+                // Disable past dates
+                if (dayDate < today && !isSameDay(dayDate, today)) {
+                    dayElement.classList.add('disabled');
+                    dayElement.disabled = true;
+                } else {
+                    dayElement.addEventListener('click', function() {
+                        document.querySelectorAll('.calendar-day').forEach(day => day.classList.remove('selected'));
                         this.classList.add('selected');
                         
-                        // Simulate loading time slots
-                        setTimeout(renderTimeSlots, 300);
-                    }
-                });
+                        const day = this.textContent;
+                        const formattedDate = `${currentYear}-${currentMonth}-${day}`;
+                        selectedDateInput.value = formattedDate;
+
+                        renderTimeSlots(formattedDate);
+                    });
+                }
                 
-                calendarDays.appendChild(dayElement);
-            }
-            
-            // Next month days
-            const daysToShow = 42 - (firstDay + daysInMonth);
-            for (let i = 1; i <= daysToShow; i++) {
-                const dayElement = document.createElement('div');
-                dayElement.className = 'calendar-day disabled text-gray-400 text-center py-2 rounded-lg';
-                dayElement.textContent = i;
                 calendarDays.appendChild(dayElement);
             }
         }
+
+        function isSameDay(d1, d2) {
+            return d1.getFullYear() === d2.getFullYear() &&
+                   d1.getMonth() === d2.getMonth() &&
+                   d1.getDate() === d2.getDate();
+        }
+
+        function renderTimeSlots(date) {
+            timeSlotsContainer.innerHTML = '';
+            const booked = bookedTimes[date] || [];
+
+            availableTimes.forEach(time => {
+                const timeElement = document.createElement('button');
+                timeElement.type = 'button';
+                timeElement.className = 'calendar-time py-2 px-4 rounded-lg';
+                timeElement.textContent = time;
+
+                if (booked.includes(time)) {
+                    timeElement.classList.add('disabled');
+                    timeElement.disabled = true;
+                } else {
+                    timeElement.addEventListener('click', function() {
+                        document.querySelectorAll('.calendar-time').forEach(timeBtn => timeBtn.classList.remove('selected'));
+                        this.classList.add('selected');
+                        selectedTimeInput.value = this.textContent;
+                    });
+                }
+
+                timeSlotsContainer.appendChild(timeElement);
+            });
+        }
         
-        function renderTimeSlots()
+        document.getElementById('prev-month').addEventListener('click', function() {
+            if (currentMonth > today.getMonth() || currentYear > today.getFullYear()) {
+                currentMonth--;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                }
+                renderCalendar();
+            }
+        });
+        
+        document.getElementById('next-month').addEventListener('click', function() {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        });
+
+        // Appointment type buttons
+        const presentialBtn = document.getElementById('presential-btn');
+        const onlineBtn = document.getElementById('online-btn');
+        const selectedTypeInput = document.getElementById('selected-type');
+
+        presentialBtn.addEventListener('click', () => {
+            presentialBtn.classList.add('selected');
+            onlineBtn.classList.remove('selected');
+            selectedTypeInput.value = 'Presencial';
+        });
+
+        onlineBtn.addEventListener('click', () => {
+            onlineBtn.classList.add('selected');
+            presentialBtn.classList.remove('selected');
+            selectedTypeInput.value = 'Online';
+        });
+
+        // Appointment form submission
+        document.getElementById('appointment-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const selectedDate = document.getElementById('selected-date').value;
+            const selectedTime = document.getElementById('selected-time').value;
+            const selectedType = document.getElementById('selected-type').value;
+
+            if (!selectedDate || !selectedTime) {
+                alert('Por favor, selecione uma data e um horário para a consulta.');
+                return;
+            }
+
+            // In a real application, you would send this data to a backend
+            const appointmentDetails = `
+                <p><strong>Paciente:</strong> ${name}</p>
+                <p><strong>E-mail:</strong> ${email}</p>
+                <p><strong>Telefone:</strong> ${phone}</p>
+                <p><strong>Data:</strong> ${selectedDate}</p>
+                <p><strong>Horário:</strong> ${selectedTime}</p>
+                <p><strong>Tipo:</strong> ${selectedType}</p>
+            `;
+
+            document.getElementById('appointment-details').innerHTML = appointmentDetails;
+            openModal('confirmation-modal');
+
+            this.reset();
+            document.querySelectorAll('.calendar-day, .calendar-time').forEach(el => el.classList.remove('selected'));
+            presentialBtn.classList.add('selected');
+            renderCalendar();
+        });
+        
+        // Initial calendar render
+        renderCalendar();
+    </script>
 </body>
 </html>
