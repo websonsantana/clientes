@@ -1,24 +1,27 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dra. Lucy Freitas | Psicóloga Clínica</title>
+    <meta name="description" content="Dra. Lucy Freitas - Psicóloga Familiar e de Casal. Abordagem acolhedora para terapia familiar, de casal e individual. Agende sua consulta online ou presencial.">
+    <meta name="keywords" content="psicóloga, terapia familiar, terapia de casal, psicoterapia, Lucy Freitas, agendar consulta, psicóloga São Paulo, saúde mental">
+    <title>Dra. Lucy Freitas | Psicologia Clínica e Familiar</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
-        
         :root {
-            --primary: #F8C3CD; /* Soft baby pink */
-            --secondary: #FFF5F7; /* Very light pink */
-            --accent: #E75480; /* Darker pink for accents */
-            --dark: #5A3E36; /* Warm brown for text */
-            --light: #FFFCFC; /* Off-white */
+            --primary: #8da3a0; /* Verde-Sálvia Suave */
+            --secondary: #f0f4f3; /* Cinza-Claro */
+            --accent: #b08d57; /* Dourado Metálico */
+            --dark: #2c3e50; /* Cinza Grafite */
+            --light: #f9fafb; /* Branco-Off */
         }
         
         body {
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Lato', sans-serif;
             color: var(--dark);
             background-color: var(--light);
         }
@@ -29,819 +32,452 @@
         }
         
         .hero {
-            background: linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)), url('https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1400&q=80');
+            background: linear-gradient(rgba(249, 250, 251, 0.9), rgba(249, 250, 251, 0.9)), url('https://images.unsplash.com/photo-1542810634-71277d95ae51?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1587&q=80');
             background-size: cover;
             background-position: center;
         }
-        
-        .nav-link {
-            position: relative;
-        }
-        
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: 0;
-            left: 0;
-            background-color: var(--accent);
-            transition: width 0.3s ease;
-        }
-        
-        .nav-link:hover::after {
-            width: 100%;
+
+        .header-scrolled {
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(8px);
         }
         
         .btn-primary {
             background-color: var(--primary);
+            color: var(--light);
             transition: all 0.3s ease;
         }
         
         .btn-primary:hover {
-            background-color: #7a9e9b;
+            background-color: var(--accent);
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        
-        .specialty-card {
+
+        .card-shadow {
             transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
-        
-        .specialty-card:hover {
-            transform: translateY(-5px);
+
+        .card-shadow:hover {
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px);
         }
-        
-        .book-card {
-            transition: all 0.3s ease;
-        }
-        
-        .book-card:hover {
-            transform: scale(1.05);
-        }
-        
-        .modal {
-            transition: all 0.3s ease;
-        }
-        
-        .calendar-day {
+
+        .calendar-day, .calendar-time {
             transition: all 0.2s ease;
         }
-        
-        .calendar-day:hover:not(.disabled) {
+
+        .calendar-day.selected, .calendar-time.selected {
+            background-color: var(--primary) !important;
+            color: white !important;
+            font-weight: 700;
+        }
+
+        .calendar-day:not(.disabled):hover, .calendar-time:not(.disabled):hover {
             background-color: var(--primary);
             color: white;
         }
-        
-        .calendar-day.selected {
-            background-color: var(--primary);
-            color: white;
-        }
-        
-        .calendar-day.disabled {
-            opacity: 0.5;
+
+        .calendar-day.disabled, .calendar-time.disabled {
+            opacity: 0.4;
             cursor: not-allowed;
         }
-        
-        .calendar-time {
-            transition: all 0.2s ease;
-        }
-        
-        .calendar-time:hover:not(.disabled) {
-            background-color: var(--primary);
+
+        .scroll-to-top {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background-color: var(--accent);
             color: white;
-        }
-        
-        .calendar-time.selected {
-            background-color: var(--primary);
-            color: white;
-        }
-        
-        .calendar-time.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .form-input:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px var(--primary);
-        }
-        
-        @media (max-width: 768px) {
-            .hero-content {
-                flex-direction: column;
-            }
-            
-            .hero-text {
-                order: 2;
-            }
-            
-            .hero-image {
-                order: 1;
-            }
+            padding: 1rem;
+            border-radius: 50%;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <!-- Header/Navigation -->
-    <header class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+    <header id="main-header" class="bg-white sticky top-0 z-50 transition-all duration-300">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
             <div class="flex items-center">
-                <div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center mr-3">
-                    <span class="text-white font-bold text-xl">LF</span>
-                </div>
-                <h1 class="text-xl font-bold">Dra. Lucy Freitas</h1>
+                <a href="#" class="text-2xl font-bold">Dra. Lucy Freitas</a>
             </div>
-            <nav class="hidden md:flex space-x-8">
-                <a href="#home" class="nav-link text-gray-700 hover:text-primary">Início</a>
-                <a href="#about" class="nav-link text-gray-700 hover:text-primary">Sobre</a>
-                <a href="#specialties" class="nav-link text-gray-700 hover:text-primary">Especialidades</a>
-                <a href="#publications" class="nav-link text-gray-700 hover:text-primary">Publicações</a>
-                <a href="#contact" class="nav-link text-gray-700 hover:text-primary">Contato</a>
+            <nav class="hidden md:flex space-x-8 text-lg">
+                <a href="#about" class="text-gray-600 hover:text-primary transition-colors">Sobre</a>
+                <a href="#specialties" class="text-gray-600 hover:text-primary transition-colors">Especialidades</a>
+                <a href="#publications" class="text-gray-600 hover:text-primary transition-colors">Publicações</a>
+                <a href="#contact" class="text-gray-600 hover:text-primary transition-colors">Contato</a>
             </nav>
+            <div class="hidden md:block">
+                <a href="#appointment" class="btn-primary py-2 px-6 rounded-full font-bold">Agendar Consulta</a>
+            </div>
             <div class="md:hidden">
-                <button id="mobile-menu-button" class="text-gray-700">
-                    <i class="fas fa-bars text-2xl"></i>
+                <button id="mobile-menu-button" class="text-gray-700 text-2xl">
+                    <i class="fas fa-bars"></i>
                 </button>
             </div>
         </div>
         
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white py-4 px-4 shadow-lg">
-            <a href="#home" class="block py-2 text-gray-700 hover:text-primary">Início</a>
-            <a href="#about" class="block py-2 text-gray-700 hover:text-primary">Sobre</a>
-            <a href="#specialties" class="block py-2 text-gray-700 hover:text-primary">Especialidades</a>
-            <a href="#publications" class="block py-2 text-gray-700 hover:text-primary">Publicações</a>
-            <a href="#contact" class="block py-2 text-gray-700 hover:text-primary">Contato</a>
-            <a href="#appointment" class="block mt-2 py-2 px-4 bg-primary text-white rounded-full text-center">Agendar Consulta</a>
+        <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg">
+            <a href="#about" class="block py-3 px-6 text-gray-700 hover:bg-gray-100 transition-colors">Sobre</a>
+            <a href="#specialties" class="block py-3 px-6 text-gray-700 hover:bg-gray-100 transition-colors">Especialidades</a>
+            <a href="#publications" class="block py-3 px-6 text-gray-700 hover:bg-gray-100 transition-colors">Publicações</a>
+            <a href="#contact" class="block py-3 px-6 text-gray-700 hover:bg-gray-100 transition-colors">Contato</a>
+            <a href="#appointment" class="block mt-4 mx-6 py-3 px-6 btn-primary rounded-full text-center font-bold">Agendar Consulta</a>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero py-20">
-        <div class="container mx-auto px-4">
-            <div class="hero-content flex items-center">
-                <div class="hero-text md:w-1/2">
-                    <h2 class="text-4xl md:text-5xl font-bold mb-4">Famílias Saudáveis, Relações Fortes</h2>
-                    <p class="text-xl mb-6">Terapia familiar com abordagem sistêmica e acolhedora para fortalecer seus laços.</p>
-                    <div class="mb-8">
-                        <h3 class="text-2xl font-semibold mb-2">Especialidades:</h3>
-                        <ul class="space-y-2">
-                            <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2"></i> Terapia Cognitivo-Comportamental</li>
-                            <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2"></i> Terapia de Casal</li>
-                            <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2"></i> Psicoterapia para Adolescentes</li>
-                        </ul>
-                    </div>
-                    <a href="#appointment" class="btn-primary text-white py-3 px-8 rounded-full font-semibold inline-block">Agendar Consulta</a>
+    <section id="home" class="hero text-center py-24 md:py-32">
+        <div class="container mx-auto px-6 max-w-4xl">
+            <h2 class="text-5xl md:text-7xl font-bold mb-4 leading-tight">Cuidando dos laços que importam.</h2>
+            <p class="text-xl md:text-2xl text-gray-700 mb-8">
+                Psicoterapia familiar e de casal com uma abordagem humanizada e profissional para uma vida mais plena.
+            </p>
+            <a href="#appointment" class="btn-primary py-3 px-8 rounded-full text-lg font-bold">Agende sua Consulta</a>
+        </div>
+    </section>
+
+    <section id="about" class="py-20 md:py-32 bg-secondary">
+        <div class="container mx-auto px-6 max-w-6xl">
+            <div class="flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-1/2">
+                    <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Dra. Lucy Freitas no consultório" class="w-full rounded-2xl shadow-xl">
                 </div>
-                <div class="hero-image md:w-1/2 flex justify-center mt-10 md:mt-0">
-                    <div class="relative">
-                        <img src="https://images.unsplash.com/photo-1600046050370-4e85d5f8f7ba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Dra. Lucy Freitas com família" class="rounded-lg shadow-xl w-full max-w-md">
-                        <div class="absolute -bottom-5 -right-5 bg-primary text-white py-2 px-4 rounded-lg shadow-lg">
-                            <p class="font-bold">Dra. Lucy Freitas</p>
-                            <p class="text-sm">CRP 12/34567</p>
-                        </div>
+                <div class="md:w-1/2">
+                    <h3 class="text-3xl md:text-4xl font-bold mb-6">Sobre a Dra. Lucy Freitas</h3>
+                    <p class="text-lg text-gray-700 leading-relaxed mb-6">
+                        Com mais de 15 anos de experiência, sou especializada em terapia familiar e de casal. Minha missão é oferecer um ambiente seguro e acolhedor, onde meus pacientes possam explorar suas emoções, resolver conflitos e fortalecer seus relacionamentos. Acredito no poder da comunicação e do autoconhecimento para construir uma vida mais feliz e equilibrada.
+                    </p>
+                    <div class="flex items-center space-x-4 mb-4">
+                        <i class="fas fa-medal text-2xl text-accent"></i>
+                        <p class="font-semibold text-gray-700">Doutora em Psicologia Familiar pela USP</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <i class="fas fa-book-reader text-2xl text-accent"></i>
+                        <p class="font-semibold text-gray-700">Mestra em Terapia Sistêmica pela PUC</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- About Section -->
-    <section id="about" class="py-20 bg-secondary">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Sobre Mim</h2>
-            <div class="flex flex-col md:flex-row items-center">
-                <div class="md:w-1/3 mb-8 md:mb-0 flex justify-center">
-                    <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Dra. Lucy Freitas em sessão familiar" class="rounded-lg shadow-lg w-full max-w-xs">
-                </div>
-                <div class="md:w-2/3 md:pl-12">
-                    <h3 class="text-2xl font-semibold mb-4">Minha Trajetória</h3>
-                    <p class="mb-6">Sou a Dra. Lucy Freitas, psicóloga clínica com mais de 15 anos de experiência ajudando pessoas a superarem desafios emocionais e alcançarem seu potencial máximo. Minha abordagem é centrada no paciente, combinando técnicas comprovadas com um atendimento humanizado e acolhedor.</p>
-                    
-                    <h3 class="text-2xl font-semibold mb-4">Formação Acadêmica</h3>
-                    <ul class="space-y-4 mb-8">
-                        <li class="flex items-start">
-                            <i class="fas fa-graduation-cap text-primary mt-1 mr-3"></i>
-                            <div>
-                                <p class="font-semibold">Doutorado em Psicologia Clínica</p>
-                                <p class="text-gray-600">Universidade de São Paulo (USP), 2015</p>
-                            </div>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fas fa-graduation-cap text-primary mt-1 mr-3"></i>
-                            <div>
-                                <p class="font-semibold">Mestrado em Terapia Cognitivo-Comportamental</p>
-                                <p class="text-gray-600">Pontifícia Universidade Católica (PUC), 2010</p>
-                            </div>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fas fa-graduation-cap text-primary mt-1 mr-3"></i>
-                            <div>
-                                <p class="font-semibold">Graduação em Psicologia</p>
-                                <p class="text-gray-600">Universidade Federal do Rio de Janeiro (UFRJ), 2005</p>
-                            </div>
-                        </li>
-                    </ul>
-                    
-                    <h3 class="text-2xl font-semibold mb-4">Áreas de Atuação</h3>
-                    <p class="mb-4">Atendo adultos, adolescentes e casais, com foco em:</p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="bg-white p-4 rounded-lg shadow-sm">
-                            <h4 class="font-semibold text-primary mb-2"><i class="fas fa-user mr-2"></i> Individuais</h4>
-                            <p>Ansiedade, depressão, autoestima, luto, TOC e desenvolvimento pessoal.</p>
-                        </div>
-                        <div class="bg-white p-4 rounded-lg shadow-sm">
-                            <h4 class="font-semibold text-primary mb-2"><i class="fas fa-users mr-2"></i> Casais</h4>
-                            <p>Conflitos conjugais, comunicação, terapia sexual e reconstrução de relacionamentos.</p>
-                        </div>
-                        <div class="bg-white p-4 rounded-lg shadow-sm">
-                            <h4 class="font-semibold text-primary mb-2"><i class="fas fa-child mr-2"></i> Adolescentes</h4>
-                            <p>Problemas escolares, bullying, identidade, ansiedade social e orientação vocacional.</p>
-                        </div>
-                        <div class="bg-white p-4 rounded-lg shadow-sm">
-                            <h4 class="font-semibold text-primary mb-2"><i class="fas fa-briefcase mr-2"></i> Corporativo</h4>
-                            <p>Estresse ocupacional, burnout, liderança e desenvolvimento de equipes.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Specialties Section -->
-    <section id="specialties" class="py-20 bg-white">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Abordagens Terapêuticas</h2>
-            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">Trabalho com diversas abordagens para atender famílias em diferentes fases da vida.</p>
-            
+    <section id="specialties" class="py-20 md:py-32 bg-light">
+        <div class="container mx-auto px-6 max-w-6xl">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Especialidades</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Specialty 1 -->
-                <div class="specialty-card bg-secondary rounded-lg p-6 shadow-md">
-                    <div class="text-primary text-4xl mb-4">
-                        <i class="fas fa-brain"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-3">Terapia Cognitivo-Comportamental</h3>
-                    <p class="text-gray-700 mb-4">Abordagem focada na identificação e modificação de padrões de pensamento disfuncionais que influenciam emoções e comportamentos.</p>
-                    <ul class="space-y-2 text-sm">
-                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Eficaz para ansiedade e depressão</li>
-                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Técnicas práticas e objetivas</li>
-                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Resultados em médio prazo</li>
-                    </ul>
+                <div class="bg-secondary p-8 rounded-xl card-shadow">
+                    <div class="text-primary text-4xl mb-4"><i class="fas fa-users-cog"></i></div>
+                    <h3 class="text-xl font-bold mb-2">Terapia Familiar</h3>
+                    <p class="text-gray-700">Ajudo famílias a navegarem por desafios, melhorando a comunicação e construindo laços mais fortes e saudáveis.</p>
                 </div>
                 
-                <!-- Specialty 2 -->
-                <div class="specialty-card bg-secondary rounded-lg p-6 shadow-md">
-                    <div class="text-primary text-4xl mb-4">
-                        <i class="fas fa-heart"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-3">Terapia de Casal</h3>
-                    <p class="text-gray-700 mb-4">Trabalho com casais para melhorar comunicação, resolver conflitos e fortalecer a conexão emocional no relacionamento.</p>
-                    <ul class="space-y-2 text-sm">
-                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Mediação de conflitos</li>
-                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Reconstrução da intimidade</li>
-                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Prevenção de separações</li>
-                    </ul>
+                <div class="bg-secondary p-8 rounded-xl card-shadow">
+                    <div class="text-primary text-4xl mb-4"><i class="fas fa-heart"></i></div>
+                    <h3 class="text-xl font-bold mb-2">Terapia de Casal</h3>
+                    <p class="text-gray-700">Foco em resolver conflitos, restaurar a intimidade e criar um relacionamento baseado em respeito e parceria mútua.</p>
                 </div>
                 
-                <!-- Specialty 3 -->
-                <div class="specialty-card bg-secondary rounded-lg p-6 shadow-md">
-                    <div class="text-primary text-4xl mb-4">
-                        <i class="fas fa-user-friends"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-3">Psicoterapia para Adolescentes</h3>
-                    <p class="text-gray-700 mb-4">Acompanhamento especializado para jovens, abordando questões específicas dessa fase de desenvolvimento.</p>
-                    <ul class="space-y-2 text-sm">
-                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Problemas escolares</li>
-                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Identidade e autoestima</li>
-                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Orientação vocacional</li>
-                    </ul>
+                <div class="bg-secondary p-8 rounded-xl card-shadow">
+                    <div class="text-primary text-4xl mb-4"><i class="fas fa-child"></i></div>
+                    <h3 class="text-xl font-bold mb-2">Psicoterapia para Adolescentes</h3>
+                    <p class="text-gray-700">Ofereço apoio para os jovens em questões de identidade, ansiedade e relações familiares, promovendo seu desenvolvimento.</p>
                 </div>
                 
-                <!-- Specialty 4 -->
-                <div class="specialty-card bg-secondary rounded-lg p-6 shadow-md">
-                    <div class="text-primary text-4xl mb-4">
-                        <i class="fas fa-seedling"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-3">Mindfulness e Autocompaixão</h3>
-                    <p class="text-gray-700 mb-4">Técnicas de atenção plena para redução de estresse, regulação emocional e desenvolvimento da autocompaixão.</p>
-                    <ul class="space-y-2 text-sm">
-                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Redução de ansiedade</li>
-                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Melhora na qualidade de vida</li>
-                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Autoconhecimento</li>
-                    </ul>
+                <div class="bg-secondary p-8 rounded-xl card-shadow">
+                    <div class="text-primary text-4xl mb-4"><i class="fas fa-brain"></i></div>
+                    <h3 class="text-xl font-bold mb-2">Terapia Cognitivo-Comportamental</h3>
+                    <p class="text-gray-700">Abordagem prática e eficaz para lidar com ansiedade, depressão e outros desafios emocionais do dia a dia.</p>
                 </div>
                 
-                <!-- Specialty 5 -->
-                <div class="specialty-card bg-secondary rounded-lg p-6 shadow-md">
-                    <div class="text-primary text-4xl mb-4">
-                        <i class="fas fa-bed"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-3">Terapia do Sono</h3>
-                    <p class="text-gray-700 mb-4">Tratamento especializado para insônia e outros distúrbios do sono, com técnicas baseadas em evidências científicas.</p>
-                    <ul class="space-y-2 text-sm">
-                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Higiene do sono</li>
-                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Controle de estímulos</li>
-                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Restrição de sono</li>
-                    </ul>
+                <div class="bg-secondary p-8 rounded-xl card-shadow">
+                    <div class="text-primary text-4xl mb-4"><i class="fas fa-seedling"></i></div>
+                    <h3 class="text-xl font-bold mb-2">Mindfulness e Autocompaixão</h3>
+                    <p class="text-gray-700">Técnicas de atenção plena para reduzir o estresse, regular emoções e cultivar a autocompaixão e o bem-estar.</p>
                 </div>
                 
-                <!-- Specialty 6 -->
-                <div class="specialty-card bg-secondary rounded-lg p-6 shadow-md">
-                    <div class="text-primary text-4xl mb-4">
-                        <i class="fas fa-briefcase"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-3">Orientação Profissional</h3>
-                    <p class="text-gray-700 mb-4">Ajuda na escolha e transição de carreira, identificando habilidades, interesses e valores pessoais.</p>
-                    <ul class="space-y-2 text-sm">
-                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Avaliação de perfil</li>
-                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Planejamento de carreira</li>
-                        <li class="flex items-center"><i class="fas fa-check text-primary mr-2"></i> Preparação para mudanças</li>
-                    </ul>
+                <div class="bg-secondary p-8 rounded-xl card-shadow">
+                    <div class="text-primary text-4xl mb-4"><i class="fas fa-user"></i></div>
+                    <h3 class="text-xl font-bold mb-2">Psicoterapia Individual</h3>
+                    <p class="text-gray-700">Um espaço dedicado para o autoconhecimento, superação de traumas e o crescimento pessoal.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Publications Section -->
-    <section id="publications" class="py-20 bg-secondary">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Minhas Publicações</h2>
-            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">Livros e artigos que escrevi para compartilhar conhecimento e ajudar mais pessoas.</p>
-            
+    <section id="publications" class="py-20 md:py-32 bg-secondary">
+        <div class="container mx-auto px-6 max-w-6xl">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Publicações</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Book 1 -->
-                <div class="book-card bg-white rounded-lg overflow-hidden shadow-lg cursor-pointer" onclick="openModal('modal1')">
+                <div class="bg-white rounded-xl card-shadow overflow-hidden cursor-pointer" onclick="openModal('modal1')">
                     <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" alt="Capa do livro Emoções em Equilíbrio" class="w-full h-64 object-cover">
                     <div class="p-6">
-                        <h3 class="text-xl font-semibold mb-2">Emoções em Equilíbrio</h3>
-                        <p class="text-gray-600">Técnicas de regulação emocional para o dia a dia</p>
-                        <div class="mt-4 flex justify-between items-center">
-                            <span class="text-primary font-semibold">R$ 49,90</span>
-                            <button class="text-primary hover:text-primary-dark">
-                                <i class="fas fa-info-circle"></i> Detalhes
-                            </button>
-                        </div>
+                        <h3 class="text-xl font-bold mb-2">Emoções em Equilíbrio</h3>
+                        <p class="text-gray-600">Guia prático para a regulação emocional</p>
                     </div>
                 </div>
                 
-                <!-- Book 2 -->
-                <div class="book-card bg-white rounded-lg overflow-hidden shadow-lg cursor-pointer" onclick="openModal('modal2')">
+                <div class="bg-white rounded-xl card-shadow overflow-hidden cursor-pointer" onclick="openModal('modal2')">
                     <img src="https://images.unsplash.com/photo-1589998059171-988d887df646?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1476&q=80" alt="Capa do livro Amor em Tempos Modernos" class="w-full h-64 object-cover">
                     <div class="p-6">
-                        <h3 class="text-xl font-semibold mb-2">Amor em Tempos Modernos</h3>
-                        <p class="text-gray-600">Como construir relacionamentos saudáveis hoje</p>
-                        <div class="mt-4 flex justify-between items-center">
-                            <span class="text-primary font-semibold">R$ 59,90</span>
-                            <button class="text-primary hover:text-primary-dark">
-                                <i class="fas fa-info-circle"></i> Detalhes
-                            </button>
-                        </div>
+                        <h3 class="text-xl font-bold mb-2">Amor em Tempos Modernos</h3>
+                        <p class="text-gray-600">Construindo relacionamentos saudáveis</p>
                     </div>
                 </div>
                 
-                <!-- Book 3 -->
-                <div class="book-card bg-white rounded-lg overflow-hidden shadow-lg cursor-pointer" onclick="openModal('modal3')">
+                <div class="bg-white rounded-xl card-shadow overflow-hidden cursor-pointer" onclick="openModal('modal3')">
                     <img src="https://images.unsplash.com/photo-1541963463532-d68292c34b19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1376&q=80" alt="Capa do livro A Jornada do Autoconhecimento" class="w-full h-64 object-cover">
                     <div class="p-6">
-                        <h3 class="text-xl font-semibold mb-2">A Jornada do Autoconhecimento</h3>
-                        <p class="text-gray-600">Um guia prático para entender a si mesmo</p>
-                        <div class="mt-4 flex justify-between items-center">
-                            <span class="text-primary font-semibold">R$ 45,90</span>
-                            <button class="text-primary hover:text-primary-dark">
-                                <i class="fas fa-info-circle"></i> Detalhes
-                            </button>
-                        </div>
+                        <h3 class="text-xl font-bold mb-2">A Jornada do Autoconhecimento</h3>
+                        <p class="text-gray-600">Um guia prático para sua jornada interior</p>
                     </div>
                 </div>
-            </div>
-            
-            <div class="mt-12 text-center">
-                <a href="#" class="inline-block px-6 py-3 bg-primary text-white rounded-full font-semibold hover:bg-primary-dark">Ver Todos os Artigos</a>
             </div>
         </div>
     </section>
 
-    <!-- Book Modals -->
-    <!-- Modal 1 -->
-    <div id="modal1" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <div class="p-6">
-                <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-2xl font-bold">Emoções em Equilíbrio</h3>
-                    <button onclick="closeModal('modal1')" class="text-gray-500 hover:text-gray-700">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="flex flex-col md:flex-row gap-6">
-                    <div class="md:w-1/3">
-                        <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" alt="Capa do livro Emoções em Equilíbrio" class="w-full rounded-lg shadow">
-                    </div>
-                    <div class="md:w-2/3">
-                        <p class="text-gray-700 mb-4"><strong>Autor:</strong> Lucy Freitas</p>
-                        <p class="text-gray-700 mb-4"><strong>Editora:</strong> Mente Saudável</p>
-                        <p class="text-gray-700 mb-4"><strong>Ano:</strong> 2020</p>
-                        <p class="text-gray-700 mb-4"><strong>Páginas:</strong> 256</p>
-                        <p class="text-gray-700 mb-4"><strong>ISBN:</strong> 978-85-1234-567-8</p>
-                        <p class="text-gray-700 mb-4"><strong>Preço:</strong> R$ 49,90</p>
-                        
-                        <h4 class="font-semibold mb-2">Sinopse:</h4>
-                        <p class="text-gray-700 mb-6">Este livro oferece um guia prático para entender e regular as emoções no dia a dia. Com técnicas baseadas na Terapia Cognitivo-Comportamental e Mindfulness, a autora apresenta estratégias para lidar com a ansiedade, estresse e desregulação emocional, promovendo maior equilíbrio e bem-estar.</p>
-                        
-                        <div class="flex flex-wrap gap-4">
-                            <a href="#" class="px-4 py-2 bg-primary text-white rounded-full hover:bg-primary-dark flex items-center">
-                                <i class="fas fa-shopping-cart mr-2"></i> Comprar na Amazon
-                            </a>
-                            <a href="#" class="px-4 py-2 border border-primary text-primary rounded-full hover:bg-secondary flex items-center">
-                                <i class="fas fa-book-open mr-2"></i> Ler Amostra
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal 2 -->
-    <div id="modal2" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <div class="p-6">
-                <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-2xl font-bold">Amor em Tempos Modernos</h3>
-                    <button onclick="closeModal('modal2')" class="text-gray-500 hover:text-gray-700">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="flex flex-col md:flex-row gap-6">
-                    <div class="md:w-1/3">
-                        <img src="https://images.unsplash.com/photo-1589998059171-988d887df646?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1476&q=80" alt="Capa do livro Amor em Tempos Modernos" class="w-full rounded-lg shadow">
-                    </div>
-                    <div class="md:w-2/3">
-                        <p class="text-gray-700 mb-4"><strong>Autor:</strong> Lucy Freitas</p>
-                        <p class="text-gray-700 mb-4"><strong>Editora:</strong> Relacionamentos</p>
-                        <p class="text-gray-700 mb-4"><strong>Ano:</strong> 2018</p>
-                        <p class="text-gray-700 mb-4"><strong>Páginas:</strong> 320</p>
-                        <p class="text-gray-700 mb-4"><strong>ISBN:</strong> 978-85-9876-543-2</p>
-                        <p class="text-gray-700 mb-4"><strong>Preço:</strong> R$ 59,90</p>
-                        
-                        <h4 class="font-semibold mb-2">Sinopse:</h4>
-                        <p class="text-gray-700 mb-6">Nesta obra, a psicóloga Lucy Freitas explora os desafios dos relacionamentos amorosos na era digital. Com base em sua experiência clínica e pesquisas atualizadas, o livro oferece insights sobre comunicação, conflitos, intimidade e como construir relacionamentos saudáveis e duradouros em um mundo de conexões superficiais.</p>
-                        
-                        <div class="flex flex-wrap gap-4">
-                            <a href="#" class="px-4 py-2 bg-primary text-white rounded-full hover:bg-primary-dark flex items-center">
-                                <i class="fas fa-shopping-cart mr-2"></i> Comprar na Amazon
-                            </a>
-                            <a href="#" class="px-4 py-2 border border-primary text-primary rounded-full hover:bg-secondary flex items-center">
-                                <i class="fas fa-book-open mr-2"></i> Ler Amostra
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal 3 -->
-    <div id="modal3" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <div class="p-6">
-                <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-2xl font-bold">A Jornada do Autoconhecimento</h3>
-                    <button onclick="closeModal('modal3')" class="text-gray-500 hover:text-gray-700">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="flex flex-col md:flex-row gap-6">
-                    <div class="md:w-1/3">
-                        <img src="https://images.unsplash.com/photo-1541963463532-d68292c34b19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1376&q=80" alt="Capa do livro A Jornada do Autoconhecimento" class="w-full rounded-lg shadow">
-                    </div>
-                    <div class="md:w-2/3">
-                        <p class="text-gray-700 mb-4"><strong>Autor:</strong> Lucy Freitas</p>
-                        <p class="text-gray-700 mb-4"><strong>Editora:</strong> Caminhos</p>
-                        <p class="text-gray-700 mb-4"><strong>Ano:</strong> 2022</p>
-                        <p class="text-gray-700 mb-4"><strong>Páginas:</strong> 280</p>
-                        <p class="text-gray-700 mb-4"><strong>ISBN:</strong> 978-85-5678-901-2</p>
-                        <p class="text-gray-700 mb-4"><strong>Preço:</strong> R$ 45,90</p>
-                        
-                        <h4 class="font-semibold mb-2">Sinopse:</h4>
-                        <p class="text-gray-700 mb-6">Um guia transformador que acompanha o leitor em uma jornada de descoberta pessoal. Através de exercícios práticos, reflexões e técnicas psicológicas, a autora ajuda a identificar padrões, crenças limitantes e potenciais, promovendo um profundo processo de autoconhecimento e crescimento pessoal.</p>
-                        
-                        <div class="flex flex-wrap gap-4">
-                            <a href="#" class="px-4 py-2 bg-primary text-white rounded-full hover:bg-primary-dark flex items-center">
-                                <i class="fas fa-shopping-cart mr-2"></i> Comprar na Amazon
-                            </a>
-                            <a href="#" class="px-4 py-2 border border-primary text-primary rounded-full hover:bg-secondary flex items-center">
-                                <i class="fas fa-book-open mr-2"></i> Ler Amostra
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Appointment Section -->
-    <section id="appointment" class="py-20 bg-white">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Agende sua Consulta</h2>
-            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">Escolha entre consultas presenciais ou online, conforme sua preferência e disponibilidade.</p>
+    <section id="appointment" class="py-20 md:py-32 bg-light">
+        <div class="container mx-auto px-6 max-w-4xl">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Agende sua Consulta</h2>
             
-            <div class="flex flex-col lg:flex-row gap-8">
-                <div class="lg:w-1/2 bg-secondary rounded-lg p-6 shadow-md">
-                    <h3 class="text-xl font-semibold mb-6 text-center">Selecione Data e Horário</h3>
-                    
-                    <div class="mb-6">
-                        <label class="block text-gray-700 mb-2">Tipo de Consulta:</label>
-                        <div class="flex gap-4">
-                            <button id="presential-btn" class="flex-1 py-2 px-4 border border-primary rounded-lg calendar-time selected">
-                                <i class="fas fa-building mr-2"></i> Presencial
-                            </button>
-                            <button id="online-btn" class="flex-1 py-2 px-4 border border-gray-300 rounded-lg calendar-time">
-                                <i class="fas fa-video mr-2"></i> Online
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-6">
-                        <label class="block text-gray-700 mb-2">Selecione o Mês:</label>
-                        <div class="flex justify-between items-center mb-4">
-                            <button id="prev-month" class="text-primary hover:text-primary-dark">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <h4 id="current-month" class="font-semibold">Junho 2023</h4>
-                            <button id="next-month" class="text-primary hover:text-primary-dark">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
+            <div class="bg-secondary rounded-2xl p-8 card-shadow">
+                <div class="flex flex-col lg:flex-row gap-8">
+                    <div class="lg:w-1/2">
+                        <h3 class="text-2xl font-bold mb-4">Selecione Data e Horário</h3>
                         
-                        <div class="grid grid-cols-7 gap-2 mb-2">
-                            <div class="text-center font-semibold text-sm">Dom</div>
-                            <div class="text-center font-semibold text-sm">Seg</div>
-                            <div class="text-center font-semibold text-sm">Ter</div>
-                            <div class="text-center font-semibold text-sm">Qua</div>
-                            <div class="text-center font-semibold text-sm">Qui</div>
-                            <div class="text-center font-semibold text-sm">Sex</div>
-                            <div class="text-center font-semibold text-sm">Sáb</div>
-                        </div>
-                        
-                        <div id="calendar-days" class="grid grid-cols-7 gap-2">
-                            <!-- Calendar days will be populated by JavaScript -->
-                        </div>
-                    </div>
-                    
-                    <div class="mb-6">
-                        <label class="block text-gray-700 mb-2">Horários Disponíveis:</label>
-                        <div id="time-slots" class="grid grid-cols-2 md:grid-cols-3 gap-2">
-                            <!-- Time slots will be populated by JavaScript -->
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="lg:w-1/2 bg-white rounded-lg p-6 shadow-md border border-gray-200">
-                    <h3 class="text-xl font-semibold mb-6 text-center">Seus Dados</h3>
-                    
-                    <form id="appointment-form">
-                        <div class="mb-4">
-                            <label for="name" class="block text-gray-700 mb-2">Nome Completo:</label>
-                            <input type="text" id="name" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary" required>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="email" class="block text-gray-700 mb-2">E-mail:</label>
-                            <input type="email" id="email" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary" required>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="phone" class="block text-gray-700 mb-2">Telefone:</label>
-                            <input type="tel" id="phone" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary" required>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="cpf" class="block text-gray-700 mb-2">CPF:</label>
-                            <input type="text" id="cpf" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary" required>
+                        <div class="mb-6">
+                            <label class="block text-gray-700 mb-2 font-semibold">Tipo de Consulta:</label>
+                            <div class="flex gap-4">
+                                <button type="button" id="presential-btn" class="flex-1 py-3 px-4 border border-primary rounded-lg text-primary font-medium selected">
+                                    <i class="fas fa-building mr-2"></i> Presencial
+                                </button>
+                                <button type="button" id="online-btn" class="flex-1 py-3 px-4 border border-gray-300 rounded-lg text-gray-500 font-medium">
+                                    <i class="fas fa-video mr-2"></i> Online
+                                </button>
+                            </div>
                         </div>
                         
                         <div class="mb-6">
-                            <label for="notes" class="block text-gray-700 mb-2">Observações (opcional):</label>
-                            <textarea id="notes" rows="3" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary"></textarea>
+                            <label class="block text-gray-700 mb-2 font-semibold">Selecione o Mês:</label>
+                            <div class="flex justify-between items-center mb-4">
+                                <button type="button" id="prev-month" class="text-primary text-2xl disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <h4 id="current-month" class="font-bold text-xl text-dark"></h4>
+                                <button type="button" id="next-month" class="text-primary text-2xl">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="grid grid-cols-7 gap-2 mb-2 text-dark font-semibold text-sm">
+                                <div class="text-center">Dom</div>
+                                <div class="text-center">Seg</div>
+                                <div class="text-center">Ter</div>
+                                <div class="text-center">Qua</div>
+                                <div class="text-center">Qui</div>
+                                <div class="text-center">Sex</div>
+                                <div class="text-center">Sáb</div>
+                            </div>
+                            
+                            <div id="calendar-days" class="grid grid-cols-7 gap-2 text-center">
+                                </div>
                         </div>
                         
-                        <div class="mb-4">
-                            <input type="checkbox" id="terms" class="mr-2" required>
-                            <label for="terms" class="text-gray-700">Li e aceito os <a href="#" class="text-primary hover:underline">Termos de Serviço</a> e <a href="#" class="text-primary hover:underline">Política de Privacidade</a></label>
+                        <div class="mb-6">
+                            <label class="block text-gray-700 mb-2 font-semibold">Horários Disponíveis:</label>
+                            <div id="time-slots" class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                <p class="col-span-full text-center text-gray-500">Selecione uma data.</p>
+                            </div>
                         </div>
+                    </div>
+                    
+                    <div class="lg:w-1/2 p-6 bg-white rounded-xl">
+                        <h3 class="text-2xl font-bold mb-4">Confirme seus Dados</h3>
                         
-                        <div class="flex flex-col sm:flex-row gap-4 mt-8">
-                            <button type="submit" class="flex-1 py-3 px-6 bg-primary text-white rounded-full font-semibold hover:bg-primary-dark">
+                        <form id="appointment-form">
+                            <input type="hidden" id="selected-date" required>
+                            <input type="hidden" id="selected-time" required>
+                            <input type="hidden" id="selected-type" value="Presencial" required>
+
+                            <div class="mb-4">
+                                <label for="name" class="block text-gray-700 mb-1">Nome Completo:</label>
+                                <input type="text" id="name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary" placeholder="Seu nome completo" required>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="email" class="block text-gray-700 mb-1">E-mail:</label>
+                                <input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary" placeholder="seu.email@exemplo.com" required>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="phone" class="block text-gray-700 mb-1">Telefone:</label>
+                                <input type="tel" id="phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary" placeholder="(11) 99999-9999" required>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <label for="notes" class="block text-gray-700 mb-1">Observações (opcional):</label>
+                                <textarea id="notes" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary" placeholder="Detalhes sobre a consulta..."></textarea>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <input type="checkbox" id="terms" class="mr-2 accent-primary" required>
+                                <label for="terms" class="text-gray-700 text-sm">Li e aceito os <a href="#" class="text-primary font-semibold hover:underline">Termos de Serviço</a> e <a href="#" class="text-primary font-semibold hover:underline">Política de Privacidade</a></label>
+                            </div>
+                            
+                            <button type="submit" class="w-full py-3 px-6 btn-primary rounded-full font-bold">
                                 Confirmar Agendamento
                             </button>
-                            <button type="button" class="flex-1 py-3 px-6 border border-primary text-primary rounded-full font-semibold hover:bg-secondary">
-                                Limpar Formulário
-                            </button>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Confirmation Modal -->
-    <div id="confirmation-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-lg max-w-md w-full mx-4 p-6">
-            <div class="text-center">
-                <div class="text-5xl text-primary mb-4">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-                <h3 class="text-2xl font-bold mb-4">Agendamento Confirmado!</h3>
-                <div id="appointment-details" class="text-gray-700 mb-6">
-                    <!-- Appointment details will be populated by JavaScript -->
-                </div>
-                <p class="text-gray-600 mb-6">Você receberá um e-mail com os detalhes da consulta e instruções para o atendimento.</p>
-                <button onclick="closeModal('confirmation-modal')" class="px-6 py-2 bg-primary text-white rounded-full font-semibold hover:bg-primary-dark">
-                    Fechar
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Contact Section -->
-    <section id="contact" class="py-20 bg-secondary">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Entre em Contato</h2>
-            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">Estou disponível para tirar dúvidas e agendar consultas através dos canais abaixo.</p>
-            
-            <div class="flex flex-col lg:flex-row gap-8">
-                <div class="lg:w-1/2 bg-white rounded-lg p-6 shadow-md">
-                    <h3 class="text-xl font-semibold mb-6">Envie uma Mensagem</h3>
-                    
+    <section id="contact" class="py-20 md:py-32 bg-secondary">
+        <div class="container mx-auto px-6 max-w-4xl">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Entre em Contato</h2>
+            <div class="flex flex-col md:flex-row gap-8">
+                <div class="md:w-1/2 p-6 bg-white rounded-xl card-shadow">
+                    <h3 class="text-xl font-bold mb-4">Envie uma Mensagem</h3>
                     <form id="contact-form">
                         <div class="mb-4">
-                            <label for="contact-name" class="block text-gray-700 mb-2">Nome:</label>
-                            <input type="text" id="contact-name" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary" required>
+                            <label for="contact-name" class="block text-gray-700 mb-1">Nome:</label>
+                            <input type="text" id="contact-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary" required>
                         </div>
-                        
                         <div class="mb-4">
-                            <label for="contact-email" class="block text-gray-700 mb-2">E-mail:</label>
-                            <input type="email" id="contact-email" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary" required>
+                            <label for="contact-email" class="block text-gray-700 mb-1">E-mail:</label>
+                            <input type="email" id="contact-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary" required>
                         </div>
-                        
-                        <div class="mb-4">
-                            <label for="contact-subject" class="block text-gray-700 mb-2">Assunto:</label>
-                            <input type="text" id="contact-subject" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary" required>
-                        </div>
-                        
                         <div class="mb-6">
-                            <label for="contact-message" class="block text-gray-700 mb-2">Mensagem:</label>
-                            <textarea id="contact-message" rows="4" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary" required></textarea>
+                            <label for="contact-message" class="block text-gray-700 mb-1">Mensagem:</label>
+                            <textarea id="contact-message" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary" required></textarea>
                         </div>
-                        
-                        <button type="submit" class="w-full py-3 bg-primary text-white rounded-full font-semibold hover:bg-primary-dark">
+                        <button type="submit" class="w-full py-3 btn-primary rounded-full font-bold">
                             Enviar Mensagem
                         </button>
                     </form>
                 </div>
-                
-                <div class="lg:w-1/2">
-                    <div class="bg-white rounded-lg p-6 shadow-md mb-6">
-                        <h3 class="text-xl font-semibold mb-4">Informações de Contato</h3>
-                        
-                        <div class="space-y-4">
-                            <div class="flex items-start">
-                                <div class="text-primary text-xl mr-4 mt-1">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-semibold">Endereço</h4>
-                                    <p class="text-gray-700">Rua das Flores, 123 - Sala 502</p>
-                                    <p class="text-gray-700">Jardim Paulista, São Paulo - SP</p>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-start">
-                                <div class="text-primary text-xl mr-4 mt-1">
-                                    <i class="fas fa-phone-alt"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-semibold">Telefone</h4>
-                                    <p class="text-gray-700">(11) 9999-9999</p>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-start">
-                                <div class="text-primary text-xl mr-4 mt-1">
-                                    <i class="fas fa-envelope"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-semibold">E-mail</h4>
-                                    <p class="text-gray-700">contato@lucyfreitas.com.br</p>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-start">
-                                <div class="text-primary text-xl mr-4 mt-1">
-                                    <i class="fas fa-clock"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-semibold">Horário de Atendimento</h4>
-                                    <p class="text-gray-700">Segunda a Sexta: 8h às 19h</p>
-                                    <p class="text-gray-700">Sábado: 8h às 12h</p>
-                                </div>
-                            </div>
+                <div class="md:w-1/2 p-6 bg-white rounded-xl card-shadow">
+                    <h3 class="text-xl font-bold mb-4">Informações e Redes Sociais</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-4">
+                            <i class="fas fa-map-marker-alt text-2xl text-accent"></i>
+                            <p class="text-gray-700">Rua das Flores, 123 - Sala 502, São Paulo - SP</p>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <i class="fas fa-phone-alt text-2xl text-accent"></i>
+                            <p class="text-gray-700">(11) 99999-9999</p>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <i class="fas fa-envelope text-2xl text-accent"></i>
+                            <p class="text-gray-700">contato@lucyfreitas.com.br</p>
                         </div>
                     </div>
-                    
-                    <div class="bg-white rounded-lg p-6 shadow-md">
-                        <h3 class="text-xl font-semibold mb-4">Redes Sociais</h3>
-                        
-                        <div class="flex justify-center space-x-6">
-                            <a href="#" class="text-primary text-2xl hover:text-primary-dark">
-                                <i class="fab fa-facebook"></i>
-                            </a>
-                            <a href="#" class="text-primary text-2xl hover:text-primary-dark">
-                                <i class="fab fa-instagram"></i>
-                            </a>
-                            <a href="#" class="text-primary text-2xl hover:text-primary-dark">
-                                <i class="fab fa-linkedin"></i>
-                            </a>
-                            <a href="#" class="text-primary text-2xl hover:text-primary-dark">
-                                <i class="fab fa-youtube"></i>
-                            </a>
-                        </div>
-                        
-                        <div class="mt-6">
-                            <a href="https://wa.me/5511999999999" class="flex items-center justify-center py-3 px-6 bg-green-500 text-white rounded-full font-semibold hover:bg-green-600">
-                                <i class="fab fa-whatsapp mr-2 text-xl"></i> Enviar Mensagem pelo WhatsApp
-                            </a>
-                        </div>
+                    <div class="mt-8">
+                        <a href="https://wa.me/5511999999999" class="w-full inline-flex items-center justify-center py-3 px-6 bg-green-500 text-white rounded-full font-bold hover:bg-green-600 transition-colors">
+                            <i class="fab fa-whatsapp mr-2 text-xl"></i> Conversar pelo WhatsApp
+                        </a>
+                    </div>
+                    <div class="mt-8 flex justify-center space-x-6">
+                        <a href="#" class="text-primary hover:text-accent text-3xl transition-colors"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-primary hover:text-accent text-3xl transition-colors"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="text-primary hover:text-accent text-3xl transition-colors"><i class="fab fa-facebook"></i></a>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Admin Login Modal -->
-    <div id="admin-login-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-lg max-w-md w-full mx-4 p-6">
+    <footer class="bg-dark text-white py-12">
+        <div class="container mx-auto px-6 text-center text-gray-400">
+            <p>&copy; 2025 Dra. Lucy Freitas - Psicologia. Todos os direitos reservados.</p>
+            <div class="mt-4 space-x-4">
+                <a href="#" class="hover:underline">Termos de Serviço</a>
+                <a href="#" class="hover:underline">Política de Privacidade</a>
+            </div>
+            <button type="button" onclick="openModal('admin-login-modal')" class="mt-4 text-sm hover:underline">
+                <i class="fas fa-lock mr-1"></i> Área Administrativa
+            </button>
+        </div>
+    </footer>
+
+    <div id="modal1" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300 opacity-0 pointer-events-none">
+        <div class="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto transform scale-95 transition-transform duration-300">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-2xl font-bold">Emoções em Equilíbrio</h3>
+                    <button type="button" onclick="closeModal('modal1')" class="text-gray-500 hover:text-gray-700 text-2xl">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="md:w-1/3 flex-shrink-0">
+                        <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" alt="Capa do livro Emoções em Equilíbrio" class="w-full rounded-lg shadow">
+                    </div>
+                    <div class="md:w-2/3">
+                        <p class="text-gray-700 mb-2"><strong>Autor:</strong> Lucy Freitas</p>
+                        <p class="text-gray-700 mb-2"><strong>Editora:</strong> Mente Saudável</p>
+                        <p class="text-gray-700 mb-4"><strong>Páginas:</strong> 256</p>
+                        <h4 class="font-bold mb-2">Sinopse:</h4>
+                        <p class="text-gray-700 mb-6">Este livro oferece um guia prático para entender e regular as emoções no dia a dia. Com técnicas baseadas na Terapia Cognitivo-Comportamental e Mindfulness, a autora apresenta estratégias para lidar com a ansiedade, estresse e desregulação emocional, promovendo maior equilíbrio e bem-estar.</p>
+                        <a href="#" class="btn-primary py-2 px-6 rounded-full font-bold">Comprar na Amazon</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-login-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300 opacity-0 pointer-events-none">
+        <div class="bg-white rounded-lg max-w-md w-full mx-4 p-6 transform scale-95 transition-transform duration-300">
             <div class="text-center mb-6">
                 <h3 class="text-2xl font-bold">Área Restrita</h3>
-                <p class="text-gray-600">Acesso exclusivo para Dra. Lucy e equipe</p>
+                <p class="text-gray-600">Acesso exclusivo para a equipe</p>
             </div>
             
             <form id="admin-login-form">
                 <div class="mb-4">
-                    <label for="admin-email" class="block text-gray-700 mb-2">E-mail:</label>
-                    <input type="email" id="admin-email" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary" required>
+                    <label for="admin-email" class="block text-gray-700 mb-1">E-mail:</label>
+                    <input type="email" id="admin-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
                 </div>
-                
                 <div class="mb-6">
-                    <label for="admin-password" class="block text-gray-700 mb-2">Senha:</label>
-                    <input type="password" id="admin-password" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary" required>
+                    <label for="admin-password" class="block text-gray-700 mb-1">Senha:</label>
+                    <input type="password" id="admin-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
                 </div>
-                
-                <button type="submit" class="w-full py-3 bg-primary text-white rounded-full font-semibold hover:bg-primary-dark mb-4">
-                    Entrar
-                </button>
-                
-                <button type="button" onclick="closeModal('admin-login-modal')" class="w-full py-3 border border-gray-300 text-gray-700 rounded-full font-semibold hover:bg-gray-100">
-                    Cancelar
-                </button>
+                <button type="submit" class="w-full py-3 btn-primary rounded-full font-bold">Entrar</button>
             </form>
         </div>
     </div>
 
-    <!-- Admin Dashboard (hidden by default) -->
-    <div id="admin-dashboard" class="hidden fixed inset-0 bg-gray-100 z-50 overflow-y-auto">
-        <div class="container mx-auto px-4 py-8">
+    <div id="admin-dashboard" class="hidden fixed inset-0 bg-secondary z-50 overflow-y-auto">
+        <div class="container mx-auto px-6 py-8">
             <div class="flex justify-between items-center mb-8">
-                <h2 class="text-2xl font-bold">Painel Administrativo</h2>
-                <div>
-                    <button id="logout-btn" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 mr-2">
-                        <i class="fas fa-sign-out-alt mr-2"></i>Sair
-                    </button>
-                    <button id="close-admin-btn" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">
-                        <i class="fas fa-times mr-2"></i>Fechar
-                    </button>
-                </div>
+                <h2 class="text-3xl font-bold">Painel Administrativo</h2>
+                <button id="logout-btn" class="py-2 px-4 bg-red-500 text-white rounded-full font-bold hover:bg-red-600 transition-colors">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Sair
+                </button>
             </div>
-            
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white p-6 rounded-lg shadow">
+                <div class="bg-white p-6 rounded-2xl card-shadow">
                     <h3 class="text-lg font-semibold mb-2">Agendamentos Hoje</h3>
-                    <p class="text-3xl font-bold text-primary">5</p>
+                    <p class="text-4xl font-bold text-primary">5</p>
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow">
+                <div class="bg-white p-6 rounded-2xl card-shadow">
                     <h3 class="text-lg font-semibold mb-2">Agendamentos Amanhã</h3>
-                    <p class="text-3xl font-bold text-primary">7</p>
+                    <p class="text-4xl font-bold text-primary">7</p>
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow">
+                <div class="bg-white p-6 rounded-2xl card-shadow">
                     <h3 class="text-lg font-semibold mb-2">Total Este Mês</h3>
-                    <p class="text-3xl font-bold text-primary">42</p>
+                    <p class="text-4xl font-bold text-primary">42</p>
                 </div>
             </div>
-            
-            <div class="bg-white rounded-lg shadow overflow-hidden mb-8">
-                <div class="p-4 border-b border-gray-200">
-                    <h3 class="font-semibold">Próximos Agendamentos</h3>
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-2xl font-bold">Próximos Agendamentos</h3>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
@@ -850,350 +486,242 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data/Hora</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paciente</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contato</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">15/06/2023 - 10:00</td>
+                                <td class="px-6 py-4 whitespace-nowrap">09/08/2025 - 10:00</td>
                                 <td class="px-6 py-4 whitespace-nowrap">Ana Silva</td>
                                 <td class="px-6 py-4 whitespace-nowrap">Presencial</td>
-                                <td class="px-6 py-4 whitespace-nowrap">ana@email.com<br>(11) 9999-8888</td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Confirmado</span>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Confirmado</span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <button class="text-blue-500 hover:text-blue-700 mr-2">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="text-red-500 hover:text-red-700">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">15/06/2023 - 14:30</td>
-                                <td class="px-6 py-4 whitespace-nowrap">Carlos Oliveira</td>
-                                <td class="px-6 py-4 whitespace-nowrap">Online</td>
-                                <td class="px-6 py-4 whitespace-nowrap">carlos@email.com<br>(11) 98888-7777</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">Pendente</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <button class="text-blue-500 hover:text-blue-700 mr-2">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="text-red-500 hover:text-red-700">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">16/06/2023 - 09:00</td>
-                                <td class="px-6 py-4 whitespace-nowrap">Mariana Costa</td>
-                                <td class="px-6 py-4 whitespace-nowrap">Presencial</td>
-                                <td class="px-6 py-4 whitespace-nowrap">mariana@email.com<br>(11) 97777-6666</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Confirmado</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <button class="text-blue-500 hover:text-blue-700 mr-2">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="text-red-500 hover:text-red-700">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">16/06/2023 - 16:00</td>
-                                <td class="px-6 py-4 whitespace-nowrap">Roberto Santos</td>
-                                <td class="px-6 py-4 whitespace-nowrap">Online</td>
-                                <td class="px-6 py-4 whitespace-nowrap">roberto@email.com<br>(11) 96666-5555</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">Cancelado</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <button class="text-blue-500 hover:text-blue-700 mr-2">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="text-red-500 hover:text-red-700">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <button class="text-indigo-600 hover:text-indigo-900 mr-2"><i class="fas fa-edit"></i></button>
+                                    <button class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-            
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                <div class="p-4 border-b border-gray-200">
-                    <h3 class="font-semibold">Todos os Agendamentos</h3>
-                </div>
-                <div class="p-4">
-                    <div class="flex flex-wrap gap-4 mb-4">
-                        <select class="border border-gray-300 rounded-lg px-4 py-2">
-                            <option>Filtrar por status</option>
-                            <option>Confirmados</option>
-                            <option>Pendentes</option>
-                            <option>Cancelados</option>
-                        </select>
-                        <select class="border border-gray-300 rounded-lg px-4 py-2">
-                            <option>Filtrar por tipo</option>
-                            <option>Presencial</option>
-                            <option>Online</option>
-                        </select>
-                        <input type="date" class="border border-gray-300 rounded-lg px-4 py-2">
-                        <button class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark">
-                            <i class="fas fa-filter mr-2"></i>Filtrar
-                        </button>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hora</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paciente</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <!-- More appointment rows would be here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-primary text-white py-12">
-        <div class="container mx-auto px-4">
-            <div class="flex flex-col md:flex-row justify-between">
-                <div class="mb-8 md:mb-0">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center mr-3">
-                            <span class="text-primary font-bold text-xl">LF</span>
-                        </div>
-                        <h3 class="text-xl font-bold">Dra. Lucy Freitas</h3>
-                    </div>
-                    <p class="mb-4">Psicóloga Clínica - CRP 12/34567</p>
-                    <p>Atendimento humanizado e especializado para adultos, adolescentes e casais.</p>
-                </div>
-                
-                <div class="mb-8 md:mb-0">
-                    <h4 class="text-lg font-semibold mb-4">Links Rápidos</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#home" class="hover:underline">Início</a></li>
-                        <li><a href="#about" class="hover:underline">Sobre</a></li>
-                        <li><a href="#specialties" class="hover:underline">Especialidades</a></li>
-                        <li><a href="#publications" class="hover:underline">Publicações</a></li>
-                        <li><a href="#contact" class="hover:underline">Contato</a></li>
-                    </ul>
-                </div>
-                
-                <div class="mb-8 md:mb-0">
-                    <h4 class="text-lg font-semibold mb-4">Contato</h4>
-                    <ul class="space-y-2">
-                        <li class="flex items-center">
-                            <i class="fas fa-map-marker-alt mr-2"></i> Rua das Flores, 123 - SP
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-phone-alt mr-2"></i> (11) 9999-9999
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-envelope mr-2"></i> contato@lucyfreitas.com.br
-                        </li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Redes Sociais</h4>
-                    <div class="flex space-x-4 mb-4">
-                        <a href="#" class="text-white hover:text-secondary text-xl">
-                            <i class="fab fa-facebook"></i>
-                        </a>
-                        <a href="#" class="text-white hover:text-secondary text-xl">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="#" class="text-white hover:text-secondary text-xl">
-                            <i class="fab fa-linkedin"></i>
-                        </a>
-                        <a href="#" class="text-white hover:text-secondary text-xl">
-                            <i class="fab fa-youtube"></i>
-                        </a>
-                    </div>
-                    <a href="https://wa.me/5511999999999" class="inline-flex items-center px-4 py-2 bg-white text-primary rounded-full font-semibold hover:bg-secondary">
-                        <i class="fab fa-whatsapp mr-2"></i> WhatsApp
-                    </a>
-                </div>
-            </div>
-            
-            <div class="border-t border-secondary mt-8 pt-8 text-center">
-                <p>&copy; 2023 Dra. Lucy Freitas - Psicóloga Clínica. Todos os direitos reservados.</p>
-                <div class="mt-4">
-                    <a href="#" class="text-white hover:underline mr-4">Termos de Serviço</a>
-                    <a href="#" class="text-white hover:underline">Política de Privacidade</a>
-                </div>
-                
-                <!-- Admin login link (would be hidden in production or properly secured) -->
-                <div class="mt-4">
-                    <button onclick="openModal('admin-login-modal')" class="text-white hover:underline text-sm">
-                        <i class="fas fa-lock mr-1"></i> Área Administrativa
-                    </button>
-                </div>
-            </div>
-        </div>
-    </footer>
+    <button id="scrollToTopBtn" class="scroll-to-top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
 
     <script>
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('main-header');
+            if (window.scrollY > 50) {
+                header.classList.add('header-scrolled');
+            } else {
+                header.classList.remove('header-scrolled');
+            }
+        });
+
         // Mobile menu toggle
-        document.getElementById('mobile-menu-button').addEventListener('click', function() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
+        document.getElementById('mobile-menu-button').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
         });
 
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                
-                const targetId = this.getAttribute('href');
-                if (targetId === '#') return;
-                
-                const targetElement = document.querySelector(targetId);
-                if (targetElement) {
-                    targetElement.scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                    
-                    // Close mobile menu if open
-                    const mobileMenu = document.getElementById('mobile-menu');
-                    if (!mobileMenu.classList.contains('hidden')) {
-                        mobileMenu.classList.add('hidden');
-                    }
-                }
-            });
-        });
-
-        // Modal functions
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.remove('hidden');
+        // Modals
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.querySelector('div').classList.remove('scale-95');
             document.body.style.overflow = 'hidden';
         }
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.querySelector('div').classList.add('scale-95');
             document.body.style.overflow = 'auto';
         }
 
-        // Close modals when clicking outside
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeModal(this.id);
-                }
-            });
-        });
-
-        // Admin dashboard functions
-        document.getElementById('admin-login-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            closeModal('admin-login-modal');
-            document.getElementById('admin-dashboard').classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        });
-
-        document.getElementById('logout-btn').addEventListener('click', function() {
-            document.getElementById('admin-dashboard').classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        });
-
-        document.getElementById('close-admin-btn').addEventListener('click', function() {
-            document.getElementById('admin-dashboard').classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        });
-
-        // Calendar functionality
+        // Calendar
         const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-        const days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+        const today = new Date();
+        let currentMonth = today.getMonth();
+        let currentYear = today.getFullYear();
+        const calendarDays = document.getElementById('calendar-days');
+        const currentMonthDisplay = document.getElementById('current-month');
+        const timeSlotsContainer = document.getElementById('time-slots');
+        const selectedDateInput = document.getElementById('selected-date');
+        const selectedTimeInput = document.getElementById('selected-time');
         
-        let currentDate = new Date();
-        let currentMonth = currentDate.getMonth();
-        let currentYear = currentDate.getFullYear();
-        
+        const availableTimes = ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"];
+        const bookedTimes = {
+            '2025-7-15': ["10:00", "14:00"],
+            '2025-7-20': ["09:00"],
+            '2025-8-10': ["10:00", "14:00"],
+            '2025-8-12': ["11:00"],
+        };
+
         function renderCalendar() {
+            currentMonthDisplay.textContent = `${months[currentMonth]} ${currentYear}`;
+            calendarDays.innerHTML = '';
+            timeSlotsContainer.innerHTML = '<p class="col-span-full text-center text-gray-500">Selecione uma data.</p>';
+            selectedDateInput.value = '';
+            selectedTimeInput.value = '';
+            
             const firstDay = new Date(currentYear, currentMonth, 1).getDay();
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-            const daysInLastMonth = new Date(currentYear, currentMonth, 0).getDate();
             
-            document.getElementById('current-month').textContent = `${months[currentMonth]} ${currentYear}`;
-            
-            let calendarDays = document.getElementById('calendar-days');
-            calendarDays.innerHTML = '';
-            
-            // Previous month days
-            for (let i = firstDay; i > 0; i--) {
-                const dayElement = document.createElement('div');
-                dayElement.className = 'calendar-day disabled text-gray-400 text-center py-2 rounded-lg';
-                dayElement.textContent = daysInLastMonth - i + 1;
-                calendarDays.appendChild(dayElement);
+            for (let i = 0; i < firstDay; i++) {
+                calendarDays.innerHTML += '<div></div>';
             }
             
-            // Current month days
             for (let i = 1; i <= daysInMonth; i++) {
-                const dayElement = document.createElement('div');
-                dayElement.className = 'calendar-day text-center py-2 rounded-lg cursor-pointer';
-                dayElement.textContent = i;
+                const dayDate = new Date(currentYear, currentMonth, i);
+                let classes = 'py-3 rounded-lg font-medium';
+                let disabled = false;
                 
-                // Mark today
-                if (i === currentDate.getDate() && currentMonth === currentDate.getMonth() && currentYear === currentDate.getFullYear()) {
-                    dayElement.classList.add('bg-primary', 'text-white');
+                if (dayDate < today && !isSameDay(dayDate, today)) {
+                    classes += ' text-gray-400 disabled cursor-not-allowed';
+                    disabled = true;
+                } else {
+                    classes += ' hover:bg-primary hover:text-white cursor-pointer';
                 }
-                
-                // Mark weekends differently
-                const dayOfWeek = new Date(currentYear, currentMonth, i).getDay();
-                if (dayOfWeek === 0 || dayOfWeek === 6) {
-                    dayElement.classList.add('bg-secondary');
-                }
-                
-                // Mark booked days (simulated)
-                if ((i === 15 || i === 20 || i === 25) && currentMonth === 5 && currentYear === 2023) {
-                    dayElement.classList.add('disabled', 'bg-red-100', 'line-through');
-                }
-                
-                dayElement.addEventListener('click', function() {
-                    if (!this.classList.contains('disabled')) {
-                        document.querySelectorAll('.calendar-day').forEach(day => {
-                            day.classList.remove('selected');
-                        });
-                        this.classList.add('selected');
-                        
-                        // Simulate loading time slots
-                        setTimeout(renderTimeSlots, 300);
-                    }
-                });
-                
-                calendarDays.appendChild(dayElement);
+
+                calendarDays.innerHTML += `<button type="button" class="${classes}" data-date="${currentYear}-${currentMonth}-${i}" ${disabled ? 'disabled' : ''}>${i}</button>`;
             }
-            
-            // Next month days
-            const daysToShow = 42 - (firstDay + daysInMonth);
-            for (let i = 1; i <= daysToShow; i++) {
-                const dayElement = document.createElement('div');
-                dayElement.className = 'calendar-day disabled text-gray-400 text-center py-2 rounded-lg';
-                dayElement.textContent = i;
-                calendarDays.appendChild(dayElement);
-            }
+
+            document.getElementById('prev-month').disabled = currentMonth === today.getMonth() && currentYear === today.getFullYear();
+
+            calendarDays.querySelectorAll('button').forEach(button => {
+                if (!button.disabled) {
+                    button.addEventListener('click', (e) => {
+                        calendarDays.querySelectorAll('button').forEach(btn => btn.classList.remove('selected'));
+                        e.target.classList.add('selected');
+                        selectedDateInput.value = e.target.dataset.date;
+                        renderTimeSlots(e.target.dataset.date);
+                    });
+                }
+            });
         }
         
-        function renderTimeSlots()
+        function isSameDay(d1, d2) {
+            return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
+        }
+
+        function renderTimeSlots(date) {
+            timeSlotsContainer.innerHTML = '';
+            const booked = bookedTimes[date] || [];
+
+            if (availableTimes.every(time => booked.includes(time))) {
+                timeSlotsContainer.innerHTML = '<p class="col-span-full text-center text-red-500">Nenhum horário disponível nesta data.</p>';
+                return;
+            }
+
+            availableTimes.forEach(time => {
+                const isBooked = booked.includes(time);
+                let classes = 'py-2 px-4 rounded-lg font-medium border-2';
+                
+                if (isBooked) {
+                    classes += ' border-gray-300 text-gray-400 disabled cursor-not-allowed';
+                } else {
+                    classes += ' border-primary text-primary hover:bg-primary hover:text-white cursor-pointer';
+                }
+
+                timeSlotsContainer.innerHTML += `<button type="button" class="${classes}" data-time="${time}" ${isBooked ? 'disabled' : ''}>${time}</button>`;
+            });
+
+            timeSlotsContainer.querySelectorAll('button').forEach(button => {
+                if (!button.disabled) {
+                    button.addEventListener('click', (e) => {
+                        timeSlotsContainer.querySelectorAll('button').forEach(btn => btn.classList.remove('selected'));
+                        e.target.classList.add('selected');
+                        selectedTimeInput.value = e.target.dataset.time;
+                    });
+                }
+            });
+        }
+
+        document.getElementById('prev-month').addEventListener('click', () => {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar();
+        });
+        
+        document.getElementById('next-month').addEventListener('click', () => {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        });
+
+        const presentialBtn = document.getElementById('presential-btn');
+        const onlineBtn = document.getElementById('online-btn');
+        const selectedTypeInput = document.getElementById('selected-type');
+
+        function toggleAppointmentType(type) {
+            presentialBtn.classList.toggle('selected', type === 'Presencial');
+            presentialBtn.classList.toggle('text-primary', type === 'Presencial');
+            presentialBtn.classList.toggle('border-primary', type === 'Presencial');
+            presentialBtn.classList.toggle('text-gray-500', type !== 'Presencial');
+            presentialBtn.classList.toggle('border-gray-300', type !== 'Presencial');
+            onlineBtn.classList.toggle('selected', type === 'Online');
+            onlineBtn.classList.toggle('text-primary', type === 'Online');
+            onlineBtn.classList.toggle('border-primary', type === 'Online');
+            onlineBtn.classList.toggle('text-gray-500', type !== 'Online');
+            onlineBtn.classList.toggle('border-gray-300', type !== 'Online');
+            selectedTypeInput.value = type;
+        }
+
+        presentialBtn.addEventListener('click', () => toggleAppointmentType('Presencial'));
+        onlineBtn.addEventListener('click', () => toggleAppointmentType('Online'));
+
+        document.getElementById('appointment-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Agendamento enviado com sucesso!'); // Simulated confirmation
+            e.target.reset();
+            renderCalendar();
+            toggleAppointmentType('Presencial');
+        });
+
+        // Admin Dashboard
+        document.getElementById('admin-login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('admin-email').value;
+            const password = document.getElementById('admin-password').value;
+            if (email === 'admin@lucy.com' && password === '12345') {
+                closeModal('admin-login-modal');
+                document.getElementById('admin-dashboard').classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                alert('Credenciais incorretas.');
+            }
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            document.getElementById('admin-dashboard').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            document.getElementById('admin-email').value = '';
+            document.getElementById('admin-password').value = '';
+        });
+
+        // Scroll to top button
+        const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+        window.addEventListener('scroll', () => {
+            scrollToTopBtn.style.display = window.scrollY > 300 ? 'block' : 'none';
+        });
+        scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        
+        renderCalendar();
+    </script>
 </body>
 </html>
