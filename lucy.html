@@ -58,6 +58,7 @@
             background-color: var(--primary);
             transition: all 0.3s ease;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: white; /* Adicionado para garantir visibilidade */
         }
         
         .btn-primary:hover {
@@ -92,6 +93,7 @@
         .calendar-day {
             transition: all 0.2s ease;
             cursor: pointer;
+            color: var(--dark); /* Garantindo que os dias do calendário sejam visíveis */
         }
         
         .calendar-day:not(.disabled):hover {
@@ -109,6 +111,7 @@
             opacity: 0.5;
             cursor: not-allowed;
             background-color: #f2f2f2;
+            color: #999;
         }
         
         .calendar-time {
@@ -555,10 +558,10 @@
                     <div class="mb-6">
                         <label class="block text-gray-700 mb-2">Tipo de Consulta:</label>
                         <div class="flex gap-4">
-                            <button id="presential-btn" class="flex-1 py-2 px-4 border border-primary rounded-lg calendar-time selected">
+                            <button type="button" id="presential-btn" class="flex-1 py-2 px-4 border border-primary rounded-lg calendar-time selected">
                                 <i class="fas fa-building mr-2"></i> Presencial
                             </button>
-                            <button id="online-btn" class="flex-1 py-2 px-4 border border-gray-300 rounded-lg calendar-time">
+                            <button type="button" id="online-btn" class="flex-1 py-2 px-4 border border-gray-300 rounded-lg calendar-time">
                                 <i class="fas fa-video mr-2"></i> Online
                             </button>
                         </div>
@@ -567,16 +570,16 @@
                     <div class="mb-6">
                         <label class="block text-gray-700 mb-2">Selecione o Mês:</label>
                         <div class="flex justify-between items-center mb-4">
-                            <button id="prev-month" class="text-primary hover:text-accent">
+                            <button type="button" id="prev-month" class="text-primary hover:text-accent">
                                 <i class="fas fa-chevron-left"></i>
                             </button>
-                            <h4 id="current-month" class="font-semibold"></h4>
-                            <button id="next-month" class="text-primary hover:text-accent">
+                            <h4 id="current-month" class="font-semibold text-dark"></h4>
+                            <button type="button" id="next-month" class="text-primary hover:text-accent">
                                 <i class="fas fa-chevron-right"></i>
                             </button>
                         </div>
                         
-                        <div class="grid grid-cols-7 gap-2 mb-2">
+                        <div class="grid grid-cols-7 gap-2 mb-2 text-dark">
                             <div class="text-center font-semibold text-sm">Dom</div>
                             <div class="text-center font-semibold text-sm">Seg</div>
                             <div class="text-center font-semibold text-sm">Ter</div>
@@ -639,7 +642,7 @@
                             <button type="submit" class="flex-1 py-3 px-6 bg-primary text-white rounded-full font-semibold hover:bg-accent">
                                 Confirmar Agendamento
                             </button>
-                            <button type="button" class="flex-1 py-3 px-6 border border-primary text-primary rounded-full font-semibold hover:bg-secondary">
+                            <button type="button" class="flex-1 py-3 px-6 border border-primary text-primary rounded-full font-semibold hover:bg-secondary" onclick="document.getElementById('appointment-form').reset()">
                                 Limpar Formulário
                             </button>
                         </div>
@@ -659,7 +662,7 @@
                 <div id="appointment-details" class="text-gray-700 mb-6">
                     </div>
                 <p class="text-gray-600 mb-6">Você receberá um e-mail com os detalhes da consulta e instruções para o atendimento.</p>
-                <button onclick="closeModal('confirmation-modal')" class="px-6 py-2 bg-primary text-white rounded-full font-semibold hover:bg-accent">
+                <button type="button" onclick="closeModal('confirmation-modal')" class="px-6 py-2 bg-primary text-white rounded-full font-semibold hover:bg-accent">
                     Fechar
                 </button>
             </div>
@@ -772,7 +775,7 @@
                         </div>
                         
                         <div class="mt-6">
-                            <a href="https://wa.me/5511999999999" class="flex items-center justify-center py-3 px-6 bg-green-500 text-white rounded-full font-semibold hover:bg-green-600">
+                            <a href="https://wa.me/5511999999999" class="inline-flex items-center justify-center w-full py-3 px-6 bg-green-500 text-white rounded-full font-semibold hover:bg-green-600">
                                 <i class="fab fa-whatsapp mr-2 text-xl"></i> Enviar Mensagem pelo WhatsApp
                             </a>
                         </div>
@@ -1029,7 +1032,7 @@
                             <i class="fab fa-youtube"></i>
                         </a>
                     </div>
-                    <a href="https://wa.me/5511999999999" class="inline-flex items-center px-4 py-2 bg-white text-primary rounded-full font-semibold hover:bg-secondary">
+                    <a href="https://wa.me/5511999999999" class="inline-flex items-center justify-center w-full py-3 px-6 bg-white text-primary rounded-full font-semibold hover:bg-secondary">
                         <i class="fab fa-whatsapp mr-2"></i> WhatsApp
                     </a>
                 </div>
@@ -1043,7 +1046,7 @@
                 </div>
                 
                 <div class="mt-4">
-                    <button onclick="openModal('admin-login-modal')" class="text-white hover:underline text-sm">
+                    <button type="button" onclick="openModal('admin-login-modal')" class="text-white hover:underline text-sm">
                         <i class="fas fa-lock mr-1"></i> Área Administrativa
                     </button>
                 </div>
@@ -1104,11 +1107,9 @@
         // Admin dashboard functions
         document.getElementById('admin-login-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            // In a real app, you would validate credentials here
             const email = document.getElementById('admin-email').value;
             const password = document.getElementById('admin-password').value;
 
-            // Simple simulated login
             if (email === 'admin@lucy.com.br' && password === '12345') {
                 closeModal('admin-login-modal');
                 document.getElementById('admin-dashboard').classList.remove('hidden');
@@ -1145,9 +1146,8 @@
 
         const availableTimes = ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00", "18:00"];
         const bookedTimes = {
-            // Simulated booked dates and times
-            '2023-5-15': ["10:00", "14:00"],
-            '2023-5-20': ["09:00"],
+            '2025-7-15': ["10:00", "14:00"],
+            '2025-7-20': ["09:00"],
         };
 
         function renderCalendar() {
@@ -1158,14 +1158,12 @@
             
             calendarDays.innerHTML = '';
             
-            // Fill initial blank days
             for (let i = 0; i < firstDay; i++) {
                 const emptyDay = document.createElement('div');
                 emptyDay.className = 'py-2';
                 calendarDays.appendChild(emptyDay);
             }
 
-            // Render days of the current month
             for (let i = 1; i <= daysInMonth; i++) {
                 const dayElement = document.createElement('button');
                 dayElement.type = 'button';
@@ -1174,7 +1172,6 @@
                 
                 const dayDate = new Date(currentYear, currentMonth, i);
                 
-                // Disable past dates
                 if (dayDate < today && !isSameDay(dayDate, today)) {
                     dayElement.classList.add('disabled');
                     dayElement.disabled = true;
@@ -1258,8 +1255,8 @@
         });
 
         onlineBtn.addEventListener('click', () => {
-            onlineBtn.classList.add('selected');
-            presentialBtn.classList.remove('selected');
+            onlineBtn.classList.remove('selected');
+            presentialBtn.classList.add('selected');
             selectedTypeInput.value = 'Online';
         });
 
@@ -1279,7 +1276,6 @@
                 return;
             }
 
-            // In a real application, you would send this data to a backend
             const appointmentDetails = `
                 <p><strong>Paciente:</strong> ${name}</p>
                 <p><strong>E-mail:</strong> ${email}</p>
