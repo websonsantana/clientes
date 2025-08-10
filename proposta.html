@@ -20,20 +20,10 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        .header {
-            text-align: right;
-            margin-bottom: 20px;
-        }
         .title {
             text-align: center;
             color: #333;
             margin-bottom: 30px;
-        }
-        .info {
-            margin-bottom: 20px;
-        }
-        .info p {
-            margin: 5px 0;
         }
         .services-table {
             width: 100%;
@@ -49,111 +39,138 @@
             background-color: #f2f2f2;
             text-align: center;
         }
-        .services-table .total-row td {
-            font-weight: bold;
-        }
         .discount-info {
             background-color: #e9f5e9;
             border-left: 5px solid #4CAF50;
             padding: 15px;
             margin-bottom: 20px;
         }
-        .discount-info h4 {
-            margin-top: 0;
-            color: #2e7d32;
-        }
-        .signature-section {
+        .form-section {
             border-top: 2px dashed #ccc;
-            padding-top: 30px;
+            padding-top: 20px;
             margin-top: 30px;
-            text-align: center;
         }
-        .signature-line {
-            width: 300px;
-            margin: 20px auto 10px auto;
-            border-bottom: 1px solid #000;
+        .form-group {
+            margin-bottom: 15px;
         }
-        .signature-label {
+        .form-group label {
+            display: block;
             font-weight: bold;
-            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+        .checkbox-group input {
+            margin-right: 8px;
         }
     </style>
 </head>
 <body>
-<img scr="ws.png">
-<div class="container">
-    <div class="header">
-        <p>Proposta L.C090825F</p>
-        <p>09/08/2025</p>
-    </div>
 
-    <h1 class="title">Proposta Comercial - WS Soluções Tecnológicas</h1>
+    <div class="container">
+        <h1 class="title">Proposta Comercial - WS Soluções Tecnológicas</h1>
 
-    <div class="info">
         <p>Prezada Lucy Freitas,</p>
         <p>
-            É com satisfação que apresentamos nossa proposta para a criação e aprimoramento da sua presença digital,
-            especialmente voltada para o seu trabalho como psicóloga.
+            Você está adquirindo um pacote promocional único para potencializar sua presença digital.
         </p>
-        <p>
-            Nosso objetivo é desenvolver um site profissional que represente sua marca com qualidade, facilitando o
-            contato com seus clientes por meio das redes sociais e WhatsApp, além de potencializar sua comunicação
-            no Instagram.
-        </p>
-        <p>
-            Abaixo estão detalhados os serviços oferecidos, seus valores e o desconto especial concedido,
-            proporcionando um investimento final bastante acessível para você.
-        </p>
+
+        <table class="services-table">
+            <thead>
+                <tr>
+                    <th>Descrição</th>
+                    <th>Valor (R$)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Criação de site de psicologia</td><td>500,00</td></tr>
+                <tr><td>Direcionamento para WhatsApp</td><td>100,00</td></tr>
+                <tr><td>Direcionamento para Instagram</td><td>100,00</td></tr>
+                <tr><td>Upgrade do Instagram</td><td>200,00</td></tr>
+                <tr><td>2 vídeos com IA para Instagram</td><td>200,00</td></tr>
+                <tr style="font-weight: bold;"><td>Total</td><td>1.100,00</td></tr>
+            </tbody>
+        </table>
+
+        <div class="discount-info">
+            <p>Valor promocional com desconto especial: <strong>R$ 400,00</strong></p>
+            <p>Proposta válida por 10 dias.</p>
+        </div>
+
+        <div class="form-section">
+            <h3>Confirmação do Acordo</h3>
+
+            <form id="agreementForm">
+                <div class="form-group">
+                    <label>Nome completo</label>
+                    <input type="text" name="nome" required>
+                </div>
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input type="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label>CPF</label>
+                    <input type="text" name="cpf" required pattern="\d{11}" placeholder="Somente números">
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" name="aceito" required>
+                    <label for="aceito">Li e concordo com os termos e valores desta proposta</label>
+                </div>
+                <br>
+                <button type="submit">Confirmar Acordo</button>
+            </form>
+        </div>
     </div>
 
-    <h3>Serviços oferecidos:</h3>
+<script>
+document.getElementById("agreementForm").addEventListener("submit", function(e) {
+    e.preventDefault();
 
-    <table class="services-table">
-        <thead>
-            <tr>
-                <th>Descrição</th>
-                <th>Valor (R$)</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr><td>Criação de site de psicologia</td><td>R$ 500,00</td></tr>
-            <tr><td>Programar direcionamento do site para WhatsApp</td><td>R$ 100,00</td></tr>
-            <tr><td>Programar direcionamento do site para Instagram</td><td>R$ 100,00</td></tr>
-            <tr><td>Upgrade do Instagram para melhor entrega de conteúdo</td><td>R$ 200,00</td></tr>
-            <tr><td>2 vídeos feitos com IA para postar no Instagram</td><td>R$ 200,00</td></tr>
-            <tr><td>Domínio (www.lucyfreitas.com.br)</td><td>R$ 29,90 Anual</td></tr>
-            <tr><td>Hospedagem</td><td>R$ 30,00 Mensal</td></tr>
-            <tr class="total-row"><td>Valor total:</td><td>R$ 1.159,90</td></tr>
-        </tbody>
-    </table>
+    let formData = new FormData(this);
+    let data = {};
+    formData.forEach((value, key) => data[key] = value);
 
-    <h3>Desconto concedido:</h3>
-    <div class="discount-info">
-        <p>
-            Este valor é uma condição única e promocional, cuidadosamente pensada para oferecer o melhor
-            custo-benefício e impulsionar o seu trabalho como psicóloga, indicado por Melquisedeque Freitas.
-        </p>
-        <p><strong>Valor total a pagar com desconto: R$ 400,00</strong></p>
-    </div>
+    data.dataHora = new Date().toLocaleString(); // Captura a data/hora
 
-    <h3>Condições:</h3>
-    <ul>
-        <li>A proposta é válida por 10 dias a partir da data de emissão.</li>
-        <li>Após aprovação, iniciaremos o desenvolvimento conforme cronograma combinado.</li>
-    </ul>
-
-    <div class="info">
-        <p>A WS Soluções Tecnológicas agradece a oportunidade de colaborar com o seu projeto e está à disposição.</p>
-    </div>
-
-    <div class="signature-section">
-        <h3>Confirmação e Assinatura</h3>
-        <p>Ao assinar, você confirma que leu e concorda com os termos e valores desta proposta.</p>
-        <div class="signature-line"></div>
-        <p class="signature-label">Lucy Freitas</p>
-        <p>Data: __________________</p>
-    </div>
-</div>
+    // Envia via POST para seu backend
+    fetch("https://seuservidor.com/salvar_acordo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    })
+    .then(res => {
+        if(res.ok) {
+            alert("Acordo confirmado com sucesso!");
+        } else {
+            alert("Erro ao enviar os dados.");
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Erro de conexão com o servidor.");
+    });
+});
+</script>
 
 </body>
 </html>
