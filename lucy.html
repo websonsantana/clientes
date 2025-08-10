@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Agenda médica online — agende consultas, veja horários disponíveis e receba atendimento com praticidade.">
-  <title>Agenda Médica</title>
+  <meta name="description" content="Lucy Freitas - Psicóloga e Terapeuta Familiar. Agende consultas, conheça seu trabalho e descubra seus livros.">
+  <title>Lucy Freitas - Psicóloga e Terapeuta Familiar</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
@@ -15,6 +15,10 @@
       background-color: rgba(255, 255, 255, 0.95);
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
+    :root {
+      --rosa-bebe: #f9c5d1;
+      --rosa-bebe-escuro: #f3a5b8;
+    }
   </style>
 </head>
 <body class="font-sans text-gray-800">
@@ -23,63 +27,91 @@
   <header id="main-header" class="fixed w-full z-50 transition-all">
     <div class="bg-white shadow-md">
       <div class="container mx-auto flex justify-between items-center px-4 py-3">
-        <a href="#" class="text-2xl font-bold text-blue-600">AgendaMédica</a>
+        <a href="#" class="text-2xl font-bold" style="color: var(--rosa-bebe-escuro)">Lucy Freitas</a>
         <nav class="hidden md:flex space-x-6">
-          <a href="#inicio" class="hover:text-blue-500">Início</a>
-          <a href="#sobre" class="hover:text-blue-500">Sobre</a>
-          <a href="#servicos" class="hover:text-blue-500">Serviços</a>
-          <a href="#agendamento" class="hover:text-blue-500">Agendamento</a>
-          <a href="#contato" class="hover:text-blue-500">Contato</a>
+          <a href="#inicio" class="hover:text-pink-400">Início</a>
+          <a href="#sobre" class="hover:text-pink-400">Sobre</a>
+          <a href="#servicos" class="hover:text-pink-400">Serviços</a>
+          <a href="#livros" class="hover:text-pink-400">Livros</a>
+          <a href="#agendamento" class="hover:text-pink-400">Agendamento</a>
+          <a href="#contato" class="hover:text-pink-400">Contato</a>
         </nav>
         <button id="mobile-menu-button" class="md:hidden text-2xl">
           <i class="fas fa-bars"></i>
         </button>
       </div>
       <div id="mobile-menu" class="hidden bg-white md:hidden px-4 pb-4">
-        <a href="#inicio" class="block py-2 hover:text-blue-500">Início</a>
-        <a href="#sobre" class="block py-2 hover:text-blue-500">Sobre</a>
-        <a href="#servicos" class="block py-2 hover:text-blue-500">Serviços</a>
-        <a href="#agendamento" class="block py-2 hover:text-blue-500">Agendamento</a>
-        <a href="#contato" class="block py-2 hover:text-blue-500">Contato</a>
+        <a href="#inicio" class="block py-2 hover:text-pink-400">Início</a>
+        <a href="#sobre" class="block py-2 hover:text-pink-400">Sobre</a>
+        <a href="#servicos" class="block py-2 hover:text-pink-400">Serviços</a>
+        <a href="#livros" class="block py-2 hover:text-pink-400">Livros</a>
+        <a href="#agendamento" class="block py-2 hover:text-pink-400">Agendamento</a>
+        <a href="#contato" class="block py-2 hover:text-pink-400">Contato</a>
       </div>
     </div>
   </header>
 
   <!-- HERO -->
-  <section id="inicio" class="h-screen flex flex-col justify-center items-center text-center bg-blue-50 px-4">
-    <h1 class="text-4xl md:text-6xl font-bold mb-4">Sua Saúde, Nossa Prioridade</h1>
-    <p class="max-w-2xl mb-6">Agende sua consulta de forma rápida e prática com nossos especialistas.</p>
-    <a href="#agendamento" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">Agendar Agora</a>
+  <section id="inicio" class="h-screen flex flex-col justify-center items-center text-center" style="background-color: var(--rosa-bebe)">
+    <h1 class="text-4xl md:text-6xl font-bold mb-4">Cuidando de Famílias e Emoções</h1>
+    <p class="max-w-2xl mb-6">Atendimento psicológico especializado em terapia familiar, com acolhimento e empatia.</p>
+    <a href="#agendamento" class="px-6 py-3 rounded-lg text-white hover:bg-pink-500" style="background-color: var(--rosa-bebe-escuro)">Agendar Consulta</a>
   </section>
 
   <!-- SOBRE -->
   <section id="sobre" class="py-16 container mx-auto px-4">
-    <h2 class="text-3xl font-bold text-center mb-8">Sobre Nós</h2>
+    <h2 class="text-3xl font-bold text-center mb-8">Sobre Mim</h2>
     <p class="max-w-3xl mx-auto text-center text-lg text-gray-600">
-      Somos uma clínica dedicada ao cuidado com a sua saúde, oferecendo atendimento humanizado e tecnologia para facilitar o agendamento e acompanhamento de consultas.
+      Sou <strong>Lucy Freitas</strong>, psicóloga e terapeuta familiar com anos de experiência ajudando indivíduos e famílias a encontrarem equilíbrio emocional. 
+      Meu trabalho é pautado na escuta ativa, no acolhimento e em estratégias personalizadas para cada situação.
     </p>
   </section>
 
   <!-- SERVIÇOS -->
   <section id="servicos" class="py-16 bg-gray-50">
     <div class="container mx-auto px-4">
-      <h2 class="text-3xl font-bold text-center mb-8">Nossos Serviços</h2>
+      <h2 class="text-3xl font-bold text-center mb-8">Serviços</h2>
       <div class="grid md:grid-cols-3 gap-8">
         <div class="bg-white shadow p-6 rounded-lg text-center">
-          <i class="fas fa-user-md text-4xl text-blue-600 mb-4"></i>
-          <h3 class="text-xl font-semibold mb-2">Consultas Presenciais</h3>
-          <p>Atendimento com especialistas em diversas áreas médicas.</p>
+          <i class="fas fa-users text-4xl mb-4" style="color: var(--rosa-bebe-escuro)"></i>
+          <h3 class="text-xl font-semibold mb-2">Terapia Familiar</h3>
+          <p>Atendimento focado em fortalecer vínculos e melhorar a comunicação entre familiares.</p>
         </div>
         <div class="bg-white shadow p-6 rounded-lg text-center">
-          <i class="fas fa-video text-4xl text-blue-600 mb-4"></i>
-          <h3 class="text-xl font-semibold mb-2">Telemedicina</h3>
-          <p>Consultas online com segurança e praticidade.</p>
+          <i class="fas fa-heart text-4xl mb-4" style="color: var(--rosa-bebe-escuro)"></i>
+          <h3 class="text-xl font-semibold mb-2">Terapia de Casal</h3>
+          <p>Ajuda para casais que desejam melhorar seu relacionamento e resolver conflitos.</p>
         </div>
         <div class="bg-white shadow p-6 rounded-lg text-center">
-          <i class="fas fa-calendar-check text-4xl text-blue-600 mb-4"></i>
-          <h3 class="text-xl font-semibold mb-2">Agendamento Rápido</h3>
-          <p>Escolha o dia e horário de forma simples e intuitiva.</p>
+          <i class="fas fa-user text-4xl mb-4" style="color: var(--rosa-bebe-escuro)"></i>
+          <h3 class="text-xl font-semibold mb-2">Terapia Individual</h3>
+          <p>Apoio emocional e estratégias para lidar com desafios pessoais e profissionais.</p>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIVROS -->
+  <section id="livros" class="py-16 container mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center mb-8">Meus Livros</h2>
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="bg-white shadow p-4 rounded-lg text-center">
+        <img src="livro1.jpg" alt="Livro 1" class="mx-auto mb-4 rounded shadow" loading="lazy">
+        <h3 class="font-semibold">Título do Livro 1</h3>
+        <p class="text-gray-600 text-sm mb-2">Breve descrição do livro.</p>
+        <a href="#" class="text-pink-500 font-semibold">Saiba mais</a>
+      </div>
+      <div class="bg-white shadow p-4 rounded-lg text-center">
+        <img src="livro2.jpg" alt="Livro 2" class="mx-auto mb-4 rounded shadow" loading="lazy">
+        <h3 class="font-semibold">Título do Livro 2</h3>
+        <p class="text-gray-600 text-sm mb-2">Breve descrição do livro.</p>
+        <a href="#" class="text-pink-500 font-semibold">Saiba mais</a>
+      </div>
+      <div class="bg-white shadow p-4 rounded-lg text-center">
+        <img src="livro3.jpg" alt="Livro 3" class="mx-auto mb-4 rounded shadow" loading="lazy">
+        <h3 class="font-semibold">Título do Livro 3</h3>
+        <p class="text-gray-600 text-sm mb-2">Breve descrição do livro.</p>
+        <a href="#" class="text-pink-500 font-semibold">Saiba mais</a>
       </div>
     </div>
   </section>
@@ -104,30 +136,29 @@
         <span class="text-gray-700">Horário</span>
         <input type="time" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm" required>
       </label>
-      <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 w-full">Confirmar Agendamento</button>
+      <button type="submit" class="px-6 py-3 rounded-lg text-white w-full hover:bg-pink-500" style="background-color: var(--rosa-bebe-escuro)">Confirmar Agendamento</button>
     </form>
   </section>
 
   <!-- CONTATO -->
   <section id="contato" class="py-16 bg-gray-50">
     <div class="container mx-auto px-4">
-      <h2 class="text-3xl font-bold text-center mb-8">Entre em Contato</h2>
-      <p class="text-center mb-6">Telefone: (11) 99999-9999 | E-mail: contato@agendamedica.com</p>
+      <h2 class="text-3xl font-bold text-center mb-8">Contato</h2>
+      <p class="text-center mb-6">Telefone: (11) 99999-9999 | E-mail: contato@lucyfreitas.com</p>
       <div class="flex justify-center space-x-4">
-        <a href="#" class="text-blue-600 text-2xl"><i class="fab fa-facebook"></i></a>
-        <a href="#" class="text-blue-400 text-2xl"><i class="fab fa-twitter"></i></a>
-        <a href="#" class="text-pink-500 text-2xl"><i class="fab fa-instagram"></i></a>
+        <a href="#" class="text-pink-500 text-2xl"><i class="fab fa-facebook"></i></a>
+        <a href="#" class="text-pink-400 text-2xl"><i class="fab fa-instagram"></i></a>
       </div>
     </div>
   </section>
 
   <!-- FOOTER -->
   <footer class="bg-white py-6 text-center border-t">
-    <p>&copy; 2025 AgendaMédica. Todos os direitos reservados.</p>
+    <p>&copy; 2025 Lucy Freitas. Todos os direitos reservados.</p>
   </footer>
 
   <!-- BOTÃO VOLTAR AO TOPO -->
-  <button id="back-to-top" class="hidden fixed bottom-6 right-6 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700">
+  <button id="back-to-top" class="hidden fixed bottom-6 right-6 text-white p-3 rounded-full shadow-lg hover:bg-pink-500" style="background-color: var(--rosa-bebe-escuro)">
     <i class="fas fa-arrow-up"></i>
   </button>
 
