@@ -1,118 +1,67 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Lucy Freitas - Psicóloga e Terapeuta Familiar">
-  <title>Lucy Freitas</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    html {
-      scroll-behavior: smooth;
-    }
-    .header-scrolled {
-      background-color: rgba(255, 245, 247, 0.95);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    .available {
-      background-color: #fde2e4;
-      cursor: pointer;
-    }
-    .unavailable {
-      background-color: #f8d7da;
-      color: #888;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lucy Freitas - Psicóloga Terapeuta Familiar</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="font-sans text-gray-800">
+<body class="bg-pink-50 text-gray-800 font-sans">
 
   <!-- HEADER -->
-  <header id="main-header" class="fixed w-full z-50 transition-all">
-    <div class="bg-pink-50 shadow-md">
-      <div class="container mx-auto flex justify-between items-center px-4 py-3">
-        <a href="#" class="text-2xl font-bold text-pink-600">Lucy Freitas</a>
-        <nav class="hidden md:flex space-x-6">
-          <a href="#inicio" class="hover:text-pink-500">Início</a>
-          <a href="#sobre" class="hover:text-pink-500">Sobre</a>
-          <a href="#livros" class="hover:text-pink-500">Livros</a>
-          <a href="#servicos" class="hover:text-pink-500">Serviços</a>
-          <a href="#agendamento" class="hover:text-pink-500">Agendamento</a>
-          <a href="#contato" class="hover:text-pink-500">Contato</a>
-        </nav>
-        <button id="mobile-menu-button" class="md:hidden text-2xl">
-          <i class="fas fa-bars"></i>
-        </button>
-      </div>
-      <div id="mobile-menu" class="hidden bg-pink-50 md:hidden px-4 pb-4">
-        <a href="#inicio" class="block py-2 hover:text-pink-500">Início</a>
-        <a href="#sobre" class="block py-2 hover:text-pink-500">Sobre</a>
-        <a href="#livros" class="block py-2 hover:text-pink-500">Livros</a>
-        <a href="#servicos" class="block py-2 hover:text-pink-500">Serviços</a>
-        <a href="#agendamento" class="block py-2 hover:text-pink-500">Agendamento</a>
-        <a href="#contato" class="block py-2 hover:text-pink-500">Contato</a>
-      </div>
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="container mx-auto flex justify-between items-center p-4">
+      <h1 class="text-2xl font-bold text-pink-500">Lucy Freitas</h1>
+      <nav class="space-x-6 hidden md:block">
+        <a href="#sobre" class="hover:text-pink-500">Sobre</a>
+        <a href="#livros" class="hover:text-pink-500">Livros</a>
+        <a href="#agendamento" class="hover:text-pink-500">Agendamento</a>
+        <a href="#contato" class="hover:text-pink-500">Contato</a>
+      </nav>
     </div>
   </header>
 
   <!-- HERO -->
-  <section id="inicio" class="h-screen flex flex-col justify-center items-center text-center bg-pink-50 px-4">
-    <h1 class="text-4xl md:text-6xl font-bold mb-4 text-pink-700">Lucy Freitas</h1>
-    <p class="max-w-2xl mb-6 text-lg">Psicóloga e Terapeuta Familiar, ajudando famílias e indivíduos a encontrarem equilíbrio emocional e harmonia.</p>
-    <a href="#agendamento" class="bg-pink-600 text-white px-6 py-3 rounded-lg hover:bg-pink-700">Agendar Consulta</a>
+  <section class="bg-pink-100 py-16 text-center">
+    <div class="container mx-auto">
+      <h2 class="text-4xl font-bold text-pink-600 mb-4">Psicóloga & Terapeuta Familiar</h2>
+      <p class="text-lg max-w-2xl mx-auto mb-6">Acolhimento e cuidado para fortalecer vínculos e promover saúde emocional.</p>
+      <a href="#agendamento" class="bg-pink-400 hover:bg-pink-500 text-white px-6 py-3 rounded-lg">Agende sua Consulta</a>
+    </div>
   </section>
 
   <!-- SOBRE -->
   <section id="sobre" class="py-16 container mx-auto px-4">
-    <h2 class="text-3xl font-bold text-center mb-8 text-pink-700">Sobre Mim</h2>
-    <p class="max-w-3xl mx-auto text-center text-lg text-gray-600">
-      Com anos de experiência em psicologia clínica e terapia familiar, meu objetivo é proporcionar um ambiente acolhedor e seguro para que meus pacientes possam se expressar e encontrar soluções para seus desafios.
-    </p>
-  </section>
-
-  <!-- LIVROS -->
-  <section id="livros" class="py-16 bg-pink-50">
-    <div class="container mx-auto px-4">
-      <h2 class="text-3xl font-bold text-center mb-8 text-pink-700">Meus Livros</h2>
-      <div class="grid md:grid-cols-3 gap-8">
-        <div class="bg-white shadow p-4 rounded-lg text-center">
-          <img src="caminho-do-livro1.jpg" alt="Livro 1" class="w-full h-64 object-cover rounded-lg mb-4" loading="lazy">
-          <h3 class="text-xl font-semibold">Título do Livro 1</h3>
-          <p class="text-gray-600 mt-2">Descrição breve do livro.</p>
-        </div>
-        <div class="bg-white shadow p-4 rounded-lg text-center">
-          <img src="caminho-do-livro2.jpg" alt="Livro 2" class="w-full h-64 object-cover rounded-lg mb-4" loading="lazy">
-          <h3 class="text-xl font-semibold">Título do Livro 2</h3>
-          <p class="text-gray-600 mt-2">Descrição breve do livro.</p>
-        </div>
-        <div class="bg-white shadow p-4 rounded-lg text-center">
-          <img src="caminho-do-livro3.jpg" alt="Livro 3" class="w-full h-64 object-cover rounded-lg mb-4" loading="lazy">
-          <h3 class="text-xl font-semibold">Título do Livro 3</h3>
-          <p class="text-gray-600 mt-2">Descrição breve do livro.</p>
-        </div>
+    <div class="md:flex items-center gap-8">
+      <img src="https://via.placeholder.com/400x400" alt="Lucy Freitas" class="rounded-lg shadow-lg mb-6 md:mb-0">
+      <div>
+        <h3 class="text-3xl font-bold text-pink-600 mb-4">Sobre mim</h3>
+        <p class="mb-4">Sou Lucy Freitas, psicóloga especialista em terapia familiar. Meu objetivo é oferecer um espaço seguro e acolhedor para que famílias e indivíduos possam superar desafios e construir relações mais saudáveis.</p>
+        <p>Com anos de experiência clínica, utilizo abordagens baseadas em evidências para promover autoconhecimento e transformação.</p>
       </div>
     </div>
   </section>
 
-  <!-- SERVIÇOS -->
-  <section id="servicos" class="py-16">
+  <!-- LIVROS -->
+  <section id="livros" class="py-16 bg-white">
     <div class="container mx-auto px-4">
-      <h2 class="text-3xl font-bold text-center mb-8 text-pink-700">Serviços</h2>
+      <h3 class="text-3xl font-bold text-center text-pink-600 mb-8">Meus Livros</h3>
       <div class="grid md:grid-cols-3 gap-8">
-        <div class="bg-white shadow p-6 rounded-lg text-center">
-          <i class="fas fa-user-md text-4xl text-pink-600 mb-4"></i>
-          <h3 class="text-xl font-semibold mb-2">Atendimento Presencial</h3>
-          <p>Consultas no consultório com acolhimento e atenção individualizada.</p>
+        <div class="bg-pink-50 p-4 rounded-lg shadow">
+          <img src="https://via.placeholder.com/200x300" alt="Livro 1" class="mx-auto mb-4 rounded shadow">
+          <h4 class="text-xl font-semibold text-center mb-2">Título do Livro 1</h4>
+          <p class="text-sm text-center">Uma breve descrição do livro, abordando temas de família, relações e saúde emocional.</p>
         </div>
-        <div class="bg-white shadow p-6 rounded-lg text-center">
-          <i class="fas fa-video text-4xl text-pink-600 mb-4"></i>
-          <h3 class="text-xl font-semibold mb-2">Terapia Online</h3>
-          <p>Atendimento à distância com a mesma qualidade e dedicação.</p>
+        <div class="bg-pink-50 p-4 rounded-lg shadow">
+          <img src="https://via.placeholder.com/200x300" alt="Livro 2" class="mx-auto mb-4 rounded shadow">
+          <h4 class="text-xl font-semibold text-center mb-2">Título do Livro 2</h4>
+          <p class="text-sm text-center">Um guia prático para lidar com desafios familiares e fortalecer vínculos.</p>
         </div>
-        <div class="bg-white shadow p-6 rounded-lg text-center">
-          <i class="fas fa-users text-4xl text-pink-600 mb-4"></i>
-          <h3 class="text-xl font-semibold mb-2">Terapia Familiar</h3>
-          <p>Trabalhando para restaurar a comunicação e harmonia familiar.</p>
+        <div class="bg-pink-50 p-4 rounded-lg shadow">
+          <img src="https://via.placeholder.com/200x300" alt="Livro 3" class="mx-auto mb-4 rounded shadow">
+          <h4 class="text-xl font-semibold text-center mb-2">Título do Livro 3</h4>
+          <p class="text-sm text-center">Reflexões e ferramentas para promover o bem-estar emocional no lar.</p>
         </div>
       </div>
     </div>
@@ -120,8 +69,9 @@
 
   <!-- AGENDAMENTO -->
   <section id="agendamento" class="py-16 container mx-auto px-4">
-    <h2 class="text-3xl font-bold text-center mb-8 text-pink-700">Agende Sua Consulta</h2>
+    <h2 class="text-3xl font-bold text-center mb-8">Agende Sua Consulta</h2>
     <div class="grid md:grid-cols-2 gap-8">
+      
       <!-- Formulário -->
       <form class="bg-white shadow p-6 rounded-lg">
         <label class="block mb-4">
@@ -132,83 +82,101 @@
           <span class="text-gray-700">E-mail</span>
           <input type="email" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm" required>
         </label>
-        <label class="block mb-4">
-          <span class="text-gray-700">Horário</span>
-          <input type="time" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm" required>
+        <label class="block mb-6">
+          <span class="text-gray-700">Data</span>
+          <input id="date-picker" type="date" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm" required>
         </label>
-        <button type="submit" class="bg-pink-600 text-white px-6 py-3 rounded-lg hover:bg-pink-700 w-full">Confirmar Agendamento</button>
+        <button type="submit" class="bg-pink-400 text-white px-6 py-3 rounded-lg hover:bg-pink-500 w-full">Confirmar Agendamento</button>
       </form>
-      
+
       <!-- Calendário -->
-      <div id="calendar" class="bg-white shadow p-6 rounded-lg"></div>
+      <div class="bg-white shadow p-6 rounded-lg">
+        <h3 class="text-lg font-semibold mb-4">Calendário</h3>
+        <p class="text-sm text-gray-500 mb-2">Dias disponíveis em rosa claro, indisponíveis em cinza.</p>
+        <div id="calendar" class="grid grid-cols-7 gap-2 text-center">
+          <!-- Dias serão gerados via JS -->
+        </div>
+      </div>
+
     </div>
   </section>
 
-  <!-- CONTATO -->
-  <section id="contato" class="py-16 bg-pink-50">
-    <div class="container mx-auto px-4 text-center">
-      <h2 class="text-3xl font-bold mb-4 text-pink-700">Contato</h2>
-      <p class="mb-6">Telefone: (11) 99999-9999 | E-mail: contato@lucyfreitas.com</p>
-      <div class="flex justify-center space-x-4">
-        <a href="#" class="text-pink-600 text-2xl"><i class="fab fa-facebook"></i></a>
-        <a href="#" class="text-pink-400 text-2xl"><i class="fab fa-instagram"></i></a>
+  <!-- MODAL HORÁRIOS -->
+  <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg w-96 p-6">
+      <h3 class="text-xl font-bold mb-4">Horários Disponíveis</h3>
+      <div id="time-slots" class="grid grid-cols-2 gap-3">
+        <!-- Horários via JS -->
       </div>
+      <button id="close-modal" class="mt-6 bg-pink-400 hover:bg-pink-500 text-white px-4 py-2 rounded-lg w-full">Fechar</button>
+    </div>
+  </div>
+
+  <!-- CONTATO -->
+  <section id="contato" class="py-16 bg-pink-100">
+    <div class="container mx-auto px-4 text-center">
+      <h3 class="text-3xl font-bold text-pink-600 mb-4">Entre em Contato</h3>
+      <p class="mb-6">E-mail: <a href="mailto:contato@lucyfreitas.com" class="text-pink-500 hover:underline">contato@lucyfreitas.com</a></p>
+      <p>Telefone: <a href="tel:+550000000000" class="text-pink-500 hover:underline">(00) 00000-0000</a></p>
     </div>
   </section>
 
   <!-- FOOTER -->
-  <footer class="bg-white py-6 text-center border-t">
-    <p>&copy; 2025 Lucy Freitas. Todos os direitos reservados.</p>
+  <footer class="bg-white text-center py-6 shadow-inner">
+    <p class="text-sm text-gray-500">&copy; 2025 Lucy Freitas - Todos os direitos reservados</p>
   </footer>
 
-  <!-- BOTÃO VOLTAR AO TOPO -->
-  <button id="back-to-top" class="hidden fixed bottom-6 right-6 bg-pink-600 text-white p-3 rounded-full shadow-lg hover:bg-pink-700">
-    <i class="fas fa-arrow-up"></i>
-  </button>
-
-  <!-- SCRIPTS -->
+  <!-- SCRIPT -->
   <script>
-    // Menu mobile
-    const menuBtn = document.getElementById('mobile-menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
-    menuBtn.addEventListener('click', () => {
-      mobileMenu.classList.toggle('hidden');
-    });
-
-    // Header scroll
-    const header = document.getElementById('main-header');
-    const backToTop = document.getElementById('back-to-top');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 50) {
-        header.classList.add('header-scrolled');
-        backToTop.classList.remove('hidden');
-      } else {
-        header.classList.remove('header-scrolled');
-        backToTop.classList.add('hidden');
-      }
-    });
-
-    // Voltar ao topo
-    backToTop.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
-    // Calendário simples com dias disponíveis/indisponíveis
-    const calendar = document.getElementById('calendar');
+    const availableDays = [1, 3, 4]; // Segunda, Quarta, Quinta
+    const calendarEl = document.getElementById('calendar');
     const today = new Date();
-    const monthDays = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-    const unavailableDays = [5, 10, 15, 20]; // Exemplo
-    let html = '<h3 class="text-xl font-semibold mb-4 text-center">Disponibilidade</h3>';
-    html += '<div class="grid grid-cols-7 gap-2 text-center">';
-    for (let i = 1; i <= monthDays; i++) {
-      if (unavailableDays.includes(i)) {
-        html += `<div class="unavailable py-2 rounded">${i}</div>`;
+    const year = today.getFullYear();
+    const month = today.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    for (let i = 1; i <= daysInMonth; i++) {
+      const date = new Date(year, month, i);
+      const dayEl = document.createElement('div');
+      dayEl.textContent = i;
+      dayEl.classList.add("py-2", "rounded-lg", "cursor-pointer");
+      if (availableDays.includes(date.getDay())) {
+        dayEl.classList.add("bg-pink-200", "hover:bg-pink-300");
+        dayEl.addEventListener('click', () => openModal(date));
       } else {
-        html += `<div class="available py-2 rounded">${i}</div>`;
+        dayEl.classList.add("bg-gray-200", "text-gray-500", "cursor-not-allowed");
       }
+      calendarEl.appendChild(dayEl);
     }
-    html += '</div>';
-    calendar.innerHTML = html;
+
+    const modal = document.getElementById('modal');
+    const closeModalBtn = document.getElementById('close-modal');
+    const timeSlotsEl = document.getElementById('time-slots');
+
+    function openModal(date) {
+      timeSlotsEl.innerHTML = "";
+      const startHour = 8;
+      const endHour = 18;
+      for (let hour = startHour; hour < endHour; hour++) {
+        for (let min = 0; min < 60; min += 30) {
+          const time = `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`;
+          const btn = document.createElement('button');
+          btn.textContent = time;
+          btn.classList.add("bg-pink-200", "hover:bg-pink-300", "px-3", "py-2", "rounded-lg");
+          btn.addEventListener('click', () => {
+            document.getElementById('date-picker').value = date.toISOString().split('T')[0];
+            modal.classList.add('hidden');
+          });
+          timeSlotsEl.appendChild(btn);
+        }
+      }
+      modal.classList.remove('hidden');
+    }
+
+    closeModalBtn.addEventListener('click', () => modal.classList.add('hidden'));
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.classList.add('hidden');
+    });
   </script>
 
 </body>
