@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Lucy Freitas - Psicóloga e Terapeuta Familiar. Agende consultas, conheça seu trabalho e descubra seus livros.">
-  <title>Lucy Freitas - Psicóloga e Terapeuta Familiar</title>
+  <meta name="description" content="Lucy Freitas - Psicóloga e Terapeuta Familiar">
+  <title>Lucy Freitas</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
@@ -12,12 +12,16 @@
       scroll-behavior: smooth;
     }
     .header-scrolled {
-      background-color: rgba(255, 255, 255, 0.95);
+      background-color: rgba(255, 245, 247, 0.95);
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-    :root {
-      --rosa-bebe: #f9c5d1;
-      --rosa-bebe-escuro: #f3a5b8;
+    .available {
+      background-color: #fde2e4;
+      cursor: pointer;
+    }
+    .unavailable {
+      background-color: #f8d7da;
+      color: #888;
     }
   </style>
 </head>
@@ -25,128 +29,128 @@
 
   <!-- HEADER -->
   <header id="main-header" class="fixed w-full z-50 transition-all">
-    <div class="bg-white shadow-md">
+    <div class="bg-pink-50 shadow-md">
       <div class="container mx-auto flex justify-between items-center px-4 py-3">
-        <a href="#" class="text-2xl font-bold" style="color: var(--rosa-bebe-escuro)">Lucy Freitas</a>
+        <a href="#" class="text-2xl font-bold text-pink-600">Lucy Freitas</a>
         <nav class="hidden md:flex space-x-6">
-          <a href="#inicio" class="hover:text-pink-400">Início</a>
-          <a href="#sobre" class="hover:text-pink-400">Sobre</a>
-          <a href="#servicos" class="hover:text-pink-400">Serviços</a>
-          <a href="#livros" class="hover:text-pink-400">Livros</a>
-          <a href="#agendamento" class="hover:text-pink-400">Agendamento</a>
-          <a href="#contato" class="hover:text-pink-400">Contato</a>
+          <a href="#inicio" class="hover:text-pink-500">Início</a>
+          <a href="#sobre" class="hover:text-pink-500">Sobre</a>
+          <a href="#livros" class="hover:text-pink-500">Livros</a>
+          <a href="#servicos" class="hover:text-pink-500">Serviços</a>
+          <a href="#agendamento" class="hover:text-pink-500">Agendamento</a>
+          <a href="#contato" class="hover:text-pink-500">Contato</a>
         </nav>
         <button id="mobile-menu-button" class="md:hidden text-2xl">
           <i class="fas fa-bars"></i>
         </button>
       </div>
-      <div id="mobile-menu" class="hidden bg-white md:hidden px-4 pb-4">
-        <a href="#inicio" class="block py-2 hover:text-pink-400">Início</a>
-        <a href="#sobre" class="block py-2 hover:text-pink-400">Sobre</a>
-        <a href="#servicos" class="block py-2 hover:text-pink-400">Serviços</a>
-        <a href="#livros" class="block py-2 hover:text-pink-400">Livros</a>
-        <a href="#agendamento" class="block py-2 hover:text-pink-400">Agendamento</a>
-        <a href="#contato" class="block py-2 hover:text-pink-400">Contato</a>
+      <div id="mobile-menu" class="hidden bg-pink-50 md:hidden px-4 pb-4">
+        <a href="#inicio" class="block py-2 hover:text-pink-500">Início</a>
+        <a href="#sobre" class="block py-2 hover:text-pink-500">Sobre</a>
+        <a href="#livros" class="block py-2 hover:text-pink-500">Livros</a>
+        <a href="#servicos" class="block py-2 hover:text-pink-500">Serviços</a>
+        <a href="#agendamento" class="block py-2 hover:text-pink-500">Agendamento</a>
+        <a href="#contato" class="block py-2 hover:text-pink-500">Contato</a>
       </div>
     </div>
   </header>
 
   <!-- HERO -->
-  <section id="inicio" class="h-screen flex flex-col justify-center items-center text-center" style="background-color: var(--rosa-bebe)">
-    <h1 class="text-4xl md:text-6xl font-bold mb-4">Cuidando de Famílias e Emoções</h1>
-    <p class="max-w-2xl mb-6">Atendimento psicológico especializado em terapia familiar, com acolhimento e empatia.</p>
-    <a href="#agendamento" class="px-6 py-3 rounded-lg text-white hover:bg-pink-500" style="background-color: var(--rosa-bebe-escuro)">Agendar Consulta</a>
+  <section id="inicio" class="h-screen flex flex-col justify-center items-center text-center bg-pink-50 px-4">
+    <h1 class="text-4xl md:text-6xl font-bold mb-4 text-pink-700">Lucy Freitas</h1>
+    <p class="max-w-2xl mb-6 text-lg">Psicóloga e Terapeuta Familiar, ajudando famílias e indivíduos a encontrarem equilíbrio emocional e harmonia.</p>
+    <a href="#agendamento" class="bg-pink-600 text-white px-6 py-3 rounded-lg hover:bg-pink-700">Agendar Consulta</a>
   </section>
 
   <!-- SOBRE -->
   <section id="sobre" class="py-16 container mx-auto px-4">
-    <h2 class="text-3xl font-bold text-center mb-8">Sobre Mim</h2>
+    <h2 class="text-3xl font-bold text-center mb-8 text-pink-700">Sobre Mim</h2>
     <p class="max-w-3xl mx-auto text-center text-lg text-gray-600">
-      Sou <strong>Lucy Freitas</strong>, psicóloga e terapeuta familiar com anos de experiência ajudando indivíduos e famílias a encontrarem equilíbrio emocional. 
-      Meu trabalho é pautado na escuta ativa, no acolhimento e em estratégias personalizadas para cada situação.
+      Com anos de experiência em psicologia clínica e terapia familiar, meu objetivo é proporcionar um ambiente acolhedor e seguro para que meus pacientes possam se expressar e encontrar soluções para seus desafios.
     </p>
   </section>
 
-  <!-- SERVIÇOS -->
-  <section id="servicos" class="py-16 bg-gray-50">
+  <!-- LIVROS -->
+  <section id="livros" class="py-16 bg-pink-50">
     <div class="container mx-auto px-4">
-      <h2 class="text-3xl font-bold text-center mb-8">Serviços</h2>
+      <h2 class="text-3xl font-bold text-center mb-8 text-pink-700">Meus Livros</h2>
       <div class="grid md:grid-cols-3 gap-8">
-        <div class="bg-white shadow p-6 rounded-lg text-center">
-          <i class="fas fa-users text-4xl mb-4" style="color: var(--rosa-bebe-escuro)"></i>
-          <h3 class="text-xl font-semibold mb-2">Terapia Familiar</h3>
-          <p>Atendimento focado em fortalecer vínculos e melhorar a comunicação entre familiares.</p>
+        <div class="bg-white shadow p-4 rounded-lg text-center">
+          <img src="caminho-do-livro1.jpg" alt="Livro 1" class="w-full h-64 object-cover rounded-lg mb-4" loading="lazy">
+          <h3 class="text-xl font-semibold">Título do Livro 1</h3>
+          <p class="text-gray-600 mt-2">Descrição breve do livro.</p>
         </div>
-        <div class="bg-white shadow p-6 rounded-lg text-center">
-          <i class="fas fa-heart text-4xl mb-4" style="color: var(--rosa-bebe-escuro)"></i>
-          <h3 class="text-xl font-semibold mb-2">Terapia de Casal</h3>
-          <p>Ajuda para casais que desejam melhorar seu relacionamento e resolver conflitos.</p>
+        <div class="bg-white shadow p-4 rounded-lg text-center">
+          <img src="caminho-do-livro2.jpg" alt="Livro 2" class="w-full h-64 object-cover rounded-lg mb-4" loading="lazy">
+          <h3 class="text-xl font-semibold">Título do Livro 2</h3>
+          <p class="text-gray-600 mt-2">Descrição breve do livro.</p>
         </div>
-        <div class="bg-white shadow p-6 rounded-lg text-center">
-          <i class="fas fa-user text-4xl mb-4" style="color: var(--rosa-bebe-escuro)"></i>
-          <h3 class="text-xl font-semibold mb-2">Terapia Individual</h3>
-          <p>Apoio emocional e estratégias para lidar com desafios pessoais e profissionais.</p>
+        <div class="bg-white shadow p-4 rounded-lg text-center">
+          <img src="caminho-do-livro3.jpg" alt="Livro 3" class="w-full h-64 object-cover rounded-lg mb-4" loading="lazy">
+          <h3 class="text-xl font-semibold">Título do Livro 3</h3>
+          <p class="text-gray-600 mt-2">Descrição breve do livro.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- LIVROS -->
-  <section id="livros" class="py-16 container mx-auto px-4">
-    <h2 class="text-3xl font-bold text-center mb-8">Meus Livros</h2>
-    <div class="grid md:grid-cols-3 gap-8">
-      <div class="bg-white shadow p-4 rounded-lg text-center">
-        <img src="livro1.jpg" alt="Livro 1" class="mx-auto mb-4 rounded shadow" loading="lazy">
-        <h3 class="font-semibold">Título do Livro 1</h3>
-        <p class="text-gray-600 text-sm mb-2">Breve descrição do livro.</p>
-        <a href="#" class="text-pink-500 font-semibold">Saiba mais</a>
-      </div>
-      <div class="bg-white shadow p-4 rounded-lg text-center">
-        <img src="livro2.jpg" alt="Livro 2" class="mx-auto mb-4 rounded shadow" loading="lazy">
-        <h3 class="font-semibold">Título do Livro 2</h3>
-        <p class="text-gray-600 text-sm mb-2">Breve descrição do livro.</p>
-        <a href="#" class="text-pink-500 font-semibold">Saiba mais</a>
-      </div>
-      <div class="bg-white shadow p-4 rounded-lg text-center">
-        <img src="livro3.jpg" alt="Livro 3" class="mx-auto mb-4 rounded shadow" loading="lazy">
-        <h3 class="font-semibold">Título do Livro 3</h3>
-        <p class="text-gray-600 text-sm mb-2">Breve descrição do livro.</p>
-        <a href="#" class="text-pink-500 font-semibold">Saiba mais</a>
+  <!-- SERVIÇOS -->
+  <section id="servicos" class="py-16">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl font-bold text-center mb-8 text-pink-700">Serviços</h2>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="bg-white shadow p-6 rounded-lg text-center">
+          <i class="fas fa-user-md text-4xl text-pink-600 mb-4"></i>
+          <h3 class="text-xl font-semibold mb-2">Atendimento Presencial</h3>
+          <p>Consultas no consultório com acolhimento e atenção individualizada.</p>
+        </div>
+        <div class="bg-white shadow p-6 rounded-lg text-center">
+          <i class="fas fa-video text-4xl text-pink-600 mb-4"></i>
+          <h3 class="text-xl font-semibold mb-2">Terapia Online</h3>
+          <p>Atendimento à distância com a mesma qualidade e dedicação.</p>
+        </div>
+        <div class="bg-white shadow p-6 rounded-lg text-center">
+          <i class="fas fa-users text-4xl text-pink-600 mb-4"></i>
+          <h3 class="text-xl font-semibold mb-2">Terapia Familiar</h3>
+          <p>Trabalhando para restaurar a comunicação e harmonia familiar.</p>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- AGENDAMENTO -->
   <section id="agendamento" class="py-16 container mx-auto px-4">
-    <h2 class="text-3xl font-bold text-center mb-8">Agende Sua Consulta</h2>
-    <form class="max-w-lg mx-auto bg-white shadow p-6 rounded-lg">
-      <label class="block mb-4">
-        <span class="text-gray-700">Nome</span>
-        <input type="text" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm" required>
-      </label>
-      <label class="block mb-4">
-        <span class="text-gray-700">E-mail</span>
-        <input type="email" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm" required>
-      </label>
-      <label class="block mb-4">
-        <span class="text-gray-700">Data</span>
-        <input type="date" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm" required>
-      </label>
-      <label class="block mb-6">
-        <span class="text-gray-700">Horário</span>
-        <input type="time" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm" required>
-      </label>
-      <button type="submit" class="px-6 py-3 rounded-lg text-white w-full hover:bg-pink-500" style="background-color: var(--rosa-bebe-escuro)">Confirmar Agendamento</button>
-    </form>
+    <h2 class="text-3xl font-bold text-center mb-8 text-pink-700">Agende Sua Consulta</h2>
+    <div class="grid md:grid-cols-2 gap-8">
+      <!-- Formulário -->
+      <form class="bg-white shadow p-6 rounded-lg">
+        <label class="block mb-4">
+          <span class="text-gray-700">Nome</span>
+          <input type="text" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm" required>
+        </label>
+        <label class="block mb-4">
+          <span class="text-gray-700">E-mail</span>
+          <input type="email" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm" required>
+        </label>
+        <label class="block mb-4">
+          <span class="text-gray-700">Horário</span>
+          <input type="time" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm" required>
+        </label>
+        <button type="submit" class="bg-pink-600 text-white px-6 py-3 rounded-lg hover:bg-pink-700 w-full">Confirmar Agendamento</button>
+      </form>
+      
+      <!-- Calendário -->
+      <div id="calendar" class="bg-white shadow p-6 rounded-lg"></div>
+    </div>
   </section>
 
   <!-- CONTATO -->
-  <section id="contato" class="py-16 bg-gray-50">
-    <div class="container mx-auto px-4">
-      <h2 class="text-3xl font-bold text-center mb-8">Contato</h2>
-      <p class="text-center mb-6">Telefone: (11) 99999-9999 | E-mail: contato@lucyfreitas.com</p>
+  <section id="contato" class="py-16 bg-pink-50">
+    <div class="container mx-auto px-4 text-center">
+      <h2 class="text-3xl font-bold mb-4 text-pink-700">Contato</h2>
+      <p class="mb-6">Telefone: (11) 99999-9999 | E-mail: contato@lucyfreitas.com</p>
       <div class="flex justify-center space-x-4">
-        <a href="#" class="text-pink-500 text-2xl"><i class="fab fa-facebook"></i></a>
+        <a href="#" class="text-pink-600 text-2xl"><i class="fab fa-facebook"></i></a>
         <a href="#" class="text-pink-400 text-2xl"><i class="fab fa-instagram"></i></a>
       </div>
     </div>
@@ -158,7 +162,7 @@
   </footer>
 
   <!-- BOTÃO VOLTAR AO TOPO -->
-  <button id="back-to-top" class="hidden fixed bottom-6 right-6 text-white p-3 rounded-full shadow-lg hover:bg-pink-500" style="background-color: var(--rosa-bebe-escuro)">
+  <button id="back-to-top" class="hidden fixed bottom-6 right-6 bg-pink-600 text-white p-3 rounded-full shadow-lg hover:bg-pink-700">
     <i class="fas fa-arrow-up"></i>
   </button>
 
@@ -188,6 +192,23 @@
     backToTop.addEventListener('click', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+
+    // Calendário simples com dias disponíveis/indisponíveis
+    const calendar = document.getElementById('calendar');
+    const today = new Date();
+    const monthDays = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+    const unavailableDays = [5, 10, 15, 20]; // Exemplo
+    let html = '<h3 class="text-xl font-semibold mb-4 text-center">Disponibilidade</h3>';
+    html += '<div class="grid grid-cols-7 gap-2 text-center">';
+    for (let i = 1; i <= monthDays; i++) {
+      if (unavailableDays.includes(i)) {
+        html += `<div class="unavailable py-2 rounded">${i}</div>`;
+      } else {
+        html += `<div class="available py-2 rounded">${i}</div>`;
+      }
+    }
+    html += '</div>';
+    calendar.innerHTML = html;
   </script>
 
 </body>
