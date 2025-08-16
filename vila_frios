@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Controle de Estoque</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .sidebar {
+            transition: all 0.3s;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            transition: all 0.3s;
+        }
+        .expiring-soon {
+            background-color: #fff3cd;
+        }
+        .expired {
+            background-color: #f8d7da;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="sidebar bg-blue-800 text-white w-64 fixed h-full overflow-y-auto">
+            <div class="p-4 flex items-center justify-between border-b border-blue-700">
+                <h1 class="text-xl font-bold">Controle de Estoque</h1>
+                <button id="sidebarToggle" class="md:hidden">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <nav class="p-4">
+                <ul>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-2 rounded hover:bg-blue-700 active-tab" data-tab="dashboard">
+                            <i class="fas fa-tachometer-alt mr-3"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-2 rounded hover:bg-blue-700" data-tab="inventory">
+                            <i class="fas fa-boxes mr-3"></i>
+                            Estoque
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-2 rounded hover:bg-blue-700" data-tab="add-item">
+                            <i class="fas fa-plus-circle mr-3"></i>
+                            Cadastrar Item
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-2 rounded hover:bg-blue-700" data-tab="withdraw">
+                            <i class="fas fa-minus-circle mr-3"></i>
+                            Baixar Itens
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-2 rounded hover:bg-blue-700" data-tab="reports">
+                            <i class="fas fa-chart-bar mr-3"></i>
+                            Relatórios
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-2 rounded hover:bg-blue-700" data-tab="expiring">
+                            <i class="fas fa-exclamation-triangle mr-3"></i>
+                            Itens a Vencer
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto ml-0 md:ml-64">
+            <!-- Header -->
+            <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+                <button id="mobileSidebarToggle" class="md:hidden">
+                    <i class="fas fa-bars text-blue-800 text-xl"></i>
+                </button>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <input type="text" placeholder="Pesquisar..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <img src="https://via.placeholder.com/40" alt="User" class="rounded-full">
+                        <span class="font-medium">Admin</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <main class="p-4">
+                <!-- Dashboard Tab -->
+                <div id="dashboard" class="tab-content">
+                    <h2 class="text-2xl font-bold mb-6">Dashboard</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="dashboard-card bg-white p-6 rounded-lg shadow-md hover:shadow-lg">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-gray-500">Total de Itens</p>
+                                    <h3 class="text-3xl font-bold" id="totalItems">0</h3>
+                                </div>
+                                <div class="bg-blue-100 p-3 rounded-full">
+                                    <i class="fas fa-boxes text-blue-600 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dashboard-card bg-white p-6 rounded-lg shadow-md hover:shadow-lg">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-gray-500">Itens Baixos</p>
+                                    <h3 class="text-3xl font-bold" id="lowStockItems">0</h3>
+                                </div>
+                                <div class="bg-yellow-100 p-3 rounded-full">
+                                    <i class="fas fa-exclamation-circle text-yellow-600 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dashboard-card bg-white p-6 rounded-lg shadow-md hover:shadow-lg">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-gray-500">Itens a Vencer</p>
+                                    <h3 class="text-3xl font-bold" id="expiringItems">0</h3>
+                                </div>
+                                <div class="bg-red-100 p-3 rounded-full">
+                                    <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dashboard-card bg-white p-6 rounded-lg shadow-md hover:shadow-lg">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-gray-500">Valor Total</p>
+                                    <h3 class="text-3xl font-bold" id="totalValue">R$ 0,00</h3>
+                                </div>
+                                <div class="bg-green-100 p-3 rounded-full">
+                                    <i class="fas fa-dollar-sign text-green-600 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h3 class="text-xl font-semibold mb-4">Estoque por Categoria</h3>
+                            <canvas id="categoryChart" height="250"></canvas>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h3 class="text-xl font-semibold mb-4">Itens Próximos ao Vencimento</h3>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full">
+                                    <thead>
+                                        <tr class="bg-gray-100">
+                                            <th class="py-2 px-4 text-left">Item</th>
+                                            <th class="py-2 px-4 text-left">Vencimento</th>
+                                            <th class="py-2 px-4 text-left">Dias Restantes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="expiringTableBody">
+                                        <!-- Will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inventory Tab -->
+                <div id="inventory" class="tab-content hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">Controle de Estoque</h2>
+                        <div class="flex space-x-2">
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center">
+                                <i class="fas fa-file-export mr-2"></i> Exportar
+                            </button>
+                            <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center">
+                                <i class="fas fa-print mr-2"></i> Imprimir
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+                        <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
+                            <div class="flex items-center space-x-4">
+                                <div class="relative">
+                                    <input type="text" placeholder="Filtrar itens..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" id="inventorySearch">
+                                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                </div>
+                                <select class="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option>Todas Categorias</option>
+                                    <option>Alimentos</option>
+                                    <option>Limpeza</option>
+                                    <option>Medicamentos</option>
+                                    <option>Outros</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600">
+                                    <span class="ml-2">Mostrar itens baixos</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="py-3 px-4 text-left">Código</th>
+                                        <th class="py-3 px-4 text-left">Item</th>
+                                        <th class="py-3 px-4 text-left">Categoria</th>
+                                        <th class="py-3 px-4 text-left">Quantidade</th>
+                                        <th class="py-3 px-4 text-left">Valor Unitário</th>
+                                        <th class="py-3 px-4 text-left">Valor Total</th>
+                                        <th class="py-3 px-4 text-left">Vencimento</th>
+                                        <th class="py-3 px-4 text-left">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inventoryTableBody">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="p-4 bg-gray-50 border-t flex justify-between items-center">
+                            <div>
+                                <span class="text-sm text-gray-600">Mostrando <span id="showingItems">1</span> a <span id="ofItems">10</span> de <span id="totalInventoryItems">0</span> itens</span>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 border rounded-lg hover:bg-gray-100">
+                                    <i class="fas fa-angle-left"></i>
+                                </button>
+                                <button class="px-3 py-1 border rounded-lg bg-blue-600 text-white hover:bg-blue-700">
+                                    1
+                                </button>
+                                <button class="px-3 py-1 border rounded-lg hover:bg-gray-100">
+                                    2
+                                </button>
+                                <button class="px-3 py-1 border rounded-lg hover:bg-gray-100">
+                                    <i class="fas fa-angle-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Item Tab -->
+                <div id="add-item" class="tab-content hidden">
+                    <h2 class="text-2xl font-bold mb-6">Cadastrar Novo Item</h2>
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <form id="addItemForm">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div>
+                                    <label for="itemName" class="block text-sm font-medium text-gray-700 mb-1">Nome do Item*</label>
+                                    <input type="text" id="itemName" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                </div>
+                                <div>
+                                    <label for="itemCode" class="block text-sm font-medium text-gray-700 mb-1">Código do Item</label>
+                                    <input type="text" id="itemCode" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label for="itemCategory" class="block text-sm font-medium text-gray-700 mb-1">Categoria*</label>
+                                    <select id="itemCategory" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                        <option value="">Selecione...</option>
+                                        <option value="Alimentos">Alimentos</option>
+                                        <option value="Limpeza">Limpeza</option>
+                                        <option value="Medicamentos">Medicamentos</option>
+                                        <option value="Outros">Outros</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="itemQuantity" class="block text-sm font-medium text-gray-700 mb-1">Quantidade*</label>
+                                    <input type="number" id="itemQuantity" min="1" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                </div>
+                                <div>
+                                    <label for="itemUnit" class="block text-sm font-medium text-gray-700 mb-1">Unidade de Medida*</label>
+                                    <select id="itemUnit" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                        <option value="un">Unidade</option>
+                                        <option value="kg">Quilograma</option>
+                                        <option value="g">Grama</option>
+                                        <option value="l">Litro</option>
+                                        <option value="ml">Mililitro</option>
+                                        <option value="cx">Caixa</option>
+                                        <option value="pct">Pacote</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="itemUnitValue" class="block text-sm font-medium text-gray-700 mb-1">Valor Unitário (R$)*</label>
+                                    <input type="number" id="itemUnitValue" min="0.01" step="0.01" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                </div>
+                                <div>
+                                    <label for="itemExpiration" class="block text-sm font-medium text-gray-700 mb-1">Data de Vencimento</label>
+                                    <input type="date" id="itemExpiration" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label for="itemMinQuantity" class="block text-sm font-medium text-gray-700 mb-1">Quantidade Mínima</label>
+                                    <input type="number" id="itemMinQuantity" min="1" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
+                            <div class="mb-6">
+                                <label for="itemDescription" class="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+                                <textarea id="itemDescription" rows="3" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                            </div>
+                            <div class="flex justify-end space-x-4">
+                                <button type="reset" class="px-6 py-2 border rounded-lg hover:bg-gray-100">Limpar</button>
+                                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Cadastrar Item</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Withdraw Tab -->
+                <div id="withdraw" class="tab-content hidden">
+                    <h2 class="text-2xl font-bold mb-6">Baixar Itens do Estoque</h2>
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <form id="withdrawForm">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div>
+                                    <label for="withdrawItem" class="block text-sm font-medium text-gray-700 mb-1">Item*</label>
+                                    <select id="withdrawItem" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                        <option value="">Selecione um item...</option>
+                                        <!-- Will be populated by JavaScript -->
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="withdrawQuantity" class="block text-sm font-medium text-gray-700 mb-1">Quantidade*</label>
+                                    <input type="number" id="withdrawQuantity" min="1" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                    <p class="text-sm text-gray-500 mt-1">Disponível: <span id="availableQuantity">0</span></p>
+                                </div>
+                                <div>
+                                    <label for="withdrawDate" class="block text-sm font-medium text-gray-700 mb-1">Data da Baixa*</label>
+                                    <input type="date" id="withdrawDate" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                </div>
+                                <div>
+                                    <label for="withdrawReason" class="block text-sm font-medium text-gray-700 mb-1">Motivo*</label>
+                                    <select id="withdrawReason" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                        <option value="">Selecione...</option>
+                                        <option value="Venda">Venda</option>
+                                        <option value="Uso Interno">Uso Interno</option>
+                                        <option value="Danificado">Danificado</option>
+                                        <option value="Vencido">Vencido</option>
+                                        <option value="Outro">Outro</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-6">
+                                <label for="withdrawNotes" class="block text-sm font-medium text-gray-700 mb-1">Observações</label>
+                                <textarea id="withdrawNotes" rows="3" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                            </div>
+                            <div class="flex justify-end space-x-4">
+                                <button type="reset" class="px-6 py-2 border rounded-lg hover:bg-gray-100">Limpar</button>
+                                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Registrar Baixa</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Reports Tab -->
+                <div id="reports" class="tab-content hidden">
+                    <h2 class="text-2xl font-bold mb-6">Relatórios</h2>
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                        <h3 class="text-xl font-semibold mb-4">Gerar Relatório</h3>
+                        <form id="reportForm">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                                <div>
+                                    <label for="reportType" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Relatório*</label>
+                                    <select id="reportType" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                        <option value="">Selecione...</option>
+                                        <option value="inventory">Estoque Atual</option>
+                                        <option value="movements">Movimentações</option>
+                                        <option value="expiring">Itens Próximos ao Vencimento</option>
+                                        <option value="lowStock">Itens com Estoque Baixo</option>
+                                        <option value="category">Por Categoria</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="reportStartDate" class="block text-sm font-medium text-gray-700 mb-1">Data Inicial</label>
+                                    <input type="date" id="reportStartDate" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label for="reportEndDate" class="block text-sm font-medium text-gray-700 mb-1">Data Final</label>
+                                    <input type="date" id="reportEndDate" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
+                            <div class="flex justify-end">
+                                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center">
+                                    <i class="fas fa-file-pdf mr-2"></i> Gerar Relatório
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-xl font-semibold mb-4">Histórico de Relatórios</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="py-3 px-4 text-left">Data</th>
+                                        <th class="py-3 px-4 text-left">Tipo</th>
+                                        <th class="py-3 px-4 text-left">Período</th>
+                                        <th class="py-3 px-4 text-left">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b">
+                                        <td class="py-3 px-4">10/06/2023</td>
+                                        <td class="py-3 px-4">Estoque Atual</td>
+                                        <td class="py-3 px-4">-</td>
+                                        <td class="py-3 px-4">
+                                            <button class="text-blue-600 hover:text-blue-800 mr-3">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                            <button class="text-red-600 hover:text-red-800">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-b">
+                                        <td class="py-3 px-4">05/06/2023</td>
+                                        <td class="py-3 px-4">Movimentações</td>
+                                        <td class="py-3 px-4">01/06/2023 - 05/06/2023</td>
+                                        <td class="py-3 px-4">
+                                            <button class="text-blue-600 hover:text-blue-800 mr-3">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                            <button class="text-red-600 hover:text-red-800">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3 px-4">01/06/2023</td>
+                                        <td class="py-3 px-4">Itens Próximos ao Vencimento</td>
+                                        <td class="py-3 px-4">-</td>
+                                        <td class="py-3 px-4">
+                                            <button class="text-blue-600 hover:text-blue-800 mr-3">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                            <button class="text-red-600 hover:text-red-800">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expiring Items Tab -->
+                <div id="expiring" class="tab-content hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">Itens Próximos ao Vencimento</h2>
+                        <div>
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" id="showExpiredItems" class="form-checkbox h-5 w-5 text-blue-600">
+                                <span class="ml-2">Mostrar itens vencidos</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="p-4 bg-gray-50 border-b">
+                            <div class="flex items-center space-x-4">
+                                <div class="relative w-full md:w-64">
+                                    <input type="text" placeholder="Filtrar itens..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full" id="expiringSearch">
+                                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                </div>
+                                <select class="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option>Todos os Itens</option>
+                                    <option>Vence em 7 dias</option>
+                                    <option>Vence em 15 dias</option>
+                                    <option>Vence em 30 dias</option>
+                                    <option>Vencidos</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="py-3 px-4 text-left">Item</th>
+                                        <th class="py-3 px-4 text-left">Categoria</th>
+                                        <th class="py-3 px-4 text-left">Quantidade</th>
+                                        <th class="py-3 px-4 text-left">Valor Unitário</th>
+                                        <th class="py-3 px-4 text-left">Valor Total</th>
+                                        <th class="py-3 px-4 text-left">Vencimento</th>
+                                        <th class="py-3 px-4 text-left">Dias Restantes</th>
+                                        <th class="py-3 px-4 text-left">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="expiringItemsTableBody">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="p-4 bg-gray-50 border-t flex justify-between items-center">
+                            <div>
+                                <span class="text-sm text-gray-600">Mostrando <span id="showingExpiringItems">1</span> a <span id="ofExpiringItems">10</span> de <span id="totalExpiringItems">0</span> itens</span>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 border rounded-lg hover:bg-gray-100">
+                                    <i class="fas fa-angle-left"></i>
+                                </button>
+                                <button class="px-3 py-1 border rounded-lg bg-blue-600 text-white hover:bg-blue-700">
+                                    1
+                                </button>
+                                <button class="px-3 py-1 border rounded-lg hover:bg-gray-100">
+                                    2
+                                </button>
+                                <button class="px-3 py-1 border rounded-lg hover:bg-gray-100">
+                                    <i class="fas fa-angle-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Sample inventory data
+        let inventory = [
+            {
+                id: 1,
+                code: 'PROD001',
+                name: 'Arroz Integral 5kg',
+                category: 'Alimentos',
+                quantity: 45,
+                minQuantity: 10,
+                unit: 'un',
+                unitValue: 22.90,
+                expiration: '2023-08-15',
+                description: 'Arroz integral tipo 1, embalagem 5kg',
+                createdAt: '2023-01-10'
+            },
+            {
+                id: 2,
+                code: 'PROD002',
+                name: 'Feijão Preto 1kg',
+                category: 'Alimentos',
+                quantity: 32,
+                minQuantity: 15,
+                unit: 'un',
+                unitValue: 8.50,
+                expiration: '2024-05-20',
+                description: 'Feijão preto selecionado',
+                createdAt: '2023-02-15'
+            },
+            {
+                id: 3,
+                code: 'PROD003',
+                name: 'Óleo de Soja 900ml',
+                category: 'Alimentos',
+                quantity: 28,
+                minQuantity: 12,
+                unit: 'un',
+                unitValue: 6.90,
+                expiration: '2023-07-30',
+                description: 'Óleo de soja refinado',
+                createdAt: '2023-03-05'
+            },
+            {
+                id: 4,
+                code: 'PROD004',
+                name: 'Sabão em Pó 1kg',
+                category: 'Limpeza',
+                quantity: 18,
+                minQuantity: 8,
+                unit: 'un',
+                unitValue: 12.50,
+                expiration: '2025-01-10',
+                description: 'Sabão em pó para roupas',
+                createdAt: '2023-01-20'
+            },
+            {
+                id: 5,
+                code: 'PROD005',
+                name: 'Desinfetante 2L',
+                category: 'Limpeza',
+                quantity: 15,
+                minQuantity: 5,
+                unit: 'un',
+                unitValue: 9.90,
+                expiration: '2024-03-15',
+                description: 'Desinfetante aroma pinho',
+                createdAt: '2023-02-10'
+            },
+            {
+                id: 6,
+                code: 'PROD006',
+                name: 'Paracetamol 500mg',
+                category: 'Medicamentos',
+                quantity: 50,
+                minQuantity: 20,
+                unit: 'un',
+                unitValue: 5.90,
+                expiration: '2023-06-25',
+                description: 'Analgésico e antitérmico',
+                createdAt: '2023-01-05'
+            },
+            {
+                id: 7,
+                code: 'PROD007',
+                name: 'Álcool em Gel 70%',
+                category: 'Medicamentos',
+                quantity: 22,
+                minQuantity: 10,
+                unit: 'un',
+                unitValue: 15.50,
+                expiration: '2023-09-10',
+                description: 'Álcool em gel antisséptico',
+                createdAt: '2023-03-01'
+            },
+            {
+                id: 8,
+                code: 'PROD008',
+                name: 'Pilhas AA',
+                category: 'Outros',
+                quantity: 60,
+                minQuantity: 30,
+                unit: 'un',
+                unitValue: 4.90,
+                expiration: '2026-12-31',
+                description: 'Pilhas alcalinas AA',
+                createdAt: '2023-01-15'
+            },
+            {
+                id: 9,
+                code: 'PROD009',
+                name: 'Leite em Pó 400g',
+                category: 'Alimentos',
+                quantity: 12,
+                minQuantity: 10,
+                unit: 'un',
+                unitValue: 14.90,
+                expiration: '2023-05-28',
+                description: 'Leite em pó integral',
+                createdAt: '2023-02-28'
+            },
+            {
+                id: 10,
+                code: 'PROD010',
+                name: 'Amoxicilina 500mg',
+                category: 'Medicamentos',
+                quantity: 35,
+                minQuantity: 15,
+                unit: 'un',
+                unitValue: 28.90,
+                expiration: '2023-04-15',
+                description: 'Antibiótico',
+                createdAt: '2023-01-25'
+            }
+        ];
+
+        // Sample movements data
+        let movements = [
+            {
+                id: 1,
+                itemId: 6,
+                itemName: 'Paracetamol 500mg',
+                type: 'withdraw',
+                quantity: 5,
+                date: '2023-03-10',
+                reason: 'Venda',
+                notes: 'Venda para cliente'
+            },
+            {
+                id: 2,
+                itemId: 2,
+                itemName: 'Feijão Preto 1kg',
+                type: 'withdraw',
+                quantity: 3,
+                date: '2023-03-12',
+                reason: 'Venda',
+                notes: 'Venda para cliente'
+            },
+            {
+                id: 3,
+                itemId: 1,
+                itemName: 'Arroz Integral 5kg',
+                type: 'withdraw',
+                quantity: 2,
+                date: '2023-03-15',
+                reason: 'Uso Interno',
+                notes: 'Consumo interno'
+            },
+            {
+                id: 11,
+                itemId: 10,
+                itemName: 'Amoxicilina 500mg',
+                type: 'withdraw',
+                quantity: 10,
+                date: '2023-03-20',
+                reason: 'Venda',
+                notes: 'Venda para cliente'
+            }
+        ];
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sidebar toggle for mobile
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const mobileSidebarToggle = document.getElementById('mobileSidebarToggle');
+
+            mobileSidebarToggle.addEventListener('click', function() {
+                sidebar.classList.add('active');
+            });
+
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.remove('active');
+            });
+
+            // Tab navigation
+            const tabLinks = document.querySelectorAll('[data-tab]');
+            
+            tabLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all tabs and links
+                    document.querySelectorAll('.tab-content').forEach(tab => {
+                        tab.classList.add('hidden');
+                    });
+                    
+                    document.querySelectorAll('[data-tab]').forEach(tabLink => {
+                        tabLink.classList.remove('active-tab');
+                    });
+                    
+                    // Add active class to current tab and link
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.remove('hidden');
+                    this.classList.add('active-tab');
+                    
+                    // Update dashboard if needed
+                    if (tabId === 'dashboard') {
+                        updateDashboard();
+                    }
+                });
+            });
+
+            // Initialize forms
+            const addItemForm = document.getElementById('addItemForm');
+            const withdrawForm = document.getElementById('withdrawForm');
+            const reportForm = document.getElementById('reportForm');
+            
+            if (addItemForm) {
+                addItemForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    addNewItem();
+                });
+            }
+            
+            if (withdrawForm) {
+                withdrawForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    withdrawItem();
+                });
+                
+                // Populate items dropdown
+                updateWithdrawItemsDropdown();
+                
+                // Update available quantity when item is selected
+                document.getElementById('withdrawItem').addEventListener('change', function() {
+                    updateAvailableQuantity();
+                });
+            }
+            
+            if (reportForm) {
+                reportForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    generateReport();
+                });
+            }
+
+            // Set default date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('itemExpiration')?.setAttribute('min', today);
+            document.getElementById('withdrawDate')?.setAttribute('max', today);
+            document.getElementById('withdrawDate')?.value = today;
+            document.getElementById('reportEndDate')?.setAttribute('max', today);
+            document.getElementById('reportEndDate')?.value = today;
+            
+            // Initialize charts and tables
+            updateDashboard();
+            updateInventoryTable();
+            updateExpiringItemsTable();
+            
+            // Show expired items checkbox
+            document.getElementById('showExpiredItems')?.addEventListener('change', function() {
+                updateExpiringItemsTable();
+            });
+        });
+
+        // Update dashboard with current data
+        function updateDashboard() {
+            // Calculate totals
+            const totalItems = inventory.length;
+            const totalValue = inventory.reduce((sum, item) => sum + (item.quantity * item.unitValue), 0);
+            
+            // Low stock items (quantity <= minQuantity)
+            const lowStockItems = inventory.filter(item => item.minQuantity && item.quantity <= item.minQuantity).length;
+            
+            // Expiring items (within 30 days)
+            const today = new Date();
+            const thirtyDaysFromNow = new Date();
+            thirtyDaysFromNow.setDate(today.getDate() + 30);
+            
+            const expiringItems = inventory.filter(item => {
+                if (!item.expiration) return false;
+                const expDate = new Date(item.expiration);
+                return expDate <= thirtyDaysFromNow && expDate >= today;
+            }).length;
+            
+            // Update dashboard cards
+            document.getElementById('totalItems').textContent = totalItems;
+            document.getElementById('totalValue').textContent = `R$ ${totalValue.toFixed(2).replace('.', ',')}`;
+            document.getElementById('lowStockItems').textContent = lowStockItems;
+            document.getElementById('expiringItems').textContent = expiringItems;
+            
+            // Update category chart
+            updateCategoryChart();
+            
+            // Update expiring items table
+            updateExpiringTable();
+        }
+        
+        // Update category chart
+        function updateCategoryChart() {
+            const ctx = document.getElementById('categoryChart');
+            
+            // Group by category
+            const categories = {};
+            inventory.forEach(item => {
+                if (!categories[item.category]) {
+                    categories[item.category] = 0;
+                }
+                categories[item.category] += item.quantity;
+            });
+            
+            const categoryNames = Object.keys(categories);
+            const categoryQuantities = Object.values(categories);
+            
+            // Colors for categories
+            const backgroundColors = [
+                'rgba(54, 162, 235, 0.7)',
+                'rgba(255, 99, 132, 0.7)',
+                'rgba(75, 192, 192, 0.7)',
+                'rgba(255, 159, 64, 0.7)',
+                'rgba(153, 102, 255, 0.7)'
+            ];
+            
+            // Create or update chart
+            if (window.categoryChart) {
+                window.categoryChart.data.labels = categoryNames;
+                window.categoryChart.data.datasets[0].data = categoryQuantities;
+                window.categoryChart.update();
+            } else {
+                window.categoryChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: categoryNames,
+                        datasets: [{
+                            data: categoryQuantities,
+                            backgroundColor: backgroundColors,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Update expiring table on dashboard
+        function updateExpiringTable() {
+            const tbody = document.getElementById('expiringTableBody');
+            tbody.innerHTML = '';
+            
+            const today = new Date();
+            const thirtyDaysFromNow = new Date();
+            thirtyDaysFromNow.setDate(today.getDate() + 30);
+            
+            // Get expiring items (within 30 days)
+            const expiringItems = inventory.filter(item => {
+                if (!item.expiration) return false;
+                const expDate = new Date(item.expiration);
+                return expDate <= thirtyDaysFromNow && expDate >= today;
+            });
+            
+            // Sort by closest to expiration
+            expiringItems.sort((a, b) => new Date(a.expiration) - new Date(b.expiration));
+            
+            // Add to table (limit to 5)
+            expiringItems.slice(0, 5).forEach(item => {
+                const expDate = new Date(item.expiration);
+                const daysLeft = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+                
+                const row = document.createElement('tr');
+                row.className = 'border-b';
+                row.innerHTML = `
+                    <td class="py-2 px-4">${item.name}</td>
+                    <td class="py-2 px-4">${formatDate(item.expiration)}</td>
+                    <td class="py-2 px-4">${daysLeft} dias</td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            if (expiringItems.length === 0) {
+                const row = document.createElement('tr');
+                row.className = 'border-b';
+                row.innerHTML = `
+                    <td colspan="3" class="py-2 px-4 text-center text-gray-500">Nenhum item próximo ao vencimento</td>
+                `;
+                tbody.appendChild(row);
+            }
+        }
+        
+        // Update inventory table
+        function updateInventoryTable() {
+            const tbody = document.getElementById('inventoryTableBody');
+            tbody.innerHTML = '';
+            
+            inventory.forEach(item => {
+                const totalValue = item.quantity * item.unitValue;
+                const isLowStock = item.minQuantity && item.quantity <= item.minQuantity;
+                
+                const row = document.createElement('tr');
+                row.className = `border-b ${isLowStock ? 'bg-yellow-50' : ''}`;
+                row.innerHTML = `
+                    <td class="py-3 px-4">${item.code}</td>
+                    <td class="py-3 px-4">${item.name}</td>
+                    <td class="py-3 px-4">${item.category}</td>
+                    <td class="py-3 px-4 ${isLowStock ? 'text-red-600 font-semibold' : ''}">${item.quantity} ${getUnitName(item.unit)}</td>
+                    <td class="py-3 px-4">R$ ${item.unitValue.toFixed(2).replace('.', ',')}</td>
+                    <td class="py-3 px-4">R$ ${totalValue.toFixed(2).replace('.', ',')}</td>
+                    <td class="py-3 px-4">${item.expiration ? formatDate(item.expiration) : '-'}</td>
+                    <td class="py-3 px-4">
+                        <button class="text-blue-600 hover:text-blue-800 mr-2" onclick="editItem(${item.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="text-red-600 hover:text-red-800" onclick="deleteItem(${item.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // Update counters
+            document.getElementById('totalInventoryItems').textContent = inventory.length;
+            document.getElementById('showingItems').textContent = 1;
+            document.getElementById('ofItems').textContent = Math.min(10, inventory.length);
+        }
+        
+        // Update expiring items table
+        function updateExpiringItemsTable() {
+            const tbody = document.getElementById('expiringItemsTableBody');
+            tbody.innerHTML = '';
+            
+            const today = new Date();
+            const showExpired = document.getElementById('showExpiredItems').checked;
+            
+            // Get expiring or expired items
+            const filteredItems = inventory.filter(item => {
+                if (!item.expiration) return false;
+                const expDate = new Date(item.expiration);
+                
+                if (showExpired) {
+                    return expDate < today;
+                } else {
+                    const thirtyDaysFromNow = new Date();
+                    thirtyDaysFromNow.setDate(today.getDate() + 30);
+                    return expDate <= thirtyDaysFromNow && expDate >= today;
+                }
+            });
+            
+            // Sort by expiration date
+            filteredItems.sort((a, b) => new Date(a.expiration) - new Date(b.expiration));
+            
+            // Add to table
+            filteredItems.forEach(item => {
+                const expDate = new Date(item.expiration);
+                const daysLeft = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+                const totalValue = item.quantity * item.unitValue;
+                const isExpired = expDate < today;
+                
+                const row = document.createElement('tr');
+                row.className = `border-b ${isExpired ? 'expired' : daysLeft <= 7 ? 'expiring-soon' : ''}`;
+                row.innerHTML = `
+                    <td class="py-3 px-4">${item.name}</td>
+                    <td class="py-3 px-4">${item.category}</td>
+                    <td class="py-3 px-4">${item.quantity} ${getUnitName(item.unit)}</td>
+                    <td class="py-3 px-4">R$ ${item.unitValue.toFixed(2).replace('.', ',')}</td>
+                    <td class="py-3 px-4">R$ ${totalValue.toFixed(2).replace('.', ',')}</td>
+                    <td class="py-3 px-4">${formatDate(item.expiration)}</td>
+                    <td class="py-3 px-4 ${isExpired ? 'text-red-600 font-semibold' : ''}">
+                        ${isExpired ? 'Vencido' : `${daysLeft} dias`}
+                    </td>
+                    <td class="py-3 px-4">
+                        <button class="text-blue-600 hover:text-blue-800" onclick="withdrawExpiredItem(${item.id})">
+                            <i class="fas fa-minus-circle"></i> Baixar
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            if (filteredItems.length === 0) {
+                const row = document.createElement('tr');
+                row.className = 'border-b';
+                row.innerHTML = `
+                    <td colspan="8" class="py-3 px-4 text-center text-gray-500">
+                        ${showExpired ? 'Nenhum item vencido' : 'Nenhum item próximo ao vencimento'}
+                    </td>
+                `;
+                tbody.appendChild(row);
+            }
+            
+            // Update counters
+            document.getElementById('totalExpiringItems').textContent = filteredItems.length;
+            document.getElementById('showingExpiringItems').textContent = 1;
+            document.getElementById('ofExpiringItems').textContent = Math.min(10, filteredItems.length);
+        }
+        
+        // Update withdraw items dropdown
+        function updateWithdrawItemsDropdown() {
+            const select = document.getElementById('withdrawItem');
+            select.innerHTML = '<option value="">Selecione um item...</option>';
+            
+            inventory.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = `${item.name} (${item.quantity} ${getUnitName(item.unit)} disponíveis)`;
+                select.appendChild(option);
+            });
+        }
+        
+        // Update available quantity when item is selected
+        function updateAvailableQuantity() {
+            const itemId = parseInt(document.getElementById('withdrawItem').value);
+            if (!itemId) return;
+            
+            const item = inventory.find(i => i.id === itemId);
+            if (item) {
+                document.getElementById('availableQuantity').textContent = `${item.quantity} ${getUnitName(item.unit)}`;
+                document.getElementById('withdrawQuantity').setAttribute('max', item.quantity);
+            }
+        }
+        
+        // Add new item to inventory
+        function addNewItem() {
+            const newItem = {
+                id: inventory.length > 0 ? Math.max(...inventory.map(i => i.id)) + 1 : 1,
+                code: document.getElementById('itemCode').value || `PROD${String(inventory.length + 1).padStart(3, '0')}`,
+                name: document.getElementById('itemName').value,
+                category: document.getElementById('itemCategory').value,
+                quantity: parseInt(document.getElementById('itemQuantity').value),
+                minQuantity: parseInt(document.getElementById('itemMinQuantity').value) || null,
+                unit: document.getElementById('itemUnit').value,
+                unitValue: parseFloat(document.getElementById('itemUnitValue').value),
+                expiration: document.getElementById('itemExpiration').value || null,
+                description: document.getElementById('itemDescription').value,
+                createdAt: new Date().toISOString().split('T')[0]
+            };
+            
+            inventory.push(newItem);
+            
+            // Reset form
+            document.getElementById('addItemForm').reset();
+            
+            // Show success message
+            alert('Item cadastrado com sucesso!');
+            
+            // Update tables
+            updateDashboard();
+            updateInventoryTable();
+            updateExpiringItemsTable();
+            updateWithdrawItemsDropdown();
+        }
+        
+        // Withdraw item from inventory
+        function withdrawItem() {
+            const itemId = parseInt(document.getElementById('withdrawItem').value);
+            const quantity = parseInt(document.getElementById('withdrawQuantity').value);
+            const date = document.getElementById('withdrawDate').value;
+            const reason = document.getElementById('withdrawReason').value;
+            const notes = document.getElementById('withdrawNotes').value;
+            
+            // Find item
+            const itemIndex = inventory.findIndex(i => i.id === itemId);
+            if (itemIndex === -1) return;
+            
+            // Check quantity
+            if (quantity > inventory[itemIndex].quantity) {
+                alert('Quantidade solicitada maior que o estoque disponível!');
+                return;
+            }
+            
+            // Update inventory
+            inventory[itemIndex].quantity -= quantity;
+            
+            // Add to movements
+            const newMovement = {
+                id: movements.length > 0 ? Math.max(...movements.map(m => m.id)) + 1 : 1,
+                itemId: itemId,
+                itemName: inventory[itemIndex].name,
+                type: 'withdraw',
+                quantity: quantity,
+                date: date,
+                reason: reason,
+                notes: notes
+            };
+            
+            movements.push(newMovement);
+            
+            // Reset form
+            document.getElementById('withdrawForm').reset();
+            document.getElementById('withdrawDate').value = new Date().toISOString().split('T')[0];
+            
+            // Show success message
+            alert('Baixa registrada com sucesso!');
+            
+            // Update tables
+            updateDashboard();
+            updateInventoryTable();
+            updateExpiringItemsTable();
+            updateWithdrawItemsDropdown();
+        }
+        
+        // Withdraw expired item
+        function withdrawExpiredItem(itemId) {
+            if (!confirm('Deseja baixar este item vencido?')) return;
+            
+            // Find item
+            const itemIndex = inventory.findIndex(i => i.id === itemId);
+            if (itemIndex === -1) return;
+            
+            const item = inventory[itemIndex];
+            
+            // Add to movements
+            const newMovement = {
+                id: movements.length > 0 ? Math.max(...movements.map(m => m.id)) + 1 : 1,
+                itemId: itemId,
+                itemName: item.name,
+                type: 'withdraw',
+                quantity: item.quantity,
+                date: new Date().toISOString().split('T')[0],
+                reason: 'Vencido',
+                notes: 'Baixa automática de item vencido'
+            };
+            
+            movements.push(newMovement);
+            
+            // Remove from inventory
+            inventory.splice(itemIndex, 1);
+            
+            // Show success message
+            alert('Item vencido baixado com sucesso!');
+            
+            // Update tables
+            updateDashboard();
+            updateInventoryTable();
+            updateExpiringItemsTable();
+            updateWithdrawItemsDropdown();
+        }
+        
+        // Generate report
+        function generateReport() {
+            const reportType = document.getElementById('reportType').value;
+            const startDate = document.getElementById('reportStartDate').value;
+            const endDate = document.getElementById('reportEndDate').value;
+            
+            // Validate
+            if (!reportType) {
+                alert('Selecione o tipo de relatório!');
+                return;
+            }
+            
+            if ((reportType === 'movements' || reportType === 'category') && (!startDate || !endDate)) {
+                alert('Selecione o período para o relatório!');
+                return;
+            }
+            
+            // In a real app, this would generate a PDF or Excel file
+            // Here we'll just show an alert
+            let reportMessage = '';
+            
+            switch (reportType) {
+                case 'inventory':
+                    reportMessage = `Relatório de Estoque Atual gerado com ${inventory.length} itens.`;
+                    break;
+                case 'movements':
+                    const filteredMovements = movements.filter(m => {
+                        const mDate = new Date(m.date);
+                        const sDate = new Date(startDate);
+                        const eDate = new Date(endDate);
+                        return mDate >= sDate && mDate <= eDate;
+                    });
+                    reportMessage = `Relatório de Movimentações gerado com ${filteredMovements.length} registros entre ${formatDate(startDate)} e ${formatDate(endDate)}.`;
+                    break;
+                case 'expiring':
+                    const today = new Date();
+                    const thirtyDaysFromNow = new Date();
+                    thirtyDaysFromNow.setDate(today.getDate() + 30);
+                    
+                    const expiringItems = inventory.filter(item => {
+                        if (!item.expiration) return false;
+                        const expDate = new Date(item.expiration);
+                        return expDate <= thirtyDaysFromNow && expDate >= today;
+                    });
+                    reportMessage = `Relatório de Itens Próximos ao Vencimento gerado com ${expiringItems.length} itens.`;
+                    break;
+                case 'lowStock':
+                    const lowStockItems = inventory.filter(item => item.minQuantity && item.quantity <= item.minQuantity);
+                    reportMessage = `Relatório de Itens com Estoque Baixo gerado com ${lowStockItems.length} itens.`;
+                    break;
+                case 'category':
+                    const category = document.getElementById('reportCategory').value;
+                    const categoryItems = inventory.filter(item => item.category === category);
+                    reportMessage = `Relatório por Categoria (${category}) gerado com ${categoryItems.length} itens entre ${formatDate(startDate)} e ${formatDate(endDate)}.`;
+                    break;
+            }
+            
+            alert(reportMessage);
+        }
+        
+        // Edit item (placeholder function)
+        function editItem(itemId) {
+            alert(`Editar item ${itemId} - Esta funcionalidade seria implementada em uma versão completa.`);
+        }
+        
+        // Delete item
+        function deleteItem(itemId) {
+            if (!confirm('Tem certeza que deseja excluir este item?')) return;
+            
+            const itemIndex = inventory.findIndex(i => i.id === itemId);
+            if (itemIndex === -1) return;
+            
+            inventory.splice(itemIndex, 1);
+            
+            // Update tables
+            updateDashboard();
+            updateInventoryTable();
+            updateExpiringItemsTable();
+            updateWithdrawItemsDropdown();
+            
+            alert('Item excluído com sucesso!');
+        }
+        
+        // Helper function to format date
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('pt-BR');
+        }
+        
+        // Helper function to get unit name
+        function getUnitName(unitCode) {
+            const units = {
+                'un': 'un',
+                'kg': 'kg',
+                'g': 'g',
+                'l': 'L',
+                'ml': 'mL',
+                'cx': 'cx',
+                'pct': 'pct'
+            };
+            return units[unitCode] || '';
+        }
+    </script>
+</body>
+</html>
