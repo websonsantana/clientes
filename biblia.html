@@ -12,98 +12,151 @@
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #555; }
-
+        
         /* Highlight current verse */
         .verse.highlighted { background-color: rgba(253, 230, 138, 0.5); }
-
+        
         /* Animation for loading */
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
         .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-
+        
         /* For offline indicator */
         .offline-banner { transform: translateY(-100%); transition: transform 0.3s ease-in-out; }
         .offline-banner.show { transform: translateY(0); }
-
+        
         /* Dark mode styles */
         .dark {
             background-color: #1a202c; /* gray-900 */
             color: #e2e8f0; /* gray-200 */
         }
-        .dark .bg-gray-50 { background-color: #2d3748; /* gray-800 */ }
-        .dark .bg-white { background-color: #2d3748; /* gray-800 */ }
+        .dark .bg-gray-50 { background-color: #2d3748; }
+        .dark .bg-white { background-color: #2d3748; }
         .dark .text-gray-800 { color: #e2e8f0; }
-        .dark .text-gray-600 { color: #cbd5e0; /* gray-300 */ }
+        .dark .text-gray-600 { color: #cbd5e0; }
         .dark .shadow-lg { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
-        .dark .bg-gray-100 { background-color: #4a5568; /* gray-700 */ }
+        .dark .bg-gray-100 { background-color: #4a5568; }
         .dark .border-gray-300 { border-color: #4a5568; }
         .dark .border-gray-200 { border-color: #4a5568; }
-        .dark .bg-blue-100 { background-color: #2a4365; /* blue-900 */ }
-        .dark .text-blue-700 { color: #63b3ed; /* blue-400 */ }
+        .dark .bg-blue-100 { background-color: #2a4365; }
+        .dark .text-blue-700 { color: #63b3ed; }
         .dark .bg-gray-200 { background-color: #4a5568; }
         .dark .bg-gray-300:hover { background-color: #4a5568; }
-        .dark .bg-yellow-500 { background-color: #d69e2e; /* yellow-600 */ }
+        .dark .bg-yellow-500 { background-color: #d69e2e; }
         .dark .text-yellow-500 { color: #ecc94b; }
-        .dark .bg-black { background-color: rgba(0,0,0,0.7); } /* Darker overlay */
+        .dark .bg-black { background-color: rgba(0,0,0,0.7); }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans dark:bg-gray-900 dark:text-gray-200">
+<body class="bg-gray-50 text-gray-800 font-sans transition-colors duration-300 dark:bg-gray-900 dark:text-gray-200">
     <div id="offlineBanner" class="offline-banner fixed top-0 left-0 right-0 bg-yellow-500 text-white text-center py-2 z-50">
         <i class="fas fa-wifi-slash mr-2"></i> Você está offline - Modo somente leitura
     </div>
-    <header class="bg-blue-700 text-white sticky top-0 z-40 shadow-md">
-        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-                <i class="fas fa-bible text-xl"></i>
-                <h1 class="text-xl font-bold">Bíblia Sagrada</h1>
+    
+    <div id="mainContent" class="pb-16 transition-transform duration-300 transform translate-x-0">
+        <header class="bg-blue-700 text-white sticky top-0 z-40 shadow-md">
+            <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-bible text-xl"></i>
+                    <h1 class="text-xl font-bold">Bíblia Sagrada</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="themeToggle" class="p-1 rounded-full focus:outline-none">
+                        <i class="fas fa-moon text-white"></i>
+                    </button>
+                    <button id="menuButton" class="p-1 rounded-full focus:outline-none">
+                        <i class="fas fa-bars text-white"></i>
+                    </button>
+                </div>
             </div>
-            <div class="flex items-center space-x-4">
-                <button id="themeToggle" class="p-1 rounded-full focus:outline-none">
-                    <i class="fas fa-moon text-white"></i>
+        </header>
+        
+        <div id="bookChapterSelector" class="bg-white shadow-lg rounded-lg mx-4 my-2 p-4 hidden dark:bg-gray-800">
+            <div class="flex justify-between mb-4">
+                <select id="bookSelect" class="bg-gray-100 border border-gray-300 rounded px-3 py-2 w-full mr-2 dark:bg-gray-700 dark:border-gray-600">
+                    <option value="">Selecione um livro</option>
+                </select>
+                <select id="chapterSelect" class="bg-gray-100 border border-gray-300 rounded px-3 py-2 w-20 dark:bg-gray-700 dark:border-gray-600">
+                    <option value="">Cap.</option>
+                </select>
+            </div>
+            <div class="flex justify-between">
+                <button id="prevChapter" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50">
+                    <i class="fas fa-arrow-left"></i> Anterior
                 </button>
-                <button id="menuButton" class="p-1 rounded-full focus:outline-none">
-                    <i class="fas fa-ellipsis-v text-white"></i>
+                <button id="nextChapter" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50">
+                    Próximo <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
         </div>
-    </header>
-    <div id="bookChapterSelector" class="bg-white shadow-lg rounded-lg mx-4 my-2 p-4 hidden dark:bg-gray-800">
-        <div class="flex justify-between mb-4">
-            <select id="bookSelect" class="bg-gray-100 border border-gray-300 rounded px-3 py-2 w-full mr-2 dark:bg-gray-700 dark:border-gray-600">
-                <option value="">Selecione um livro</option>
-            </select>
-            <select id="chapterSelect" class="bg-gray-100 border border-gray-300 rounded px-3 py-2 w-20 dark:bg-gray-700 dark:border-gray-600">
-                <option value="">Cap.</option>
-            </select>
-        </div>
-        <div class="flex justify-between">
-            <button id="prevChapter" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50">
-                <i class="fas fa-arrow-left"></i> Anterior
-            </button>
-            <button id="nextChapter" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50">
-                Próximo <i class="fas fa-arrow-right"></i>
+        
+        <div class="bg-white shadow-sm mx-4 my-2 p-3 rounded-lg flex justify-between items-center dark:bg-gray-800">
+            <div>
+                <h2 id="currentBook" class="font-bold text-lg">Gênesis</h2>
+                <p id="currentChapter" class="text-gray-600 dark:text-gray-300">Capítulo 1</p>
+            </div>
+            <button id="showSelector" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full dark:bg-blue-900 dark:text-blue-400">
+                <i class="fas fa-exchange-alt mr-1"></i> Trocar
             </button>
         </div>
-    </div>
-    <div class="bg-white shadow-sm mx-4 my-2 p-3 rounded-lg flex justify-between items-center dark:bg-gray-800">
-        <div>
-            <h2 id="currentBook" class="font-bold text-lg">Gênesis</h2>
-            <p id="currentChapter" class="text-gray-600 dark:text-gray-300">Capítulo 1</p>
-        </div>
-        <button id="showSelector" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full dark:bg-blue-900 dark:text-blue-400">
-            <i class="fas fa-exchange-alt mr-1"></i> Trocar
-        </button>
-    </div>
-    <div id="bibleText" class="container mx-auto px-4 py-4">
-        <div class="bg-white rounded-lg shadow p-4 dark:bg-gray-800">
-            <div class="text-center py-8">
-                <i class="fas fa-bible text-4xl text-blue-500 mb-4"></i>
-                <p class="text-gray-600 dark:text-gray-300">Selecione um livro e capítulo para começar a leitura</p>
+        
+        <div id="bibleText" class="container mx-auto px-4 py-4">
+            <div class="bg-white rounded-lg shadow p-4 dark:bg-gray-800">
+                <div class="text-center py-8">
+                    <i class="fas fa-bible text-4xl text-blue-500 mb-4"></i>
+                    <p class="text-gray-600 dark:text-gray-300">Selecione um livro e capítulo para começar a leitura</p>
+                </div>
             </div>
         </div>
     </div>
+    
+    <div id="searchOverlay" class="fixed inset-0 bg-gray-50 dark:bg-gray-900 z-50 hidden transition-all duration-300 p-4 pt-16">
+        <div class="flex items-center space-x-2 mb-4">
+            <button id="closeSearch" class="text-gray-600 dark:text-gray-400">
+                <i class="fas fa-arrow-left text-xl"></i>
+            </button>
+            <input type="text" id="searchInput" placeholder="Buscar versículos..." class="flex-grow bg-gray-100 border border-gray-300 rounded-full px-4 py-2 focus:outline-none dark:bg-gray-700 dark:border-gray-600">
+            <button id="searchButton" class="bg-blue-600 text-white p-2 rounded-full">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+        <div id="searchResults" class="bg-white rounded-lg shadow-md p-4 dark:bg-gray-800">
+            <p class="text-gray-500 dark:text-gray-400">Os resultados da busca aparecerão aqui.</p>
+        </div>
+    </div>
+    
+    <div id="settingsOverlay" class="fixed inset-0 bg-gray-50 dark:bg-gray-900 z-50 hidden transition-all duration-300 p-4 pt-16">
+        <div class="flex items-center space-x-2 mb-4">
+            <button id="closeSettings" class="text-gray-600 dark:text-gray-400">
+                <i class="fas fa-arrow-left text-xl"></i>
+            </button>
+            <h2 class="text-xl font-bold">Configurações</h2>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-4 space-y-4 dark:bg-gray-800">
+            <div>
+                <h3 class="font-bold text-lg">Opções de Leitura</h3>
+                <div class="flex items-center justify-between mt-2">
+                    <label class="text-gray-600 dark:text-gray-400">Tamanho da Fonte</label>
+                    <div class="flex items-center space-x-2">
+                        <button id="decreaseFont" class="bg-gray-200 p-1 rounded-full dark:bg-gray-700"><i class="fas fa-minus"></i></button>
+                        <span id="fontSizeDisplay">16</span>px
+                        <button id="increaseFont" class="bg-gray-200 p-1 rounded-full dark:bg-gray-700"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h3 class="font-bold text-lg">Tema</h3>
+                <div class="flex items-center justify-between mt-2">
+                    <label class="text-gray-600 dark:text-gray-400">Modo Escuro</label>
+                    <button id="themeToggleSettings" class="bg-gray-200 dark:bg-gray-700 p-2 rounded-full w-12 h-6 flex items-center transition-colors duration-300">
+                        <div class="bg-white w-4 h-4 rounded-full shadow transition-transform duration-300 transform dark:translate-x-6"></div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <div id="verseOptionsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
         <div class="bg-white rounded-lg shadow-lg w-11/12 max-w-md dark:bg-gray-800">
             <div class="p-4 border-b dark:border-gray-700">
@@ -130,28 +183,29 @@
             </div>
         </div>
     </div>
+    
     <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200 z-30 dark:bg-gray-800 dark:border-gray-700">
         <div class="flex justify-around">
-            <button class="py-3 px-4 text-center text-blue-600 dark:text-blue-400">
+            <button id="navHome" class="py-3 px-4 text-center text-blue-600 dark:text-blue-400">
                 <i class="fas fa-home block text-xl mb-1"></i>
                 <span class="text-xs">Início</span>
             </button>
-            <button class="py-3 px-4 text-center text-gray-500 dark:text-gray-400">
+            <button id="navSearch" class="py-3 px-4 text-center text-gray-500 dark:text-gray-400">
                 <i class="fas fa-search block text-xl mb-1"></i>
                 <span class="text-xs">Buscar</span>
             </button>
-            <button class="py-3 px-4 text-center text-gray-500 dark:text-gray-400">
+            <button id="navBookmarks" class="py-3 px-4 text-center text-gray-500 dark:text-gray-400">
                 <i class="fas fa-bookmark block text-xl mb-1"></i>
                 <span class="text-xs">Marcadores</span>
             </button>
-            <button class="py-3 px-4 text-center text-gray-500 dark:text-gray-400">
+            <button id="navSettings" class="py-3 px-4 text-center text-gray-500 dark:text-gray-400">
                 <i class="fas fa-cog block text-xl mb-1"></i>
                 <span class="text-xs">Configurações</span>
             </button>
         </div>
     </nav>
+    
     <script>
-        // API URL for the bible
         const BIBLE_API_URL = 'https://bible-api.com/';
         
         // Register Service Worker for offline capability
@@ -164,7 +218,7 @@
                 });
             });
         }
-
+        
         // Check online status
         function updateOnlineStatus() {
             const offlineBanner = document.getElementById('offlineBanner');
@@ -252,10 +306,9 @@
             ]
         };
 
-        // Current book and chapter
         let currentBook = "Gênesis";
         let currentChapter = 1;
-
+        
         // DOM Elements
         const bookSelect = document.getElementById('bookSelect');
         const chapterSelect = document.getElementById('chapterSelect');
@@ -270,14 +323,28 @@
         const closeVerseOptions = document.getElementById('closeVerseOptions');
         const verseNumberDisplay = document.getElementById('verseNumber');
         const themeToggle = document.getElementById('themeToggle');
+        const navSearch = document.getElementById('navSearch');
+        const navSettings = document.getElementById('navSettings');
+        const navHome = document.getElementById('navHome');
+        const mainContent = document.getElementById('mainContent');
+        const searchOverlay = document.getElementById('searchOverlay');
+        const closeSearch = document.getElementById('closeSearch');
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const searchResults = document.getElementById('searchResults');
+        const settingsOverlay = document.getElementById('settingsOverlay');
+        const closeSettings = document.getElementById('closeSettings');
+        const increaseFont = document.getElementById('increaseFont');
+        const decreaseFont = document.getElementById('decreaseFont');
+        const fontSizeDisplay = document.getElementById('fontSizeDisplay');
+        const themeToggleSettings = document.getElementById('themeToggleSettings');
 
-        // Initialize the app
         function initApp() {
             populateBookSelect();
             updateChapterSelect(currentBook);
             loadChapter(currentBook, currentChapter);
 
-            // Set up event listeners
+            // Event Listeners
             bookSelect.addEventListener('change', (e) => {
                 const book = e.target.value;
                 if (book) {
@@ -288,7 +355,7 @@
                     chapterSelect.value = 1;
                     currentChapterDisplay.textContent = `Capítulo 1`;
                     loadChapter(book, 1);
-                    bookChapterSelector.classList.add('hidden'); // Hide selector after choice
+                    bookChapterSelector.classList.add('hidden');
                 }
             });
             chapterSelect.addEventListener('change', (e) => {
@@ -297,7 +364,7 @@
                     currentChapter = chapter;
                     currentChapterDisplay.textContent = `Capítulo ${chapter}`;
                     loadChapter(currentBook, chapter);
-                    bookChapterSelector.classList.add('hidden'); // Hide selector after choice
+                    bookChapterSelector.classList.add('hidden');
                 }
             });
             showSelector.addEventListener('click', () => {
@@ -320,20 +387,14 @@
                     loadChapter(currentBook, currentChapter);
                 }
             });
-
-            // Verse options modal
             document.addEventListener('click', (e) => {
                 if (e.target.classList.contains('verse-number')) {
                     const verseNum = e.target.textContent;
                     const verseElement = e.target.closest('.verse');
-
-                    // Remove highlight from all verses
                     document.querySelectorAll('.verse').forEach(v => {
                         v.classList.remove('highlighted');
                     });
-                    // Highlight the selected verse
                     verseElement.classList.add('highlighted');
-                    // Show options modal
                     verseNumberDisplay.textContent = verseNum;
                     verseOptionsModal.classList.remove('hidden');
                 }
@@ -344,29 +405,76 @@
                     v.classList.remove('highlighted');
                 });
             });
-
-            // Theme toggle
-            themeToggle.addEventListener('click', () => {
-                document.body.classList.toggle('dark');
-                const icon = themeToggle.querySelector('i');
-                if (document.body.classList.contains('dark')) {
-                    icon.classList.replace('fa-moon', 'fa-sun');
-                    localStorage.setItem('theme', 'dark');
-                } else {
-                    icon.classList.replace('fa-sun', 'fa-moon');
-                    localStorage.setItem('theme', 'light');
+            themeToggle.addEventListener('click', toggleTheme);
+            themeToggleSettings.addEventListener('click', toggleTheme);
+            navSearch.addEventListener('click', () => {
+                searchOverlay.classList.remove('hidden');
+                mainContent.classList.add('hidden');
+            });
+            closeSearch.addEventListener('click', () => {
+                searchOverlay.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+                searchResults.innerHTML = '<p class="text-gray-500 dark:text-gray-400">Os resultados da busca aparecerão aqui.</p>';
+                searchInput.value = '';
+            });
+            navSettings.addEventListener('click', () => {
+                settingsOverlay.classList.remove('hidden');
+                mainContent.classList.add('hidden');
+            });
+            closeSettings.addEventListener('click', () => {
+                settingsOverlay.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+            });
+            navHome.addEventListener('click', () => {
+                // Return to home view
+                searchOverlay.classList.add('hidden');
+                settingsOverlay.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+            });
+            searchButton.addEventListener('click', () => {
+                const query = searchInput.value.trim();
+                if (query) {
+                    searchBible(query);
                 }
             });
-            // Check for saved theme preference
+            increaseFont.addEventListener('click', () => {
+                const currentSize = parseInt(bibleTextContainer.style.fontSize) || 16;
+                bibleTextContainer.style.fontSize = `${currentSize + 1}px`;
+                fontSizeDisplay.textContent = currentSize + 1;
+            });
+            decreaseFont.addEventListener('click', () => {
+                const currentSize = parseInt(bibleTextContainer.style.fontSize) || 16;
+                if (currentSize > 12) {
+                    bibleTextContainer.style.fontSize = `${currentSize - 1}px`;
+                    fontSizeDisplay.textContent = currentSize - 1;
+                }
+            });
+
             if (localStorage.getItem('theme') === 'dark' || (window.matchMedia('(prefers-color-scheme: dark)').matches && !localStorage.getItem('theme'))) {
                 document.body.classList.add('dark');
                 themeToggle.querySelector('i').classList.replace('fa-moon', 'fa-sun');
+                themeToggleSettings.querySelector('div').classList.add('translate-x-6');
             }
         }
 
-        // Populate book select dropdown
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            const isDarkMode = document.body.classList.contains('dark');
+            const icon = themeToggle.querySelector('i');
+            const toggleDiv = themeToggleSettings.querySelector('div');
+
+            if (isDarkMode) {
+                icon.classList.replace('fa-moon', 'fa-sun');
+                toggleDiv.classList.add('translate-x-6');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                icon.classList.replace('fa-sun', 'fa-moon');
+                toggleDiv.classList.remove('translate-x-6');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
         function populateBookSelect() {
-            // Add Old Testament books
             const oldTestamentGroup = document.createElement('optgroup');
             oldTestamentGroup.label = "Antigo Testamento";
             bibleData.oldTestament.forEach(book => {
@@ -377,7 +485,6 @@
             });
             bookSelect.appendChild(oldTestamentGroup);
 
-            // Add New Testament books
             const newTestamentGroup = document.createElement('optgroup');
             newTestamentGroup.label = "Novo Testamento";
             bibleData.newTestament.forEach(book => {
@@ -388,11 +495,9 @@
             });
             bookSelect.appendChild(newTestamentGroup);
 
-            // Set current book
             bookSelect.value = currentBook;
         }
 
-        // Update chapter select dropdown based on selected book
         function updateChapterSelect(bookName) {
             chapterSelect.innerHTML = '<option value="">Cap.</option>';
             const allBooks = [...bibleData.oldTestament, ...bibleData.newTestament];
@@ -408,17 +513,13 @@
             chapterSelect.value = currentChapter;
         }
 
-        // Load chapter content from API
         async function loadChapter(bookName, chapterNumber) {
-            // Find the abbreviation for the book
-            const allBooks = [...bibleData.oldTestament, ...bibleData.newTestament];
-            const book = allBooks.find(b => b.name === bookName);
+            const book = [...bibleData.oldTestament, ...bibleData.newTestament].find(b => b.name === bookName);
             if (!book) {
                 showError("Livro não encontrado.");
                 return;
             }
 
-            // Show loading state
             bibleTextContainer.innerHTML = `
                 <div class="bg-white rounded-lg shadow p-4 dark:bg-gray-800">
                     <div class="animate-pulse flex flex-col space-y-4">
@@ -432,13 +533,10 @@
             `;
 
             try {
-                // Use a tradução "almeida" para buscar em português
                 const response = await fetch(`${BIBLE_API_URL}${book.abbreviation}+${chapterNumber}?translation=almeida`);
-
                 if (!response.ok) {
                     throw new Error(`Erro ao carregar o capítulo. Status: ${response.status}`);
                 }
-
                 const data = await response.json();
                 const verses = data.verses;
 
@@ -447,7 +545,6 @@
                     return;
                 }
 
-                // Build the chapter HTML
                 let html = `
                     <div class="bg-white rounded-lg shadow p-4 dark:bg-gray-800">
                         <h3 class="text-xl font-bold text-center mb-6">${bookName} ${chapterNumber}</h3>
@@ -472,9 +569,44 @@
                 console.error("Erro ao buscar dados da Bíblia:", error);
                 showError("Não foi possível carregar o capítulo. Verifique sua conexão ou tente novamente.");
             }
-
-            // Scroll to top
             window.scrollTo(0, 0);
+        }
+
+        async function searchBible(query) {
+            searchResults.innerHTML = `
+                <div class="animate-pulse flex flex-col space-y-4">
+                    <div class="h-4 bg-gray-200 rounded w-full dark:bg-gray-700"></div>
+                    <div class="h-4 bg-gray-200 rounded w-5/6 dark:bg-gray-700"></div>
+                    <div class="h-4 bg-gray-200 rounded w-2/3 dark:bg-gray-700"></div>
+                </div>
+            `;
+            try {
+                const response = await fetch(`${BIBLE_API_URL}?translation=almeida&search=${encodeURIComponent(query)}`);
+                if (!response.ok) {
+                    throw new Error(`Erro na busca. Status: ${response.status}`);
+                }
+                const data = await response.json();
+                const results = data.verses;
+
+                if (!results || results.length === 0) {
+                    searchResults.innerHTML = `<p class="text-gray-500 dark:text-gray-400">Nenhum resultado encontrado para "${query}".</p>`;
+                    return;
+                }
+
+                let html = '';
+                results.forEach(verse => {
+                    html += `
+                        <div class="mb-4">
+                            <h4 class="font-bold text-lg">${verse.book_name} ${verse.chapter}:${verse.verse}</h4>
+                            <p class="text-gray-700 dark:text-gray-300">${verse.text}</p>
+                        </div>
+                    `;
+                });
+                searchResults.innerHTML = html;
+            } catch (error) {
+                console.error("Erro ao buscar versículos:", error);
+                searchResults.innerHTML = `<p class="text-red-500">Erro na busca. Tente novamente mais tarde.</p>`;
+            }
         }
 
         function showError(message) {
@@ -488,7 +620,6 @@
             `;
         }
 
-        // Initialize the app when DOM is loaded
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
