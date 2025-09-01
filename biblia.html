@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bíblia Sagrada - Mobile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        /* Highlight current verse */
+        .verse.highlighted {
+            background-color: rgba(253, 230, 138, 0.5);
+        }
+        
+        /* Animation for loading */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        /* For offline indicator */
+        .offline-banner {
+            transform: translateY(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        .offline-banner.show {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+    <!-- Offline Banner -->
+    <div id="offlineBanner" class="offline-banner fixed top-0 left-0 right-0 bg-yellow-500 text-white text-center py-2 z-50">
+        <i class="fas fa-wifi-slash mr-2"></i> Você está offline - Modo somente leitura
+    </div>
+
+    <!-- Header -->
+    <header class="bg-blue-700 text-white sticky top-0 z-40 shadow-md">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-bible text-xl"></i>
+                <h1 class="text-xl font-bold">Bíblia Sagrada</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="themeToggle" class="p-1 rounded-full focus:outline-none">
+                    <i class="fas fa-moon text-white"></i>
+                </button>
+                <button id="menuButton" class="p-1 rounded-full focus:outline-none">
+                    <i class="fas fa-ellipsis-v text-white"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Book/Chapter Selector -->
+    <div id="bookChapterSelector" class="bg-white shadow-lg rounded-lg mx-4 my-2 p-4 hidden">
+        <div class="flex justify-between mb-4">
+            <select id="bookSelect" class="bg-gray-100 border border-gray-300 rounded px-3 py-2 w-full mr-2">
+                <option value="">Selecione um livro</option>
+            </select>
+            <select id="chapterSelect" class="bg-gray-100 border border-gray-300 rounded px-3 py-2 w-20">
+                <option value="">Cap.</option>
+            </select>
+        </div>
+        <div class="flex justify-between">
+            <button id="prevChapter" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                <i class="fas fa-arrow-left"></i> Anterior
+            </button>
+            <button id="nextChapter" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Próximo <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Current Book/Chapter Display -->
+    <div class="bg-white shadow-sm mx-4 my-2 p-3 rounded-lg flex justify-between items-center">
+        <div>
+            <h2 id="currentBook" class="font-bold text-lg">Gênesis</h2>
+            <p id="currentChapter" class="text-gray-600">Capítulo 1</p>
+        </div>
+        <button id="showSelector" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
+            <i class="fas fa-exchange-alt mr-1"></i> Trocar
+        </button>
+    </div>
+
+    <!-- Bible Text Container -->
+    <div id="bibleText" class="container mx-auto px-4 py-4">
+        <div class="bg-white rounded-lg shadow p-4">
+            <div class="text-center py-8">
+                <i class="fas fa-bible text-4xl text-blue-500 mb-4"></i>
+                <p class="text-gray-600">Selecione um livro e capítulo para começar a leitura</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Verse Options Modal -->
+    <div id="verseOptionsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-lg shadow-lg w-11/12 max-w-md">
+            <div class="p-4 border-b">
+                <h3 class="font-bold text-lg">Opções do Versículo <span id="verseNumber"></span></h3>
+            </div>
+            <div class="p-4 space-y-3">
+                <button class="flex items-center w-full p-2 hover:bg-gray-100 rounded">
+                    <i class="fas fa-bookmark text-blue-500 mr-3"></i>
+                    <span>Marcar versículo</span>
+                </button>
+                <button class="flex items-center w-full p-2 hover:bg-gray-100 rounded">
+                    <i class="fas fa-highlighter text-yellow-500 mr-3"></i>
+                    <span>Destacar versículo</span>
+                </button>
+                <button class="flex items-center w-full p-2 hover:bg-gray-100 rounded">
+                    <i class="fas fa-share-alt text-green-500 mr-3"></i>
+                    <span>Compartilhar versículo</span>
+                </button>
+                <button class="flex items-center w-full p-2 hover:bg-gray-100 rounded">
+                    <i class="fas fa-comment text-purple-500 mr-3"></i>
+                    <span>Adicionar nota</span>
+                </button>
+            </div>
+            <div class="p-4 border-t flex justify-end">
+                <button id="closeVerseOptions" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200 z-30">
+        <div class="flex justify-around">
+            <button class="py-3 px-4 text-center text-blue-600">
+                <i class="fas fa-home block text-xl mb-1"></i>
+                <span class="text-xs">Início</span>
+            </button>
+            <button class="py-3 px-4 text-center text-gray-500">
+                <i class="fas fa-search block text-xl mb-1"></i>
+                <span class="text-xs">Buscar</span>
+            </button>
+            <button class="py-3 px-4 text-center text-gray-500">
+                <i class="fas fa-bookmark block text-xl mb-1"></i>
+                <span class="text-xs">Marcadores</span>
+            </button>
+            <button class="py-3 px-4 text-center text-gray-500">
+                <i class="fas fa-cog block text-xl mb-1"></i>
+                <span class="text-xs">Configurações</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Service Worker Registration and Bible Data -->
+    <script>
+        // Register Service Worker for offline capability
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(registration => {
+                    console.log('ServiceWorker registration successful');
+                }).catch(err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+
+        // Check online status
+        function updateOnlineStatus() {
+            const offlineBanner = document.getElementById('offlineBanner');
+            if (navigator.onLine) {
+                offlineBanner.classList.remove('show');
+            } else {
+                offlineBanner.classList.add('show');
+            }
+        }
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        updateOnlineStatus();
+
+        // Bible data (simplified version - in a real app this would be more complete)
+        const bibleData = {
+            "oldTestament": [
+                { "name": "Gênesis", "chapters": 50, "abbreviation": "Gn" },
+                { "name": "Êxodo", "chapters": 40, "abbreviation": "Êx" },
+                { "name": "Levítico", "chapters": 27, "abbreviation": "Lv" },
+                { "name": "Números", "chapters": 36, "abbreviation": "Nm" },
+                { "name": "Deuteronômio", "chapters": 34, "abbreviation": "Dt" },
+                { "name": "Josué", "chapters": 24, "abbreviation": "Js" },
+                { "name": "Juízes", "chapters": 21, "abbreviation": "Jz" },
+                { "name": "Rute", "chapters": 4, "abbreviation": "Rt" },
+                { "name": "1 Samuel", "chapters": 31, "abbreviation": "1Sm" },
+                { "name": "2 Samuel", "chapters": 24, "abbreviation": "2Sm" },
+                { "name": "1 Reis", "chapters": 22, "abbreviation": "1Rs" },
+                { "name": "2 Reis", "chapters": 25, "abbreviation": "2Rs" },
+                { "name": "1 Crônicas", "chapters": 29, "abbreviation": "1Cr" },
+                { "name": "2 Crônicas", "chapters": 36, "abbreviation": "2Cr" },
+                { "name": "Esdras", "chapters": 10, "abbreviation": "Ed" },
+                { "name": "Neemias", "chapters": 13, "abbreviation": "Ne" },
+                { "name": "Ester", "chapters": 10, "abbreviation": "Et" },
+                { "name": "Jó", "chapters": 42, "abbreviation": "Jó" },
+                { "name": "Salmos", "chapters": 150, "abbreviation": "Sl" },
+                { "name": "Provérbios", "chapters": 31, "abbreviation": "Pv" },
+                { "name": "Eclesiastes", "chapters": 12, "abbreviation": "Ec" },
+                { "name": "Cânticos", "chapters": 8, "abbreviation": "Ct" },
+                { "name": "Isaías", "chapters": 66, "abbreviation": "Is" },
+                { "name": "Jeremias", "chapters": 52, "abbreviation": "Jr" },
+                { "name": "Lamentações", "chapters": 5, "abbreviation": "Lm" },
+                { "name": "Ezequiel", "chapters": 48, "abbreviation": "Ez" },
+                { "name": "Daniel", "chapters": 12, "abbreviation": "Dn" },
+                { "name": "Oséias", "chapters": 14, "abbreviation": "Os" },
+                { "name": "Joel", "chapters": 3, "abbreviation": "Jl" },
+                { "name": "Amós", "chapters": 9, "abbreviation": "Am" },
+                { "name": "Obadias", "chapters": 1, "abbreviation": "Ob" },
+                { "name": "Jonas", "chapters": 4, "abbreviation": "Jn" },
+                { "name": "Miquéias", "chapters": 7, "abbreviation": "Mq" },
+                { "name": "Naum", "chapters": 3, "abbreviation": "Na" },
+                { "name": "Habacuque", "chapters": 3, "abbreviation": "Hc" },
+                { "name": "Sofonias", "chapters": 3, "abbreviation": "Sf" },
+                { "name": "Ageu", "chapters": 2, "abbreviation": "Ag" },
+                { "name": "Zacarias", "chapters": 14, "abbreviation": "Zc" },
+                { "name": "Malaquias", "chapters": 4, "abbreviation": "Ml" }
+            ],
+            "newTestament": [
+                { "name": "Mateus", "chapters": 28, "abbreviation": "Mt" },
+                { "name": "Marcos", "chapters": 16, "abbreviation": "Mc" },
+                { "name": "Lucas", "chapters": 24, "abbreviation": "Lc" },
+                { "name": "João", "chapters": 21, "abbreviation": "Jo" },
+                { "name": "Atos", "chapters": 28, "abbreviation": "At" },
+                { "name": "Romanos", "chapters": 16, "abbreviation": "Rm" },
+                { "name": "1 Coríntios", "chapters": 16, "abbreviation": "1Co" },
+                { "name": "2 Coríntios", "chapters": 13, "abbreviation": "2Co" },
+                { "name": "Gálatas", "chapters": 6, "abbreviation": "Gl" },
+                { "name": "Efésios", "chapters": 6, "abbreviation": "Ef" },
+                { "name": "Filipenses", "chapters": 4, "abbreviation": "Fp" },
+                { "name": "Colossenses", "chapters": 4, "abbreviation": "Cl" },
+                { "name": "1 Tessalonicenses", "chapters": 5, "abbreviation": "1Ts" },
+                { "name": "2 Tessalonicenses", "chapters": 3, "abbreviation": "2Ts" },
+                { "name": "1 Timóteo", "chapters": 6, "abbreviation": "1Tm" },
+                { "name": "2 Timóteo", "chapters": 4, "abbreviation": "2Tm" },
+                { "name": "Tito", "chapters": 3, "abbreviation": "Tt" },
+                { "name": "Filemom", "chapters": 1, "abbreviation": "Fm" },
+                { "name": "Hebreus", "chapters": 13, "abbreviation": "Hb" },
+                { "name": "Tiago", "chapters": 5, "abbreviation": "Tg" },
+                { "name": "1 Pedro", "chapters": 5, "abbreviation": "1Pe" },
+                { "name": "2 Pedro", "chapters": 3, "abbreviation": "2Pe" },
+                { "name": "1 João", "chapters": 5, "abbreviation": "1Jo" },
+                { "name": "2 João", "chapters": 1, "abbreviation": "2Jo" },
+                { "name": "3 João", "chapters": 1, "abbreviation": "3Jo" },
+                { "name": "Judas", "chapters": 1, "abbreviation": "Jd" },
+                { "name": "Apocalipse", "chapters": 22, "abbreviation": "Ap" }
+            ]
+        };
+
+        // Sample verses (in a real app this would be complete)
+        const sampleVerses = {
+            "Gênesis": {
+                "1": [
+                    "No princípio, criou Deus os céus e a terra.",
+                    "A terra, porém, estava sem forma e vazia; havia trevas sobre a face do abismo, e o Espírito de Deus pairava por sobre as águas.",
+                    "Disse Deus: Haja luz; e houve luz.",
+                    "E viu Deus que a luz era boa; e fez separação entre a luz e as trevas.",
+                    "Chamou Deus à luz Dia e às trevas, Noite. Houve tarde e manhã, o primeiro dia."
+                ]
+            },
+            "Mateus": {
+                "1": [
+                    "Livro da genealogia de Jesus Cristo, filho de Davi, filho de Abraão.",
+                    "Abraão gerou a Isaque; Isaque gerou a Jacó; Jacó gerou a Judá e a seus irmãos;",
+                    "Judá gerou a Perez e a Zerá, de Tamar; Perez gerou a Esrom; Esrom gerou a Arão;",
+                    "Arão gerou a Aminadabe; Aminadabe gerou a Naassom; Naassom gerou a Salmom;",
+                    "Salmom gerou a Boaz, de Raabe; Boaz gerou a Obede, de Rute; Obede gerou a Jessé;"
+                ]
+            }
+        };
+
+        // Current book and chapter
+        let currentBook = "Gênesis";
+        let currentChapter = 1;
+
+        // DOM Elements
+        const bookSelect = document.getElementById('bookSelect');
+        const chapterSelect = document.getElementById('chapterSelect');
+        const currentBookDisplay = document.getElementById('currentBook');
+        const currentChapterDisplay = document.getElementById('currentChapter');
+        const bibleTextContainer = document.getElementById('bibleText');
+        const bookChapterSelector = document.getElementById('bookChapterSelector');
+        const showSelector = document.getElementById('showSelector');
+        const prevChapterBtn = document.getElementById('prevChapter');
+        const nextChapterBtn = document.getElementById('nextChapter');
+        const verseOptionsModal = document.getElementById('verseOptionsModal');
+        const closeVerseOptions = document.getElementById('closeVerseOptions');
+        const verseNumberDisplay = document.getElementById('verseNumber');
+        const themeToggle = document.getElementById('themeToggle');
+
+        // Initialize the app
+        function initApp() {
+            populateBookSelect();
+            updateChapterSelect(currentBook);
+            loadChapter(currentBook, currentChapter);
+            
+            // Set up event listeners
+            bookSelect.addEventListener('change', (e) => {
+                const book = e.target.value;
+                if (book) {
+                    currentBook = book;
+                    currentBookDisplay.textContent = book;
+                    updateChapterSelect(book);
+                    currentChapter = 1;
+                    chapterSelect.value = 1;
+                    currentChapterDisplay.textContent = `Capítulo 1`;
+                    loadChapter(book, 1);
+                }
+            });
+            
+            chapterSelect.addEventListener('change', (e) => {
+                const chapter = parseInt(e.target.value);
+                if (chapter) {
+                    currentChapter = chapter;
+                    currentChapterDisplay.textContent = `Capítulo ${chapter}`;
+                    loadChapter(currentBook, chapter);
+                }
+            });
+            
+            showSelector.addEventListener('click', () => {
+                bookChapterSelector.classList.toggle('hidden');
+            });
+            
+            prevChapterBtn.addEventListener('click', () => {
+                if (currentChapter > 1) {
+                    currentChapter--;
+                    chapterSelect.value = currentChapter;
+                    currentChapterDisplay.textContent = `Capítulo ${currentChapter}`;
+                    loadChapter(currentBook, currentChapter);
+                }
+            });
+            
+            nextChapterBtn.addEventListener('click', () => {
+                const bookData = [...bibleData.oldTestament, ...bibleData.newTestament].find(b => b.name === currentBook);
+                if (currentChapter < bookData.chapters) {
+                    currentChapter++;
+                    chapterSelect.value = currentChapter;
+                    currentChapterDisplay.textContent = `Capítulo ${currentChapter}`;
+                    loadChapter(currentBook, currentChapter);
+                }
+            });
+            
+            // Verse options modal
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('verse-number')) {
+                    const verseNum = e.target.textContent;
+                    const verseElement = e.target.closest('.verse');
+                    
+                    // Remove highlight from all verses
+                    document.querySelectorAll('.verse').forEach(v => {
+                        v.classList.remove('highlighted');
+                    });
+                    
+                    // Highlight the selected verse
+                    verseElement.classList.add('highlighted');
+                    
+                    // Show options modal
+                    verseNumberDisplay.textContent = verseNum;
+                    verseOptionsModal.classList.remove('hidden');
+                }
+            });
+            
+            closeVerseOptions.addEventListener('click', () => {
+                verseOptionsModal.classList.add('hidden');
+            });
+            
+            // Theme toggle
+            themeToggle.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+                const icon = themeToggle.querySelector('i');
+                if (document.documentElement.classList.contains('dark')) {
+                    icon.classList.replace('fa-moon', 'fa-sun');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    icon.classList.replace('fa-sun', 'fa-moon');
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+            
+            // Check for saved theme preference
+            if (localStorage.getItem('theme') === 'dark' || 
+                (window.matchMedia('(prefers-color-scheme: dark)').matches && !localStorage.getItem('theme'))) {
+                document.documentElement.classList.add('dark');
+   
