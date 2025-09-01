@@ -152,12 +152,8 @@
     </nav>
     <script>
         // API URL for the bible
-        const BIBLE_API_URL = 'https://api.bibliaapi.com/v1/verses/pt-br/nvi/';
-        // API KEY - This is a fictional key. You need to get your own.
-        // For testing purposes, you can use public APIs that don't require keys.
-        // A good alternative that doesn't need a key is the 'Bible API' from bible-api.com, but it's in English.
-        const BIBLE_API_KEY = 'YOUR_API_KEY_HERE';
-
+        const BIBLE_API_URL = 'https://bible-api.com/';
+        
         // Register Service Worker for offline capability
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -182,77 +178,77 @@
         window.addEventListener('offline', updateOnlineStatus);
         updateOnlineStatus();
 
-        // Bible data (simplified version - fetched from API now)
+        // Bible data with English abbreviations for API
         const bibleData = {
             "oldTestament": [
-                {"name": "Gênesis", "abbreviation": "gn", "chapters": 50},
-                {"name": "Êxodo", "abbreviation": "ex", "chapters": 40},
-                {"name": "Levítico", "abbreviation": "lv", "chapters": 27},
-                {"name": "Números", "abbreviation": "nm", "chapters": 36},
-                {"name": "Deuteronômio", "abbreviation": "dt", "chapters": 34},
-                {"name": "Josué", "abbreviation": "js", "chapters": 24},
-                {"name": "Juízes", "abbreviation": "jz", "chapters": 21},
-                {"name": "Rute", "abbreviation": "rt", "chapters": 4},
-                {"name": "1 Samuel", "abbreviation": "1sm", "chapters": 31},
-                {"name": "2 Samuel", "abbreviation": "2sm", "chapters": 24},
-                {"name": "1 Reis", "abbreviation": "1rs", "chapters": 22},
-                {"name": "2 Reis", "abbreviation": "2rs", "chapters": 25},
-                {"name": "1 Crônicas", "abbreviation": "1cr", "chapters": 29},
-                {"name": "2 Crônicas", "abbreviation": "2cr", "chapters": 36},
-                {"name": "Esdras", "abbreviation": "ed", "chapters": 10},
-                {"name": "Neemias", "abbreviation": "ne", "chapters": 13},
-                {"name": "Ester", "abbreviation": "et", "chapters": 10},
-                {"name": "Jó", "abbreviation": "jo", "chapters": 42},
-                {"name": "Salmos", "abbreviation": "sl", "chapters": 150},
-                {"name": "Provérbios", "abbreviation": "pv", "chapters": 31},
-                {"name": "Eclesiastes", "abbreviation": "ec", "chapters": 12},
-                {"name": "Cânticos", "abbreviation": "ct", "chapters": 8},
-                {"name": "Isaías", "abbreviation": "is", "chapters": 66},
-                {"name": "Jeremias", "abbreviation": "jr", "chapters": 52},
-                {"name": "Lamentações", "abbreviation": "lm", "chapters": 5},
-                {"name": "Ezequiel", "abbreviation": "ez", "chapters": 48},
-                {"name": "Daniel", "abbreviation": "dn", "chapters": 12},
-                {"name": "Oséias", "abbreviation": "os", "chapters": 14},
-                {"name": "Joel", "abbreviation": "jl", "chapters": 3},
-                {"name": "Amós", "abbreviation": "am", "chapters": 9},
-                {"name": "Obadias", "abbreviation": "ob", "chapters": 1},
-                {"name": "Jonas", "abbreviation": "jn", "chapters": 4},
-                {"name": "Miquéias", "abbreviation": "mq", "chapters": 7},
-                {"name": "Naum", "abbreviation": "na", "chapters": 3},
-                {"name": "Habacuque", "abbreviation": "hc", "chapters": 3},
-                {"name": "Sofonias", "abbreviation": "sf", "chapters": 3},
-                {"name": "Ageu", "abbreviation": "ag", "chapters": 2},
-                {"name": "Zacarias", "abbreviation": "zc", "chapters": 14},
-                {"name": "Malaquias", "abbreviation": "ml", "chapters": 4}
+                {"name": "Gênesis", "abbreviation": "gen", "chapters": 50},
+                {"name": "Êxodo", "abbreviation": "exo", "chapters": 40},
+                {"name": "Levítico", "abbreviation": "lev", "chapters": 27},
+                {"name": "Números", "abbreviation": "num", "chapters": 36},
+                {"name": "Deuteronômio", "abbreviation": "deu", "chapters": 34},
+                {"name": "Josué", "abbreviation": "jos", "chapters": 24},
+                {"name": "Juízes", "abbreviation": "jdg", "chapters": 21},
+                {"name": "Rute", "abbreviation": "rut", "chapters": 4},
+                {"name": "1 Samuel", "abbreviation": "1sa", "chapters": 31},
+                {"name": "2 Samuel", "abbreviation": "2sa", "chapters": 24},
+                {"name": "1 Reis", "abbreviation": "1ki", "chapters": 22},
+                {"name": "2 Reis", "abbreviation": "2ki", "chapters": 25},
+                {"name": "1 Crônicas", "abbreviation": "1ch", "chapters": 29},
+                {"name": "2 Crônicas", "abbreviation": "2ch", "chapters": 36},
+                {"name": "Esdras", "abbreviation": "ezr", "chapters": 10},
+                {"name": "Neemias", "abbreviation": "neh", "chapters": 13},
+                {"name": "Ester", "abbreviation": "est", "chapters": 10},
+                {"name": "Jó", "abbreviation": "job", "chapters": 42},
+                {"name": "Salmos", "abbreviation": "psa", "chapters": 150},
+                {"name": "Provérbios", "abbreviation": "pro", "chapters": 31},
+                {"name": "Eclesiastes", "abbreviation": "ecc", "chapters": 12},
+                {"name": "Cânticos", "abbreviation": "sos", "chapters": 8},
+                {"name": "Isaías", "abbreviation": "isa", "chapters": 66},
+                {"name": "Jeremias", "abbreviation": "jer", "chapters": 52},
+                {"name": "Lamentações", "abbreviation": "lam", "chapters": 5},
+                {"name": "Ezequiel", "abbreviation": "ezk", "chapters": 48},
+                {"name": "Daniel", "abbreviation": "dan", "chapters": 12},
+                {"name": "Oséias", "abbreviation": "hos", "chapters": 14},
+                {"name": "Joel", "abbreviation": "jol", "chapters": 3},
+                {"name": "Amós", "abbreviation": "amo", "chapters": 9},
+                {"name": "Obadias", "abbreviation": "oba", "chapters": 1},
+                {"name": "Jonas", "abbreviation": "jon", "chapters": 4},
+                {"name": "Miquéias", "abbreviation": "mic", "chapters": 7},
+                {"name": "Naum", "abbreviation": "nah", "chapters": 3},
+                {"name": "Habacuque", "abbreviation": "hab", "chapters": 3},
+                {"name": "Sofonias", "abbreviation": "zep", "chapters": 3},
+                {"name": "Ageu", "abbreviation": "hag", "chapters": 2},
+                {"name": "Zacarias", "abbreviation": "zec", "chapters": 14},
+                {"name": "Malaquias", "abbreviation": "mal", "chapters": 4}
             ],
             "newTestament": [
-                {"name": "Mateus", "abbreviation": "mt", "chapters": 28},
-                {"name": "Marcos", "abbreviation": "mc", "chapters": 16},
-                {"name": "Lucas", "abbreviation": "lc", "chapters": 24},
-                {"name": "João", "abbreviation": "jo", "chapters": 21},
-                {"name": "Atos", "abbreviation": "at", "chapters": 28},
-                {"name": "Romanos", "abbreviation": "rm", "chapters": 16},
+                {"name": "Mateus", "abbreviation": "mat", "chapters": 28},
+                {"name": "Marcos", "abbreviation": "mar", "chapters": 16},
+                {"name": "Lucas", "abbreviation": "luk", "chapters": 24},
+                {"name": "João", "abbreviation": "jhn", "chapters": 21},
+                {"name": "Atos", "abbreviation": "act", "chapters": 28},
+                {"name": "Romanos", "abbreviation": "rom", "chapters": 16},
                 {"name": "1 Coríntios", "abbreviation": "1co", "chapters": 16},
                 {"name": "2 Coríntios", "abbreviation": "2co", "chapters": 13},
-                {"name": "Gálatas", "abbreviation": "gl", "chapters": 6},
-                {"name": "Efésios", "abbreviation": "ef", "chapters": 6},
-                {"name": "Filipenses", "abbreviation": "fp", "chapters": 4},
-                {"name": "Colossenses", "abbreviation": "cl", "chapters": 4},
-                {"name": "1 Tessalonicenses", "abbreviation": "1ts", "chapters": 5},
-                {"name": "2 Tessalonicenses", "abbreviation": "2ts", "chapters": 3},
-                {"name": "1 Timóteo", "abbreviation": "1tm", "chapters": 6},
-                {"name": "2 Timóteo", "abbreviation": "2tm", "chapters": 4},
-                {"name": "Tito", "abbreviation": "tt", "chapters": 3},
-                {"name": "Filemom", "abbreviation": "fm", "chapters": 1},
-                {"name": "Hebreus", "abbreviation": "hb", "chapters": 13},
-                {"name": "Tiago", "abbreviation": "tg", "chapters": 5},
+                {"name": "Gálatas", "abbreviation": "gal", "chapters": 6},
+                {"name": "Efésios", "abbreviation": "eph", "chapters": 6},
+                {"name": "Filipenses", "abbreviation": "php", "chapters": 4},
+                {"name": "Colossenses", "abbreviation": "col", "chapters": 4},
+                {"name": "1 Tessalonicenses", "abbreviation": "1th", "chapters": 5},
+                {"name": "2 Tessalonicenses", "abbreviation": "2th", "chapters": 3},
+                {"name": "1 Timóteo", "abbreviation": "1ti", "chapters": 6},
+                {"name": "2 Timóteo", "abbreviation": "2ti", "chapters": 4},
+                {"name": "Tito", "abbreviation": "tit", "chapters": 3},
+                {"name": "Filemom", "abbreviation": "phm", "chapters": 1},
+                {"name": "Hebreus", "abbreviation": "heb", "chapters": 13},
+                {"name": "Tiago", "abbreviation": "jas", "chapters": 5},
                 {"name": "1 Pedro", "abbreviation": "1pe", "chapters": 5},
                 {"name": "2 Pedro", "abbreviation": "2pe", "chapters": 3},
                 {"name": "1 João", "abbreviation": "1jo", "chapters": 5},
                 {"name": "2 João", "abbreviation": "2jo", "chapters": 1},
                 {"name": "3 João", "abbreviation": "3jo", "chapters": 1},
-                {"name": "Judas", "abbreviation": "jd", "chapters": 1},
-                {"name": "Apocalipse", "abbreviation": "ap", "chapters": 22}
+                {"name": "Judas", "abbreviation": "jud", "chapters": 1},
+                {"name": "Apocalipse", "abbreviation": "rev", "chapters": 22}
             ]
         };
 
@@ -436,12 +432,8 @@
             `;
 
             try {
-                const response = await fetch(`https://bible-api.com/${book.abbreviation}+${chapterNumber}?translation=almeida`, {
-                    headers: {
-                        // This API doesn't require a key, but for others you'd use:
-                        // 'Authorization': `Bearer ${BIBLE_API_KEY}`
-                    }
-                });
+                // Use a tradução "almeida" para buscar em português
+                const response = await fetch(`${BIBLE_API_URL}${book.abbreviation}+${chapterNumber}?translation=almeida`);
 
                 if (!response.ok) {
                     throw new Error(`Erro ao carregar o capítulo. Status: ${response.status}`);
