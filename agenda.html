@@ -38,9 +38,9 @@
     </style>
 </head>
 <body class="bg-gray-50">
-    <div id="app" class="min-h-screen flex flex-col">
+    <div id="app" class="min-h-screen flex flex-col bg-gradient-to-br from-indigo-50 to-gray-100">
         <!-- Header -->
-        <header class="bg-indigo-600 text-white shadow-lg">
+        <header class="bg-gradient-to-r from-indigo-600 to-indigo-800 text-white shadow-lg">
             <div class="container mx-auto px-4 py-4 flex justify-between items-center">
                 <div class="flex items-center space-x-2">
                     <i data-feather="calendar" class="w-6 h-6"></i>
@@ -105,8 +105,8 @@
         </main>
 
         <!-- Welcome Modal -->
-        <div id="welcomeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full" data-aos="zoom-in">
+        <div id="welcomeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
+            <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full border border-indigo-100" data-aos="zoom-in">
                 <div class="p-6">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-xl font-bold text-indigo-700">Bem-vindo à sua Agenda Digital</h2>
@@ -135,8 +135,8 @@
         </div>
 
         <!-- Add Event Modal -->
-        <div id="addEventModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-            <div class="bg-white rounded-lg shadow-xl max-w-md w-full" data-aos="zoom-in">
+        <div id="addEventModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden backdrop-blur-sm">
+            <div class="bg-white rounded-xl shadow-2xl max-w-md w-full border border-indigo-100" data-aos="zoom-in">
                 <div class="p-6">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-xl font-bold text-indigo-700">Adicionar Evento</h2>
@@ -201,8 +201,8 @@
         </div>
 
         <!-- Import Modal -->
-        <div id="importModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-            <div class="bg-white rounded-lg shadow-xl max-w-md w-full" data-aos="zoom-in">
+        <div id="importModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden backdrop-blur-sm">
+            <div class="bg-white rounded-xl shadow-2xl max-w-md w-full border border-indigo-100" data-aos="zoom-in">
                 <div class="p-6">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-xl font-bold text-indigo-700">Importar Eventos</h2>
@@ -275,21 +275,35 @@
             });
             
             // Initialize FullCalendar
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
+            const calendarEl = document.getElementById('calendar');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'timeGridWeek',
                 locale: 'pt-br',
+                editable: true,
+                selectable: true,
+                selectMirror: true,
+                dayMaxEvents: true,
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay listWeek'
                 },
                 buttonText: {
                     today: 'Hoje',
                     month: 'Mês',
                     week: 'Semana',
-                    day: 'Dia'
+                    day: 'Dia',
+                    list: 'Lista'
                 },
+                eventTimeFormat: {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                },
+                slotMinTime: '08:00:00',
+                slotMaxTime: '20:00:00',
+                nowIndicator: true,
+                navLinks: true,
                 events: [
                     {
                         title: 'Reunião com equipe',
@@ -361,4 +375,176 @@
                     const btn = document.getElementById(`${view}ViewBtn`);
                     if (view === activeView) {
                         btn.classList.add('bg-indigo-600', 'text-white');
-        
+                        btn.classList.remove('bg-indigo-100', 'text-indigo-700');
+                    } else {
+                        btn.classList.remove('bg-indigo-600', 'text-white');
+                        btn.classList.add('bg-indigo-100', 'text-indigo-700');
+                    }
+                });
+            }
+            
+            // Add Event Modal
+            document.getElementById('addEventBtn').addEventListener('click', function() {
+                document.getElementById('addEventModal').classList.remove('hidden');
+            });
+            
+            document.getElementById('closeAddEventModal').addEventListener('click', function() {
+                document.getElementById('addEventModal').classList.add('hidden');
+            });
+            
+            document.getElementById('cancelAddEvent').addEventListener('click', function() {
+                document.getElementById('addEventModal').classList.add('hidden');
+            });
+            
+            document.getElementById('eventForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const title = document.getElementById('eventTitle').value;
+                const date = document.getElementById('eventDate').value;
+                const time = document.getElementById('eventTime').value;
+                const location = document.getElementById('eventLocation').value;
+                const category = document.getElementById('eventCategory').value;
+                const description = document.getElementById('eventDescription').value;
+                const reminder = document.getElementById('eventReminder').value;
+                
+                // Create event object
+                const event = {
+                    title: title,
+                    start: new Date(`${date}T${time || '00:00'}`),
+                    allDay: !time,
+                    extendedProps: {
+                        location: location,
+                        description: description,
+                        category: category,
+                        reminder: reminder
+                    }
+                };
+                
+                // Set color based on category
+                switch(category) {
+                    case 'work':
+                        event.color = '#4f46e5';
+                        break;
+                    case 'personal':
+                        event.color = '#10b981';
+                        break;
+                    case 'family':
+                        event.color = '#f59e0b';
+                        break;
+                    default:
+                        event.color = '#64748b';
+                }
+                
+                // Add event to calendar
+                calendar.addEvent(event);
+                
+                // Reset form
+                this.reset();
+                
+                // Close modal
+                document.getElementById('addEventModal').classList.add('hidden');
+                
+                // Show success message
+                alert('Evento adicionado com sucesso!');
+            });
+            
+            // Import Modal
+            document.getElementById('importBtn').addEventListener('click', function() {
+                document.getElementById('importModal').classList.remove('hidden');
+                resetImportModal();
+            });
+            
+            document.getElementById('closeImportModal').addEventListener('click', function() {
+                document.getElementById('importModal').classList.add('hidden');
+            });
+            
+            document.getElementById('cancelImport').addEventListener('click', function() {
+                document.getElementById('importModal').classList.add('hidden');
+            });
+            
+            document.getElementById('fileUpload').addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    handleFileImport(e.target.files[0]);
+                }
+            });
+
+            function resetImportModal() {
+                document.getElementById('importProgress').classList.add('hidden');
+                document.getElementById('importSuccess').classList.add('hidden');
+                document.getElementById('importError').classList.add('hidden');
+                document.getElementById('fileUpload').value = '';
+            }
+
+            function handleFileImport(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, {type: 'array'});
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                        
+                        processImport(jsonData);
+                    } catch (error) {
+                        showImportError("Erro ao processar arquivo: " + error.message);
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            }
+
+            function processImport(data) {
+                const progress = document.getElementById('importProgress');
+                const progressBar = document.getElementById('progressBar');
+                const success = document.getElementById('importSuccess');
+                
+                progress.classList.remove('hidden');
+                
+                let progressValue = 0;
+                const interval = setInterval(() => {
+                    progressValue += 5;
+                    progressBar.style.width = `${progressValue}%`;
+                    progress.querySelector('span:last-child').textContent = `${progressValue}%`;
+                    
+                    if (progressValue >= 100) {
+                        clearInterval(interval);
+                        progress.classList.add('hidden');
+                        success.classList.remove('hidden');
+                        
+                        // Process each row from the imported data
+                        data.forEach(item => {
+                            try {
+                                const startDate = item.Data ? new Date(item.Data) : new Date();
+                                const endDate = item['Data Fim'] ? new Date(item['Data Fim']) : 
+                                    new Date(startDate.getTime() + (item.Duração ? parseInt(item.Duração) * 60000 : 3600000));
+                                
+                                calendar.addEvent({
+                                    title: item.Título || 'Novo Evento',
+                                    start: startDate,
+                                    end: endDate,
+                                    color: getCategoryColor(item.Categoria),
+                                    extendedProps: {
+                                        location: item.Local || '',
+                                        description: item.Descrição || '',
+                                        category: item.Categoria || 'other'
+                                    }
+                                });
+                            } catch (error) {
+                                console.error("Erro ao adicionar evento:", error);
+                            }
+                        });
+                        
+                        function getCategoryColor(category) {
+                            switch((category || '').toLowerCase()) {
+                                case 'trabalho': return '#4f46e5';
+                                case 'pessoal': return '#10b981';
+                                case 'família': return '#f59e0b';
+                                default: return '#64748b';
+                            }
+                        }
+                    }
+                }, 100);
+            }
+        });
+    </script>
+</body>
+</html>
