@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fila de Adubo Orgânico - Composteira Empresa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .notification {
+            animation: slideInRight 0.5s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .queue-item {
+            transition: all 0.3s ease;
+        }
+        
+        .queue-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .admin-panel {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .user-panel {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .compost-bg {
+            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><pattern id="leaves" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="15" fill="%23059669" opacity="0.1"/><circle cx="75" cy="75" r="10" fill="%2316a34a" opacity="0.1"/><circle cx="50" cy="80" r="8" fill="%2322c55e" opacity="0.1"/></pattern></defs><rect width="1000" height="1000" fill="url(%23leaves)"/></svg>');
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <header class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-leaf text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Composteira da Empresa</h1>
+                        <p class="text-gray-600">Sistema de Distribuição de Adubo Orgânico</p>
+                    </div>
+                </div>
+                <div class="flex space-x-4">
+                    <button onclick="showUserPanel()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
+                        <i class="fas fa-user mr-2"></i>Colaborador
+                    </button>
+                    <button onclick="showAdminPanel()" class="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition">
+                        <i class="fas fa-cog mr-2"></i>Administração
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div id="notificationArea" class="fixed top-4 right-4 z-50"></div>
+
+    <div id="userPanel" class="min-h-screen compost-bg">
+        <div class="max-w-6xl mx-auto px-4 py-8">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-white mb-4">
+                    <i class="fas fa-seedling mr-3"></i>Fila de Adubo Orgânico
+                </h2>
+                <p class="text-white text-lg opacity-90">
+                    Cadastre-se na fila e receba adubo orgânico de qualidade da nossa composteira!
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-lg shadow-xl p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-user-plus text-green-600 mr-2"></i>
+                            Entrar na Fila
+                        </h3>
+                        
+                        <form id="registrationForm" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Nome Completo</label>
+                                <input type="text" id="userName" required 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">E-mail</label>
+                                <input type="email" id="userEmail" required 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Setor</label>
+                                <select id="userSector" required 
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                                    <option value="">Selecione seu setor</option>
+                                    <option value="Administração">Administração</option>
+                                    <option value="RH">Recursos Humanos</option>
+                                    <option value="TI">Tecnologia da Informação</option>
+                                    <option value="Vendas">Vendas</option>
+                                    <option value="Marketing">Marketing</option>
+                                    <option value="Financeiro">Financeiro</option>
+                                    <option value="Operações">Operações</option>
+                                    <option value="Jurídico">Jurídico</option>
+                                </select>
+                            </div>
+                            
+                            <button type="submit" 
+                                    class="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition font-medium">
+                                <i class="fas fa-plus-circle mr-2"></i>Entrar na Fila
+                            </button>
+                        </form>
+
+                        <div id="userPosition" class="mt-6 hidden">
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <div class="flex items-center">
+                                    <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                                    <div>
+                                        <p class="text-blue-800 font-medium">Você está na fila!</p>
+                                        <p class="text-blue-600" id="positionText">Posição: #0</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-xl p-6 mt-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Estatísticas</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Pessoas na fila:</span>
+                                <span class="font-bold text-green-600" id="queueCount">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Adubo disponível:</span>
+                                <span class="font-bold text-blue-600" id="fertilizerStock">5kg</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Próxima colheita:</span>
+                                <span class="font-bold text-purple-600">7 dias</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-lg shadow-xl p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-list-ol text-green-600 mr-2"></i>
+                            Fila Atual
+                        </h3>
+                        
+                        <div id="queueDisplay" class="space-y-4">
+                            <div class="text-center py-8 text-gray-500">
+                                <i class="fas fa-clipboard-list text-4xl mb-4"></i>
+                                <p>Nenhuma pessoa na fila ainda.</p>
+                                <p class="text-sm">Seja o primeiro a se cadastrar!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="adminPanel" class="min-h-screen admin-panel hidden">
+        <div class="max-w-7xl mx-auto px-4 py-8">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-white mb-4">
+                    <i class="fas fa-cog mr-3"></i>Painel de Administração
+                </h2>
+                <p class="text-white text-lg opacity-90">
+                    Gerencie a fila de distribuição de adubo orgânico
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                    <div class="text-3xl font-bold text-blue-600" id="adminQueueCount">0</div>
+                    <div class="text-gray-600">Pessoas na Fila</div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                    <div class="text-3xl font-bold text-green-600" id="completedCount">0</div>
+                    <div class="text-gray-600">Retiradas Concluídas</div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                    <div class="text-3xl font-bold text-orange-600" id="pendingCount">0</div>
+                    <div class="text-gray-600">Agendamentos Pendentes</div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                    <div class="text-3xl font-bold text-purple-600">5kg</div>
+                    <div class="text-gray-600">Estoque Disponível</div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-xl p-6 mb-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">Controles Administrativos</h3>
+                <div class="flex flex-wrap gap-4">
+                    <button onclick="notifyNext()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
+                        <i class="fas fa-bell mr-2"></i>Notificar Próximo
+                    </button>
+                    <button onclick="clearQueue()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
+                        <i class="fas fa-trash mr-2"></i>Limpar Fila
+                    </button>
+                    <button onclick="exportQueue()" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">
+                        <i class="fas fa-download mr-2"></i>Exportar Lista
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-xl p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">Gerenciamento da Fila</h3>
+                <div id="adminQueueDisplay">
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-clipboard-list text-4xl mb-4"></i>
+                        <p>Nenhuma pessoa na fila.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="schedulingModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+                <div class="p-6 border-b">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-bold text-gray-800">Agendar Retirada</h3>
+                        <button onclick="closeSchedulingModal()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="p-6">
+                    <form id="schedulingForm">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Data da Retirada</label>
+                            <input type="date" id="pickupDate" required 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Horário</label>
+                            <select id="pickupTime" required 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                                <option value="">Selecione um horário</option>
+                                <option value="08:00">08:00 - 08:30</option>
+                                <option value="08:30">08:30 - 09:00</option>
+                                <option value="09:00">09:00 - 09:30</option>
+                                <option value="09:30">09:30 - 10:00</option>
+                                <option value="14:00">14:00 - 14:30</option>
+                                <option value="14:30">14:30 - 15:00</option>
+                                <option value="15:00">15:00 - 15:30</option>
+                                <option value="15:30">15:30 - 16:00</option>
+                            </select>
+                        </div>
+                        
+                        <div class="flex justify-end space-x-4">
+                            <button type="button" onclick="closeSchedulingModal()" 
+                                    class="px-4 py-2 text-gray-600 hover:text-gray-800">
+                                Cancelar
+                            </button>
+                            <button type="submit" 
+                                    class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                                Confirmar Agendamento
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let queue = [];
+        let completedPickups = [];
+        let currentUserId = null;
+        let currentSchedulingId = null;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            updateDisplays();
+            setMinDate();
+        });
+
+        // Set minimum date to today
+        function setMinDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('pickupDate').min = today;
+        }
+
+        // Load data from localStorage
+        function loadData() {
+            const savedQueue = localStorage.getItem('fertilizerQueue');
+            const savedCompleted = localStorage.getItem('completedPickups');
+            
+            if (savedQueue) {
+                queue = JSON.parse(savedQueue);
+            }
+            
+            if (savedCompleted) {
+                completedPickups = JSON.parse(savedCompleted);
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('fertilizerQueue', JSON.stringify(queue));
+            localStorage.setItem('completedPickups', JSON.stringify(completedPickups));
+        }
+
+        // Show user panel
+        function showUserPanel() {
+            document.getElementById('userPanel').classList.remove('hidden');
+            document.getElementById('adminPanel').classList.add('hidden');
+            updateDisplays();
+        }
+
+        // Show admin panel
+        function showAdminPanel() {
+            document.getElementById('userPanel').classList.add('hidden');
+            document.getElementById('adminPanel').classList.remove('hidden');
+            updateAdminDisplays();
+        }
+
+        // Registration form handler
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('userName').value.trim();
+            const email = document.getElementById('userEmail').value.trim();
+            const sector = document.getElementById('userSector').value;
+            
+            // Check if email already exists
+            if (queue.some(person => person.email === email)) {
+                showNotification('Este e-mail já está cadastrado na fila!', 'error');
+                return;
+            }
+            
+            const newPerson = {
+                id: Date.now(),
+                name: name,
+                email: email,
+                sector: sector,
+                joinedAt: new Date().toISOString(),
+                status: 'waiting', // waiting, ready, scheduled, completed
+                scheduledDate: null,
+                scheduledTime: null
+            };
+            
+            queue.push(newPerson);
+            currentUserId = newPerson.id;
+            
+            saveData();
+            updateDisplays();
+            
+            this.reset();
+            showNotification(`${name} foi adicionado(a) à fila!`, 'success');
+            
+            // Show user position
+            updateUserPosition();
+        });
+
+        // Update user position display
+        function updateUserPosition() {
+            if (currentUserId) {
+                const userIndex = queue.findIndex(person => person.id === currentUserId);
+                if (userIndex !== -1) {
+                    document.getElementById('userPosition').classList.remove('hidden');
+                    document.getElementById('positionText').textContent = `Posição: #${userIndex + 1}`;
+                    
+                    const person = queue[userIndex];
+                    if (person.status === 'ready') {
+                        document.getElementById('positionText').innerHTML = `
+                            <span class="text-green-600 font-bold">É sua vez! Clique para agendar a retirada.</span>
+                            <button onclick="openSchedulingModal(${person.id})" 
+                                    class="ml-2 bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
+                                Agendar
+                            </button>
+                        `;
+                    } else if (person.st
