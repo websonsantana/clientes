@@ -50,45 +50,45 @@
 <body class="bg-gray-50 font-sans">
     <header class="bg-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-6">
-                <div class="flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center">
-                        <i class="fas fa-leaf text-white text-xl"></i>
+            <div class="flex flex-col sm:flex-row justify-between items-center py-4 sm:py-6">
+                <div class="flex items-center space-x-3 mb-4 sm:mb-0">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-green-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-leaf text-white text-lg sm:text-xl"></i>
                     </div>
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-800">Composteira da Empresa</h1>
-                        <p class="text-gray-600">Sistema de Distribuição de Adubo Orgânico</p>
+                        <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Composteira da Empresa</h1>
+                        <p class="text-sm sm:text-base text-gray-600">Sistema de Distribuição de Adubo Orgânico</p>
                     </div>
                 </div>
-                <div class="flex space-x-4">
-                    <button onclick="showUserPanel()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
-                        <i class="fas fa-user mr-2"></i>Colaborador
+                <div class="flex space-x-2 sm:space-x-4">
+                    <button onclick="showUserPanel()" class="bg-blue-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-blue-600 transition text-sm sm:text-base">
+                        <i class="fas fa-user mr-1 sm:mr-2"></i>Colaborador
                     </button>
-                    <button onclick="showAdminPanel()" class="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition">
-                        <i class="fas fa-cog mr-2"></i>Administração
+                    <button onclick="showAdminPanel()" class="bg-purple-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-purple-600 transition text-sm sm:text-base">
+                        <i class="fas fa-cog mr-1 sm:mr-2"></i>Admin
                     </button>
                 </div>
             </div>
         </div>
     </header>
 
-    <div id="notificationArea" class="fixed top-4 right-4 z-50"></div>
+    <div id="notificationArea" class="fixed top-4 right-4 z-50 p-2 sm:p-0"></div>
 
     <div id="userPanel" class="min-h-screen compost-bg">
-        <div class="max-w-6xl mx-auto px-4 py-8">
-            <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-white mb-4">
-                    <i class="fas fa-seedling mr-3"></i>Fila de Adubo Orgânico
+        <div class="max-w-6xl mx-auto px-4 py-6 sm:py-8">
+            <div class="text-center mb-6 sm:mb-8">
+                <h2 class="text-2xl sm:text-3xl font-bold text-white mb-2 sm:mb-4">
+                    <i class="fas fa-seedling mr-2 sm:mr-3"></i>Fila de Adubo Orgânico
                 </h2>
-                <p class="text-white text-lg opacity-90">
+                <p class="text-base sm:text-lg text-white opacity-90">
                     Cadastre-se na fila e receba adubo orgânico de qualidade da nossa composteira!
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
                 <div class="lg:col-span-1">
-                    <div class="bg-white rounded-lg shadow-xl p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                    <div class="bg-white rounded-lg shadow-xl p-5 sm:p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-5 flex items-center">
                             <i class="fas fa-user-plus text-green-600 mr-2"></i>
                             Entrar na Fila
                         </h3>
@@ -130,8 +130,7 @@
 
                         <div id="userPosition" class="mt-6 hidden">
                             <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                <div class="flex items-center">
-                                    <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                                <div class="flex items-center flex-wrap"> <i class="fas fa-info-circle text-blue-500 mr-2 mb-1 sm:mb-0"></i>
                                     <div>
                                         <p class="text-blue-800 font-medium">Você está na fila!</p>
                                         <p class="text-blue-600" id="positionText">Posição: #0</p>
@@ -141,7 +140,7 @@
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-lg shadow-xl p-6 mt-6">
+                    <div class="bg-white rounded-lg shadow-xl p-5 sm:p-6 mt-6">
                         <h3 class="text-lg font-bold text-gray-800 mb-4">Estatísticas</h3>
                         <div class="space-y-3">
                             <div class="flex justify-between items-center">
@@ -161,8 +160,8 @@
                 </div>
 
                 <div class="lg:col-span-2">
-                    <div class="bg-white rounded-lg shadow-xl p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                    <div class="bg-white rounded-lg shadow-xl p-5 sm:p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-5 flex items-center">
                             <i class="fas fa-list-ol text-green-600 mr-2"></i>
                             Fila Atual
                         </h3>
@@ -181,55 +180,55 @@
     </div>
 
     <div id="adminPanel" class="min-h-screen admin-panel hidden">
-        <div class="max-w-7xl mx-auto px-4 py-8">
-            <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-white mb-4">
-                    <i class="fas fa-cog mr-3"></i>Painel de Administração
+        <div class="max-w-7xl mx-auto px-4 py-6 sm:py-8">
+            <div class="text-center mb-6 sm:mb-8">
+                <h2 class="text-2xl sm:text-3xl font-bold text-white mb-2 sm:mb-4">
+                    <i class="fas fa-cog mr-2 sm:mr-3"></i>Painel de Administração
                 </h2>
-                <p class="text-white text-lg opacity-90">
+                <p class="text-base sm:text-lg text-white opacity-90">
                     Gerencie a fila de distribuição de adubo orgânico
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white rounded-lg shadow-lg p-6 text-center">
-                    <div class="text-3xl font-bold text-blue-600" id="adminQueueCount">0</div>
-                    <div class="text-gray-600">Pessoas na Fila</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                <div class="bg-white rounded-lg shadow-lg p-5 text-center">
+                    <div class="text-2xl sm:text-3xl font-bold text-blue-600" id="adminQueueCount">0</div>
+                    <div class="text-gray-600 text-sm sm:text-base">Pessoas na Fila</div>
                 </div>
                 
-                <div class="bg-white rounded-lg shadow-lg p-6 text-center">
-                    <div class="text-3xl font-bold text-green-600" id="completedCount">0</div>
-                    <div class="text-gray-600">Retiradas Concluídas</div>
+                <div class="bg-white rounded-lg shadow-lg p-5 text-center">
+                    <div class="text-2xl sm:text-3xl font-bold text-green-600" id="completedCount">0</div>
+                    <div class="text-gray-600 text-sm sm:text-base">Retiradas Concluídas</div>
                 </div>
                 
-                <div class="bg-white rounded-lg shadow-lg p-6 text-center">
-                    <div class="text-3xl font-bold text-orange-600" id="pendingCount">0</div>
-                    <div class="text-gray-600">Agendamentos Pendentes</div>
+                <div class="bg-white rounded-lg shadow-lg p-5 text-center">
+                    <div class="text-2xl sm:text-3xl font-bold text-orange-600" id="pendingCount">0</div>
+                    <div class="text-gray-600 text-sm sm:text-base">Agendamentos Pendentes</div>
                 </div>
                 
-                <div class="bg-white rounded-lg shadow-lg p-6 text-center">
-                    <div class="text-3xl font-bold text-purple-600">5kg</div>
-                    <div class="text-gray-600">Estoque Disponível</div>
+                <div class="bg-white rounded-lg shadow-lg p-5 text-center">
+                    <div class="text-2xl sm:text-3xl font-bold text-purple-600">5kg</div>
+                    <div class="text-gray-600 text-sm sm:text-base">Estoque Disponível</div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow-xl p-6 mb-8">
-                <h3 class="text-xl font-bold text-gray-800 mb-6">Controles Administrativos</h3>
-                <div class="flex flex-wrap gap-4">
-                    <button onclick="notifyNext()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
-                        <i class="fas fa-bell mr-2"></i>Notificar Próximo
+            <div class="bg-white rounded-lg shadow-xl p-5 sm:p-6 mb-6 sm:mb-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-5">Controles Administrativos</h3>
+                <div class="flex flex-wrap gap-3 sm:gap-4">
+                    <button onclick="notifyNext()" class="bg-blue-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-blue-600 transition text-sm sm:text-base">
+                        <i class="fas fa-bell mr-1 sm:mr-2"></i>Notificar Próximo
                     </button>
-                    <button onclick="clearQueue()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
-                        <i class="fas fa-trash mr-2"></i>Limpar Fila
+                    <button onclick="clearQueue()" class="bg-red-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-red-600 transition text-sm sm:text-base">
+                        <i class="fas fa-trash mr-1 sm:mr-2"></i>Limpar Fila
                     </button>
-                    <button onclick="exportQueue()" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">
-                        <i class="fas fa-download mr-2"></i>Exportar Lista
+                    <button onclick="exportQueue()" class="bg-green-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-green-600 transition text-sm sm:text-base">
+                        <i class="fas fa-download mr-1 sm:mr-2"></i>Exportar Lista
                     </button>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow-xl p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-6">Gerenciamento da Fila</h3>
+            <div class="bg-white rounded-lg shadow-xl p-5 sm:p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-5">Gerenciamento da Fila</h3>
                 <div id="adminQueueDisplay">
                     <div class="text-center py-8 text-gray-500">
                         <i class="fas fa-clipboard-list text-4xl mb-4"></i>
@@ -242,8 +241,8 @@
 
     <div id="schedulingModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40">
         <div class="flex items-center justify-center min-h-screen px-4">
-            <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
-                <div class="p-6 border-b">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-sm sm:max-w-md">
+                <div class="p-5 border-b">
                     <div class="flex justify-between items-center">
                         <h3 class="text-lg font-bold text-gray-800">Agendar Retirada</h3>
                         <button onclick="closeSchedulingModal()" class="text-gray-400 hover:text-gray-600">
@@ -252,7 +251,7 @@
                     </div>
                 </div>
                 
-                <div class="p-6">
+                <div class="p-5">
                     <form id="schedulingForm">
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Data da Retirada</label>
@@ -276,13 +275,13 @@
                             </select>
                         </div>
                         
-                        <div class="flex justify-end space-x-4">
+                        <div class="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4">
                             <button type="button" onclick="closeSchedulingModal()" 
-                                    class="px-4 py-2 text-gray-600 hover:text-gray-800">
+                                    class="px-4 py-2 text-gray-600 hover:text-gray-800 order-2 sm:order-1">
                                 Cancelar
                             </button>
                             <button type="submit" 
-                                    class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                                    class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 order-1 sm:order-2">
                                 Confirmar Agendamento
                             </button>
                         </div>
@@ -309,7 +308,10 @@
         // Set minimum date to today
         function setMinDate() {
             const today = new Date().toISOString().split('T')[0];
-            document.getElementById('pickupDate').min = today;
+            const pickupDateInput = document.getElementById('pickupDate');
+            if (pickupDateInput) {
+                pickupDateInput.min = today;
+            }
         }
 
         // Load data from localStorage
@@ -390,15 +392,375 @@
                 const userIndex = queue.findIndex(person => person.id === currentUserId);
                 if (userIndex !== -1) {
                     document.getElementById('userPosition').classList.remove('hidden');
-                    document.getElementById('positionText').textContent = `Posição: #${userIndex + 1}`;
-                    
                     const person = queue[userIndex];
+                    let positionHtml = '';
+
                     if (person.status === 'ready') {
-                        document.getElementById('positionText').innerHTML = `
+                        positionHtml = `
                             <span class="text-green-600 font-bold">É sua vez! Clique para agendar a retirada.</span>
                             <button onclick="openSchedulingModal(${person.id})" 
-                                    class="ml-2 bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
+                                    class="ml-2 mt-2 sm:mt-0 bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
                                 Agendar
                             </button>
                         `;
-                    } else if (person.st
+                    } else if (person.status === 'scheduled') {
+                        positionHtml = `
+                            <span class="text-blue-600 font-bold">Agendado para ${formatDate(person.scheduledDate)} às ${person.scheduledTime}</span>
+                        `;
+                    } else if (person.status === 'waiting') {
+                         positionHtml = `Posição: <span class="font-bold">#${userIndex + 1}</span>`;
+                    }
+                    document.getElementById('positionText').innerHTML = positionHtml;
+
+                }
+            }
+        }
+
+        // Update all displays
+        function updateDisplays() {
+            updateQueueDisplay();
+            updateStats();
+            updateUserPosition();
+        }
+
+        // Update queue display for users
+        function updateQueueDisplay() {
+            const container = document.getElementById('queueDisplay');
+            
+            if (queue.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-clipboard-list text-4xl mb-4"></i>
+                        <p>Nenhuma pessoa na fila ainda.</p>
+                        <p class="text-sm">Seja o primeiro a se cadastrar!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = queue.map((person, index) => `
+                <div class="queue-item border-l-4 ${getStatusBorderColor(person.status)} bg-gray-50 p-3 sm:p-4 rounded-r-lg">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between">
+                        <div class="flex items-center space-x-3 sm:space-x-4 mb-2 sm:mb-0">
+                            <div class="w-9 h-9 sm:w-10 sm:h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-bold text-sm sm:text-base">
+                                ${index + 1}
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800 text-base sm:text-lg">${person.name}</h4>
+                                <p class="text-xs sm:text-sm text-gray-600">${person.sector}</p>
+                                <p class="text-xs text-gray-500">Entrou em: ${formatDateTime(person.joinedAt)}</p>
+                            </div>
+                        </div>
+                        <div class="text-left sm:text-right w-full sm:w-auto mt-2 sm:mt-0">
+                            <span class="inline-block px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(person.status)}">
+                                ${getStatusText(person.status)}
+                            </span>
+                            ${person.scheduledDate ? `
+                                <p class="text-xs text-gray-600 mt-1">
+                                    ${formatDate(person.scheduledDate)} às ${person.scheduledTime}
+                                </p>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update admin displays
+        function updateAdminDisplays() {
+            updateAdminQueueDisplay();
+            updateAdminStats();
+        }
+
+        // Update admin queue display
+        function updateAdminQueueDisplay() {
+            const container = document.getElementById('adminQueueDisplay');
+            
+            if (queue.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-clipboard-list text-4xl mb-4"></i>
+                        <p>Nenhuma pessoa na fila.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Usar uma div responsiva para a tabela
+            container.innerHTML = `
+                <div class="overflow-x-auto rounded-lg shadow-md">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Posição</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">E-mail</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Setor</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Agendamento</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            ${queue.map((person, index) => `
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        #${index + 1}
+                                    </td>
+                                    <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-900">${person.name}</td>
+                                    <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500">${person.email}</td>
+                                    <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500">${person.sector}</td>
+                                    <td class="px-3 py-3 whitespace-nowrap">
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(person.status)}">
+                                            ${getStatusText(person.status)}
+                                        </span>
+                                    </td>
+                                    <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500">
+                                        ${person.scheduledDate ? `${formatDate(person.scheduledDate)} ${person.scheduledTime}` : '-'}
+                                    </td>
+                                    <td class="px-3 py-3 whitespace-nowrap text-sm font-medium space-x-1 flex flex-wrap gap-1">
+                                        ${person.status === 'waiting' ? `
+                                            <button onclick="markAsReady(${person.id})" 
+                                                    class="text-blue-600 hover:text-blue-900 text-sm">
+                                                Notificar
+                                            </button>
+                                        ` : ''}
+                                        ${person.status === 'scheduled' ? `
+                                            <button onclick="markAsCompleted(${person.id})" 
+                                                    class="text-green-600 hover:text-green-900 text-sm">
+                                                Concluir
+                                            </button>
+                                        ` : ''}
+                                        <button onclick="removeFromQueue(${person.id})" 
+                                                class="text-red-600 hover:text-red-900 text-sm">
+                                            Remover
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // Update stats
+        function updateStats() {
+            document.getElementById('queueCount').textContent = queue.length;
+        }
+
+        // Update admin stats
+        function updateAdminStats() {
+            document.getElementById('adminQueueCount').textContent = queue.length;
+            document.getElementById('completedCount').textContent = completedPickups.length;
+            document.getElementById('pendingCount').textContent = queue.filter(p => p.status === 'scheduled').length;
+        }
+
+        // Admin functions
+        function markAsReady(personId) {
+            const person = queue.find(p => p.id === personId);
+            if (person) {
+                person.status = 'ready';
+                saveData();
+                updateAdminDisplays();
+                updateDisplays();
+                
+                showNotification(`${person.name} foi notificado para agendar a retirada!`, 'success');
+                
+                // Simulate email notification
+                simulateEmailNotification(person);
+            }
+        }
+
+        function markAsCompleted(personId) {
+            const personIndex = queue.findIndex(p => p.id === personId);
+            if (personIndex !== -1) {
+                const person = queue[personIndex];
+                person.completedAt = new Date().toISOString();
+                completedPickups.push(person);
+                queue.splice(personIndex, 1);
+                
+                saveData();
+                updateAdminDisplays();
+                updateDisplays();
+                
+                showNotification(`Retirada de ${person.name} marcada como concluída!`, 'success');
+            }
+        }
+
+        function removeFromQueue(personId) {
+            if (confirm('Tem certeza que deseja remover esta pessoa da fila?')) {
+                const personIndex = queue.findIndex(p => p.id === personId);
+                if (personIndex !== -1) {
+                    const person = queue[personIndex];
+                    queue.splice(personIndex, 1);
+                    
+                    saveData();
+                    updateAdminDisplays();
+                    updateDisplays();
+                    
+                    showNotification(`${person.name} foi removido(a) da fila.`, 'info');
+                }
+            }
+        }
+
+        function notifyNext() {
+            const nextPerson = queue.find(p => p.status === 'waiting');
+            if (nextPerson) {
+                markAsReady(nextPerson.id);
+            } else {
+                showNotification('Não há pessoas aguardando para serem notificadas.', 'info');
+            }
+        }
+
+        // Simula uma notificação (no caso real, seria um e-mail)
+        function simulateEmailNotification(person) {
+            console.log(`Simulando notificação para ${person.email}...`);
+            // Aqui você integraria com um serviço de e-mail real (ex: SendGrid, Mailgun, etc.)
+            // fetch('/send-email', { method: 'POST', body: JSON.stringify({ to: person.email, subject: 'Sua vez!', body: '...' }) });
+        }
+
+        // Open scheduling modal
+        function openSchedulingModal(personId) {
+            currentSchedulingId = personId;
+            document.getElementById('schedulingModal').classList.remove('hidden');
+        }
+
+        // Close scheduling modal
+        function closeSchedulingModal() {
+            document.getElementById('schedulingModal').classList.add('hidden');
+            currentSchedulingId = null;
+        }
+
+        // Scheduling form handler
+        document.getElementById('schedulingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const pickupDate = document.getElementById('pickupDate').value;
+            const pickupTime = document.getElementById('pickupTime').value;
+            
+            const person = queue.find(p => p.id === currentSchedulingId);
+            if (person) {
+                person.status = 'scheduled';
+                person.scheduledDate = pickupDate;
+                person.scheduledTime = pickupTime;
+                
+                saveData();
+                updateDisplays();
+                closeSchedulingModal();
+                showNotification(`Agendamento confirmado para ${person.name}!`, 'success');
+            }
+        });
+
+        // Admin Control Functions
+        function clearQueue() {
+            if (confirm('Tem certeza que deseja limpar toda a fila? Esta ação não pode ser desfeita.')) {
+                queue = [];
+                saveData();
+                updateAdminDisplays();
+                updateDisplays();
+                showNotification('Fila limpa com sucesso!', 'info');
+            }
+        }
+
+        function exportQueue() {
+            if (queue.length === 0) {
+                showNotification('A fila está vazia, não há dados para exportar.', 'info');
+                return;
+            }
+            
+            const data = queue.map(person => ({
+                Posição: queue.indexOf(person) + 1,
+                Nome: person.name,
+                Email: person.email,
+                Setor: person.sector,
+                Status: getStatusText(person.status),
+                'Data de Entrada': formatDateTime(person.joinedAt),
+                'Agendamento': person.scheduledDate ? `${formatDate(person.scheduledDate)} às ${person.scheduledTime}` : 'Não agendado'
+            }));
+            
+            const csvContent = "data:text/csv;charset=utf-8," + 
+                               [Object.keys(data[0]).join(';'), ...data.map(e => Object.values(e).join(';'))].join('\n');
+                               
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "fila_adubo.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showNotification('Fila exportada como fila_adubo.csv!', 'success');
+        }
+
+        // Utility functions for formatting and status display
+        function getStatusColor(status) {
+            switch (status) {
+                case 'waiting': return 'bg-gray-200 text-gray-800';
+                case 'ready': return 'bg-green-100 text-green-800';
+                case 'scheduled': return 'bg-blue-100 text-blue-800';
+                case 'completed': return 'bg-purple-100 text-purple-800';
+                default: return 'bg-gray-200 text-gray-800';
+            }
+        }
+
+        function getStatusBorderColor(status) {
+            switch (status) {
+                case 'waiting': return 'border-gray-400';
+                case 'ready': return 'border-green-600';
+                case 'scheduled': return 'border-blue-600';
+                case 'completed': return 'border-purple-600';
+                default: return 'border-gray-400';
+            }
+        }
+
+        function getStatusText(status) {
+            switch (status) {
+                case 'waiting': return 'Aguardando';
+                case 'ready': return 'Pronto para agendar';
+                case 'scheduled': return 'Agendado';
+                case 'completed': return 'Concluído';
+                default: return 'Desconhecido';
+            }
+        }
+
+        function formatDate(isoDate) {
+            const date = new Date(isoDate + 'T00:00:00'); // Add time to avoid timezone issues
+            return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+
+        function formatDateTime(isoString) {
+            const date = new Date(isoString);
+            return date.toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Notification system
+        function showNotification(message, type) {
+            const notificationArea = document.getElementById('notificationArea');
+            const notification = document.createElement('div');
+            notification.className = `notification p-4 rounded-lg shadow-lg mb-2 flex items-center space-x-3 
+                                      ${type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500'} 
+                                      text-white font-medium`;
+
+            const iconClass = type === 'success' ? 'fas fa-check-circle' : type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-info-circle';
+
+            notification.innerHTML = `
+                <i class="${iconClass} text-xl"></i>
+                <span>${message}</span>
+            `;
+            
+            notificationArea.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                notification.addEventListener('animationend', () => notification.remove());
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
