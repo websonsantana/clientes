@@ -7,95 +7,105 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
     <style>
-        .priority-high { border-left: 4px solid #ef4444; }
-        .priority-medium { border-left: 4px solid #f59e0b; }
-        .priority-low { border-left: 4px solid #10b981; }
-        .completed-item { opacity: 0.6; text-decoration: line-through; }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        body { font-family: 'Poppins', sans-serif; }
+        .priority-high { border-left: 5px solid #ef4444; }
+        .priority-medium { border-left: 5px solid #f97316; }
+        .priority-low { border-left: 5px solid #22c55e; }
+        .completed-item { opacity: 0.5; text-decoration: line-through; }
         .modal-overlay {
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
+            animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <div class="container mx-auto px-4 py-8 max-w-md">
-        <header class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-800 flex items-center">
-                <i data-feather="shopping-cart" class="mr-2"></i> Lista de Compras
+<body class="bg-slate-100 min-h-screen text-slate-800">
+    <div class="container mx-auto px-4 py-10 max-w-lg">
+        <header class="mb-8 text-center" data-aos="fade-down">
+            <h1 class="text-4xl font-extrabold flex items-center justify-center">
+                <i data-feather="shopping-bag" class="mr-3 text-sky-600 w-8 h-8"></i>
+                Lista de Compras
             </h1>
-            <p class="text-gray-600">Compartilhada com sua esposa</p>
+            <p class="text-slate-500 mt-1">Sincronizada para o casal ❤️</p>
         </header>
 
-        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
-            <form id="addItemForm" class="space-y-4">
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8" data-aos="fade-up">
+            <h2 class="text-xl font-semibold mb-4 text-slate-700">Adicionar Novo Item</h2>
+            <form id="addItemForm" class="space-y-5">
                 <div>
-                    <label for="itemName" class="block text-sm font-medium text-gray-700 mb-1">Item</label>
-                    <input type="text" id="itemName" required class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <label for="itemName" class="block text-sm font-medium text-slate-600 mb-1">Item</label>
+                    <input type="text" id="itemName" required class="w-full px-5 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200">
                 </div>
                 
+                <div>
+                    <label for="itemLink" class="block text-sm font-medium text-slate-600 mb-1">Link do Produto</label>
+                    <input type="url" id="itemLink" placeholder="Ex: https://..." class="w-full px-5 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200">
+                </div>
+
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label for="itemPriority" class="block text-sm font-medium text-gray-700 mb-1">Prioridade</label>
-                        <select id="itemPriority" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <label for="itemPriority" class="block text-sm font-medium text-slate-600 mb-1">Prioridade</label>
+                        <select id="itemPriority" class="w-full px-5 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200 bg-white">
                             <option value="high">Alta</option>
                             <option value="medium" selected>Média</option>
                             <option value="low">Baixa</option>
                         </select>
                     </div>
                     <div>
-                        <label for="itemPrice" class="block text-sm font-medium text-gray-700 mb-1">Valor (R$)</label>
-                        <input type="number" step="0.01" id="itemPrice" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <label for="itemPrice" class="block text-sm font-medium text-slate-600 mb-1">Valor (R$)</label>
+                        <input type="number" step="0.01" id="itemPrice" class="w-full px-5 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200">
                     </div>
                 </div>
                 
                 <div>
-                    <label for="itemNotes" class="block text-sm font-medium text-gray-700 mb-1">Observações</label>
-                    <textarea id="itemNotes" rows="2" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    <label for="itemNotes" class="block text-sm font-medium text-slate-600 mb-1">Observações</label>
+                    <textarea id="itemNotes" rows="3" class="w-full px-5 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-200"></textarea>
                 </div>
                 
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200 flex items-center justify-center">
-                    <i data-feather="plus" class="mr-2"></i> Adicionar Item
+                <button type="submit" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 px-6 rounded-xl transition duration-300 flex items-center justify-center shadow-lg hover:shadow-xl">
+                    <i data-feather="plus-circle" class="w-5 h-5 mr-2"></i> Adicionar à Lista
                 </button>
             </form>
         </div>
 
-        <div class="bg-white rounded-xl shadow-md overflow-hidden">
-            <div class="p-4 border-b border-gray-200 flex justify-between items-center">
-                <h2 class="text-lg font-semibold text-gray-800">Itens da Lista</h2>
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden" data-aos="fade-up" data-aos-delay="200">
+            <div class="p-5 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center">
+                <h2 class="text-xl font-semibold text-slate-700 mb-3 sm:mb-0">Itens da Lista</h2>
                 <div class="flex space-x-2">
-                    <button id="filterAll" class="px-3 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">Todos</button>
-                    <button id="filterPending" class="px-3 py-1 text-xs bg-gray-100 text-gray-800 rounded-full">Pendentes</button>
+                    <button id="filterAll" class="px-4 py-2 text-xs font-semibold rounded-full bg-sky-500 text-white shadow-md transition duration-200">Todos</button>
+                    <button id="filterPending" class="px-4 py-2 text-xs font-semibold rounded-full bg-slate-200 text-slate-600 transition duration-200 hover:bg-slate-300">Pendentes</button>
                 </div>
             </div>
             
-            <ul id="shoppingList" class="divide-y divide-gray-200">
-                <!-- Items will be added here dynamically -->
-            </ul>
+            <ul id="shoppingList" class="divide-y divide-slate-200">
+                </ul>
         </div>
     </div>
 
-    <!-- Item Details Modal -->
     <div id="itemModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
         <div class="modal-overlay absolute inset-0"></div>
-        <div class="bg-white rounded-xl shadow-xl w-full max-w-md relative z-10 max-h-[90vh] overflow-y-auto">
-            <button id="closeModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
-                <i data-feather="x"></i>
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md relative z-10 max-h-[90vh] overflow-y-auto transform scale-95 opacity-0 transition-all duration-300 ease-in-out">
+            <button id="closeModal" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 transition-colors">
+                <i data-feather="x" class="w-6 h-6"></i>
             </button>
             
-            <div class="p-6">
+            <div class="p-8">
                 <div id="modalContent">
-                    <!-- Modal content will be loaded here -->
-                </div>
+                    </div>
                 
-                <div class="mt-6 flex space-x-3">
-                    <button id="deleteItem" class="flex-1 bg-red-100 hover:bg-red-200 text-red-800 py-2 px-4 rounded-lg transition duration-200 flex items-center justify-center">
-                        <i data-feather="trash-2" class="mr-2"></i> Excluir
+                <div class="mt-8 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
+                    <button id="saveChanges" class="flex-1 bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 px-6 rounded-xl transition duration-300 flex items-center justify-center shadow-md hover:shadow-lg">
+                        <i data-feather="save" class="w-4 h-4 mr-2"></i> Salvar
                     </button>
-                    <button id="saveChanges" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition duration-200 flex items-center justify-center">
-                        <i data-feather="save" class="mr-2"></i> Salvar
+                    <button id="deleteItem" class="flex-1 bg-red-100 hover:bg-red-200 text-red-700 font-semibold py-3 px-6 rounded-xl transition duration-300 flex items-center justify-center">
+                        <i data-feather="trash-2" class="w-4 h-4 mr-2"></i> Excluir
                     </button>
                 </div>
             </div>
@@ -104,17 +114,15 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            AOS.init({ duration: 800, once: true });
             feather.replace();
-            AOS.init();
             
-            // Initialize Firebase (replace with your config)
-            // For demo purposes, we'll use localStorage
             let shoppingList = JSON.parse(localStorage.getItem('sharedShoppingList')) || [];
             
-            // DOM Elements
             const addItemForm = document.getElementById('addItemForm');
             const shoppingListEl = document.getElementById('shoppingList');
             const itemModal = document.getElementById('itemModal');
+            const modalContainer = itemModal.querySelector('.relative');
             const closeModal = document.getElementById('closeModal');
             const modalContent = document.getElementById('modalContent');
             const deleteItemBtn = document.getElementById('deleteItem');
@@ -124,7 +132,6 @@
             
             let currentItemId = null;
             
-            // Render shopping list
             function renderShoppingList(filter = 'all') {
                 shoppingListEl.innerHTML = '';
                 
@@ -134,8 +141,8 @@
                 
                 if (filteredList.length === 0) {
                     shoppingListEl.innerHTML = `
-                        <li class="p-4 text-center text-gray-500">
-                            Nenhum item na lista. Adicione seu primeiro item!
+                        <li class="p-6 text-center text-slate-400 font-medium">
+                            Nenhum item na lista. Adicione seu primeiro item! 😊
                         </li>
                     `;
                     return;
@@ -146,17 +153,20 @@
                     const completedClass = item.completed ? 'completed-item' : '';
                     
                     const itemEl = document.createElement('li');
-                    itemEl.className = `p-4 ${priorityClass} ${completedClass} hover:bg-gray-50 cursor-pointer transition`;
+                    itemEl.className = `p-5 ${priorityClass} ${completedClass} hover:bg-slate-50 cursor-pointer transition-colors duration-200`;
                     itemEl.dataset.id = item.id;
                     
                     itemEl.innerHTML = `
                         <div class="flex items-center justify-between">
                             <div class="flex items-center">
                                 <input type="checkbox" ${item.completed ? 'checked' : ''} 
-                                    class="h-5 w-5 text-blue-600 rounded focus:ring-blue-500 mr-3">
-                                <span class="font-medium">${item.name}</span>
+                                    class="h-5 w-5 text-sky-600 rounded border-slate-300 focus:ring-sky-500 mr-4">
+                                <div>
+                                    <span class="font-semibold text-lg text-slate-800 block">${item.name}</span>
+                                    ${item.price > 0 ? `<p class="text-sm text-slate-500 mt-1">R$ ${item.price.toFixed(2)}</p>` : ''}
+                                </div>
                             </div>
-                            <span class="text-sm ${getPriorityColor(item.priority)} px-2 py-1 rounded-full">
+                            <span class="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full ${getPriorityColor(item.priority)}">
                                 ${getPriorityText(item.priority)}
                             </span>
                         </div>
@@ -164,24 +174,21 @@
                     
                     shoppingListEl.appendChild(itemEl);
                     
-                    // Add event listeners
                     const checkbox = itemEl.querySelector('input[type="checkbox"]');
-                    checkbox.addEventListener('change', () => toggleItemCompleted(item.id));
-                    
-                    itemEl.addEventListener('click', (e) => {
-                        if (e.target !== checkbox) {
-                            openItemModal(item.id);
-                        }
+                    checkbox.addEventListener('change', (e) => {
+                        e.stopPropagation();
+                        toggleItemCompleted(item.id);
                     });
+                    
+                    itemEl.addEventListener('click', () => openItemModal(item.id));
                 });
             }
             
-            // Helper functions
             function getPriorityText(priority) {
                 switch(priority) {
-                    case 'high': return 'Alta';
-                    case 'medium': return 'Média';
-                    case 'low': return 'Baixa';
+                    case 'high': return 'Urgente';
+                    case 'medium': return 'Importante';
+                    case 'low': return 'Comum';
                     default: return '';
                 }
             }
@@ -189,17 +196,17 @@
             function getPriorityColor(priority) {
                 switch(priority) {
                     case 'high': return 'bg-red-100 text-red-800';
-                    case 'medium': return 'bg-yellow-100 text-yellow-800';
+                    case 'medium': return 'bg-orange-100 text-orange-800';
                     case 'low': return 'bg-green-100 text-green-800';
                     default: return '';
                 }
             }
             
-            // Form submission
             addItemForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 
                 const name = document.getElementById('itemName').value.trim();
+                const link = document.getElementById('itemLink').value.trim();
                 const priority = document.getElementById('itemPriority').value;
                 const price = parseFloat(document.getElementById('itemPrice').value) || 0;
                 const notes = document.getElementById('itemNotes').value.trim();
@@ -207,6 +214,7 @@
                 const newItem = {
                     id: Date.now().toString(),
                     name,
+                    link,
                     priority,
                     price,
                     notes,
@@ -218,12 +226,10 @@
                 saveList();
                 renderShoppingList();
                 
-                // Reset form
                 addItemForm.reset();
                 document.getElementById('itemName').focus();
             });
             
-            // Toggle item completed status
             function toggleItemCompleted(id) {
                 shoppingList = shoppingList.map(item => {
                     if (item.id === id) {
@@ -235,7 +241,6 @@
                 renderShoppingList();
             }
             
-            // Open item modal
             function openItemModal(id) {
                 const item = shoppingList.find(item => item.id === id);
                 if (!item) return;
@@ -243,43 +248,56 @@
                 currentItemId = id;
                 
                 modalContent.innerHTML = `
-                    <h3 class="text-xl font-bold mb-4">${item.name}</h3>
+                    <h3 class="text-3xl font-bold mb-2 text-slate-800">${item.name}</h3>
+                    <p class="text-sm text-slate-400 mb-6">Criado em: ${new Date(item.createdAt).toLocaleString('pt-BR')}</p>
                     
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-500 mb-1">Prioridade</label>
-                            <select id="modalPriority" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="high" ${item.priority === 'high' ? 'selected' : ''}>Alta</option>
-                                <option value="medium" ${item.priority === 'medium' ? 'selected' : ''}>Média</option>
-                                <option value="low" ${item.priority === 'low' ? 'selected' : ''}>Baixa</option>
+                            <label class="block text-sm font-medium text-slate-500 mb-1">Prioridade</label>
+                            <select id="modalPriority" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 bg-white">
+                                <option value="high" ${item.priority === 'high' ? 'selected' : ''}>Urgente</option>
+                                <option value="medium" ${item.priority === 'medium' ? 'selected' : ''}>Importante</option>
+                                <option value="low" ${item.priority === 'low' ? 'selected' : ''}>Comum</option>
                             </select>
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-500 mb-1">Valor (R$)</label>
-                            <input type="number" step="0.01" id="modalPrice" value="${item.price}" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <label class="block text-sm font-medium text-slate-500 mb-1">Valor (R$)</label>
+                            <input type="number" step="0.01" id="modalPrice" value="${item.price}" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-500 mb-1">Link do Produto</label>
+                            <input type="url" id="modalLink" value="${item.link || ''}" placeholder="URL de compra" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-500 mb-1">Observações</label>
-                            <textarea id="modalNotes" rows="3" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">${item.notes || ''}</textarea>
-                        </div>
-                        
-                        <div class="pt-2 border-t border-gray-200">
-                            <p class="text-sm text-gray-500">Adicionado em: ${new Date(item.createdAt).toLocaleString()}</p>
+                            <label class="block text-sm font-medium text-slate-500 mb-1">Observações</label>
+                            <textarea id="modalNotes" rows="3" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500">${item.notes || ''}</textarea>
                         </div>
                     </div>
+
+                    ${item.link ? `
+                        <a href="${item.link}" target="_blank" class="mt-6 block w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-3 rounded-xl text-center transition duration-300">
+                            <i data-feather="external-link" class="inline w-4 h-4 mr-2"></i> Ver Produto
+                        </a>
+                    ` : ''}
                 `;
-                
+
+                feather.replace(); // Re-render icons inside the modal
                 itemModal.classList.remove('hidden');
+                setTimeout(() => {
+                    modalContainer.classList.remove('scale-95', 'opacity-0');
+                    modalContainer.classList.add('scale-100', 'opacity-100');
+                }, 10);
             }
             
-            // Close modal
             closeModal.addEventListener('click', () => {
-                itemModal.classList.add('hidden');
+                modalContainer.classList.remove('scale-100', 'opacity-100');
+                modalContainer.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => itemModal.classList.add('hidden'), 300);
             });
             
-            // Delete item
             deleteItemBtn.addEventListener('click', () => {
                 if (!currentItemId) return;
                 
@@ -287,16 +305,16 @@
                     shoppingList = shoppingList.filter(item => item.id !== currentItemId);
                     saveList();
                     renderShoppingList();
-                    itemModal.classList.add('hidden');
+                    closeModal.click();
                 }
             });
             
-            // Save changes
             saveChangesBtn.addEventListener('click', () => {
                 if (!currentItemId) return;
                 
                 const priority = document.getElementById('modalPriority').value;
                 const price = parseFloat(document.getElementById('modalPrice').value) || 0;
+                const link = document.getElementById('modalLink').value.trim();
                 const notes = document.getElementById('modalNotes').value.trim();
                 
                 shoppingList = shoppingList.map(item => {
@@ -305,6 +323,7 @@
                             ...item, 
                             priority,
                             price,
+                            link,
                             notes
                         };
                     }
@@ -313,37 +332,31 @@
                 
                 saveList();
                 renderShoppingList();
-                itemModal.classList.add('hidden');
+                closeModal.click();
             });
             
-            // Filter buttons
             filterAllBtn.addEventListener('click', () => {
-                filterAllBtn.classList.remove('bg-gray-100', 'text-gray-800');
-                filterAllBtn.classList.add('bg-blue-100', 'text-blue-800');
-                filterPendingBtn.classList.remove('bg-blue-100', 'text-blue-800');
-                filterPendingBtn.classList.add('bg-gray-100', 'text-gray-800');
+                filterAllBtn.classList.add('bg-sky-500', 'text-white');
+                filterAllBtn.classList.remove('bg-slate-200', 'text-slate-600');
+                filterPendingBtn.classList.remove('bg-sky-500', 'text-white');
+                filterPendingBtn.classList.add('bg-slate-200', 'text-slate-600');
                 renderShoppingList('all');
             });
             
             filterPendingBtn.addEventListener('click', () => {
-                filterPendingBtn.classList.remove('bg-gray-100', 'text-gray-800');
-                filterPendingBtn.classList.add('bg-blue-100', 'text-blue-800');
-                filterAllBtn.classList.remove('bg-blue-100', 'text-blue-800');
-                filterAllBtn.classList.add('bg-gray-100', 'text-gray-800');
+                filterPendingBtn.classList.add('bg-sky-500', 'text-white');
+                filterPendingBtn.classList.remove('bg-slate-200', 'text-slate-600');
+                filterAllBtn.classList.remove('bg-sky-500', 'text-white');
+                filterAllBtn.classList.add('bg-slate-200', 'text-slate-600');
                 renderShoppingList('pending');
             });
             
-            // Save to localStorage
             function saveList() {
                 localStorage.setItem('sharedShoppingList', JSON.stringify(shoppingList));
-                // In a real app, you would sync with Firebase here
             }
             
-            // Initial render
             renderShoppingList();
         });
     </script>
-    <script>AOS.init();</script>
-    <script>feather.replace();</script>
 </body>
 </html>
