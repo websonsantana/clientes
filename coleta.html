@@ -6,6 +6,7 @@
     <title>Fila de Adubo Orgânico - Composteira Empresa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/supabase/2.39.7/umd/supabase.js"></script>
     <style>
         .notification {
             animation: slideInRight 0.5s ease-out;
@@ -45,9 +46,78 @@
         .compost-bg {
             background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><pattern id="leaves" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="15" fill="%23059669" opacity="0.1"/><circle cx="75" cy="75" r="10" fill="%2316a34a" opacity="0.1"/><circle cx="50" cy="80" r="8" fill="%2322c55e" opacity="0.1"/></pattern></defs><rect width="1000" height="1000" fill="url(%23leaves)"/></svg>');
         }
+        
+        .config-panel {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 50;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 300px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .config-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 40;
+        }
     </style>
 </head>
 <body class="bg-gray-50 font-sans">
+    <!-- Configuração Supabase Modal -->
+    <div id="configBackdrop" class="config-backdrop hidden"></div>
+    <div id="configPanel" class="config-panel hidden">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold text-gray-800">Configuração Supabase</h3>
+            <button onclick="closeConfigPanel()" class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <form id="supabaseConfigForm" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">URL do Projeto</label>
+                <input type="url" id="supabaseUrl" required 
+                       placeholder="https://seu-projeto.supabase.co"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Chave Pública (anon key)</label>
+                <textarea id="supabaseKey" required 
+                          placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                          rows="3"
+                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"></textarea>
+            </div>
+            
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p class="text-blue-800 text-sm mb-2"><strong>Configuração necessária no Supabase:</strong></p>
+                <p class="text-blue-700 text-xs">1. Crie uma tabela 'fertilizer_queue' com as colunas: id, name, email, sector, joined_at, status, scheduled_date, scheduled_time</p>
+                <p class="text-blue-700 text-xs mt-1">2. Crie uma tabela 'completed_pickups' com a mesma estrutura + completed_at</p>
+            </div>
+            
+            <div class="flex justify-end space-x-3">
+                <button type="button" onclick="closeConfigPanel()" 
+                        class="px-4 py-2 text-gray-600 hover:text-gray-800">
+                    Cancelar
+                </button>
+                <button type="submit" 
+                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                    Configurar
+                </button>
+            </div>
+        </form>
+    </div>
+
     <header class="bg-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col sm:flex-row justify-between items-center py-4 sm:py-6">
@@ -61,6 +131,9 @@
                     </div>
                 </div>
                 <div class="flex space-x-2 sm:space-x-4">
+                    <button onclick="showConfigPanel()" class="bg-gray-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-gray-600 transition text-sm sm:text-base">
+                        <i class="fas fa-database mr-1 sm:mr-2"></i>Config
+                    </button>
                     <button onclick="showUserPanel()" class="bg-blue-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-blue-600 transition text-sm sm:text-base">
                         <i class="fas fa-user mr-1 sm:mr-2"></i>Colaborador
                     </button>
@@ -73,6 +146,14 @@
     </header>
 
     <div id="notificationArea" class="fixed top-4 right-4 z-50 p-2 sm:p-0"></div>
+
+    <!-- Status de conexão -->
+    <div id="connectionStatus" class="fixed bottom-4 left-4 z-50">
+        <div class="bg-gray-800 text-white px-3 py-2 rounded-lg text-sm flex items-center space-x-2">
+            <i id="statusIcon" class="fas fa-circle text-red-500"></i>
+            <span id="statusText">Desconectado</span>
+        </div>
+    </div>
 
     <div id="userPanel" class="min-h-screen compost-bg">
         <div class="max-w-6xl mx-auto px-4 py-6 sm:py-8">
@@ -169,8 +250,7 @@
                         <div id="queueDisplay" class="space-y-4">
                             <div class="text-center py-8 text-gray-500">
                                 <i class="fas fa-clipboard-list text-4xl mb-4"></i>
-                                <p>Nenhuma pessoa na fila ainda.</p>
-                                <p class="text-sm">Seja o primeiro a se cadastrar!</p>
+                                <p>Carregando dados...</p>
                             </div>
                         </div>
                     </div>
@@ -224,6 +304,9 @@
                     <button onclick="exportQueue()" class="bg-green-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-green-600 transition text-sm sm:text-base">
                         <i class="fas fa-download mr-1 sm:mr-2"></i>Exportar Lista
                     </button>
+                    <button onclick="refreshData()" class="bg-gray-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-gray-600 transition text-sm sm:text-base">
+                        <i class="fas fa-sync-alt mr-1 sm:mr-2"></i>Atualizar
+                    </button>
                 </div>
             </div>
 
@@ -232,7 +315,7 @@
                 <div id="adminQueueDisplay">
                     <div class="text-center py-8 text-gray-500">
                         <i class="fas fa-clipboard-list text-4xl mb-4"></i>
-                        <p>Nenhuma pessoa na fila.</p>
+                        <p>Carregando dados...</p>
                     </div>
                 </div>
             </div>
@@ -293,16 +376,114 @@
 
     <script>
         // Global state
+        let supabase = null;
         let queue = [];
         let completedPickups = [];
         let currentUserId = null;
         let currentSchedulingId = null;
+        let isConnected = false;
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
-            loadData();
-            updateDisplays();
+            initializeSupabase();
             setMinDate();
+            checkConnection();
+        });
+
+        // Initialize Supabase
+        function initializeSupabase() {
+            const savedUrl = localStorage.getItem('supabaseUrl');
+            const savedKey = localStorage.getItem('supabaseKey');
+            
+            if (savedUrl && savedKey) {
+                try {
+                    supabase = window.supabase.createClient(savedUrl, savedKey);
+                    updateConnectionStatus(true);
+                    loadData();
+                } catch (error) {
+                    console.error('Erro ao conectar com Supabase:', error);
+                    updateConnectionStatus(false);
+                    showNotification('Erro ao conectar com Supabase. Verifique as configurações.', 'error');
+                    showConfigPanel();
+                }
+            } else {
+                updateConnectionStatus(false);
+                showNotification('Configure as credenciais do Supabase para começar.', 'info');
+                showConfigPanel();
+            }
+        }
+
+        // Update connection status
+        function updateConnectionStatus(connected) {
+            isConnected = connected;
+            const statusIcon = document.getElementById('statusIcon');
+            const statusText = document.getElementById('statusText');
+            
+            if (connected) {
+                statusIcon.className = 'fas fa-circle text-green-500';
+                statusText.textContent = 'Conectado ao Supabase';
+            } else {
+                statusIcon.className = 'fas fa-circle text-red-500';
+                statusText.textContent = 'Desconectado';
+            }
+        }
+
+        // Check connection periodically
+        function checkConnection() {
+            if (supabase) {
+                supabase.from('fertilizer_queue').select('count').limit(1)
+                    .then(() => updateConnectionStatus(true))
+                    .catch(() => updateConnectionStatus(false));
+            }
+            
+            setTimeout(checkConnection, 30000); // Check every 30 seconds
+        }
+
+        // Configuration Panel Functions
+        function showConfigPanel() {
+            document.getElementById('configPanel').classList.remove('hidden');
+            document.getElementById('configBackdrop').classList.remove('hidden');
+            
+            // Load saved values
+            const savedUrl = localStorage.getItem('supabaseUrl');
+            const savedKey = localStorage.getItem('supabaseKey');
+            
+            if (savedUrl) document.getElementById('supabaseUrl').value = savedUrl;
+            if (savedKey) document.getElementById('supabaseKey').value = savedKey;
+        }
+
+        function closeConfigPanel() {
+            document.getElementById('configPanel').classList.add('hidden');
+            document.getElementById('configBackdrop').classList.add('hidden');
+        }
+
+        // Configuration form handler
+        document.getElementById('supabaseConfigForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const url = document.getElementById('supabaseUrl').value.trim();
+            const key = document.getElementById('supabaseKey').value.trim();
+            
+            try {
+                // Test connection
+                const testClient = window.supabase.createClient(url, key);
+                await testClient.from('fertilizer_queue').select('count').limit(1);
+                
+                // Save configuration
+                localStorage.setItem('supabaseUrl', url);
+                localStorage.setItem('supabaseKey', key);
+                
+                supabase = testClient;
+                updateConnectionStatus(true);
+                closeConfigPanel();
+                
+                showNotification('Supabase configurado com sucesso!', 'success');
+                loadData();
+                
+            } catch (error) {
+                console.error('Erro ao testar conexão:', error);
+                showNotification('Erro ao conectar. Verifique as credenciais.', 'error');
+            }
         });
 
         // Set minimum date to today
@@ -314,24 +495,65 @@
             }
         }
 
-        // Load data from localStorage
-        function loadData() {
-            const savedQueue = localStorage.getItem('fertilizerQueue');
-            const savedCompleted = localStorage.getItem('completedPickups');
-            
-            if (savedQueue) {
-                queue = JSON.parse(savedQueue);
+        // Load data from Supabase
+        async function loadData() {
+            if (!supabase || !isConnected) {
+                showFallbackMessage();
+                return;
             }
             
-            if (savedCompleted) {
-                completedPickups = JSON.parse(savedCompleted);
+            try {
+                // Load queue
+                const { data: queueData, error: queueError } = await supabase
+                    .from('fertilizer_queue')
+                    .select('*')
+                    .order('joined_at', { ascending: true });
+                    
+                if (queueError) throw queueError;
+                queue = queueData || [];
+                
+                // Load completed pickups
+                const { data: completedData, error: completedError } = await supabase
+                    .from('completed_pickups')
+                    .select('*')
+                    .order('completed_at', { ascending: false });
+                    
+                if (completedError) throw completedError;
+                completedPickups = completedData || [];
+                
+                updateDisplays();
+                
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+                showNotification('Erro ao carregar dados do servidor.', 'error');
+                updateConnectionStatus(false);
             }
         }
 
-        // Save data to localStorage
-        function saveData() {
-            localStorage.setItem('fertilizerQueue', JSON.stringify(queue));
-            localStorage.setItem('completedPickups', JSON.stringify(completedPickups));
+        // Show fallback message when not connected
+        function showFallbackMessage() {
+            const containers = ['queueDisplay', 'adminQueueDisplay'];
+            containers.forEach(containerId => {
+                const container = document.getElementById(containerId);
+                if (container) {
+                    container.innerHTML = `
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-database text-4xl mb-4"></i>
+                            <p>Configure o Supabase para visualizar os dados.</p>
+                            <button onclick="showConfigPanel()" class="mt-3 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                                Configurar Agora
+                            </button>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        // Refresh data manually
+        async function refreshData() {
+            showNotification('Atualizando dados...', 'info');
+            await loadData();
+            showNotification('Dados atualizados!', 'success');
         }
 
         // Show user panel
@@ -349,41 +571,62 @@
         }
 
         // Registration form handler
-        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+        document.getElementById('registrationForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            
+            if (!supabase || !isConnected) {
+                showNotification('Configure o Supabase primeiro!', 'error');
+                return;
+            }
             
             const name = document.getElementById('userName').value.trim();
             const email = document.getElementById('userEmail').value.trim();
             const sector = document.getElementById('userSector').value;
             
-            // Check if email already exists
-            if (queue.some(person => person.email === email)) {
-                showNotification('Este e-mail já está cadastrado na fila!', 'error');
-                return;
+            try {
+                // Check if email already exists
+                const { data: existingUser } = await supabase
+                    .from('fertilizer_queue')
+                    .select('id')
+                    .eq('email', email)
+                    .single();
+                
+                if (existingUser) {
+                    showNotification('Este e-mail já está cadastrado na fila!', 'error');
+                    return;
+                }
+                
+                // Insert new person
+                const { data, error } = await supabase
+                    .from('fertilizer_queue')
+                    .insert([
+                        {
+                            name: name,
+                            email: email,
+                            sector: sector,
+                            joined_at: new Date().toISOString(),
+                            status: 'waiting'
+                        }
+                    ])
+                    .select()
+                    .single();
+                
+                if (error) throw error;
+                
+                currentUserId = data.id;
+                
+                await loadData(); // Reload data to update displays
+                
+                this.reset();
+                showNotification(`${name} foi adicionado(a) à fila!`, 'success');
+                
+                // Show user position
+                updateUserPosition();
+                
+            } catch (error) {
+                console.error('Erro ao cadastrar:', error);
+                showNotification('Erro ao cadastrar na fila. Tente novamente.', 'error');
             }
-            
-            const newPerson = {
-                id: Date.now(),
-                name: name,
-                email: email,
-                sector: sector,
-                joinedAt: new Date().toISOString(),
-                status: 'waiting', // waiting, ready, scheduled, completed
-                scheduledDate: null,
-                scheduledTime: null
-            };
-            
-            queue.push(newPerson);
-            currentUserId = newPerson.id;
-            
-            saveData();
-            updateDisplays();
-            
-            this.reset();
-            showNotification(`${name} foi adicionado(a) à fila!`, 'success');
-            
-            // Show user position
-            updateUserPosition();
         });
 
         // Update user position display
@@ -405,13 +648,12 @@
                         `;
                     } else if (person.status === 'scheduled') {
                         positionHtml = `
-                            <span class="text-blue-600 font-bold">Agendado para ${formatDate(person.scheduledDate)} às ${person.scheduledTime}</span>
+                            <span class="text-blue-600 font-bold">Agendado para ${formatDate(person.scheduled_date)} às ${person.scheduled_time}</span>
                         `;
                     } else if (person.status === 'waiting') {
                          positionHtml = `Posição: <span class="font-bold">#${userIndex + 1}</span>`;
                     }
                     document.getElementById('positionText').innerHTML = positionHtml;
-
                 }
             }
         }
@@ -426,6 +668,11 @@
         // Update queue display for users
         function updateQueueDisplay() {
             const container = document.getElementById('queueDisplay');
+            
+            if (!isConnected) {
+                showFallbackMessage();
+                return;
+            }
             
             if (queue.length === 0) {
                 container.innerHTML = `
@@ -448,16 +695,16 @@
                             <div>
                                 <h4 class="font-semibold text-gray-800 text-base sm:text-lg">${person.name}</h4>
                                 <p class="text-xs sm:text-sm text-gray-600">${person.sector}</p>
-                                <p class="text-xs text-gray-500">Entrou em: ${formatDateTime(person.joinedAt)}</p>
+                                <p class="text-xs text-gray-500">Entrou em: ${formatDateTime(person.joined_at)}</p>
                             </div>
                         </div>
                         <div class="text-left sm:text-right w-full sm:w-auto mt-2 sm:mt-0">
                             <span class="inline-block px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(person.status)}">
                                 ${getStatusText(person.status)}
                             </span>
-                            ${person.scheduledDate ? `
+                            ${person.scheduled_date ? `
                                 <p class="text-xs text-gray-600 mt-1">
-                                    ${formatDate(person.scheduledDate)} às ${person.scheduledTime}
+                                    ${formatDate(person.scheduled_date)} às ${person.scheduled_time}
                                 </p>
                             ` : ''}
                         </div>
@@ -476,6 +723,11 @@
         function updateAdminQueueDisplay() {
             const container = document.getElementById('adminQueueDisplay');
             
+            if (!isConnected) {
+                showFallbackMessage();
+                return;
+            }
+            
             if (queue.length === 0) {
                 container.innerHTML = `
                     <div class="text-center py-8 text-gray-500">
@@ -486,7 +738,6 @@
                 return;
             }
             
-            // Usar uma div responsiva para a tabela
             container.innerHTML = `
                 <div class="overflow-x-auto rounded-lg shadow-md">
                     <table class="min-w-full divide-y divide-gray-200">
@@ -516,7 +767,7 @@
                                         </span>
                                     </td>
                                     <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500">
-                                        ${person.scheduledDate ? `${formatDate(person.scheduledDate)} ${person.scheduledTime}` : '-'}
+                                        ${person.scheduled_date ? `${formatDate(person.scheduled_date)} ${person.scheduled_time}` : '-'}
                                     </td>
                                     <td class="px-3 py-3 whitespace-nowrap text-sm font-medium space-x-1 flex flex-wrap gap-1">
                                         ${person.status === 'waiting' ? `
@@ -557,67 +808,117 @@
         }
 
         // Admin functions
-        function markAsReady(personId) {
-            const person = queue.find(p => p.id === personId);
-            if (person) {
-                person.status = 'ready';
-                saveData();
-                updateAdminDisplays();
-                updateDisplays();
+        async function markAsReady(personId) {
+            if (!supabase || !isConnected) {
+                showNotification('Sem conexão com o servidor!', 'error');
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabase
+                    .from('fertilizer_queue')
+                    .update({ status: 'ready' })
+                    .eq('id', personId)
+                    .select()
+                    .single();
                 
-                showNotification(`${person.name} foi notificado para agendar a retirada!`, 'success');
+                if (error) throw error;
                 
-                // Simulate email notification
-                simulateEmailNotification(person);
+                await loadData(); // Reload data
+                showNotification(`${data.name} foi notificado para agendar a retirada!`, 'success');
+                
+            } catch (error) {
+                console.error('Erro ao atualizar status:', error);
+                showNotification('Erro ao notificar pessoa.', 'error');
             }
         }
 
-        function markAsCompleted(personId) {
-            const personIndex = queue.findIndex(p => p.id === personId);
-            if (personIndex !== -1) {
-                const person = queue[personIndex];
-                person.completedAt = new Date().toISOString();
-                completedPickups.push(person);
-                queue.splice(personIndex, 1);
+        async function markAsCompleted(personId) {
+            if (!supabase || !isConnected) {
+                showNotification('Sem conexão com o servidor!', 'error');
+                return;
+            }
+            
+            try {
+                // Get person data
+                const { data: person, error: fetchError } = await supabase
+                    .from('fertilizer_queue')
+                    .select('*')
+                    .eq('id', personId)
+                    .single();
                 
-                saveData();
-                updateAdminDisplays();
-                updateDisplays();
+                if (fetchError) throw fetchError;
                 
+                // Add to completed pickups
+                const { error: insertError } = await supabase
+                    .from('completed_pickups')
+                    .insert([
+                        {
+                            ...person,
+                            completed_at: new Date().toISOString()
+                        }
+                    ]);
+                
+                if (insertError) throw insertError;
+                
+                // Remove from queue
+                const { error: deleteError } = await supabase
+                    .from('fertilizer_queue')
+                    .delete()
+                    .eq('id', personId);
+                
+                if (deleteError) throw deleteError;
+                
+                await loadData(); // Reload data
                 showNotification(`Retirada de ${person.name} marcada como concluída!`, 'success');
+                
+            } catch (error) {
+                console.error('Erro ao marcar como concluído:', error);
+                showNotification('Erro ao concluir retirada.', 'error');
             }
         }
 
-        function removeFromQueue(personId) {
-            if (confirm('Tem certeza que deseja remover esta pessoa da fila?')) {
-                const personIndex = queue.findIndex(p => p.id === personId);
-                if (personIndex !== -1) {
-                    const person = queue[personIndex];
-                    queue.splice(personIndex, 1);
-                    
-                    saveData();
-                    updateAdminDisplays();
-                    updateDisplays();
-                    
-                    showNotification(`${person.name} foi removido(a) da fila.`, 'info');
-                }
+        async function removeFromQueue(personId) {
+            if (!confirm('Tem certeza que deseja remover esta pessoa da fila?')) {
+                return;
+            }
+            
+            if (!supabase || !isConnected) {
+                showNotification('Sem conexão com o servidor!', 'error');
+                return;
+            }
+            
+            try {
+                // Get person name before deletion
+                const { data: person } = await supabase
+                    .from('fertilizer_queue')
+                    .select('name')
+                    .eq('id', personId)
+                    .single();
+                
+                const { error } = await supabase
+                    .from('fertilizer_queue')
+                    .delete()
+                    .eq('id', personId);
+                
+                if (error) throw error;
+                
+                await loadData(); // Reload data
+                showNotification(`${person?.name || 'Pessoa'} foi removido(a) da fila.`, 'info');
+                
+            } catch (error) {
+                console.error('Erro ao remover da fila:', error);
+                showNotification('Erro ao remover pessoa da fila.', 'error');
             }
         }
 
-        function notifyNext() {
+        async function notifyNext() {
             const nextPerson = queue.find(p => p.status === 'waiting');
             if (nextPerson) {
-                markAsReady(nextPerson.id);
+                await markAsReady(nextPerson.id);
             } else {
                 showNotification('Não há pessoas aguardando para serem notificadas.', 'info');
             }
-        }
-
-        // Simula uma notificação (no caso real, seria um e-mail)
-        function simulateEmailNotification(person) {
-            console.log(`Simulando notificação para ${person.email}...`);
-            // Aqui você integraria com um serviço de e-mail real (ex: SendGrid, Mailgun, etc.)
-            // fetch('/send-email', { method: 'POST', body: JSON.stringify({ to: person.email, subject: 'Sua vez!', body: '...' }) });
         }
 
         // Open scheduling modal
@@ -633,33 +934,66 @@
         }
 
         // Scheduling form handler
-        document.getElementById('schedulingForm').addEventListener('submit', function(e) {
+        document.getElementById('schedulingForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            
+            if (!supabase || !isConnected) {
+                showNotification('Sem conexão com o servidor!', 'error');
+                return;
+            }
             
             const pickupDate = document.getElementById('pickupDate').value;
             const pickupTime = document.getElementById('pickupTime').value;
             
-            const person = queue.find(p => p.id === currentSchedulingId);
-            if (person) {
-                person.status = 'scheduled';
-                person.scheduledDate = pickupDate;
-                person.scheduledTime = pickupTime;
+            try {
+                const { data, error } = await supabase
+                    .from('fertilizer_queue')
+                    .update({
+                        status: 'scheduled',
+                        scheduled_date: pickupDate,
+                        scheduled_time: pickupTime
+                    })
+                    .eq('id', currentSchedulingId)
+                    .select()
+                    .single();
                 
-                saveData();
-                updateDisplays();
+                if (error) throw error;
+                
+                await loadData(); // Reload data
                 closeSchedulingModal();
-                showNotification(`Agendamento confirmado para ${person.name}!`, 'success');
+                showNotification(`Agendamento confirmado para ${data.name}!`, 'success');
+                
+            } catch (error) {
+                console.error('Erro ao agendar:', error);
+                showNotification('Erro ao confirmar agendamento.', 'error');
             }
         });
 
         // Admin Control Functions
-        function clearQueue() {
-            if (confirm('Tem certeza que deseja limpar toda a fila? Esta ação não pode ser desfeita.')) {
-                queue = [];
-                saveData();
-                updateAdminDisplays();
-                updateDisplays();
+        async function clearQueue() {
+            if (!confirm('Tem certeza que deseja limpar toda a fila? Esta ação não pode ser desfeita.')) {
+                return;
+            }
+            
+            if (!supabase || !isConnected) {
+                showNotification('Sem conexão com o servidor!', 'error');
+                return;
+            }
+            
+            try {
+                const { error } = await supabase
+                    .from('fertilizer_queue')
+                    .delete()
+                    .neq('id', 0); // Delete all records
+                
+                if (error) throw error;
+                
+                await loadData(); // Reload data
                 showNotification('Fila limpa com sucesso!', 'info');
+                
+            } catch (error) {
+                console.error('Erro ao limpar fila:', error);
+                showNotification('Erro ao limpar fila.', 'error');
             }
         }
 
@@ -669,14 +1003,14 @@
                 return;
             }
             
-            const data = queue.map(person => ({
-                Posição: queue.indexOf(person) + 1,
+            const data = queue.map((person, index) => ({
+                Posição: index + 1,
                 Nome: person.name,
                 Email: person.email,
                 Setor: person.sector,
                 Status: getStatusText(person.status),
-                'Data de Entrada': formatDateTime(person.joinedAt),
-                'Agendamento': person.scheduledDate ? `${formatDate(person.scheduledDate)} às ${person.scheduledTime}` : 'Não agendado'
+                'Data de Entrada': formatDateTime(person.joined_at),
+                'Agendamento': person.scheduled_date ? `${formatDate(person.scheduled_date)} às ${person.scheduled_time}` : 'Não agendado'
             }));
             
             const csvContent = "data:text/csv;charset=utf-8," + 
@@ -724,7 +1058,7 @@
         }
 
         function formatDate(isoDate) {
-            const date = new Date(isoDate + 'T00:00:00'); // Add time to avoid timezone issues
+            const date = new Date(isoDate + 'T00:00:00');
             return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
         }
 
