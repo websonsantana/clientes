@@ -444,12 +444,9 @@
             document.getElementById('configPanel').classList.remove('hidden');
             document.getElementById('configBackdrop').classList.remove('hidden');
             
-            // Load saved values
-            const savedUrl = localStorage.getItem('supabaseUrl');
-            const savedKey = localStorage.getItem('supabaseKey');
-            
-            if (savedUrl) document.getElementById('supabaseUrl').value = savedUrl;
-            if (savedKey) document.getElementById('supabaseKey').value = savedKey;
+            // Suas credenciais pré-configuradas
+            document.getElementById('supabaseUrl').value = 'https://blraodduccltnyhykbbg.supabase.co';
+            document.getElementById('supabaseKey').value = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJscmFvZGR1Y2NsdG55aHlrYmJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc4MDU3MzUsImV4cCI6MjA3MzM4MTczNX0.GHr4rRurb1zzy6g2lirATxghtmgt7PGjEPzA_vKlzY0';
         }
 
         function closeConfigPanel() {
