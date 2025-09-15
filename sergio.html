@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SA&C - Sérgio Ar & Clima | Refrigeração e Ar Condicionado</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, #0D2C6E 0%, #1E4B8B 100%);
+        }
+        .logo-circle {
+            width: 180px;
+            height: 180px;
+            border: 12px solid white;
+            background-color: #0D2C6E;
+        }
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .whatsapp-float {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            bottom: 40px;
+            right: 40px;
+            background-color: #25D366;
+            color: #FFF;
+            border-radius: 50px;
+            text-align: center;
+            font-size: 30px;
+            box-shadow: 2px 2px 3px #999;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- WhatsApp Float Button -->
+    <a href="https://wa.me/SEUNUMERO" class="whatsapp-float" target="_blank">
+        <i data-feather="message-circle"></i>
+    </a>
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-24 items-center">
+                <div class="flex items-center">
+                    <div class="logo-circle rounded-full flex flex-col items-center justify-center text-white font-bold mr-4">
+                        <div class="text-3xl">SA&C</div>
+                        <div class="text-xs text-center leading-tight">
+                            <div>Sérgio Ar</div>
+                            <div>& Clima</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#inicio" class="text-blue-900 font-medium hover:text-blue-700 transition">Início</a>
+                    <a href="#servicos" class="text-gray-600 hover:text-blue-700 transition">Serviços</a>
+                    <a href="#sobre" class="text-gray-600 hover:text-blue-700 transition">Sobre Nós</a>
+                    <a href="#contato" class="text-gray-600 hover:text-blue-700 transition">Contato</a>
+                </div>
+                <div class="md:hidden">
+                    <button class="mobile-menu-button p-2 focus:outline-none">
+                        <i data-feather="menu"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile menu -->
+        <div class="mobile-menu hidden md:hidden bg-white border-t">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#inicio" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-700 hover:bg-gray-50">Início</a>
+                <a href="#servicos" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-700 hover:bg-gray-50">Serviços</a>
+                <a href="#sobre" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-700 hover:bg-gray-50">Sobre Nós</a>
+                <a href="#contato" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-700 hover:bg-gray-50">Contato</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="hero-gradient text-white py-20 md:py-32">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="md:flex items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0" data-aos="fade-right">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-6">Soluções em Refrigeração e Climatização</h1>
+                    <p class="text-xl mb-8">Profissionais qualificados para instalação, manutenção e reparo de sistemas de ar condicionado e refrigeração.</p>
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <a href="#contato" class="bg-white text-blue-900 px-8 py-3 rounded-lg font-bold text-center hover:bg-gray-100 transition">Solicitar Orçamento</a>
+                        <a href="#servicos" class="border-2 border-white px-8 py-3 rounded-lg font-bold text-center hover:bg-white hover:text-blue-900 transition">Nossos Serviços</a>
+                    </div>
+                </div>
+                <div class="md:w-1/2 flex justify-center" data-aos="fade-left">
+                    <img src="http://static.photos/technology/640x360/10" alt="Técnico de refrigeração" class="rounded-lg shadow-2xl max-w-full h-auto">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="servicos" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Nossos Serviços</h2>
+                <div class="w-20 h-1 bg-blue-900 mx-auto"></div>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Service 1 -->
+                <div class="service-card bg-white rounded-lg shadow-md p-6 transition duration-300" data-aos="fade-up" data-aos-delay="100">
+                    <div class="text-blue-900 mb-4">
+                        <i data-feather="tool" class="w-10 h-10"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Instalação de Ar Condicionado</h3>
+                    <p class="text-gray-600">Instalação profissional de sistemas split, janela, piso-teto e outros tipos de ar condicionado residencial e comercial.</p>
+                </div>
+                
+                <!-- Service 2 -->
+                <div class="service-card bg-white rounded-lg shadow-md p-6 transition duration-300" data-aos="fade-up" data-aos-delay="200">
+                    <div class="text-blue-900 mb-4">
+                        <i data-feather="settings" class="w-10 h-10"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Manutenção Preventiva</h3>
+                    <p class="text-gray-600">Serviços de limpeza e manutenção periódica para garantir o melhor desempenho e durabilidade do seu equipamento.</p>
+                </div>
+                
+                <!-- Service 3 -->
+                <div class="service-card bg-white rounded-lg shadow-md p-6 transition duration-300" data-aos="fade-up" data-aos-delay="300">
+                    <div class="text-blue-900 mb-4">
+                        <i data-feather="alert-circle" class="w-10 h-10"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Reparos Emergenciais</h3>
+                    <p class="text-gray-600">Atendimento rápido para conserto de vazamentos, falta de refrigeração, problemas elétricos e outros defeitos.</p>
+                </div>
+                
+                <!-- Service 4 -->
+                <div class="service-card bg-white rounded-lg shadow-md p-6 transition duration-300" data-aos="fade-up" data-aos-delay="100">
+                    <div class="text-blue-900 mb-4">
+                        <i data-feather="wind" class="w-10 h-10"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Limpeza de Ductos</h3>
+                    <p class="text-gray-600">Higienização completa de sistemas de ar condicionado central para melhorar a qualidade do ar e eficiência energética.</p>
+                </div>
+                
+                <!-- Service 5 -->
+                <div class="service-card bg-white rounded-lg shadow-md p-6 transition duration-300" data-aos="fade-up" data-aos-delay="200">
+                    <div class="text-blue-900 mb-4">
+                        <i data-feather="thermometer" class="w-10 h-10"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Carga de Gás</h3>
+                    <p class="text-gray-600">Recarga de gás refrigerante com equipamentos profissionais e seguindo todas as normas ambientais.</p>
+                </div>
+                
+                <!-- Service 6 -->
+                <div class="service-card bg-white rounded-lg shadow-md p-6 transition duration-300" data-aos="fade-up" data-aos-delay="300">
+                    <div class="text-blue-900 mb-4">
+                        <i data-feather="shopping-cart" class="w-10 h-10"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Venda de Equipamentos</h3>
+                    <p class="text-gray-600">Oferecemos os melhores equipamentos das principais marcas do mercado com instalação profissional inclusa.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="sobre" class="py-20 bg-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="md:flex items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0 md:pr-10" data-aos="fade-right">
+                    <img src="http://static.photos/office/640x360/15" alt="Equipe SA&C" class="rounded-lg shadow-xl w-full">
+                </div>
+                <div class="md:w-1/2" data-aos="fade-left">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-6">Sobre a SA&C</h2>
+                    <p class="text-gray-600 mb-4">A SA&C - Sérgio Ar & Clima é uma empresa especializada em serviços de refrigeração e climatização, com mais de 15 anos de experiência no mercado.</p>
+                    <p class="text-gray-600 mb-6">Nossa equipe é formada por técnicos altamente qualificados e certificados, comprometidos em oferecer soluções personalizadas e de alta qualidade para residências e empresas.</p>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 text-blue-900 mr-3">
+                                <i data-feather="check-circle" class="w-5 h-5"></i>
+                            </div>
+                            <p class="text-gray-600">Atendimento rápido e eficiente em toda a região</p>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 text-blue-900 mr-3">
+                                <i data-feather="check-circle" class="w-5 h-5"></i>
+                            </div>
+                            <p class="text-gray-600">Peças originais e equipamentos de primeira linha</p>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 text-blue-900 mr-3">
+                                <i data-feather="check-circle" class="w-5 h-5"></i>
+                            </div>
+                            <p class="text-gray-600">Garantia em todos os serviços prestados</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-20 bg-blue-900 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-3xl font-bold mb-4">O que nossos clientes dizem</h2>
+                <div class="w-20 h-1 bg-white mx-auto"></div>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-white bg-opacity-10 rounded-lg p-6 backdrop-filter backdrop-blur-sm" data-aos="fade-up" data-aos-delay="100">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-white bg-opacity-20 flex items-center justify-center mr-4">
+                            <i data-feather="user" class="text-white"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold">Carlos Silva</h4>
+                            <div class="flex text-yellow-300">
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-white text-opacity-90">"Excelente atendimento! Resolveram meu problema de vazamento no ar condicionado em menos de 2 horas. Super recomendo!"</p>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="bg-white bg-opacity-10 rounded-lg p-6 backdrop-filter backdrop-blur-sm" data-aos="fade-up" data-aos-delay="200">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-white bg-opacity-20 flex items-center justify-center mr-4">
+                            <i data-feather="user" class="text-white"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold">Ana Paula Oliveira</h4>
+                            <div class="flex text-yellow-300">
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-white text-opacity-90">"Instalaram 3 splits na minha casa com muita competência e organização. Limparam tudo após o serviço e explicaram como usar corretamente."</p>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="bg-white bg-opacity-10 rounded-lg p-6 backdrop-filter backdrop-blur-sm" data-aos="fade-up" data-aos-delay="300">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-white bg-opacity-20 flex items-center justify-center mr-4">
+                            <i data-feather="user" class="text-white"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold">Roberto Santos</h4>
+                            <div class="flex text-yellow-300">
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-white text-opacity-90">"Contratei a manutenção anual para os ares condicionados da minha empresa. Nota 10 para o profissionalismo e qualidade do serviço!"</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contato" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Entre em Contato</h2>
+                <div class="w-20 h-1 bg-blue-900 mx-auto"></div>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-12">
+                <div data-aos="fade-right">
+                    <h3 class="text-xl font-bold text-gray-900 mb-6">Informações de Contato</h3>
+                    <div class="space-y-6">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 text-blue-900 mr-4">
+                                <i data-feather="phone" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-900">Telefone</h4>
+                                <p class="text-gray-600">(XX) XXXX-XXXX</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 text-blue-900 mr-4">
+                                <i data-feather="mail" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-900">Email</h4>
+                                <p class="text-gray-600">contato@sergioarclima.com.br</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 text-blue-900 mr-4">
+                                <i data-feather="map-pin" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-900">Endereço</h4>
+                                <p class="text-gray-600">Rua Exemplo, 123 - Centro<br>Cidade - Estado</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 text-blue-900 mr-4">
+                                <i data-feather="clock" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-900">Horário de Atendimento</h4>
+                                <p class="text-gray-600">Segunda a Sexta: 8h às 18h<br>Sábado: 8h às 12h</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-10">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Siga-nos</h3>
+                        <div class="flex space-x-4">
+                            <a href="#" class="w-10 h-10 rounded-full bg-blue-900 text-white flex items-center justify-center hover:bg-blue-700 transition">
+                                <i data-feather="facebook"></i>
+                            </a>
+                            <a href="
