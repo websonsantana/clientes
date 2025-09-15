@@ -13,6 +13,9 @@
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         body {
             font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
         }
         .hero-gradient {
             background: linear-gradient(135deg, #0D2C6E 0%, #1E4B8B 100%);
@@ -22,6 +25,13 @@
             height: 180px;
             border: 12px solid white;
             background-color: #0D2C6E;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .service-card {
+            transition: all 0.3s ease;
         }
         .service-card:hover {
             transform: translateY(-10px);
@@ -43,6 +53,20 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        .mobile-menu {
+            display: none;
+        }
+        .mobile-menu.active {
+            display: block;
         }
     </style>
 </head>
@@ -459,23 +483,36 @@
         });
 
         // Mobile menu toggle
-        const mobileMenuButton = document.querySelector('.mobile-menu-button');
-        const mobileMenu = document.querySelector('.mobile-menu');
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.querySelector('.mobile-menu-button');
+            const mobileMenu = document.querySelector('.mobile-menu');
 
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
-
-        // Close mobile menu when clicking a link
-        const mobileMenuLinks = document.querySelectorAll('.mobile-menu a');
-        mobileMenuLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                mobileMenu.classList.add('hidden');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('active');
+                mobileMenuButton.innerHTML = mobileMenu.classList.contains('active') ? 
+                    feather.icons['x'].toSvg() : feather.icons['menu'].toSvg();
             });
+
+            // Close mobile menu when clicking a link
+            const mobileMenuLinks = document.querySelectorAll('.mobile-menu a');
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.remove('active');
+                    mobileMenuButton.innerHTML = feather.icons['menu'].toSvg();
+                });
+            });
+
+            // Initialize all feather icons
+            feather.replace();
         });
 
-        // Feather icons replace
-        feather.replace();
+        // Initialize AOS animation
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true,
+            offset: 120
+        });
     </script>
 </body>
 </html>
