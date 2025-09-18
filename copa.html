@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Votação CIPA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #166534 0%, #15803d 100%);
+        }
+        .vote-card {
+            transition: all 0.3s ease;
+        }
+        .vote-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-100">
+    <div id="app">
+        <!-- Header -->
+        <header class="gradient-bg text-white shadow-lg">
+            <div class="container mx-auto px-4 py-6">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center space-x-2">
+                        <i data-feather="shield" class="w-8 h-8"></i>
+                        <h1 class="text-2xl font-bold">Votação CIPA</h1>
+                    </div>
+                    <nav>
+                        <ul class="flex space-x-6">
+                            <li><a href="#" class="hover:text-blue-200 transition">Início</a></li>
+                            <li><a href="#" class="hover:text-blue-200 transition">Candidatos</a></li>
+                            <li><a href="#" class="hover:text-blue-200 transition">Regras</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-8">
+            <section class="mb-12 text-center" data-aos="fade-up">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Sistema de Votação Eletrônica</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Seu voto é importante! Escolha os representantes da CIPA de forma segura e anônima.</p>
+            </section>
+
+            <!-- Authentication Section -->
+            <section class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6 mb-12" data-aos="fade-up">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Autenticação</h3>
+                <form id="authForm" class="space-y-4">
+                    <div>
+                        <label for="matricula" class="block text-sm font-medium text-gray-700">Matrícula</label>
+                        <input type="text" id="matricula" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="senha" class="block text-sm font-medium text-gray-700">Senha</label>
+                        <input type="password" id="senha" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Acessar Sistema
+                    </button>
+                </form>
+            </section>
+
+            <!-- Voting Section (Hidden by default) -->
+            <section id="votingSection" class="hidden" data-aos="fade-up">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden p-6 mb-8">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-6">Escolha seus candidatos</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Candidate 1 -->
+                        <div class="vote-card bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm p-4">
+                            <div class="flex items-center space-x-4 mb-4">
+                                <img src="http://static.photos/people/200x200/1" alt="Candidato" class="w-16 h-16 rounded-full object-cover">
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">João Silva</h4>
+                                    <p class="text-sm text-gray-500">Setor: Produção</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-4">"Trabalharei pela segurança de todos os colaboradores."</p>
+                            <button onclick="selectCandidate(1)" class="w-full py-2 px-4 border border-green-500 rounded-md text-sm font-medium text-green-600 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                Selecionar
+                            </button>
+                        </div>
+                        
+                        <!-- Candidate 2 -->
+                        <div class="vote-card bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm p-4">
+                            <div class="flex items-center space-x-4 mb-4">
+                                <img src="http://static.photos/people/200x200/2" alt="Candidato" class="w-16 h-16 rounded-full object-cover">
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">Maria Oliveira</h4>
+                                    <p class="text-sm text-gray-500">Setor: RH</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-4">"Priorizarei o bem-estar e a saúde no ambiente de trabalho."</p>
+                            <button onclick="selectCandidate(2)" class="w-full py-2 px-4 border border-green-500 rounded-md text-sm font-medium text-green-600 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                Selecionar
+                            </button>
+                        </div>
+                        
+                        <!-- Candidate 3 -->
+                        <div class="vote-card bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm p-4">
+                            <div class="flex items-center space-x-4 mb-4">
+                                <img src="http://static.photos/people/200x200/3" alt="Candidato" class="w-16 h-16 rounded-full object-cover">
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">Carlos Souza</h4>
+                                    <p class="text-sm text-gray-500">Setor: Logística</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-4">"Foco na prevenção de acidentes e melhoria contínua."</p>
+                            <button onclick="selectCandidate(3)" class="w-full py-2 px-4 border border-green-500 rounded-md text-sm font-medium text-green-600 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                Selecionar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Confirmation Section -->
+                <div id="confirmationSection" class="hidden bg-white rounded-xl shadow-md overflow-hidden p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Confirmação de Voto</h3>
+                    <div id="selectedCandidate" class="mb-6 p-4 bg-green-50 rounded-lg"></div>
+                    <div class="flex justify-end space-x-4">
+                        <button onclick="cancelVote()" class="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Cancelar
+                        </button>
+                        <button onclick="submitVote()" class="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            Confirmar Voto
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Success Message (Hidden by default) -->
+            <div id="successMessage" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div class="bg-white rounded-xl p-8 max-w-md mx-4 text-center">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-feather="check" class="w-8 h-8 text-green-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Voto registrado com sucesso!</h3>
+                    <p class="text-gray-600 mb-6">Seu voto foi criptografado e enviado com segurança. Obrigado por participar!</p>
+                    <button onclick="closeSuccessMessage()" class="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        Fechar
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-800 text-white py-8">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-4 md:mb-0">
+                        <div class="flex items-center space-x-2">
+                            <i data-feather="shield" class="w-6 h-6"></i>
+                            <span class="font-semibold">Votação CIPA</span>
+                        </div>
+                        <p class="text-gray-400 text-sm mt-2">Sistema seguro de votação eletrônica</p>
+                    </div>
+                    <div class="text-gray-400 text-sm">
+                        <p>© 2023 Comissão Interna de Prevenção de Acidentes</p>
+                        <p>Todos os direitos reservados</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize libraries
+        AOS.init();
+        feather.replace();
+
+        // Global variables
+        let selectedCandidateId = null;
+        const secretKey = "CIPA_VOTATION_SECRET_2023"; // This should be more secure in production
+
+        // Form submission
+        document.getElementById('authForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // In a real application, you would validate credentials here
+            document.getElementById('votingSection').classList.remove('hidden');
+            document.getElementById('authForm').classList.add('hidden');
+        });
+
+        // Candidate selection
+        function selectCandidate(id) {
+            selectedCandidateId = id;
+            
+            // Find candidate data (in a real app, this would come from an API)
+            let candidateName, candidateSector;
+            switch(id) {
+                case 1:
+                    candidateName = "João Silva";
+                    candidateSector = "Produção";
+                    break;
+                case 2:
+                    candidateName = "Maria Oliveira";
+                    candidateSector = "RH";
+                    break;
+                case 3:
+                    candidateName = "Carlos Souza";
+                    candidateSector = "Logística";
+                    break;
+            }
+            
+            // Show confirmation
+            document.getElementById('selectedCandidate').innerHTML = `
+                <p class="font-medium text-gray-800">Você selecionou:</p>
+                <div class="flex items-center space-x-3 mt-2">
+                    <img src="http://static.photos/people/200x200/${id}" alt="Candidato" class="w-10 h-10 rounded-full object-cover">
+                    <div>
+                        <p class="font-semibold">${candidateName}</p>
+                        <p class="text-sm text-gray-600">${candidateSector}</p>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('confirmationSection').classList.remove('hidden');
+            
+            // Scroll to confirmation
+            document.getElementById('confirmationSection').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+
+        // Cancel vote
+        function cancelVote() {
+            selectedCandidateId = null;
+            document.getElementById('confirmationSection').classList.add('hidden');
+        }
+
+        // Submit vote
+        function submitVote() {
+            if (!selectedCandidateId) return;
+            
+            // Get current timestamp
+            const timestamp = new Date().toISOString();
+            
+            // Create vote object
+            const voteData = {
+                candidateId: selectedCandidateId,
+                timestamp: timestamp,
+                // In a real app, you might include voter ID (hashed) or other metadata
+            };
+            
+            // Convert to JSON string
+            const voteString = JSON.stringify(voteData);
+            
+            // Encrypt vote using AES (CryptoJS)
+            const encryptedVote = CryptoJS.AES.encrypt(voteString, secretKey).toString();
+            
+            // In a real application, you would send this to your backend
+            console.log("Encrypted vote:", encryptedVote);
+            
+            // Show success message
+            document.getElementById('successMessage').classList.remove('hidden');
+            
+            // Reset UI
+            document.getElementById('confirmationSection').classList.add('hidden');
+            selectedCandidateId = null;
+        }
+
+        // Close success message
+        function closeSuccessMessage() {
+            document.getElementById('successMessage').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
