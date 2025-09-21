@@ -115,7 +115,6 @@
     </style>
 </head>
 <body class="bg-gray-50 font-sans">
-    <!-- Autenticação de Admin Modal -->
     <div id="authBackdrop" class="config-backdrop hidden"></div>
     <div id="authPanel" class="auth-panel hidden">
         <div class="text-center mb-6">
@@ -148,7 +147,6 @@
         </form>
     </div>
 
-    <!-- Configuração Supabase Modal -->
     <div id="configBackdrop" class="config-backdrop hidden"></div>
     <div id="configPanel" class="config-panel hidden">
         <div class="flex justify-between items-center mb-4">
@@ -231,7 +229,6 @@
 
     <div id="notificationArea" class="fixed top-4 right-4 z-50 p-2 sm:p-0"></div>
 
-    <!-- Status de conexão -->
     <div id="connectionStatus" class="fixed bottom-4 left-4 z-50">
         <div class="bg-gray-800 text-white px-3 py-2 rounded-lg text-sm flex items-center space-x-2">
             <i id="statusIcon" class="fas fa-circle text-red-500"></i>
@@ -239,7 +236,6 @@
         </div>
     </div>
 
-    <!-- Status de admin autenticado -->
     <div id="adminStatus" class="fixed bottom-4 right-4 z-50 hidden">
         <div class="bg-purple-600 text-white px-3 py-2 rounded-lg text-sm flex items-center space-x-2">
             <i class="fas fa-shield-check"></i>
@@ -459,7 +455,7 @@
                         <div class="mb-6">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Horário</label>
                             <select id="pickupTime" required 
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
                                 <option value="">Selecione um horário</option>
                                 <option value="08:00">08:00 - 08:30</option>
                                 <option value="08:30">08:30 - 09:00</option>
@@ -490,7 +486,7 @@
     </div>
 
     <script>
-        // Global state
+        // === GLOBAL STATE ===
         let supabase = null;
         let queue = [];
         let completedPickups = [];
@@ -500,7 +496,7 @@
         let isAdminAuthenticated = false;
         let realtimeChannel = null;
 
-        // Configuration constants
+        // === CONFIGURATION ===
         const CONFIG = {
             ADMIN_PASSWORD_KEY: 'admin_password_hash',
             DEFAULT_ADMIN_PASSWORD: 'admin123',
@@ -509,7 +505,7 @@
             RETRY_DELAY: 1000
         };
 
-        // Utility functions
+        // === UTILITY FUNCTIONS ===
         function debounce(func, wait) {
             let timeout;
             return function executedFunction(...args) {
@@ -552,10 +548,9 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // Create debounced refresh function
         const debouncedRefresh = debounce(refreshData, 300);
 
-        // Initialize the application
+        // === INITIALIZATION AND SETUP ===
         document.addEventListener('DOMContentLoaded', function() {
             initializeApplication();
         });
@@ -563,22 +558,23 @@
         async function initializeApplication() {
             setMinDate();
             await initializeSupabase();
-            checkConnection();
             setupEventListeners();
             startPeriodicRefresh();
         }
 
         function setupEventListeners() {
-            // Form validation on input
             const nameInput = document.getElementById('userName');
             const emailInput = document.getElementById('userEmail');
+            const adminPasswordSetup = document.getElementById('adminPasswordSetup');
             
             nameInput.addEventListener('input', function() {
                 validateFieldOnInput(this, this.value.length >= 2, 'Nome muito curto');
             });
-            
             emailInput.addEventListener('input', function() {
                 validateFieldOnInput(this, validateEmail(this.value), 'Email inválido');
+            });
+            adminPasswordSetup.addEventListener('input', function() {
+                validateFieldOnInput(this, this.value.length >= 6, 'Senha deve ter 6 caracteres');
             });
         }
 
@@ -612,7 +608,7 @@
             }, CONFIG.REFRESH_INTERVAL);
         }
 
-        // Initialize Supabase with improved error handling
+        // === SUPABASE CONNECTION ===
         async function initializeSupabase() {
             const savedUrl = localStorage.getItem('supabaseUrl');
             const savedKey = localStorage.getItem('supabaseKey');
@@ -643,7 +639,6 @@
 
         function handleSupabaseError(error) {
             let message = 'Erro de conexão com o banco de dados.';
-            
             if (error.message.includes('Invalid API key')) {
                 message = 'Chave de API inválida. Verifique as credenciais.';
             } else if (error.message.includes('relation "fertilizer_queue" does not exist')) {
@@ -656,10 +651,8 @@
             setTimeout(showConfigPanel, 2000);
         }
 
-        // Real-time subscription setup
         function setupRealtimeSubscription() {
             if (!supabase) return;
-            
             try {
                 realtimeChannel = supabase
                     .channel('queue_changes')
@@ -687,7 +680,6 @@
             }
         }
 
-        // Update connection status with retry logic
         function updateConnectionStatus(connected) {
             isConnected = connected;
             const statusIcon = document.getElementById('statusIcon');
@@ -702,7 +694,6 @@
             }
         }
 
-        // Enhanced connection checking with retry
         async function checkConnection() {
             if (supabase) {
                 try {
@@ -713,11 +704,10 @@
                     console.warn('Conexão perdida, tentando reconectar...');
                 }
             }
-            
             setTimeout(checkConnection, CONFIG.REFRESH_INTERVAL);
         }
 
-        // Authentication functions
+        // === AUTHENTICATION ===
         function showAuthPanel() {
             document.getElementById('authPanel').classList.remove('hidden');
             document.getElementById('authBackdrop').classList.remove('hidden');
@@ -735,7 +725,6 @@
             const inputPasswordHash = await hashPassword(password);
             
             if (!savedPasswordHash) {
-                // First time setup - use default password
                 const defaultHash = await hashPassword(CONFIG.DEFAULT_ADMIN_PASSWORD);
                 return inputPasswordHash === defaultHash;
             }
@@ -751,16 +740,12 @@
             showNotification('Logout realizado com sucesso.', 'info');
         }
 
-        // Admin authentication form handler
         document.getElementById('adminAuthForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
             const password = document.getElementById('adminPassword').value;
             const submitButton = document.querySelector('#authPanel button[type="submit"]');
             const buttonText = document.getElementById('authButtonText');
             const spinner = document.getElementById('authSpinner');
-            
-            // Show loading
             submitButton.disabled = true;
             buttonText.textContent = 'Verificando...';
             spinner.classList.remove('hidden');
@@ -783,18 +768,16 @@
                 showNotification('Erro ao verificar senha.', 'error');
             }
             
-            // Reset button
             submitButton.disabled = false;
             buttonText.textContent = 'Entrar';
             spinner.classList.add('hidden');
         });
 
-        // Configuration Panel Functions
+        // === SUPABASE CONFIGURATION PANEL ===
         function showConfigPanel() {
             document.getElementById('configPanel').classList.remove('hidden');
             document.getElementById('configBackdrop').classList.remove('hidden');
             
-            // Load saved values
             const savedUrl = localStorage.getItem('supabaseUrl');
             const savedKey = localStorage.getItem('supabaseKey');
             
@@ -807,7 +790,6 @@
             document.getElementById('configBackdrop').classList.add('hidden');
         }
 
-        // Configuration form handler with improved validation
         document.getElementById('supabaseConfigForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -819,7 +801,6 @@
             const buttonText = document.getElementById('configButtonText');
             const spinner = document.getElementById('configSpinner');
             
-            // Validation
             if (!url.includes('supabase.co')) {
                 showNotification('URL do Supabase inválida!', 'error');
                 return;
@@ -835,21 +816,17 @@
                 return;
             }
             
-            // Show loading
             submitButton.disabled = true;
             buttonText.textContent = 'Configurando...';
             spinner.classList.remove('hidden');
             
             try {
-                // Test connection
                 const testClient = window.supabase.createClient(url, key);
                 await testClient.from('fertilizer_queue').select('count').limit(1);
                 
-                // Save configuration
                 localStorage.setItem('supabaseUrl', url);
                 localStorage.setItem('supabaseKey', key);
                 
-                // Save admin password hash
                 const passwordHash = await hashPassword(adminPassword);
                 localStorage.setItem(CONFIG.ADMIN_PASSWORD_KEY, passwordHash);
                 
@@ -860,19 +837,17 @@
                 showNotification('Supabase configurado com sucesso!', 'success');
                 loadData();
                 setupRealtimeSubscription();
-                
             } catch (error) {
                 console.error('Erro ao testar conexão:', error);
                 handleSupabaseError(error);
             }
             
-            // Reset button
             submitButton.disabled = false;
             buttonText.textContent = 'Configurar';
             spinner.classList.add('hidden');
         });
 
-        // Set minimum date to today
+        // === DATA LOADING AND DISPLAY ===
         function setMinDate() {
             const today = new Date().toISOString().split('T')[0];
             const pickupDateInput = document.getElementById('pickupDate');
@@ -881,7 +856,6 @@
             }
         }
 
-        // Enhanced data loading with retry logic
         async function loadData(retryCount = 0) {
             if (!supabase || !isConnected) {
                 showFallbackMessage();
@@ -890,22 +864,18 @@
             
             try {
                 const startTime = Date.now();
-                
-                // Load queue with better error handling
                 const { data: queueData, error: queueError } = await supabase
                     .from('fertilizer_queue')
                     .select('*')
                     .order('joined_at', { ascending: true });
-                    
                 if (queueError) throw queueError;
                 queue = queueData || [];
                 
-                // Load completed pickups
                 const { data: completedData, error: completedError } = await supabase
                     .from('completed_pickups')
                     .select('*')
                     .order('completed_at', { ascending: false })
-                    .limit(100); // Limit for performance
+                    .limit(100);
                     
                 if (completedError) throw completedError;
                 completedPickups = completedData || [];
@@ -915,10 +885,8 @@
                 
                 const loadTime = Date.now() - startTime;
                 console.log(`Dados carregados em ${loadTime}ms`);
-                
             } catch (error) {
                 console.error('Erro ao carregar dados:', error);
-                
                 if (retryCount < CONFIG.MAX_RETRIES) {
                     setTimeout(() => {
                         loadData(retryCount + 1);
@@ -939,7 +907,6 @@
             document.getElementById('lastUpdate').textContent = timeString;
         }
 
-        // Show fallback message when not connected
         function showFallbackMessage() {
             const containers = ['queueDisplay', 'adminQueueDisplay'];
             containers.forEach(containerId => {
@@ -958,7 +925,6 @@
             });
         }
 
-        // Enhanced refresh with visual feedback
         async function refreshData() {
             const refreshIcon = document.getElementById('refreshIcon');
             refreshIcon.classList.add('fa-spin');
@@ -973,14 +939,13 @@
             }
         }
 
-        // Show user panel
+        // === PANEL LOGIC ===
         function showUserPanel() {
             document.getElementById('userPanel').classList.remove('hidden');
             document.getElementById('adminPanel').classList.add('hidden');
             updateDisplays();
         }
 
-        // Show admin panel with authentication
         function showAdminPanel() {
             if (!isAdminAuthenticated) {
                 showAuthPanel();
@@ -992,7 +957,7 @@
             updateAdminDisplays();
         }
 
-        // Enhanced registration form handler
+        // === USER PANEL LOGIC ===
         document.getElementById('registrationForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -1005,7 +970,6 @@
             const email = sanitizeInput(document.getElementById('userEmail').value);
             const sector = document.getElementById('userSector').value;
             
-            // Validate form
             const validation = validateForm(name, email, sector);
             if (!validation.valid) {
                 showNotification(validation.message, 'error');
@@ -1015,20 +979,16 @@
             const submitButton = document.getElementById('submitButton');
             const submitText = document.getElementById('submitText');
             const submitSpinner = document.getElementById('submitSpinner');
-            
-            // Show loading
             submitButton.disabled = true;
             submitText.textContent = 'Cadastrando...';
             submitSpinner.classList.remove('hidden');
             
             try {
-                // Check if email already exists
                 const { data: existingUser, error: checkError } = await supabase
                     .from('fertilizer_queue')
                     .select('id, name')
                     .eq('email', email)
                     .maybeSingle();
-                
                 if (checkError && checkError.code !== 'PGRST116') {
                     throw checkError;
                 }
@@ -1038,7 +998,6 @@
                     return;
                 }
                 
-                // Insert new person
                 const { data, error } = await supabase
                     .from('fertilizer_queue')
                     .insert([
@@ -1052,22 +1011,16 @@
                     ])
                     .select()
                     .single();
-                
                 if (error) throw error;
                 
                 currentUserId = data.id;
-                
-                // Reset form and show success
                 this.reset();
                 showNotification(`${name} foi adicionado(a) à fila!`, 'success');
-                
-                // Reload data and update position
                 await loadData();
                 updateUserPosition();
                 
             } catch (error) {
                 console.error('Erro ao cadastrar:', error);
-                
                 if (error.code === '23505') {
                     showNotification('Este e-mail já está cadastrado!', 'error');
                 } else if (error.code === '42501') {
@@ -1076,14 +1029,12 @@
                     showNotification('Erro ao cadastrar. Tente novamente.', 'error');
                 }
             } finally {
-                // Reset button
                 submitButton.disabled = false;
                 submitText.textContent = 'Entrar na Fila';
                 submitSpinner.classList.add('hidden');
             }
         });
 
-        // Update user position display with enhanced functionality
         function updateUserPosition() {
             if (currentUserId) {
                 const userIndex = queue.findIndex(person => person.id === currentUserId);
@@ -1095,7 +1046,7 @@
                     if (person.status === 'ready') {
                         positionHtml = `
                             <span class="text-green-600 font-bold">É sua vez! Clique para agendar a retirada.</span>
-                            <button onclick="openSchedulingModal(${person.id})" 
+                            <button onclick="openSchedulingModal('${person.id}')" 
                                     class="ml-2 mt-2 sm:mt-0 bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition">
                                 <i class="fas fa-calendar-plus mr-1"></i>Agendar
                             </button>
@@ -1123,17 +1074,14 @@
             }
         }
 
-        // Update all displays
         function updateDisplays() {
             updateQueueDisplay();
             updateStats();
             updateUserPosition();
         }
 
-        // Enhanced queue display for users
         function updateQueueDisplay() {
             const container = document.getElementById('queueDisplay');
-            
             if (!isConnected) {
                 showFallbackMessage();
                 return;
@@ -1160,7 +1108,7 @@
                             <div>
                                 <h4 class="font-semibold text-gray-800 text-base sm:text-lg">
                                     ${person.name}
-                                    ${person.id === currentUserId ? '<i class="fas fa-user text-blue-                                    ${person.id === currentUserId ? '<i class="fas fa-user text-blue-500 ml-2"></i>' : ''}
+                                    ${person.id === currentUserId ? '<i class="fas fa-user text-blue-500 ml-2"></i>' : ''}
                                 </h4>
                                 <p class="text-sm text-gray-600">${person.sector}</p>
                             </div>
@@ -1173,7 +1121,6 @@
             `).join('');
         }
 
-        // Helpers de exibição
         function getStatusBorderColor(status) {
             switch (status) {
                 case 'waiting': return 'border-yellow-400';
@@ -1205,7 +1152,6 @@
             return date.toLocaleDateString('pt-BR');
         }
 
-        // Atualizar estatísticas
         function updateStats() {
             document.getElementById('queueCount').textContent = queue.length;
             document.getElementById('adminQueueCount').textContent = queue.length;
@@ -1216,7 +1162,7 @@
             document.getElementById('pendingCount').textContent = pending;
         }
 
-        // Admin display
+        // === ADMIN PANEL LOGIC ===
         function updateAdminDisplays() {
             const container = document.getElementById('adminQueueDisplay');
             if (!queue || queue.length === 0) {
@@ -1248,14 +1194,12 @@
             `).join('');
         }
 
-        // Ações admin
         async function markReady(id) {
             try {
                 const { error } = await supabase
                     .from('fertilizer_queue')
                     .update({ status: 'ready' })
                     .eq('id', id);
-
                 if (error) throw error;
                 showNotification('Pessoa marcada como pronta!', 'success');
                 await loadData();
@@ -1301,7 +1245,6 @@
             const csvContent = "data:text/csv;charset=utf-8," +
                 ["Nome,Email,Setor,Status"].join(",") + "\n" +
                 queue.map(p => `${p.name},${p.email},${p.sector},${p.status}`).join("\n");
-
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
@@ -1311,7 +1254,7 @@
             document.body.removeChild(link);
         }
 
-        // Agendamento
+        // === SCHEDULING MODAL LOGIC ===
         function openSchedulingModal(id) {
             currentSchedulingId = id;
             document.getElementById('schedulingModal').classList.remove('hidden');
@@ -1344,7 +1287,7 @@
             }
         });
 
-        // Notificações
+        // === NOTIFICATIONS ===
         function showNotification(message, type = 'info') {
             const area = document.getElementById('notificationArea');
             const id = Date.now();
@@ -1355,7 +1298,6 @@
                 info: 'bg-blue-500',
                 warning: 'bg-yellow-500'
             };
-
             const div = document.createElement('div');
             div.className = `notification text-white px-4 py-2 rounded shadow mb-2 flex items-center justify-between ${colors[type] || colors.info}`;
             div.id = `notif-${id}`;
