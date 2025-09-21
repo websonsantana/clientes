@@ -12,9 +12,18 @@
             animation: slideInRight 0.5s ease-out;
         }
         
+        .fade-out {
+            animation: fadeOut 0.3s ease-out forwards;
+        }
+        
         @keyframes slideInRight {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
         }
         
         .fade-in {
@@ -57,6 +66,7 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             padding: 20px;
             width: 300px;
+            max-width: 90vw;
             max-height: 80vh;
             overflow-y: auto;
         }
@@ -70,9 +80,74 @@
             background: rgba(0, 0, 0, 0.3);
             z-index: 40;
         }
+        
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .auth-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 60;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            width: 400px;
+            max-width: 90vw;
+        }
+        
+        .admin-authenticated {
+            border: 2px solid #10b981;
+        }
     </style>
 </head>
 <body class="bg-gray-50 font-sans">
+    <!-- Autenticação de Admin Modal -->
+    <div id="authBackdrop" class="config-backdrop hidden"></div>
+    <div id="authPanel" class="auth-panel hidden">
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-shield-alt text-white text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800">Acesso Administrativo</h3>
+            <p class="text-gray-600 text-sm mt-2">Digite a senha para acessar o painel administrativo</p>
+        </div>
+        
+        <form id="adminAuthForm" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Senha de Administrador</label>
+                <input type="password" id="adminPassword" required 
+                       placeholder="Digite a senha"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+            </div>
+            
+            <div class="flex justify-end space-x-3">
+                <button type="button" onclick="closeAuthPanel()" 
+                        class="px-4 py-2 text-gray-600 hover:text-gray-800">
+                    Cancelar
+                </button>
+                <button type="submit" 
+                        class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 flex items-center">
+                    <span id="authButtonText">Entrar</span>
+                    <div id="authSpinner" class="loading-spinner ml-2 hidden"></div>
+                </button>
+            </div>
+        </form>
+    </div>
+
     <!-- Configuração Supabase Modal -->
     <div id="configBackdrop" class="config-backdrop hidden"></div>
     <div id="configPanel" class="config-panel hidden">
@@ -99,10 +174,18 @@
                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"></textarea>
             </div>
             
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Senha de Administrador</label>
+                <input type="password" id="adminPasswordSetup" required 
+                       placeholder="Defina uma senha para o admin"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+            </div>
+            
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
                 <p class="text-blue-800 text-sm mb-2"><strong>Configuração necessária no Supabase:</strong></p>
-                <p class="text-blue-700 text-xs">1. Crie uma tabela 'fertilizer_queue' com as colunas: id, name, email, sector, joined_at, status, scheduled_date, scheduled_time</p>
-                <p class="text-blue-700 text-xs mt-1">2. Crie uma tabela 'completed_pickups' com a mesma estrutura + completed_at</p>
+                <p class="text-blue-700 text-xs">1. Crie uma tabela 'fertilizer_queue' com as colunas: id (uuid), name (text), email (text), sector (text), joined_at (timestamptz), status (text), scheduled_date (date), scheduled_time (text)</p>
+                <p class="text-blue-700 text-xs mt-1">2. Crie uma tabela 'completed_pickups' com a mesma estrutura + completed_at (timestamptz)</p>
+                <p class="text-blue-700 text-xs mt-1">3. Adicione RLS (Row Level Security) para proteger os dados</p>
             </div>
             
             <div class="flex justify-end space-x-3">
@@ -111,8 +194,9 @@
                     Cancelar
                 </button>
                 <button type="submit" 
-                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                    Configurar
+                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center">
+                    <span id="configButtonText">Configurar</span>
+                    <div id="configSpinner" class="loading-spinner ml-2 hidden"></div>
                 </button>
             </div>
         </form>
@@ -137,7 +221,7 @@
                     <button onclick="showUserPanel()" class="bg-blue-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-blue-600 transition text-sm sm:text-base">
                         <i class="fas fa-user mr-1 sm:mr-2"></i>Colaborador
                     </button>
-                    <button onclick="showAdminPanel()" class="bg-purple-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-purple-600 transition text-sm sm:text-base">
+                    <button onclick="showAdminPanel()" id="adminButton" class="bg-purple-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-purple-600 transition text-sm sm:text-base">
                         <i class="fas fa-cog mr-1 sm:mr-2"></i>Admin
                     </button>
                 </div>
@@ -152,6 +236,17 @@
         <div class="bg-gray-800 text-white px-3 py-2 rounded-lg text-sm flex items-center space-x-2">
             <i id="statusIcon" class="fas fa-circle text-red-500"></i>
             <span id="statusText">Desconectado</span>
+        </div>
+    </div>
+
+    <!-- Status de admin autenticado -->
+    <div id="adminStatus" class="fixed bottom-4 right-4 z-50 hidden">
+        <div class="bg-purple-600 text-white px-3 py-2 rounded-lg text-sm flex items-center space-x-2">
+            <i class="fas fa-shield-check"></i>
+            <span>Admin Autenticado</span>
+            <button onclick="logoutAdmin()" class="ml-2 text-purple-200 hover:text-white">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
         </div>
     </div>
 
@@ -176,19 +271,23 @@
                         
                         <form id="registrationForm" class="space-y-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Nome Completo</label>
-                                <input type="text" id="userName" required 
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Nome Completo *</label>
+                                <input type="text" id="userName" required minlength="2" maxlength="100"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                       aria-describedby="nameHelp">
+                                <p id="nameHelp" class="text-xs text-gray-500 mt-1">Mínimo 2 caracteres</p>
                             </div>
                             
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">E-mail</label>
-                                <input type="email" id="userEmail" required 
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">E-mail *</label>
+                                <input type="email" id="userEmail" required maxlength="100"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                       aria-describedby="emailHelp">
+                                <p id="emailHelp" class="text-xs text-gray-500 mt-1">Será usado para notificações</p>
                             </div>
                             
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Setor</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Setor *</label>
                                 <select id="userSector" required 
                                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
                                     <option value="">Selecione seu setor</option>
@@ -200,18 +299,21 @@
                                     <option value="Financeiro">Financeiro</option>
                                     <option value="Operações">Operações</option>
                                     <option value="Jurídico">Jurídico</option>
+                                    <option value="Outro">Outro</option>
                                 </select>
                             </div>
                             
-                            <button type="submit" 
-                                    class="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition font-medium">
-                                <i class="fas fa-plus-circle mr-2"></i>Entrar na Fila
+                            <button type="submit" id="submitButton"
+                                    class="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition font-medium flex items-center justify-center">
+                                <span id="submitText">Entrar na Fila</span>
+                                <div id="submitSpinner" class="loading-spinner ml-2 hidden"></div>
                             </button>
                         </form>
 
                         <div id="userPosition" class="mt-6 hidden">
                             <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                <div class="flex items-center flex-wrap"> <i class="fas fa-info-circle text-blue-500 mr-2 mb-1 sm:mb-0"></i>
+                                <div class="flex items-center flex-wrap">
+                                    <i class="fas fa-info-circle text-blue-500 mr-2 mb-1 sm:mb-0"></i>
                                     <div>
                                         <p class="text-blue-800 font-medium">Você está na fila!</p>
                                         <p class="text-blue-600" id="positionText">Posição: #0</p>
@@ -222,7 +324,10 @@
                     </div>
 
                     <div class="bg-white rounded-lg shadow-xl p-5 sm:p-6 mt-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">Estatísticas</h3>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                            <i class="fas fa-chart-bar text-green-600 mr-2"></i>
+                            Estatísticas
+                        </h3>
                         <div class="space-y-3">
                             <div class="flex justify-between items-center">
                                 <span class="text-gray-600">Pessoas na fila:</span>
@@ -233,8 +338,12 @@
                                 <span class="font-bold text-blue-600" id="fertilizerStock">5kg</span>
                             </div>
                             <div class="flex justify-between items-center">
-                                <span class="text-gray-600">Próxima colheita:</span>
-                                <span class="font-bold text-purple-600">7 dias</span>
+                                <span class="text-gray-600">Total concluídos:</span>
+                                <span class="font-bold text-purple-600" id="totalCompleted">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Última atualização:</span>
+                                <span class="font-bold text-gray-600 text-xs" id="lastUpdate">--:--</span>
                             </div>
                         </div>
                     </div>
@@ -242,14 +351,19 @@
 
                 <div class="lg:col-span-2">
                     <div class="bg-white rounded-lg shadow-xl p-5 sm:p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-5 flex items-center">
-                            <i class="fas fa-list-ol text-green-600 mr-2"></i>
-                            Fila Atual
-                        </h3>
+                        <div class="flex justify-between items-center mb-5">
+                            <h3 class="text-xl font-bold text-gray-800 flex items-center">
+                                <i class="fas fa-list-ol text-green-600 mr-2"></i>
+                                Fila Atual
+                            </h3>
+                            <button onclick="debouncedRefresh()" class="text-gray-500 hover:text-gray-700 p-2">
+                                <i class="fas fa-sync-alt" id="refreshIcon"></i>
+                            </button>
+                        </div>
                         
                         <div id="queueDisplay" class="space-y-4">
                             <div class="text-center py-8 text-gray-500">
-                                <i class="fas fa-clipboard-list text-4xl mb-4"></i>
+                                <div class="loading-spinner mx-auto mb-4"></div>
                                 <p>Carregando dados...</p>
                             </div>
                         </div>
@@ -304,7 +418,7 @@
                     <button onclick="exportQueue()" class="bg-green-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-green-600 transition text-sm sm:text-base">
                         <i class="fas fa-download mr-1 sm:mr-2"></i>Exportar Lista
                     </button>
-                    <button onclick="refreshData()" class="bg-gray-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-gray-600 transition text-sm sm:text-base">
+                    <button onclick="debouncedRefresh()" class="bg-gray-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-gray-600 transition text-sm sm:text-base">
                         <i class="fas fa-sync-alt mr-1 sm:mr-2"></i>Atualizar
                     </button>
                 </div>
@@ -314,7 +428,7 @@
                 <h3 class="text-xl font-bold text-gray-800 mb-5">Gerenciamento da Fila</h3>
                 <div id="adminQueueDisplay">
                     <div class="text-center py-8 text-gray-500">
-                        <i class="fas fa-clipboard-list text-4xl mb-4"></i>
+                        <div class="loading-spinner mx-auto mb-4"></div>
                         <p>Carregando dados...</p>
                     </div>
                 </div>
@@ -364,8 +478,9 @@
                                 Cancelar
                             </button>
                             <button type="submit" 
-                                    class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 order-1 sm:order-2">
-                                Confirmar Agendamento
+                                    class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 order-1 sm:order-2 flex items-center justify-center">
+                                <span id="scheduleButtonText">Confirmar Agendamento</span>
+                                <div id="scheduleSpinner" class="loading-spinner ml-2 hidden"></div>
                             </button>
                         </div>
                     </form>
@@ -382,38 +497,197 @@
         let currentUserId = null;
         let currentSchedulingId = null;
         let isConnected = false;
+        let isAdminAuthenticated = false;
+        let realtimeChannel = null;
+
+        // Configuration constants
+        const CONFIG = {
+            ADMIN_PASSWORD_KEY: 'admin_password_hash',
+            DEFAULT_ADMIN_PASSWORD: 'admin123',
+            REFRESH_INTERVAL: 30000,
+            MAX_RETRIES: 3,
+            RETRY_DELAY: 1000
+        };
+
+        // Utility functions
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function validateForm(name, email, sector) {
+            if (!name.trim() || name.length < 2) {
+                return { valid: false, message: 'Nome deve ter pelo menos 2 caracteres' };
+            }
+            if (!validateEmail(email)) {
+                return { valid: false, message: 'Email inválido' };
+            }
+            if (!sector) {
+                return { valid: false, message: 'Setor é obrigatório' };
+            }
+            return { valid: true };
+        }
+
+        function sanitizeInput(input) {
+            return input.trim().replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+        }
+
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // Create debounced refresh function
+        const debouncedRefresh = debounce(refreshData, 300);
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
-            initializeSupabase();
-            setMinDate();
-            checkConnection();
+            initializeApplication();
         });
 
-        // Initialize Supabase
-        function initializeSupabase() {
+        async function initializeApplication() {
+            setMinDate();
+            await initializeSupabase();
+            checkConnection();
+            setupEventListeners();
+            startPeriodicRefresh();
+        }
+
+        function setupEventListeners() {
+            // Form validation on input
+            const nameInput = document.getElementById('userName');
+            const emailInput = document.getElementById('userEmail');
+            
+            nameInput.addEventListener('input', function() {
+                validateFieldOnInput(this, this.value.length >= 2, 'Nome muito curto');
+            });
+            
+            emailInput.addEventListener('input', function() {
+                validateFieldOnInput(this, validateEmail(this.value), 'Email inválido');
+            });
+        }
+
+        function validateFieldOnInput(field, isValid, errorMessage) {
+            field.classList.remove('border-red-500', 'border-green-500');
+            const errorElement = field.parentElement.querySelector('.error-message');
+            
+            if (field.value) {
+                if (isValid) {
+                    field.classList.add('border-green-500');
+                    if (errorElement) errorElement.remove();
+                } else {
+                    field.classList.add('border-red-500');
+                    if (!errorElement) {
+                        const error = document.createElement('p');
+                        error.className = 'error-message text-xs text-red-500 mt-1';
+                        error.textContent = errorMessage;
+                        field.parentElement.appendChild(error);
+                    }
+                }
+            } else {
+                if (errorElement) errorElement.remove();
+            }
+        }
+
+        function startPeriodicRefresh() {
+            setInterval(() => {
+                if (isConnected && supabase) {
+                    loadData();
+                }
+            }, CONFIG.REFRESH_INTERVAL);
+        }
+
+        // Initialize Supabase with improved error handling
+        async function initializeSupabase() {
             const savedUrl = localStorage.getItem('supabaseUrl');
             const savedKey = localStorage.getItem('supabaseKey');
             
             if (savedUrl && savedKey) {
                 try {
                     supabase = window.supabase.createClient(savedUrl, savedKey);
+                    await testConnection();
                     updateConnectionStatus(true);
                     loadData();
+                    setupRealtimeSubscription();
                 } catch (error) {
                     console.error('Erro ao conectar com Supabase:', error);
                     updateConnectionStatus(false);
-                    showNotification('Erro ao conectar com Supabase. Verifique as configurações.', 'error');
-                    showConfigPanel();
+                    handleSupabaseError(error);
                 }
             } else {
                 updateConnectionStatus(false);
                 showNotification('Configure as credenciais do Supabase para começar.', 'info');
-                showConfigPanel();
+                setTimeout(showConfigPanel, 1000);
             }
         }
 
-        // Update connection status
+        async function testConnection() {
+            const { error } = await supabase.from('fertilizer_queue').select('count').limit(1);
+            if (error) throw error;
+        }
+
+        function handleSupabaseError(error) {
+            let message = 'Erro de conexão com o banco de dados.';
+            
+            if (error.message.includes('Invalid API key')) {
+                message = 'Chave de API inválida. Verifique as credenciais.';
+            } else if (error.message.includes('relation "fertilizer_queue" does not exist')) {
+                message = 'Tabelas não encontradas. Configure o banco de dados primeiro.';
+            } else if (error.code === 'PGRST301') {
+                message = 'Erro de permissão. Verifique as políticas RLS.';
+            }
+            
+            showNotification(message, 'error');
+            setTimeout(showConfigPanel, 2000);
+        }
+
+        // Real-time subscription setup
+        function setupRealtimeSubscription() {
+            if (!supabase) return;
+            
+            try {
+                realtimeChannel = supabase
+                    .channel('queue_changes')
+                    .on('postgres_changes', 
+                        { event: '*', schema: 'public', table: 'fertilizer_queue' },
+                        (payload) => {
+                            console.log('Mudança detectada na fila:', payload);
+                            loadData();
+                        }
+                    )
+                    .on('postgres_changes',
+                        { event: '*', schema: 'public', table: 'completed_pickups' },
+                        (payload) => {
+                            console.log('Mudança detectada nos concluídos:', payload);
+                            loadData();
+                        }
+                    )
+                    .subscribe((status) => {
+                        if (status === 'SUBSCRIBED') {
+                            console.log('Subscrito para atualizações em tempo real');
+                        }
+                    });
+            } catch (error) {
+                console.warn('Não foi possível configurar atualizações em tempo real:', error);
+            }
+        }
+
+        // Update connection status with retry logic
         function updateConnectionStatus(connected) {
             isConnected = connected;
             const statusIcon = document.getElementById('statusIcon');
@@ -421,32 +695,111 @@
             
             if (connected) {
                 statusIcon.className = 'fas fa-circle text-green-500';
-                statusText.textContent = 'Conectado ao Supabase';
+                statusText.textContent = 'Conectado';
             } else {
                 statusIcon.className = 'fas fa-circle text-red-500';
                 statusText.textContent = 'Desconectado';
             }
         }
 
-        // Check connection periodically
-        function checkConnection() {
+        // Enhanced connection checking with retry
+        async function checkConnection() {
             if (supabase) {
-                supabase.from('fertilizer_queue').select('count').limit(1)
-                    .then(() => updateConnectionStatus(true))
-                    .catch(() => updateConnectionStatus(false));
+                try {
+                    await testConnection();
+                    updateConnectionStatus(true);
+                } catch (error) {
+                    updateConnectionStatus(false);
+                    console.warn('Conexão perdida, tentando reconectar...');
+                }
             }
             
-            setTimeout(checkConnection, 30000); // Check every 30 seconds
+            setTimeout(checkConnection, CONFIG.REFRESH_INTERVAL);
         }
+
+        // Authentication functions
+        function showAuthPanel() {
+            document.getElementById('authPanel').classList.remove('hidden');
+            document.getElementById('authBackdrop').classList.remove('hidden');
+            document.getElementById('adminPassword').focus();
+        }
+
+        function closeAuthPanel() {
+            document.getElementById('authPanel').classList.add('hidden');
+            document.getElementById('authBackdrop').classList.add('hidden');
+            document.getElementById('adminPassword').value = '';
+        }
+
+        async function authenticateAdmin(password) {
+            const savedPasswordHash = localStorage.getItem(CONFIG.ADMIN_PASSWORD_KEY);
+            const inputPasswordHash = await hashPassword(password);
+            
+            if (!savedPasswordHash) {
+                // First time setup - use default password
+                const defaultHash = await hashPassword(CONFIG.DEFAULT_ADMIN_PASSWORD);
+                return inputPasswordHash === defaultHash;
+            }
+            
+            return inputPasswordHash === savedPasswordHash;
+        }
+
+        function logoutAdmin() {
+            isAdminAuthenticated = false;
+            document.getElementById('adminStatus').classList.add('hidden');
+            document.getElementById('adminButton').classList.remove('admin-authenticated');
+            showUserPanel();
+            showNotification('Logout realizado com sucesso.', 'info');
+        }
+
+        // Admin authentication form handler
+        document.getElementById('adminAuthForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const password = document.getElementById('adminPassword').value;
+            const submitButton = document.querySelector('#authPanel button[type="submit"]');
+            const buttonText = document.getElementById('authButtonText');
+            const spinner = document.getElementById('authSpinner');
+            
+            // Show loading
+            submitButton.disabled = true;
+            buttonText.textContent = 'Verificando...';
+            spinner.classList.remove('hidden');
+            
+            try {
+                const isValid = await authenticateAdmin(password);
+                
+                if (isValid) {
+                    isAdminAuthenticated = true;
+                    closeAuthPanel();
+                    showAdminPanel();
+                    document.getElementById('adminStatus').classList.remove('hidden');
+                    document.getElementById('adminButton').classList.add('admin-authenticated');
+                    showNotification('Login administrativo realizado com sucesso!', 'success');
+                } else {
+                    showNotification('Senha incorreta!', 'error');
+                }
+            } catch (error) {
+                console.error('Erro na autenticação:', error);
+                showNotification('Erro ao verificar senha.', 'error');
+            }
+            
+            // Reset button
+            submitButton.disabled = false;
+            buttonText.textContent = 'Entrar';
+            spinner.classList.add('hidden');
+        });
 
         // Configuration Panel Functions
         function showConfigPanel() {
             document.getElementById('configPanel').classList.remove('hidden');
             document.getElementById('configBackdrop').classList.remove('hidden');
             
-            // Suas credenciais pré-configuradas
-            document.getElementById('supabaseUrl').value = 'https://blraodduccltnyhykbbg.supabase.co';
-            document.getElementById('supabaseKey').value = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJscmFvZGR1Y2NsdG55aHlrYmJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc4MDU3MzUsImV4cCI6MjA3MzM4MTczNX0.GHr4rRurb1zzy6g2lirATxghtmgt7PGjEPzA_vKlzY0';
+            // Load saved values
+            const savedUrl = localStorage.getItem('supabaseUrl');
+            const savedKey = localStorage.getItem('supabaseKey');
+            
+            if (savedUrl) document.getElementById('supabaseUrl').value = savedUrl;
+            if (savedKey) document.getElementById('supabaseKey').value = savedKey;
         }
 
         function closeConfigPanel() {
@@ -454,12 +807,38 @@
             document.getElementById('configBackdrop').classList.add('hidden');
         }
 
-        // Configuration form handler
+        // Configuration form handler with improved validation
         document.getElementById('supabaseConfigForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const url = document.getElementById('supabaseUrl').value.trim();
-            const key = document.getElementById('supabaseKey').value.trim();
+            const url = sanitizeInput(document.getElementById('supabaseUrl').value);
+            const key = sanitizeInput(document.getElementById('supabaseKey').value);
+            const adminPassword = document.getElementById('adminPasswordSetup').value;
+            
+            const submitButton = document.querySelector('#configPanel button[type="submit"]');
+            const buttonText = document.getElementById('configButtonText');
+            const spinner = document.getElementById('configSpinner');
+            
+            // Validation
+            if (!url.includes('supabase.co')) {
+                showNotification('URL do Supabase inválida!', 'error');
+                return;
+            }
+            
+            if (key.length < 50) {
+                showNotification('Chave de API muito curta!', 'error');
+                return;
+            }
+            
+            if (!adminPassword || adminPassword.length < 6) {
+                showNotification('Senha de admin deve ter pelo menos 6 caracteres!', 'error');
+                return;
+            }
+            
+            // Show loading
+            submitButton.disabled = true;
+            buttonText.textContent = 'Configurando...';
+            spinner.classList.remove('hidden');
             
             try {
                 // Test connection
@@ -470,17 +849,27 @@
                 localStorage.setItem('supabaseUrl', url);
                 localStorage.setItem('supabaseKey', key);
                 
+                // Save admin password hash
+                const passwordHash = await hashPassword(adminPassword);
+                localStorage.setItem(CONFIG.ADMIN_PASSWORD_KEY, passwordHash);
+                
                 supabase = testClient;
                 updateConnectionStatus(true);
                 closeConfigPanel();
                 
                 showNotification('Supabase configurado com sucesso!', 'success');
                 loadData();
+                setupRealtimeSubscription();
                 
             } catch (error) {
                 console.error('Erro ao testar conexão:', error);
-                showNotification('Erro ao conectar. Verifique as credenciais.', 'error');
+                handleSupabaseError(error);
             }
+            
+            // Reset button
+            submitButton.disabled = false;
+            buttonText.textContent = 'Configurar';
+            spinner.classList.add('hidden');
         });
 
         // Set minimum date to today
@@ -492,15 +881,17 @@
             }
         }
 
-        // Load data from Supabase
-        async function loadData() {
+        // Enhanced data loading with retry logic
+        async function loadData(retryCount = 0) {
             if (!supabase || !isConnected) {
                 showFallbackMessage();
                 return;
             }
             
             try {
-                // Load queue
+                const startTime = Date.now();
+                
+                // Load queue with better error handling
                 const { data: queueData, error: queueError } = await supabase
                     .from('fertilizer_queue')
                     .select('*')
@@ -513,18 +904,39 @@
                 const { data: completedData, error: completedError } = await supabase
                     .from('completed_pickups')
                     .select('*')
-                    .order('completed_at', { ascending: false });
+                    .order('completed_at', { ascending: false })
+                    .limit(100); // Limit for performance
                     
                 if (completedError) throw completedError;
                 completedPickups = completedData || [];
                 
                 updateDisplays();
+                updateLastUpdateTime();
+                
+                const loadTime = Date.now() - startTime;
+                console.log(`Dados carregados em ${loadTime}ms`);
                 
             } catch (error) {
                 console.error('Erro ao carregar dados:', error);
-                showNotification('Erro ao carregar dados do servidor.', 'error');
-                updateConnectionStatus(false);
+                
+                if (retryCount < CONFIG.MAX_RETRIES) {
+                    setTimeout(() => {
+                        loadData(retryCount + 1);
+                    }, CONFIG.RETRY_DELAY * (retryCount + 1));
+                } else {
+                    showNotification('Erro ao carregar dados após várias tentativas.', 'error');
+                    updateConnectionStatus(false);
+                }
             }
+        }
+
+        function updateLastUpdateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('pt-BR', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            document.getElementById('lastUpdate').textContent = timeString;
         }
 
         // Show fallback message when not connected
@@ -536,8 +948,8 @@
                     container.innerHTML = `
                         <div class="text-center py-8 text-gray-500">
                             <i class="fas fa-database text-4xl mb-4"></i>
-                            <p>Configure o Supabase para visualizar os dados.</p>
-                            <button onclick="showConfigPanel()" class="mt-3 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                            <p class="mb-2">Configure o Supabase para visualizar os dados.</p>
+                            <button onclick="showConfigPanel()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
                                 Configurar Agora
                             </button>
                         </div>
@@ -546,11 +958,19 @@
             });
         }
 
-        // Refresh data manually
+        // Enhanced refresh with visual feedback
         async function refreshData() {
-            showNotification('Atualizando dados...', 'info');
-            await loadData();
-            showNotification('Dados atualizados!', 'success');
+            const refreshIcon = document.getElementById('refreshIcon');
+            refreshIcon.classList.add('fa-spin');
+            
+            try {
+                await loadData();
+                showNotification('Dados atualizados!', 'success');
+            } finally {
+                setTimeout(() => {
+                    refreshIcon.classList.remove('fa-spin');
+                }, 1000);
+            }
         }
 
         // Show user panel
@@ -560,14 +980,19 @@
             updateDisplays();
         }
 
-        // Show admin panel
+        // Show admin panel with authentication
         function showAdminPanel() {
+            if (!isAdminAuthenticated) {
+                showAuthPanel();
+                return;
+            }
+            
             document.getElementById('userPanel').classList.add('hidden');
             document.getElementById('adminPanel').classList.remove('hidden');
             updateAdminDisplays();
         }
 
-        // Registration form handler
+        // Enhanced registration form handler
         document.getElementById('registrationForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -576,20 +1001,40 @@
                 return;
             }
             
-            const name = document.getElementById('userName').value.trim();
-            const email = document.getElementById('userEmail').value.trim();
+            const name = sanitizeInput(document.getElementById('userName').value);
+            const email = sanitizeInput(document.getElementById('userEmail').value);
             const sector = document.getElementById('userSector').value;
+            
+            // Validate form
+            const validation = validateForm(name, email, sector);
+            if (!validation.valid) {
+                showNotification(validation.message, 'error');
+                return;
+            }
+            
+            const submitButton = document.getElementById('submitButton');
+            const submitText = document.getElementById('submitText');
+            const submitSpinner = document.getElementById('submitSpinner');
+            
+            // Show loading
+            submitButton.disabled = true;
+            submitText.textContent = 'Cadastrando...';
+            submitSpinner.classList.remove('hidden');
             
             try {
                 // Check if email already exists
-                const { data: existingUser } = await supabase
+                const { data: existingUser, error: checkError } = await supabase
                     .from('fertilizer_queue')
-                    .select('id')
+                    .select('id, name')
                     .eq('email', email)
-                    .single();
+                    .maybeSingle();
+                
+                if (checkError && checkError.code !== 'PGRST116') {
+                    throw checkError;
+                }
                 
                 if (existingUser) {
-                    showNotification('Este e-mail já está cadastrado na fila!', 'error');
+                    showNotification(`Este e-mail já está cadastrado para ${existingUser.name}!`, 'error');
                     return;
                 }
                 
@@ -612,21 +1057,33 @@
                 
                 currentUserId = data.id;
                 
-                await loadData(); // Reload data to update displays
-                
+                // Reset form and show success
                 this.reset();
                 showNotification(`${name} foi adicionado(a) à fila!`, 'success');
                 
-                // Show user position
+                // Reload data and update position
+                await loadData();
                 updateUserPosition();
                 
             } catch (error) {
                 console.error('Erro ao cadastrar:', error);
-                showNotification('Erro ao cadastrar na fila. Tente novamente.', 'error');
+                
+                if (error.code === '23505') {
+                    showNotification('Este e-mail já está cadastrado!', 'error');
+                } else if (error.code === '42501') {
+                    showNotification('Erro de permissão. Verifique as políticas RLS.', 'error');
+                } else {
+                    showNotification('Erro ao cadastrar. Tente novamente.', 'error');
+                }
+            } finally {
+                // Reset button
+                submitButton.disabled = false;
+                submitText.textContent = 'Entrar na Fila';
+                submitSpinner.classList.add('hidden');
             }
         });
 
-        // Update user position display
+        // Update user position display with enhanced functionality
         function updateUserPosition() {
             if (currentUserId) {
                 const userIndex = queue.findIndex(person => person.id === currentUserId);
@@ -639,16 +1096,27 @@
                         positionHtml = `
                             <span class="text-green-600 font-bold">É sua vez! Clique para agendar a retirada.</span>
                             <button onclick="openSchedulingModal(${person.id})" 
-                                    class="ml-2 mt-2 sm:mt-0 bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
-                                Agendar
+                                    class="ml-2 mt-2 sm:mt-0 bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition">
+                                <i class="fas fa-calendar-plus mr-1"></i>Agendar
                             </button>
                         `;
                     } else if (person.status === 'scheduled') {
                         positionHtml = `
-                            <span class="text-blue-600 font-bold">Agendado para ${formatDate(person.scheduled_date)} às ${person.scheduled_time}</span>
+                            <span class="text-blue-600 font-bold">
+                                <i class="fas fa-calendar-check mr-1"></i>
+                                Agendado para ${formatDate(person.scheduled_date)} às ${person.scheduled_time}
+                            </span>
                         `;
                     } else if (person.status === 'waiting') {
-                         positionHtml = `Posição: <span class="font-bold">#${userIndex + 1}</span>`;
+                        const position = userIndex + 1;
+                        const estimatedWait = Math.ceil(position * 2); // Rough estimate: 2 days per position
+                        positionHtml = `
+                            <span class="font-bold">Posição: #${position}</span>
+                            <span class="text-sm text-gray-600 block mt-1">
+                                <i class="fas fa-clock mr-1"></i>
+                                Estimativa: ~${estimatedWait} dias
+                            </span>
+                        `;
                     }
                     document.getElementById('positionText').innerHTML = positionHtml;
                 }
@@ -662,7 +1130,7 @@
             updateUserPosition();
         }
 
-        // Update queue display for users
+        // Enhanced queue display for users
         function updateQueueDisplay() {
             const container = document.getElementById('queueDisplay');
             
@@ -674,345 +1142,166 @@
             if (queue.length === 0) {
                 container.innerHTML = `
                     <div class="text-center py-8 text-gray-500">
-                        <i class="fas fa-clipboard-list text-4xl mb-4"></i>
-                        <p>Nenhuma pessoa na fila ainda.</p>
+                        <i class="fas fa-clipboard-list text-4xl mb-4 text-gray-300"></i>
+                        <p class="text-lg mb-2">Nenhuma pessoa na fila ainda.</p>
                         <p class="text-sm">Seja o primeiro a se cadastrar!</p>
                     </div>
                 `;
                 return;
             }
             
-            container.innerHTML = queue.map((person, index) => `
+            container.innerHTML = queue.slice(0, 10).map((person, index) => `
                 <div class="queue-item border-l-4 ${getStatusBorderColor(person.status)} bg-gray-50 p-3 sm:p-4 rounded-r-lg">
                     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between">
                         <div class="flex items-center space-x-3 sm:space-x-4 mb-2 sm:mb-0">
-                            <div class="w-9 h-9 sm:w-10 sm:h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-bold text-sm sm:text-base">
+                            <div class="w-9 h-9 sm:w-10 sm:h-10 ${getPositionColor(index)} rounded-full flex items-center justify-center text-white font-bold text-sm sm:text-base">
                                 ${index + 1}
                             </div>
                             <div>
-                                <h4 class="font-semibold text-gray-800 text-base sm:text-lg">${person.name}</h4>
-                                <p class="text-xs sm:text-sm text-gray-600">${person.sector}</p>
-                                <p class="text-xs text-gray-500">Entrou em: ${formatDateTime(person.joined_at)}</p>
+                                <h4 class="font-semibold text-gray-800 text-base sm:text-lg">
+                                    ${person.name}
+                                    ${person.id === currentUserId ? '<i class="fas fa-user text-blue-                                    ${person.id === currentUserId ? '<i class="fas fa-user text-blue-500 ml-2"></i>' : ''}
+                                </h4>
+                                <p class="text-sm text-gray-600">${person.sector}</p>
                             </div>
                         </div>
-                        <div class="text-left sm:text-right w-full sm:w-auto mt-2 sm:mt-0">
-                            <span class="inline-block px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(person.status)}">
-                                ${getStatusText(person.status)}
-                            </span>
-                            ${person.scheduled_date ? `
-                                <p class="text-xs text-gray-600 mt-1">
-                                    ${formatDate(person.scheduled_date)} às ${person.scheduled_time}
-                                </p>
-                            ` : ''}
+                        <div class="text-sm text-gray-500">
+                            ${getStatusLabel(person)}
                         </div>
                     </div>
                 </div>
             `).join('');
         }
 
-        // Update admin displays
-        function updateAdminDisplays() {
-            updateAdminQueueDisplay();
-            updateAdminStats();
+        // Helpers de exibição
+        function getStatusBorderColor(status) {
+            switch (status) {
+                case 'waiting': return 'border-yellow-400';
+                case 'ready': return 'border-green-500';
+                case 'scheduled': return 'border-blue-500';
+                default: return 'border-gray-300';
+            }
         }
 
-        // Update admin queue display
-        function updateAdminQueueDisplay() {
-            const container = document.getElementById('adminQueueDisplay');
-            
-            if (!isConnected) {
-                showFallbackMessage();
-                return;
+        function getPositionColor(index) {
+            if (index === 0) return 'bg-green-500';
+            if (index < 3) return 'bg-blue-500';
+            return 'bg-gray-400';
+        }
+
+        function getStatusLabel(person) {
+            if (person.status === 'ready') {
+                return '<span class="text-green-600 font-medium">Pronto para agendar</span>';
             }
-            
-            if (queue.length === 0) {
+            if (person.status === 'scheduled') {
+                return `<span class="text-blue-600 font-medium">Agendado: ${formatDate(person.scheduled_date)} ${person.scheduled_time}</span>`;
+            }
+            return '<span class="text-gray-600">Aguardando...</span>';
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('pt-BR');
+        }
+
+        // Atualizar estatísticas
+        function updateStats() {
+            document.getElementById('queueCount').textContent = queue.length;
+            document.getElementById('adminQueueCount').textContent = queue.length;
+            document.getElementById('totalCompleted').textContent = completedPickups.length;
+            document.getElementById('completedCount').textContent = completedPickups.length;
+
+            const pending = queue.filter(p => p.status === 'scheduled').length;
+            document.getElementById('pendingCount').textContent = pending;
+        }
+
+        // Admin display
+        function updateAdminDisplays() {
+            const container = document.getElementById('adminQueueDisplay');
+            if (!queue || queue.length === 0) {
                 container.innerHTML = `
                     <div class="text-center py-8 text-gray-500">
-                        <i class="fas fa-clipboard-list text-4xl mb-4"></i>
-                        <p>Nenhuma pessoa na fila.</p>
+                        <i class="fas fa-clipboard-list text-4xl mb-4 text-gray-300"></i>
+                        <p class="text-lg mb-2">Nenhuma pessoa na fila ainda.</p>
                     </div>
                 `;
                 return;
             }
-            
-            container.innerHTML = `
-                <div class="overflow-x-auto rounded-lg shadow-md">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Posição</th>
-                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
-                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">E-mail</th>
-                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Setor</th>
-                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Agendamento</th>
-                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            ${queue.map((person, index) => `
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        #${index + 1}
-                                    </td>
-                                    <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-900">${person.name}</td>
-                                    <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500">${person.email}</td>
-                                    <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500">${person.sector}</td>
-                                    <td class="px-3 py-3 whitespace-nowrap">
-                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(person.status)}">
-                                            ${getStatusText(person.status)}
-                                        </span>
-                                    </td>
-                                    <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500">
-                                        ${person.scheduled_date ? `${formatDate(person.scheduled_date)} ${person.scheduled_time}` : '-'}
-                                    </td>
-                                    <td class="px-3 py-3 whitespace-nowrap text-sm font-medium space-x-1 flex flex-wrap gap-1">
-                                        ${person.status === 'waiting' ? `
-                                            <button onclick="markAsReady(${person.id})" 
-                                                    class="text-blue-600 hover:text-blue-900 text-sm">
-                                                Notificar
-                                            </button>
-                                        ` : ''}
-                                        ${person.status === 'scheduled' ? `
-                                            <button onclick="markAsCompleted(${person.id})" 
-                                                    class="text-green-600 hover:text-green-900 text-sm">
-                                                Concluir
-                                            </button>
-                                        ` : ''}
-                                        <button onclick="removeFromQueue(${person.id})" 
-                                                class="text-red-600 hover:text-red-900 text-sm">
-                                            Remover
-                                        </button>
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
+
+            container.innerHTML = queue.map((person, index) => `
+                <div class="queue-item flex flex-col sm:flex-row justify-between items-start sm:items-center border-b py-3">
+                    <div>
+                        <p class="font-semibold text-gray-800">${index + 1}. ${person.name}</p>
+                        <p class="text-sm text-gray-600">${person.email} | ${person.sector}</p>
+                        <p class="text-xs text-gray-500">${getStatusLabel(person)}</p>
+                    </div>
+                    <div class="flex space-x-2 mt-2 sm:mt-0">
+                        <button onclick="markReady('${person.id}')" class="bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600">
+                            Pronto
+                        </button>
+                        <button onclick="removeFromQueue('${person.id}')" class="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600">
+                            Remover
+                        </button>
+                    </div>
                 </div>
-            `;
+            `).join('');
         }
 
-        // Update stats
-        function updateStats() {
-            document.getElementById('queueCount').textContent = queue.length;
-        }
-
-        // Update admin stats
-        function updateAdminStats() {
-            document.getElementById('adminQueueCount').textContent = queue.length;
-            document.getElementById('completedCount').textContent = completedPickups.length;
-            document.getElementById('pendingCount').textContent = queue.filter(p => p.status === 'scheduled').length;
-        }
-
-        // Admin functions
-        async function markAsReady(personId) {
-            if (!supabase || !isConnected) {
-                showNotification('Sem conexão com o servidor!', 'error');
-                return;
-            }
-            
+        // Ações admin
+        async function markReady(id) {
             try {
-                const { data, error } = await supabase
-                    .from('fertilizer_queue')
-                    .update({ status: 'ready' })
-                    .eq('id', personId)
-                    .select()
-                    .single();
-                
-                if (error) throw error;
-                
-                await loadData(); // Reload data
-                showNotification(`${data.name} foi notificado para agendar a retirada!`, 'success');
-                
-            } catch (error) {
-                console.error('Erro ao atualizar status:', error);
-                showNotification('Erro ao notificar pessoa.', 'error');
-            }
-        }
-
-        async function markAsCompleted(personId) {
-            if (!supabase || !isConnected) {
-                showNotification('Sem conexão com o servidor!', 'error');
-                return;
-            }
-            
-            try {
-                // Get person data
-                const { data: person, error: fetchError } = await supabase
-                    .from('fertilizer_queue')
-                    .select('*')
-                    .eq('id', personId)
-                    .single();
-                
-                if (fetchError) throw fetchError;
-                
-                // Add to completed pickups
-                const { error: insertError } = await supabase
-                    .from('completed_pickups')
-                    .insert([
-                        {
-                            ...person,
-                            completed_at: new Date().toISOString()
-                        }
-                    ]);
-                
-                if (insertError) throw insertError;
-                
-                // Remove from queue
-                const { error: deleteError } = await supabase
-                    .from('fertilizer_queue')
-                    .delete()
-                    .eq('id', personId);
-                
-                if (deleteError) throw deleteError;
-                
-                await loadData(); // Reload data
-                showNotification(`Retirada de ${person.name} marcada como concluída!`, 'success');
-                
-            } catch (error) {
-                console.error('Erro ao marcar como concluído:', error);
-                showNotification('Erro ao concluir retirada.', 'error');
-            }
-        }
-
-        async function removeFromQueue(personId) {
-            if (!confirm('Tem certeza que deseja remover esta pessoa da fila?')) {
-                return;
-            }
-            
-            if (!supabase || !isConnected) {
-                showNotification('Sem conexão com o servidor!', 'error');
-                return;
-            }
-            
-            try {
-                // Get person name before deletion
-                const { data: person } = await supabase
-                    .from('fertilizer_queue')
-                    .select('name')
-                    .eq('id', personId)
-                    .single();
-                
                 const { error } = await supabase
                     .from('fertilizer_queue')
-                    .delete()
-                    .eq('id', personId);
-                
+                    .update({ status: 'ready' })
+                    .eq('id', id);
+
                 if (error) throw error;
-                
-                await loadData(); // Reload data
-                showNotification(`${person?.name || 'Pessoa'} foi removido(a) da fila.`, 'info');
-                
-            } catch (error) {
-                console.error('Erro ao remover da fila:', error);
-                showNotification('Erro ao remover pessoa da fila.', 'error');
+                showNotification('Pessoa marcada como pronta!', 'success');
+                await loadData();
+            } catch (err) {
+                showNotification('Erro ao atualizar status.', 'error');
+            }
+        }
+
+        async function removeFromQueue(id) {
+            if (!confirm('Deseja remover esta pessoa da fila?')) return;
+            try {
+                const { error } = await supabase.from('fertilizer_queue').delete().eq('id', id);
+                if (error) throw error;
+                showNotification('Removido com sucesso!', 'success');
+                await loadData();
+            } catch (err) {
+                showNotification('Erro ao remover.', 'error');
             }
         }
 
         async function notifyNext() {
-            const nextPerson = queue.find(p => p.status === 'waiting');
-            if (nextPerson) {
-                await markAsReady(nextPerson.id);
-            } else {
-                showNotification('Não há pessoas aguardando para serem notificadas.', 'info');
-            }
-        }
-
-        // Open scheduling modal
-        function openSchedulingModal(personId) {
-            currentSchedulingId = personId;
-            document.getElementById('schedulingModal').classList.remove('hidden');
-        }
-
-        // Close scheduling modal
-        function closeSchedulingModal() {
-            document.getElementById('schedulingModal').classList.add('hidden');
-            currentSchedulingId = null;
-        }
-
-        // Scheduling form handler
-        document.getElementById('schedulingForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            if (!supabase || !isConnected) {
-                showNotification('Sem conexão com o servidor!', 'error');
+            if (queue.length === 0) {
+                showNotification('Nenhum usuário na fila.', 'info');
                 return;
             }
-            
-            const pickupDate = document.getElementById('pickupDate').value;
-            const pickupTime = document.getElementById('pickupTime').value;
-            
-            try {
-                const { data, error } = await supabase
-                    .from('fertilizer_queue')
-                    .update({
-                        status: 'scheduled',
-                        scheduled_date: pickupDate,
-                        scheduled_time: pickupTime
-                    })
-                    .eq('id', currentSchedulingId)
-                    .select()
-                    .single();
-                
-                if (error) throw error;
-                
-                await loadData(); // Reload data
-                closeSchedulingModal();
-                showNotification(`Agendamento confirmado para ${data.name}!`, 'success');
-                
-            } catch (error) {
-                console.error('Erro ao agendar:', error);
-                showNotification('Erro ao confirmar agendamento.', 'error');
-            }
-        });
+            const next = queue[0];
+            await markReady(next.id);
+        }
 
-        // Admin Control Functions
         async function clearQueue() {
-            if (!confirm('Tem certeza que deseja limpar toda a fila? Esta ação não pode ser desfeita.')) {
-                return;
-            }
-            
-            if (!supabase || !isConnected) {
-                showNotification('Sem conexão com o servidor!', 'error');
-                return;
-            }
-            
+            if (!confirm('Tem certeza que deseja limpar toda a fila?')) return;
             try {
-                const { error } = await supabase
-                    .from('fertilizer_queue')
-                    .delete()
-                    .neq('id', 0); // Delete all records
-                
+                const { error } = await supabase.from('fertilizer_queue').delete().neq('id', '');
                 if (error) throw error;
-                
-                await loadData(); // Reload data
-                showNotification('Fila limpa com sucesso!', 'info');
-                
-            } catch (error) {
-                console.error('Erro ao limpar fila:', error);
+                showNotification('Fila limpa!', 'success');
+                await loadData();
+            } catch (err) {
                 showNotification('Erro ao limpar fila.', 'error');
             }
         }
 
         function exportQueue() {
-            if (queue.length === 0) {
-                showNotification('A fila está vazia, não há dados para exportar.', 'info');
-                return;
-            }
-            
-            const data = queue.map((person, index) => ({
-                Posição: index + 1,
-                Nome: person.name,
-                Email: person.email,
-                Setor: person.sector,
-                Status: getStatusText(person.status),
-                'Data de Entrada': formatDateTime(person.joined_at),
-                'Agendamento': person.scheduled_date ? `${formatDate(person.scheduled_date)} às ${person.scheduled_time}` : 'Não agendado'
-            }));
-            
-            const csvContent = "data:text/csv;charset=utf-8," + 
-                               [Object.keys(data[0]).join(';'), ...data.map(e => Object.values(e).join(';'))].join('\n');
-                               
+            const csvContent = "data:text/csv;charset=utf-8," +
+                ["Nome,Email,Setor,Status"].join(",") + "\n" +
+                queue.map(p => `${p.name},${p.email},${p.sector},${p.status}`).join("\n");
+
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
@@ -1020,77 +1309,73 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showNotification('Fila exportada como fila_adubo.csv!', 'success');
         }
 
-        // Utility functions for formatting and status display
-        function getStatusColor(status) {
-            switch (status) {
-                case 'waiting': return 'bg-gray-200 text-gray-800';
-                case 'ready': return 'bg-green-100 text-green-800';
-                case 'scheduled': return 'bg-blue-100 text-blue-800';
-                case 'completed': return 'bg-purple-100 text-purple-800';
-                default: return 'bg-gray-200 text-gray-800';
+        // Agendamento
+        function openSchedulingModal(id) {
+            currentSchedulingId = id;
+            document.getElementById('schedulingModal').classList.remove('hidden');
+        }
+
+        function closeSchedulingModal() {
+            document.getElementById('schedulingModal').classList.add('hidden');
+            currentSchedulingId = null;
+        }
+
+        document.getElementById('schedulingForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            if (!currentSchedulingId) return;
+
+            const date = document.getElementById('pickupDate').value;
+            const time = document.getElementById('pickupTime').value;
+
+            try {
+                const { error } = await supabase
+                    .from('fertilizer_queue')
+                    .update({ status: 'scheduled', scheduled_date: date, scheduled_time: time })
+                    .eq('id', currentSchedulingId);
+
+                if (error) throw error;
+                showNotification('Agendamento confirmado!', 'success');
+                closeSchedulingModal();
+                await loadData();
+            } catch (err) {
+                showNotification('Erro ao agendar.', 'error');
             }
-        }
+        });
 
-        function getStatusBorderColor(status) {
-            switch (status) {
-                case 'waiting': return 'border-gray-400';
-                case 'ready': return 'border-green-600';
-                case 'scheduled': return 'border-blue-600';
-                case 'completed': return 'border-purple-600';
-                default: return 'border-gray-400';
-            }
-        }
+        // Notificações
+        function showNotification(message, type = 'info') {
+            const area = document.getElementById('notificationArea');
+            const id = Date.now();
 
-        function getStatusText(status) {
-            switch (status) {
-                case 'waiting': return 'Aguardando';
-                case 'ready': return 'Pronto para agendar';
-                case 'scheduled': return 'Agendado';
-                case 'completed': return 'Concluído';
-                default: return 'Desconhecido';
-            }
-        }
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                info: 'bg-blue-500',
+                warning: 'bg-yellow-500'
+            };
 
-        function formatDate(isoDate) {
-            const date = new Date(isoDate + 'T00:00:00');
-            return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        }
-
-        function formatDateTime(isoString) {
-            const date = new Date(isoString);
-            return date.toLocaleDateString('pt-BR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
-
-        // Notification system
-        function showNotification(message, type) {
-            const notificationArea = document.getElementById('notificationArea');
-            const notification = document.createElement('div');
-            notification.className = `notification p-4 rounded-lg shadow-lg mb-2 flex items-center space-x-3 
-                                      ${type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500'} 
-                                      text-white font-medium`;
-
-            const iconClass = type === 'success' ? 'fas fa-check-circle' : type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-info-circle';
-
-            notification.innerHTML = `
-                <i class="${iconClass} text-xl"></i>
+            const div = document.createElement('div');
+            div.className = `notification text-white px-4 py-2 rounded shadow mb-2 flex items-center justify-between ${colors[type] || colors.info}`;
+            div.id = `notif-${id}`;
+            div.innerHTML = `
                 <span>${message}</span>
+                <button onclick="hideNotification('${id}')" class="ml-3 text-white">
+                    <i class="fas fa-times"></i>
+                </button>
             `;
-            
-            notificationArea.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.classList.add('fade-out');
-                notification.addEventListener('animationend', () => notification.remove());
-            }, 5000);
+            area.appendChild(div);
+
+            setTimeout(() => hideNotification(id), 5000);
+        }
+
+        function hideNotification(id) {
+            const div = document.getElementById(`notif-${id}`);
+            if (div) {
+                div.classList.add('fade-out');
+                setTimeout(() => div.remove(), 300);
+            }
         }
     </script>
 </body>
