@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinanceApp - Contas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .skeleton {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { background-color: #e5e7eb; }
+            50% { background-color: #f3f4f6; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 p-4 font-sans">
+
+    <div class="max-w-4xl mx-auto">
+        <header class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold">Dashboard</h1>
+            <div class="text-right">
+                <span class="text-lg font-medium text-gray-600">Saldo Atual</span>
+                <p class="text-2xl font-bold text-green-600 mt-1" id="saldo-atual">R$ 0,00</p>
+            </div>
+        </header>
+
+        <div id="loading-state" class="space-y-4">
+            <div class="h-8 bg-gray-300 rounded-md w-3/4 skeleton"></div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="h-28 bg-gray-300 rounded-xl skeleton"></div>
+                <div class="h-28 bg-gray-300 rounded-xl skeleton"></div>
+                <div class="h-28 bg-gray-300 rounded-xl skeleton"></div>
+            </div>
+            <div class="h-64 bg-gray-300 rounded-xl skeleton"></div>
+        </div>
+
+        <div id="main-content" class="hidden space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <p class="text-gray-500 text-sm">Receitas</p>
+                    <p class="text-2xl font-bold text-green-600" id="receitas">R$ 0,00</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <p class="text-gray-500 text-sm">Despesas</p>
+                    <p class="text-2xl font-bold text-red-600" id="despesas">R$ 0,00</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <p class="text-gray-500 text-sm">Contas a Pagar</p>
+                    <p class="text-2xl font-bold text-yellow-600" id="contas-pagar">0</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Despesas por Categoria</h2>
+                <div class="flex justify-center items-center">
+                    <div class="w-40 h-40 bg-gray-200 rounded-full flex items-center justify-center text-sm text-gray-500">
+                        Gráfico de Pizza
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold">Contas a Pagar</h2>
+                    <a href="#" class="text-indigo-600 font-medium">+ Adicionar Conta</a>
+                </div>
+                <ul id="lista-contas" class="space-y-4">
+                    </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulação de dados fictícios para a página
+        const dadosFinanceiros = {
+            saldo: 1547.50,
+            receitas: 3200.00,
+            despesas: 1652.50,
+            contas: [
+                { nome: 'Aluguel', valor: 950.00, vencimento: '2025-09-25', status: 'pendente' },
+                { nome: 'Conta de Luz', valor: 125.75, vencimento: '2025-09-20', status: 'vencida' }, // Vencida
+                { nome: 'Assinatura Spotify', valor: 21.90, vencimento: '2025-10-01', status: 'pendente' },
+            ]
+        };
+
+        // Referências aos elementos HTML
+        const loadingState = document.getElementById('loading-state');
+        const mainContent = document.getElementById('main-content');
+        const saldoAtualEl = document.getElementById('saldo-atual');
+        const receitasEl = document.getElementById('receitas');
+        const despesasEl = document.getElementById('despesas');
+        const contasPagarEl = document.getElementById('contas-pagar');
+        const listaContasEl = document.getElementById('lista-contas');
+
+        // Função para formatar valores como moeda
+        const formatarMoeda = (valor) => `R$ ${valor.toFixed(2).replace('.', ',')}`;
+
+        // Função para renderizar as contas na lista
+        const renderizarContas = () => {
+            listaContasEl.innerHTML = ''; // Limpa a lista
+            dadosFinanceiros.contas.forEach(conta => {
+                const li = document.createElement('li');
+                let classes = 'p-4 rounded-lg shadow-sm flex justify-between items-center';
+
+                // Lógica para o alerta visual
+                if (conta.status === 'vencida') {
+                    classes += ' bg-red-100 border border-red-400';
+                } else {
+                    classes += ' bg-gray-50';
+                }
+
+                li.className = classes;
+                
+                // Ícones visuais (simulados)
+                const icon = conta.status === 'vencida' ? '⚠️' : '➡️';
+                
+                li.innerHTML = `
+                    <div>
+                        <span class="text-sm text-gray-500">${icon}</span>
+                        <h3 class="font-semibold text-gray-800">${conta.nome}</h3>
+                        <p class="text-sm text-gray-500">Vencimento: ${conta.vencimento}</p>
+                    </div>
+                    <span class="text-lg font-bold ${conta.status === 'vencida' ? 'text-red-600' : 'text-gray-700'}">
+                        ${formatarMoeda(conta.valor)}
+                    </span>
+                `;
+                listaContasEl.appendChild(li);
+            });
+        };
+
+        // Simula o carregamento dos dados (3 segundos)
+        setTimeout(() => {
+            // Esconde o skeleton
+            loadingState.classList.add('hidden');
+            // Mostra o conteúdo principal
+            mainContent.classList.remove('hidden');
+
+            // Preenche a página com os dados fictícios
+            saldoAtualEl.textContent = formatarMoeda(dadosFinanceiros.saldo);
+            receitasEl.textContent = formatarMoeda(dadosFinanceiros.receitas);
+            despesasEl.textContent = formatarMoeda(dadosFinanceiros.despesas);
+            contasPagarEl.textContent = dadosFinanceiros.contas.length;
+
+            // Renderiza a lista de contas
+            renderizarContas();
+        }, 3000);
+    </script>
+</body>
+</html>
