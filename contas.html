@@ -29,7 +29,7 @@
             to { transform: translateX(0); opacity: 1; }
         }
         .icon {
-            font-size: 1.25rem; /* Ajuste o tamanho do ícone */
+            font-size: 1.25rem;
             line-height: 1;
         }
     </style>
@@ -57,9 +57,10 @@
 
         <div id="main-content" class="hidden space-y-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                <div class="bg-white p-6 rounded-xl shadow-md fade-in">
+                <div class="bg-white p-6 rounded-xl shadow-md fade-in flex flex-col justify-between items-center">
                     <p class="text-gray-500 text-sm">Receitas</p>
                     <p class="text-2xl font-bold text-green-600" id="receitas">R$ 0,00</p>
+                    <button id="btn-adicionar-receita" class="mt-2 bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full hover:bg-green-600 transition-colors">+ Adicionar Receita</button>
                 </div>
                 <div class="bg-white p-6 rounded-xl shadow-md fade-in">
                     <p class="text-gray-500 text-sm">Despesas</p>
@@ -141,17 +142,35 @@
                             <input type="date" id="vencimento-conta" class="w-full border rounded-md p-2" required>
                         </div>
                         <div class="flex justify-end gap-2 pt-4">
-                            <button type="button" id="btn-cancelar" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancelar</button>
+                            <button type="button" id="btn-cancelar-conta" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancelar</button>
                             <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Salvar</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
+
+        <div id="modal-receita" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+            <div class="bg-white rounded-xl shadow-lg w-full max-w-md slide-in">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-4">Adicionar Receita</h3>
+                    <form id="form-receita" class="space-y-4">
+                        <div>
+                            <label for="valor-receita" class="block text-sm font-medium text-gray-700 mb-1">Valor (R$)</label>
+                            <input type="number" id="valor-receita" step="0.01" min="0" class="w-full border rounded-md p-2" required>
+                        </div>
+                        <div class="flex justify-end gap-2 pt-4">
+                            <button type="button" id="btn-cancelar-receita" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancelar</button>
+                            <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Salvar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        // Mapeamento de categorias para ícones
         const iconesCategorias = {
             'Moradia': '🏠',
             'Alimentação': '🛒',
@@ -162,11 +181,10 @@
             'Outros': '📦'
         };
 
-        // Dados iniciais ou carregados do localStorage
         let dadosFinanceiros = JSON.parse(localStorage.getItem('dadosFinanceiros')) || {
-            saldo: 1547.50,
-            receitas: 3200.00,
-            despesas: 1652.50,
+            saldo: 0,
+            receitas: 0,
+            despesas: 0,
             contas: [
                 { id: 1, nome: 'Aluguel', valor: 950.00, categoria: 'Moradia', vencimento: '2025-09-25', status: 'pendente' },
                 { id: 2, nome: 'Conta de Luz', valor: 125.75, categoria: 'Moradia', vencimento: '2025-09-20', status: 'vencida' },
@@ -179,7 +197,6 @@
             ]
         };
 
-        // Referências aos elementos HTML
         const loadingState = document.getElementById('loading-state');
         const mainContent = document.getElementById('main-content');
         const saldoAtualEl = document.getElementById('saldo-atual');
@@ -191,25 +208,28 @@
         const btnAdicionarConta = document.getElementById('btn-adicionar-conta');
         const modalConta = document.getElementById('modal-conta');
         const formConta = document.getElementById('form-conta');
-        const btnCancelar = document.getElementById('btn-cancelar');
+        const btnCancelarConta = document.getElementById('btn-cancelar-conta');
         const nomeContaInput = document.getElementById('nome-conta');
         const valorContaInput = document.getElementById('valor-conta');
         const vencimentoContaInput = document.getElementById('vencimento-conta');
 
-        // Gráficos
+        // NOVOS ELEMENTOS
+        const btnAdicionarReceita = document.getElementById('btn-adicionar-receita');
+        const modalReceita = document.getElementById('modal-receita');
+        const formReceita = document.getElementById('form-receita');
+        const btnCancelarReceita = document.getElementById('btn-cancelar-receita');
+        const valorReceitaInput = document.getElementById('valor-receita');
+
         let graficoCategorias;
         let graficoSaldo;
 
-        // Função para formatar valores como moeda
         const formatarMoeda = (valor) => `R$ ${parseFloat(valor).toFixed(2).replace('.', ',')}`;
 
-        // Função para formatar data
         const formatarData = (dataString) => {
-            const data = new Date(dataString + 'T00:00:00'); // Garante que a data seja interpretada como local para evitar problemas de fuso horário
+            const data = new Date(dataString + 'T00:00:00');
             return data.toLocaleDateString('pt-BR');
         };
 
-        // Função para verificar status da conta
         const verificarStatusConta = (vencimento, statusAtual) => {
             if (statusAtual === 'paga') return 'paga';
             const hoje = new Date();
@@ -234,7 +254,6 @@
             salvarDados();
         };
 
-        // Função para gerar cores para o gráfico
         const gerarCores = (quantidade) => {
             const cores = [
                 '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
@@ -243,7 +262,6 @@
             return cores.slice(0, quantidade);
         };
 
-        // Funções de Gráficos
         const criarGraficoCategorias = () => {
             const ctx = document.getElementById('grafico-categorias').getContext('2d');
             const despesasPorCategoria = {};
@@ -298,7 +316,6 @@
         const criarGraficoSaldo = () => {
             const ctx = document.getElementById('grafico-saldo').getContext('2d');
             
-            // Dados fictícios para o gráfico de saldo ao longo do tempo (últimos 6 meses)
             const meses = ['Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro'];
             const saldos = [850.00, 1100.50, 925.75, 1450.00, 1280.25, dadosFinanceiros.saldo];
             
@@ -335,7 +352,6 @@
             });
         };
 
-        // Função para renderizar as contas na lista
         const renderizarContas = (filtro = 'todos') => {
             listaContasEl.innerHTML = '';
             let contasFiltradas = dadosFinanceiros.contas;
@@ -458,6 +474,33 @@
             fecharModalConta();
         };
 
+        // NOVO: Funções para o modal de receita
+        const abrirModalReceita = () => {
+            formReceita.reset();
+            modalReceita.classList.remove('hidden');
+        };
+
+        const fecharModalReceita = () => {
+            modalReceita.classList.add('hidden');
+        };
+
+        const adicionarReceita = (event) => {
+            event.preventDefault();
+            
+            const valor = parseFloat(valorReceitaInput.value);
+            
+            if (isNaN(valor) || valor <= 0) {
+                alert('Por favor, insira um valor de receita válido.');
+                return;
+            }
+            
+            dadosFinanceiros.receitas = valor;
+            calcularTotais();
+            criarGraficoCategorias();
+            criarGraficoSaldo();
+            fecharModalReceita();
+        };
+
         window.marcarComoPaga = (id) => {
             const conta = dadosFinanceiros.contas.find(c => c.id === id);
             if (conta) {
@@ -488,7 +531,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             btnAdicionarConta.addEventListener('click', abrirModalConta);
-            btnCancelar.addEventListener('click', fecharModalConta);
+            btnCancelarConta.addEventListener('click', fecharModalConta);
             formConta.addEventListener('submit', adicionarConta);
             filtroStatus.addEventListener('change', () => {
                 renderizarContas(filtroStatus.value);
@@ -499,6 +542,16 @@
                 }
             });
             
+            // NOVO: Eventos para o modal de receita
+            btnAdicionarReceita.addEventListener('click', abrirModalReceita);
+            btnCancelarReceita.addEventListener('click', fecharModalReceita);
+            formReceita.addEventListener('submit', adicionarReceita);
+            modalReceita.addEventListener('click', (e) => {
+                if (e.target === modalReceita) {
+                    fecharModalReceita();
+                }
+            });
+
             setTimeout(() => {
                 loadingState.classList.add('hidden');
                 mainContent.classList.remove('hidden');
