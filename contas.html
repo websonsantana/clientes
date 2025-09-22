@@ -1,10 +1,29 @@
+Análise e Melhorias para o FinanceApp
+
+Analisei seu código e identifiquei várias oportunidades de melhoria. Vou implementar funcionalidades adicionais e melhorar a estrutura existente.
+
+Melhorias planejadas:
+
+1. Gráfico de pizza interativo para despesas por categoria
+2. Sistema de categorias para organizar despesas
+3. Formulário para adicionar novas contas
+4. Filtros e ordenação para a lista de contas
+5. Armazenamento local para persistência de dados
+6. Responsividade aprimorada
+7. Animações e transições mais suaves
+8. Validação de formulários
+
+Aqui está o código melhorado:
+
+```html
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinanceApp - Contas</title>
+    <title>FinanceApp - Controle Financeiro</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .skeleton {
             animation: pulse 1.5s infinite;
@@ -13,14 +32,28 @@
             0%, 100% { background-color: #e5e7eb; }
             50% { background-color: #f3f4f6; }
         }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800 p-4 font-sans">
+<body class="bg-gray-100 text-gray-800 p-4 font-sans min-h-screen">
 
-    <div class="max-w-4xl mx-auto">
-        <header class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold">Dashboard</h1>
-            <div class="text-right">
+    <div class="max-w-6xl mx-auto">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+            <h1 class="text-3xl font-bold">Dashboard Financeiro</h1>
+            <div class="text-center md:text-right">
                 <span class="text-lg font-medium text-gray-600">Saldo Atual</span>
                 <p class="text-2xl font-bold text-green-600 mt-1" id="saldo-atual">R$ 0,00</p>
             </div>
@@ -38,50 +71,104 @@
 
         <div id="main-content" class="hidden space-y-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                <div class="bg-white p-6 rounded-xl shadow-md">
+                <div class="bg-white p-6 rounded-xl shadow-md fade-in">
                     <p class="text-gray-500 text-sm">Receitas</p>
                     <p class="text-2xl font-bold text-green-600" id="receitas">R$ 0,00</p>
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow-md">
+                <div class="bg-white p-6 rounded-xl shadow-md fade-in">
                     <p class="text-gray-500 text-sm">Despesas</p>
                     <p class="text-2xl font-bold text-red-600" id="despesas">R$ 0,00</p>
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow-md">
+                <div class="bg-white p-6 rounded-xl shadow-md fade-in">
                     <p class="text-gray-500 text-sm">Contas a Pagar</p>
                     <p class="text-2xl font-bold text-yellow-600" id="contas-pagar">0</p>
                 </div>
             </div>
 
-            <div class="bg-white p-6 rounded-xl shadow-md">
+            <div class="bg-white p-6 rounded-xl shadow-md fade-in">
                 <h2 class="text-xl font-semibold mb-4">Despesas por Categoria</h2>
-                <div class="flex justify-center items-center">
-                    <div class="w-40 h-40 bg-gray-200 rounded-full flex items-center justify-center text-sm text-gray-500">
-                        Gráfico de Pizza
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="w-full md:w-1/2 h-64">
+                        <canvas id="grafico-categorias"></canvas>
+                    </div>
+                    <div class="w-full md:w-1/2 mt-4 md:mt-0 md:pl-4">
+                        <div id="legenda-categorias" class="space-y-2"></div>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white p-6 rounded-xl shadow-md">
-                <div class="flex justify-between items-center mb-4">
+            <div class="bg-white p-6 rounded-xl shadow-md fade-in">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2">
                     <h2 class="text-xl font-semibold">Contas a Pagar</h2>
-                    <a href="#" class="text-indigo-600 font-medium">+ Adicionar Conta</a>
+                    <div class="flex gap-2">
+                        <select id="filtro-status" class="border rounded-md p-2 text-sm">
+                            <option value="todos">Todos</option>
+                            <option value="pendente">Pendentes</option>
+                            <option value="vencida">Vencidas</option>
+                            <option value="paga">Pagas</option>
+                        </select>
+                        <button id="btn-adicionar-conta" class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors">
+                            + Adicionar Conta
+                        </button>
+                    </div>
                 </div>
-                <ul id="lista-contas" class="space-y-4">
-                    </ul>
+                <ul id="lista-contas" class="space-y-4"></ul>
+            </div>
+        </div>
+
+        <!-- Modal para adicionar conta -->
+        <div id="modal-conta" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+            <div class="bg-white rounded-xl shadow-lg w-full max-w-md slide-in">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-4">Adicionar Nova Conta</h3>
+                    <form id="form-conta" class="space-y-4">
+                        <div>
+                            <label for="nome-conta" class="block text-sm font-medium text-gray-700 mb-1">Nome da Conta</label>
+                            <input type="text" id="nome-conta" class="w-full border rounded-md p-2" required>
+                        </div>
+                        <div>
+                            <label for="valor-conta" class="block text-sm font-medium text-gray-700 mb-1">Valor (R$)</label>
+                            <input type="number" id="valor-conta" step="0.01" min="0" class="w-full border rounded-md p-2" required>
+                        </div>
+                        <div>
+                            <label for="categoria-conta" class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+                            <select id="categoria-conta" class="w-full border rounded-md p-2" required>
+                                <option value="">Selecione uma categoria</option>
+                                <option value="Moradia">Moradia</option>
+                                <option value="Alimentação">Alimentação</option>
+                                <option value="Transporte">Transporte</option>
+                                <option value="Saúde">Saúde</option>
+                                <option value="Educação">Educação</option>
+                                <option value="Lazer">Lazer</option>
+                                <option value="Outros">Outros</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="vencimento-conta" class="block text-sm font-medium text-gray-700 mb-1">Data de Vencimento</label>
+                            <input type="date" id="vencimento-conta" class="w-full border rounded-md p-2" required>
+                        </div>
+                        <div class="flex justify-end gap-2 pt-4">
+                            <button type="button" id="btn-cancelar" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancelar</button>
+                            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Salvar</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Simulação de dados fictícios para a página
-        const dadosFinanceiros = {
+        // Dados iniciais ou carregados do localStorage
+        let dadosFinanceiros = JSON.parse(localStorage.getItem('dadosFinanceiros')) || {
             saldo: 1547.50,
             receitas: 3200.00,
             despesas: 1652.50,
             contas: [
-                { nome: 'Aluguel', valor: 950.00, vencimento: '2025-09-25', status: 'pendente' },
-                { nome: 'Conta de Luz', valor: 125.75, vencimento: '2025-09-20', status: 'vencida' }, // Vencida
-                { nome: 'Assinatura Spotify', valor: 21.90, vencimento: '2025-10-01', status: 'pendente' },
+                { id: 1, nome: 'Aluguel', valor: 950.00, categoria: 'Moradia', vencimento: '2025-09-25', status: 'pendente' },
+                { id: 2, nome: 'Conta de Luz', valor: 125.75, categoria: 'Moradia', vencimento: '2025-09-20', status: 'vencida' },
+                { id: 3, nome: 'Assinatura Spotify', valor: 21.90, categoria: 'Lazer', vencimento: '2025-10-01', status: 'pendente' },
+                { id: 4, nome: 'Supermercado', valor: 350.00, categoria: 'Alimentação', vencimento: '2025-09-22', status: 'paga' },
+                { id: 5, nome: 'Academia', valor: 89.90, categoria: 'Saúde', vencimento: '2025-09-28', status: 'pendente' },
             ]
         };
 
@@ -93,59 +180,366 @@
         const despesasEl = document.getElementById('despesas');
         const contasPagarEl = document.getElementById('contas-pagar');
         const listaContasEl = document.getElementById('lista-contas');
+        const filtroStatus = document.getElementById('filtro-status');
+        const btnAdicionarConta = document.getElementById('btn-adicionar-conta');
+        const modalConta = document.getElementById('modal-conta');
+        const formConta = document.getElementById('form-conta');
+        const btnCancelar = document.getElementById('btn-cancelar');
+
+        // Gráfico
+        let graficoCategorias;
 
         // Função para formatar valores como moeda
-        const formatarMoeda = (valor) => `R$ ${valor.toFixed(2).replace('.', ',')}`;
+        const formatarMoeda = (valor) => `R$ ${parseFloat(valor).toFixed(2).replace('.', ',')}`;
+
+        // Função para formatar data
+        const formatarData = (dataString) => {
+            const data = new Date(dataString);
+            return data.toLocaleDateString('pt-BR');
+        };
+
+        // Função para verificar status da conta baseado na data de vencimento
+        const verificarStatusConta = (vencimento, statusAtual) => {
+            if (statusAtual === 'paga') return 'paga';
+            
+            const hoje = new Date();
+            const dataVencimento = new Date(vencimento);
+            dataVencimento.setHours(23, 59, 59, 999); // Fim do dia
+            
+            return dataVencimento < hoje ? 'vencida' : 'pendente';
+        };
+
+        // Função para atualizar status das contas
+        const atualizarStatusContas = () => {
+            dadosFinanceiros.contas.forEach(conta => {
+                conta.status = verificarStatusConta(conta.vencimento, conta.status);
+            });
+            salvarDados();
+        };
+
+        // Função para salvar dados no localStorage
+        const salvarDados = () => {
+            localStorage.setItem('dadosFinanceiros', JSON.stringify(dadosFinanceiros));
+        };
+
+        // Função para calcular totais
+        const calcularTotais = () => {
+            // Atualizar status das contas antes de calcular
+            atualizarStatusContas();
+            
+            // Calcular despesas (apenas contas pagas)
+            const totalDespesas = dadosFinanceiros.contas
+                .filter(conta => conta.status === 'paga')
+                .reduce((total, conta) => total + conta.valor, 0);
+            
+            // Atualizar despesas nos dados
+            dadosFinanceiros.despesas = totalDespesas;
+            
+            // Calcular saldo
+            dadosFinanceiros.saldo = dadosFinanceiros.receitas - dadosFinanceiros.despesas;
+            
+            // Contar contas pendentes e vencidas
+            const contasPendentes = dadosFinanceiros.contas.filter(conta => 
+                conta.status === 'pendente' || conta.status === 'vencida'
+            ).length;
+            
+            // Atualizar elementos da interface
+            saldoAtualEl.textContent = formatarMoeda(dadosFinanceiros.saldo);
+            receitasEl.textContent = formatarMoeda(dadosFinanceiros.receitas);
+            despesasEl.textContent = formatarMoeda(dadosFinanceiros.despesas);
+            contasPagarEl.textContent = contasPendentes;
+            
+            // Salvar dados atualizados
+            salvarDados();
+        };
+
+        // Função para gerar cores para o gráfico
+        const gerarCores = (quantidade) => {
+            const cores = [
+                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
+                '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF'
+            ];
+            return cores.slice(0, quantidade);
+        };
+
+        // Função para criar o gráfico de categorias
+        const criarGraficoCategorias = () => {
+            const ctx = document.getElementById('grafico-categorias').getContext('2d');
+            
+            // Agrupar despesas por categoria (apenas contas pagas)
+            const despesasPorCategoria = {};
+            dadosFinanceiros.contas
+                .filter(conta => conta.status === 'paga')
+                .forEach(conta => {
+                    if (despesasPorCategoria[conta.categoria]) {
+                        despesasPorCategoria[conta.categoria] += conta.valor;
+                    } else {
+                        despesasPorCategoria[conta.categoria] = conta.valor;
+                    }
+                });
+            
+            const categorias = Object.keys(despesasPorCategoria);
+            const valores = Object.values(despesasPorCategoria);
+            const cores = gerarCores(categorias.length);
+            
+            // Destruir gráfico anterior se existir
+            if (graficoCategorias) {
+                graficoCategorias.destroy();
+            }
+            
+            // Criar novo gráfico
+            graficoCategorias = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: categorias,
+                    datasets: [{
+                        data: valores,
+                        backgroundColor: cores,
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = valores.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${formatarMoeda(value)} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Atualizar legenda
+            const legenda = document.getElementById('legenda-categorias');
+            legenda.innerHTML = '';
+            
+            categorias.forEach((categoria, index) => {
+                const valor = despesasPorCategoria[categoria];
+                const total = valores.reduce((a, b) => a + b, 0);
+                const porcentagem = Math.round((valor / total) * 100);
+                
+                const itemLegenda = document.createElement('div');
+                itemLegenda.className = 'flex items-center justify-between';
+                itemLegenda.innerHTML = `
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 rounded-full mr-2" style="background-color: ${cores[index]}"></div>
+                        <span class="text-sm">${categoria}</span>
+                    </div>
+                    <div class="text-sm font-medium">${formatarMoeda(valor)} (${porcentagem}%)</div>
+                `;
+                legenda.appendChild(itemLegenda);
+            });
+        };
 
         // Função para renderizar as contas na lista
-        const renderizarContas = () => {
+        const renderizarContas = (filtro = 'todos') => {
             listaContasEl.innerHTML = ''; // Limpa a lista
-            dadosFinanceiros.contas.forEach(conta => {
+            
+            // Filtrar contas
+            let contasFiltradas = dadosFinanceiros.contas;
+            if (filtro !== 'todos') {
+                contasFiltradas = dadosFinanceiros.contas.filter(conta => conta.status === filtro);
+            }
+            
+            // Ordenar por data de vencimento (vencidas primeiro, depois por data)
+            contasFiltradas.sort((a, b) => {
+                if (a.status === 'vencida' && b.status !== 'vencida') return -1;
+                if (a.status !== 'vencida' && b.status === 'vencida') return 1;
+                return new Date(a.vencimento) - new Date(b.vencimento);
+            });
+            
+            if (contasFiltradas.length === 0) {
                 const li = document.createElement('li');
-                let classes = 'p-4 rounded-lg shadow-sm flex justify-between items-center';
-
+                li.className = 'text-center py-8 text-gray-500';
+                li.textContent = 'Nenhuma conta encontrada';
+                listaContasEl.appendChild(li);
+                return;
+            }
+            
+            contasFiltradas.forEach(conta => {
+                const li = document.createElement('li');
+                let classes = 'p-4 rounded-lg shadow-sm flex justify-between items-center transition-all duration-200 hover:shadow-md';
+                
                 // Lógica para o alerta visual
                 if (conta.status === 'vencida') {
-                    classes += ' bg-red-100 border border-red-400';
+                    classes += ' bg-red-50 border-l-4 border-red-500';
+                } else if (conta.status === 'pendente') {
+                    classes += ' bg-yellow-50 border-l-4 border-yellow-500';
                 } else {
-                    classes += ' bg-gray-50';
+                    classes += ' bg-green-50 border-l-4 border-green-500';
                 }
-
+                
                 li.className = classes;
                 
-                // Ícones visuais (simulados)
-                const icon = conta.status === 'vencida' ? '⚠️' : '➡️';
+                // Ícones visuais
+                let icon = '➡️';
+                if (conta.status === 'vencida') icon = '⚠️';
+                if (conta.status === 'paga') icon = '✅';
                 
                 li.innerHTML = `
-                    <div>
-                        <span class="text-sm text-gray-500">${icon}</span>
-                        <h3 class="font-semibold text-gray-800">${conta.nome}</h3>
-                        <p class="text-sm text-gray-500">Vencimento: ${conta.vencimento}</p>
+                    <div class="flex-1">
+                        <div class="flex items-center mb-1">
+                            <span class="text-sm mr-2">${icon}</span>
+                            <h3 class="font-semibold text-gray-800">${conta.nome}</h3>
+                            <span class="ml-2 text-xs px-2 py-1 rounded-full ${conta.status === 'vencida' ? 'bg-red-100 text-red-800' : conta.status === 'pendente' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}">${conta.status}</span>
+                        </div>
+                        <div class="flex flex-wrap gap-2 text-xs text-gray-500">
+                            <span>Categoria: ${conta.categoria}</span>
+                            <span>Vencimento: ${formatarData(conta.vencimento)}</span>
+                        </div>
                     </div>
-                    <span class="text-lg font-bold ${conta.status === 'vencida' ? 'text-red-600' : 'text-gray-700'}">
-                        ${formatarMoeda(conta.valor)}
-                    </span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg font-bold ${conta.status === 'vencida' ? 'text-red-600' : conta.status === 'pendente' ? 'text-yellow-600' : 'text-green-600'}">
+                            ${formatarMoeda(conta.valor)}
+                        </span>
+                        <div class="flex gap-1">
+                            <button class="p-1 rounded hover:bg-gray-200 transition-colors" onclick="marcarComoPaga(${conta.id})" title="Marcar como paga">
+                                ✅
+                            </button>
+                            <button class="p-1 rounded hover:bg-gray-200 transition-colors" onclick="excluirConta(${conta.id})" title="Excluir conta">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
                 `;
                 listaContasEl.appendChild(li);
             });
         };
 
-        // Simula o carregamento dos dados (3 segundos)
-        setTimeout(() => {
-            // Esconde o skeleton
-            loadingState.classList.add('hidden');
-            // Mostra o conteúdo principal
-            mainContent.classList.remove('hidden');
+        // Função para abrir o modal de adicionar conta
+        const abrirModalConta = () => {
+            // Limpar formulário
+            formConta.reset();
+            // Definir data mínima como hoje
+            document.getElementById('vencimento-conta').min = new Date().toISOString().split('T')[0];
+            // Mostrar modal
+            modalConta.classList.remove('hidden');
+        };
 
-            // Preenche a página com os dados fictícios
-            saldoAtualEl.textContent = formatarMoeda(dadosFinanceiros.saldo);
-            receitasEl.textContent = formatarMoeda(dadosFinanceiros.receitas);
-            despesasEl.textContent = formatarMoeda(dadosFinanceiros.despesas);
-            contasPagarEl.textContent = dadosFinanceiros.contas.length;
+        // Função para fechar o modal
+        const fecharModalConta = () => {
+            modalConta.classList.add('hidden');
+        };
 
-            // Renderiza a lista de contas
-            renderizarContas();
-        }, 3000);
+        // Função para adicionar nova conta
+        const adicionarConta = (event) => {
+            event.preventDefault();
+            
+            const nome = document.getElementById('nome-conta').value;
+            const valor = parseFloat(document.getElementById('valor-conta').value);
+            const categoria = document.getElementById('categoria-conta').value;
+            const vencimento = document.getElementById('vencimento-conta').value;
+            
+            // Validar dados
+            if (!nome || !valor || !categoria || !vencimento) {
+                alert('Por favor, preencha todos os campos.');
+                return;
+            }
+            
+            // Criar nova conta
+            const novaConta = {
+                id: Date.now(), // ID único baseado no timestamp
+                nome,
+                valor,
+                categoria,
+                vencimento,
+                status: verificarStatusConta(vencimento, 'pendente')
+            };
+            
+            // Adicionar à lista
+            dadosFinanceiros.contas.push(novaConta);
+            
+            // Atualizar interface
+            calcularTotais();
+            criarGraficoCategorias();
+            renderizarContas(filtroStatus.value);
+            
+            // Fechar modal
+            fecharModalConta();
+            
+            // Mostrar mensagem de sucesso
+            alert('Conta adicionada com sucesso!');
+        };
+
+        // Função para marcar conta como paga
+        window.marcarComoPaga = (id) => {
+            const conta = dadosFinanceiros.contas.find(c => c.id === id);
+            if (conta) {
+                conta.status = 'paga';
+                calcularTotais();
+                criarGraficoCategorias();
+                renderizarContas(filtroStatus.value);
+            }
+        };
+
+        // Função para excluir conta
+        window.excluirConta = (id) => {
+            if (confirm('Tem certeza que deseja excluir esta conta?')) {
+                dadosFinanceiros.contas = dadosFinanceiros.contas.filter(c => c.id !== id);
+                calcularTotais();
+                criarGraficoCategorias();
+                renderizarContas(filtroStatus.value);
+            }
+        };
+
+        // Inicialização da aplicação
+        document.addEventListener('DOMContentLoaded', () => {
+            // Configurar eventos
+            btnAdicionarConta.addEventListener('click', abrirModalConta);
+            btnCancelar.addEventListener('click', fecharModalConta);
+            formConta.addEventListener('submit', adicionarConta);
+            filtroStatus.addEventListener('change', () => {
+                renderizarContas(filtroStatus.value);
+            });
+            
+            // Fechar modal ao clicar fora
+            modalConta.addEventListener('click', (e) => {
+                if (e.target === modalConta) {
+                    fecharModalConta();
+                }
+            });
+            
+            // Simula o carregamento dos dados (3 segundos)
+            setTimeout(() => {
+                // Esconde o skeleton
+                loadingState.classList.add('hidden');
+                // Mostra o conteúdo principal
+                mainContent.classList.remove('hidden');
+                
+                // Preenche a página com os dados
+                calcularTotais();
+                criarGraficoCategorias();
+                renderizarContas();
+            }, 2000); // Reduzido para 2 segundos para melhor experiência
+        });
     </script>
 </body>
 </html>
+```
+
+Principais melhorias implementadas:
+
+1. Gráfico de pizza interativo usando Chart.js para visualizar despesas por categoria
+2. Sistema de categorias para organizar as despesas
+3. Formulário modal para adicionar novas contas com validação
+4. Filtros para visualizar contas por status (todas, pendentes, vencidas, pagas)
+5. Armazenamento local para persistir os dados entre sessões
+6. Ações nas contas: marcar como paga e excluir
+7. Design responsivo aprimorado para diferentes tamanhos de tela
+8. Animações e transições suaves para melhor experiência do usuário
+9. Cálculos automáticos de saldo e totais
+10. Verificação automática de contas vencidas
+
+O código agora oferece uma experiência mais completa e profissional para o controle financeiro pessoal.
