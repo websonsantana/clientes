@@ -1,3337 +1,698 @@
-<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
-
-    <div class="container">
-        <!-- Sidebar -->
-        <nav class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <h2>CDNE Frotas</h2>
-                <p>Sistema de Gestão</p>
-            </div>
-            <div class="nav-menu">
-                <a href="#" class="nav-item active" onclick="showSection('dashboard')">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
-                </a>
-                <a href="#" class="nav-item" onclick="showSection('veiculos')">
-                    <i class="fas fa-truck"></i> Gestão de Frota
-                </a>
-                <a href="#" class="nav-item" onclick="showSection('financeiro')">
-                    <i class="fas fa-dollar-sign"></i> Financeiro
-                </a>
-                <a href="#" class="nav-item" onclick="showSection('manutencao')">
-                    <i class="fas fa-tools"></i> Manutenção
-                </a>
-                <a href="#" class="nav-item" onclick="showSection('relatorios')">
-                    <i class="fas fa-chart-bar"></i> Relatórios
-                </a>
-                <a href="#" class="nav-item" onclick="showSection('motoristas')">
-                    <i class="fas fa-users"></i> Motoristas
-                </a>
-                <a href="#" class="nav-item" onclick="showSection('abastecimentos')">
-                    <i class="fas fa-gas-pump"></i> Abastecimentos
-                </a>
-            </div>
-        </nav>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Dashboard Section -->
-            <section id="dashboard" class="content-section active">
-                <div class="page-header">
-                    <h1>Dashboard</h1>
-                    <p>Visão geral da sua frota</p>
-                </div>
-
-                <div class="dashboard-cards">
-                    <div class="card">
-                        <div class="card-header">
-                            <div>
-                                <div class="card-value" id="total-veiculos">45</div>
-                                <div class="card-label">Total de Veículos</div>
-                            </div>
-                            <div class="card-icon vehicles">
-                                <i class="fas fa-truck"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <div>
-                                <div class="card-value" id="despesas-mes">R$ 45.230</div>
-                                <div class="card-label">Despesas do Mês</div>
-                            </div>
-                            <div class="card-icon expenses">
-                                <i class="fas fa-money-bill"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <div>
-                                <div class="card-value" id="manutencoes-pendentes">8</div>
-                                <div class="card-label">Manutenções Pendentes</div>
-                            </div>
-                            <div class="card-icon maintenance">
-                                <i class="fas fa-wrench"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <div>
-                                <div class="card-value" id="alertas-vencimento">12</div>
-                                <div class="card-label">Alertas de Vencimento</div>
-                            </div>
-                            <div class="card-icon alerts">
-                                <i class="fas fa-exclamation-triangle"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Alertas importantes -->
-                <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <strong>Atenção:</strong> 5 veículos possuem dedetização vencendo nos próximos 15 dias.
-                </div>
-
-                <div class="alert alert-danger">
-                    <i class="fas fa-times-circle"></i>
-                    <strong>Urgente:</strong> 3 veículos estão com opacidade vencida.
-                </div>
-
-                <!-- Gráficos e relatórios rápidos -->
-                <div class="chart-container">
-                    <h3>Despesas por Categoria - Mês Atual</h3>
-                    <p style="margin-top: 50px;">
-                        <i class="fas fa-chart-pie" style="font-size: 3rem; color: #ddd;"></i><br>
-                        Gráfico de Despesas por Categoria<br>
-                        <small>Integração com biblioteca de gráficos será implementada aqui</small>
-                    </p>
-                </div>
-            </section>
-
-            <!-- Gestão de Frota Section -->
-            <section id="veiculos" class="content-section">
-                <div class="page-header">
-                    <h1>Gestão de Frota</h1>
-                    <p>Cadastro e controle de veículos</p>
-                </div>
-
-                <div class="table-container">
-                    <div class="table-header">
-                        <h3>Lista de Veículos</h3>
-                        <div class="search-filters">
-                            <input type="text" class="form-control search-input" placeholder="Buscar por placa, modelo...">
-                            <select class="form-control mobile-hide">
-                                <option>Todos os tipos</option>
-                                <option>Cavalo</option>
-                                <option>Carreta</option>
-                                <option>Bitruck</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <table id="veiculos-table">
-                        <thead>
-                            <tr>
-                                <th>Placa</th>
-                                <th class="mobile-hide">Tipo</th>
-                                <th>Modelo</th>
-                                <th class="mobile-hide">Ano</th>
-                                <th class="mobile-hide">KM Atual</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>ABC-1234</strong></td>
-                                <td class="mobile-hide">Cavalo</td>
-                                <td>Volvo FH 540</td>
-                                <td class="mobile-hide">2022</td>
-                                <td class="mobile-hide">125.450</td>
-                                <td><span class="status-badge status-ok">Ativo</span></td>
-                                <td>
-                                    <div class="table-actions">
-                                        <button class="btn btn-secondary btn-sm">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-primary btn-sm">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>24/03/2025</td>
-                                <td><strong>DEF-5678</strong></td>
-                                <td class="mobile-hide">Maria Santos</td>
-                                <td>Diesel S-10</td>
-                                <td class="mobile-hide">120L</td>
-                                <td><strong>R$ 636,00</strong></td>
-                                <td class="mobile-hide">Shell Select</td>
-                                <td>
-                                    <div class="table-actions">
-                                        <button class="btn btn-secondary btn-sm">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-primary btn-sm">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <button class="fab" onclick="openModal('fuel-modal')">
-                    <i class="fas fa-plus"></i>
-                </button>
-            </section>
-
-            <!-- Manutenção Section -->
-            <section id="manutencao" class="content-section">
-                <div class="page-header">
-                    <h1>Manutenção</h1>
-                    <p>Controle de manutenções e vencimentos</p>
-                </div>
-
-                <!-- Próximos Vencimentos -->
-                <div class="table-container" style="margin-bottom: 30px;">
-                    <div class="table-header">
-                        <h3>Próximos Vencimentos</h3>
-                        <button class="btn btn-primary" onclick="openModal('maintenance-modal')">
-                            <i class="fas fa-plus"></i> <span class="mobile-hide">Nova Manutenção</span>
-                        </button>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Veículo</th>
-                                <th>Tipo</th>
-                                <th>Vencimento</th>
-                                <th>Status</th>
-                                <th class="mobile-hide">Fornecedor</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>ABC-1234</strong></td>
-                                <td>Dedetização</td>
-                                <td>30/03/2025</td>
-                                <td><span class="status-badge status-warning">A Vencer</span></td>
-                                <td class="mobile-hide">Dedetizadora XYZ</td>
-                                <td>
-                                    <div class="table-actions">
-                                        <button class="btn btn-primary btn-sm">Renovar</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong>DEF-5678</strong></td>
-                                <td>Opacidade</td>
-                                <td>20/03/2025</td>
-                                <td><span class="status-badge status-danger">Vencido</span></td>
-                                <td class="mobile-hide">Inmetro Teste</td>
-                                <td>
-                                    <div class="table-actions">
-                                        <button class="btn btn-danger btn-sm">Urgente</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong>GHI-9012</strong></td>
-                                <td>Calibração</td>
-                                <td>15/04/2025</td>
-                                <td><span class="status-badge status-ok">OK</span></td>
-                                <td class="mobile-hide">Calibradora ABC</td>
-                                <td>
-                                    <div class="table-actions">
-                                        <button class="btn btn-secondary btn-sm">Ver</button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Histórico de Manutenções -->
-                <div class="table-container">
-                    <div class="table-header">
-                        <h3>Histórico de Manutenções</h3>
-                        <button class="btn btn-secondary" onclick="openModal('checklist-modal')">
-                            <i class="fas fa-clipboard-check"></i> <span class="mobile-hide">Checklist Baú</span>
-                        </button>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Data</th>
-                                <th>Veículo</th>
-                                <th class="mobile-hide">Tipo</th>
-                                <th>Serviço</th>
-                                <th class="mobile-hide">Prestador</th>
-                                <th>Valor</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>10/03/2025</td>
-                                <td><strong>ABC-1234</strong></td>
-                                <td class="mobile-hide">Preventiva</td>
-                                <td>Troca de óleo e filtros</td>
-                                <td class="mobile-hide">Oficina Central</td>
-                                <td><strong>R$ 450,00</strong></td>
-                                <td><span class="status-badge status-ok">Concluída</span></td>
-                            </tr>
-                            <tr>
-                                <td>08/03/2025</td>
-                                <td><strong>DEF-5678</strong></td>
-                                <td class="mobile-hide">Corretiva</td>
-                                <td>Reparo sistema de freios</td>
-                                <td class="mobile-hide">Freios Express</td>
-                                <td><strong>R$ 1.200,00</strong></td>
-                                <td><span class="status-badge status-ok">Concluída</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Relatórios Section -->
-            <section id="relatorios" class="content-section">
-                <div class="page-header">
-                    <h1>Relatórios</h1>
-                    <p>Análises e relatórios da frota</p>
-                </div>
-
-                <div class="dashboard-cards">
-                    <div class="card">
-                        <h3>Relatório de Consumo</h3>
-                        <p>Análise de KM/Litro por veículo</p>
-                        <button class="btn btn-primary">Gerar Relatório</button>
-                    </div>
-                    <div class="card">
-                        <h3>Custos por Veículo</h3>
-                        <p>Ranking de custos de manutenção</p>
-                        <button class="btn btn-primary">Gerar Relatório</button>
-                    </div>
-                    <div class="card">
-                        <h3>Status da Frota</h3>
-                        <p>Relatório completo da situação</p>
-                        <button class="btn btn-primary">Gerar Relatório</button>
-                    </div>
-                    <div class="card">
-                        <h3>Análise Financeira</h3>
-                        <p>Despesas por categoria e período</p>
-                        <button class="btn btn-primary">Gerar Relatório</button>
-                    </div>
-                </div>
-
-                <!-- Filtros para relatórios -->
-                <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                    <h3>Filtros de Relatório</h3>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Período Inicial</label>
-                            <input type="date" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label>Período Final</label>
-                            <input type="date" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label>Tipo de Veículo</label>
-                            <select class="form-control">
-                                <option>Todos</option>
-                                <option>Cavalo</option>
-                                <option>Carreta</option>
-                                <option>Bitruck</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Categoria de Despesa</label>
-                            <select class="form-control">
-                                <option>Todas</option>
-                                <option>Manutenção</option>
-                                <option>Combustível</option>
-                                <option>Lavagem</option>
-                                <option>Outros</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary" style="margin-top: 15px;">Aplicar Filtros</button>
-                </div>
-
-                <!-- Gráficos de análise -->
-                <div class="chart-container">
-                    <h3>Top 10 Veículos - Maior Consumo</h3>
-                    <p style="margin-top: 50px;">
-                        <i class="fas fa-chart-bar" style="font-size: 3rem; color: #ddd;"></i><br>
-                        Gráfico de Barras - Consumo por Veículo<br>
-                        <small>Análise comparativa de consumo de combustível</small>
-                    </p>
-                </div>
-
-                <div class="chart-container">
-                    <h3>Evolução de Custos por Categoria</h3>
-                    <p style="margin-top: 50px;">
-                        <i class="fas fa-chart-area" style="font-size: 3rem; color: #ddd;"></i><br>
-                        Gráfico de Área - Custos por Categoria<br>
-                        <small>Evolução temporal dos custos separados por categoria</small>
-                    </p>
-                </div>
-            </section>
-
-            <!-- Motoristas Section -->
-            <section id="motoristas" class="content-section">
-                <div class="page-header">
-                    <h1>Motoristas</h1>
-                    <p>Cadastro e controle de motoristas</p>
-                </div>
-
-                <div class="table-container">
-                    <div class="table-header">
-                        <h3>Lista de Motoristas</h3>
-                        <div class="search-filters">
-                            <input type="text" class="form-control search-input" placeholder="Buscar por nome ou matrícula...">
-                        </div>
-                    </div>
-
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Matrícula</th>
-                                <th>Nome</th>
-                                <th class="mobile-hide">Veículo Atual</th>
-                                <th class="mobile-hide">Total Abast.</th>
-                                <th class="mobile-hide">Consumo Médio</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>12345</strong></td>
-                                <td>João Silva</td>
-                                <td class="mobile-hide">ABC-1234</td>
-                                <td class="mobile-hide">45</td>
-                                <td class="mobile-hide">3.2 km/l</td>
-                                <td>
-                                    <div class="table-actions">
-                                        <button class="btn btn-secondary btn-sm">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-primary btn-sm">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong>12346</strong></td>
-                                <td>Maria Santos</td>
-                                <td class="mobile-hide">DEF-5678</td>
-                                <td class="mobile-hide">38</td>
-                                <td class="mobile-hide">2.9 km/l</td>
-                                <td>
-                                    <div class="table-actions">
-                                        <button class="btn btn-secondary btn-sm">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-primary btn-sm">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong>12347</strong></td>
-                                <td>Pedro Oliveira</td>
-                                <td class="mobile-hide">GHI-9012</td>
-                                <td class="mobile-hide">52</td>
-                                <td class="mobile-hide">3.1 km/l</td>
-                                <td>
-                                    <div class="table-actions">
-                                        <button class="btn btn-secondary btn-sm">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-primary btn-sm">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <button class="fab" onclick="openModal('driver-modal')">
-                    <i class="fas fa-plus"></i>
-                </button>
-            </section>
-        </main>
-    </div>
-
-    <!-- Modals -->
-    <!-- Vehicle Modal -->
-    <div id="vehicle-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-truck"></i> Cadastro de Veículo</h2>
-                <button class="modal-close" onclick="closeModal('vehicle-modal')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <form id="vehicle-form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Placa *</label>
-                        <input type="text" name="placa" placeholder="ABC-1234" required>
-                        <div class="error-message">Campo obrigatório</div>
-                    </div>
-                    <div class="form-group">
-                        <label>Placa TK</label>
-                        <input type="text" name="placa_tk" placeholder="TK123">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Tipo *</label>
-                        <select name="tipo" required>
-                            <option value="">Selecione</option>
-                            <option>Cavalo</option>
-                            <option>Carreta</option>
-                            <option>Bitruck</option>
-                        </select>
-                        <div class="error-message">Campo obrigatório</div>
-                    </div>
-                    <div class="form-group">
-                        <label>Fabricante/Modelo</label>
-                        <input type="text" name="fabricante_modelo" placeholder="Volvo FH 540">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Ano Fabricação</label>
-                        <input type="number" name="ano_fabricacao" min="1980" max="2025">
-                    </div>
-                    <div class="form-group">
-                        <label>Ano Modelo</label>
-                        <input type="number" name="ano_modelo" min="1980" max="2025">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>RENAVAM</label>
-                        <input type="text" name="renavam" placeholder="12345678901">
-                    </div>
-                    <div class="form-group">
-                        <label>Chassi</label>
-                        <input type="text" name="chassi" placeholder="9BWZZZ377VT004251">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Capacidade do Tanque (L)</label>
-                        <input type="number" name="capacidade_tanque" placeholder="300">
-                    </div>
-                    <div class="form-group">
-                        <label>KM Atual</label>
-                        <input type="number" name="km_atual" placeholder="125000">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Observações</label>
-                    <textarea name="observacao" rows="3" placeholder="Observações sobre o veículo..."></textarea>
-                </div>
-            </form>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('vehicle-modal')">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="saveVehicle()">
-                    <span class="btn-text">Salvar</span>
-                    <div class="loading" style="display: none;"></div>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Driver Modal -->
-    <div id="driver-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-user"></i> Cadastro de Motorista</h2>
-                <button class="modal-close" onclick="closeModal('driver-modal')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <form id="driver-form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Matrícula *</label>
-                        <input type="number" name="matricula" placeholder="12345" required>
-                        <div class="error-message">Campo obrigatório</div>
-                    </div>
-                    <div class="form-group">
-                        <label>Nome Completo *</label>
-                        <input type="text" name="nome" placeholder="Nome do motorista" required>
-                        <div class="error-message">Campo obrigatório</div>
-                    </div>
-                </div>
-            </form>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('driver-modal')">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="saveDriver()">
-                    <span class="btn-text">Salvar</span>
-                    <div class="loading" style="display: none;"></div>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Expense Modal -->
-    <div id="expense-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-receipt"></i> Nova Despesa</h2>
-                <button class="modal-close" onclick="closeModal('expense-modal')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <form id="expense-form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Veículo *</label>
-                        <select name="veiculo_id" required>
-                            <option value="">Selecione o veículo</option>
-                            <option value="1">ABC-1234 - Volvo FH 540</option>
-                            <option value="2">DEF-5678 - Randon Bitrem</option>
-                        </select>
-                        <div class="error-message">Campo obrigatório</div>
-                    </div>
-                    <div class="form-group">
-                        <label>Data *</label>
-                        <input type="date" name="data" required>
-                        <div class="error-message">Campo obrigatório</div>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Fornecedor *</label>
-                        <input type="text" name="fornecedor" placeholder="Nome do fornecedor" required>
-                        <div class="error-message">Campo obrigatório</div>
-                    </div>
-                    <div class="form-group">
-                        <label>Tipo de Despesa *</label>
-                        <select name="tipo_despesa" required>
-                            <option value="">Selecione</option>
-                            <option>Corretiva</option>
-                            <option>Preventiva</option>
-                            <option>Lavagem</option>
-                            <option>Combustível</option>
-                            <option>Pneus</option>
-                            <option>Outros</option>
-                        </select>
-                        <div class="error-message">Campo obrigatório</div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Serviços/Peças</label>
-                    <textarea name="servicos_pecas" rows="3" placeholder="Descrição dos serviços ou peças..."></textarea>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Ordem de Compra</label>
-                        <input type="text" name="ordem_compra" placeholder="OC123456">
-                    </div>
-                    <div class="form-group">
-                        <label>NFE</label>
-                        <input type="text" name="nfe" placeholder="123456">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Valor *</label>
-                        <input type="number" step="0.01" name="valor" placeholder="0,00" required>
-                        <div class="error-message">Campo obrigatório</div>
-                    </div>
-                    <div class="form-group">
-                        <label>Status do Pagamento</label>
-                        <select name="status_pagamento">
-                            <option>Pendente</option>
-                            <option>Pago</option>
-                            <option>Cancelado</option>
-                        </select>
-                    </div>
-                </div>
-            </form>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('expense-modal')">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="saveExpense()">
-                    <span class="btn-text">Salvar</span>
-                    <div class="loading" style="display: none;"></div>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Fuel Modal -->
-    <div id="fuel-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-gas-pump"></i> Novo Abastecimento</h2>
-                <button class="modal-close" onclick="closeModal('fuel-modal')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <form id="fuel-form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Veículo *</label>
-                        <select name="veiculo_id" required>
-                            <option value="">Selecione o veículo</option>
-                            <option value="1">ABC-1234 - Volvo FH 540</option>
-                            <option value="2">DEF-5678 - Randon Bitrem</option>
-                        </select>
-                        <div class="error-message">Campo obrigatório</div>
-                    </div>
-                    <div class="form-group">
-                        <label>Motorista *</label>
-                        <select name="motorista_id" required>
-                            <option value="">Selecione o motorista</option>
-                            <option value="1">João Silva (12345)</option>
-                            <option value="2">Maria Santos (12346)</option>
-                        </select>
-                        <div class="error-message">Campo obrigatório</div>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Data/Hora *</label>
-                        <input type="datetime-local" name="data_transacao" required>
-                        <div class="error-message">Campo obrigatório</div>
-                    </div>
-                    <div class="form-group">
-                        <label>Tipo de Combustível *</label>
-                        <select name="tipo_combustivel" required>
-                            <option value="">Selecione</option>
-                            <option>Diesel S-10</option>
-                            <option>Diesel Comum</option>
-                            <option>Gasolina</option>
-                            <option>Etanol</option>
-                            <option>Arla 32</option>
-                        </select>
-                        <div class="error-message">Campo obrigatório</div>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Litros *</label>
-                        <input type="number" step="0.01" name="litros" placeholder="150,00" required>
-                        <div class="error-message">Campo obrigatório</div>
-                    </div>
-                    <div class="form-group">
-                        <label>Valor por Litro *</label>
-                        <input type="number" step="0.001" name="valor_litro" placeholder="5,30" required>
-                        <div class="error-message">Campo obrigatório</div>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Hodômetro (KM)</label>
-                        <input type="number" name="hodometro" placeholder="125450">
-                    </div>
-                    <div class="form-group">
-                        <label>Valor Total</label>
-                        <input type="number" step="0.01" name="valor_total" placeholder="795,00" readonly>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Posto/Estabelecimento</label>
-                        <input type="text" name="posto_estabelecimento" placeholder="Posto BR">
-                    </div>
-                    <div class="form-group">
-                        <label>Cidade/UF</label>
-                        <input type="text" name="cidade_uf" placeholder="São Paulo/SP">
-                    </div>
-                </div>
-            </form>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('fuel-modal')">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="saveFuel()">
-                    <span class="btn-text">Salvar</span>
-                    <div class="loading" style="display: none;"></div>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Maintenance Modal -->
-    <div id="maintenance-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-wrench"></i> Nova Manutenção</h2>
-                <button class="modal-close" onclick="closeModal('maintenance-modal')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <form id="maintenance-form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Veículo *</label>
-                        <select name="veiculo_id" required>
-                            <option value="">Selecione o veículo</option>
-                            <option value="1">ABC-1234 - Volvo FH 540</option>
-                            <option value="2">DEF-5678 - Randon Bitrem</option>
-                        </select>
-                        <div class="error-message">Campo obrigatório</div>
-                    </div>
-                    <div class="form-group">
-                        <label>Data da Manutenção *</label>
-                        <input type="date" name="data_manutencao" required>
-                        <div class="error-message">Campo obrigatório</div>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Tipo de Manutenção *</label>
-                        <select name="tipo_manutencao" required>
-                            <option value="">Selecione</option>
-                            <option>Preventiva</option>
-                            <option>Corretiva</option>
-                            <option>Pneu</option>
-                            <option>Elétrica</option>
-                            <option>Motor</option>
-                        </select>
-                        <div class="error-message">Campo obrigatório</div>
-                    </div>
-                    <div class="form-group">
-                        <label>Componente</label>
-                        <input type="text" name="componente" placeholder="Ex: Motor, Freios, Pneus">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Hodômetro/Horímetro</label>
-                        <input type="number" name="hodometro_horimetro" placeholder="125450">
-                    </div>
-                    <div class="form-group">
-                        <input type="number" step="0.01" name="valor" placeholder="450,00">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Descrição do Serviço</label>
-                    <textarea name="descricao_servico" rows="3" placeholder="Descrição detalhada do serviço realizado..."></textarea>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Prestador</label>
-                        <input type="text" name="prestador" placeholder="Nome da oficina/prestador">
-                    </div>
-                    <div class="form-group">
-                        <label>Status da NF</label>
-                        <select name="status_nf">
-                            <option>Pendente</option>
-                            <option>Emitida</option>
-                            <option>Paga</option>
-                        </select>
-                    </div>
-                </div>
-            </form>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('maintenance-modal')">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="saveMaintenance()">
-                    <span class="btn-text">Salvar</span>
-                    <div class="loading" style="display: none;"></div>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Checklist Modal -->
-    <div id="checklist-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-clipboard-check"></i> Checklist do Baú</h2>
-                <button class="modal-close" onclick="closeModal('checklist-modal')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <form id="checklist-form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Veículo *</label>
-                        <select name="veiculo_id" required>
-                            <option value="">Selecione o veículo</option>
-                            <option value="1">ABC-1234 - Volvo FH 540</option>
-                            <option value="2">DEF-5678 - Randon Bitrem</option>
-                        </select>
-                        <div class="error-message">Campo obrigatório</div>
-                    </div>
-                    <div class="form-group">
-                        <label>Semana *</label>
-                        <input type="number" name="semana" min="1" max="53" placeholder="12" required>
-                        <div class="error-message">Campo obrigatório</div>
-                    </div>
-                </div>
-                
-                <h4 style="margin: 20px 0 15px 0; color: #333; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">
-                    <i class="fas fa-list-check"></i> Itens de Verificação
-                </h4>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Iluminação Interna</label>
-                        <select name="iluminacao_interna">
-                            <option value="OK">OK</option>
-                            <option value="Atenção">Atenção</option>
-                            <option value="Problema">Problema</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Interna do Baú</label>
-                        <select name="interna_bau">
-                            <option value="OK">OK</option>
-                            <option value="Atenção">Atenção</option>
-                            <option value="Problema">Problema</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Cortinas</label>
-                        <select name="cortinas">
-                            <option value="OK">OK</option>
-                            <option value="Atenção">Atenção</option>
-                            <option value="Problema">Problema</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Escadas</label>
-                        <select name="escadas">
-                            <option value="OK">OK</option>
-                            <option value="Atenção">Atenção</option>
-                            <option value="Problema">Problema</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Plataformas</label>
-                        <select name="plataformas">
-                            <option value="OK">OK</option>
-                            <option value="Atenção">Atenção</option>
-                            <option value="Problema">Problema</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Cozinha</label>
-                        <select name="cozinha">
-                            <option value="OK">OK</option>
-                            <option value="Atenção">Atenção</option>
-                            <option value="Problema">Problema</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Caixa de Esteiras</label>
-                        <select name="caixa_esteiras">
-                            <option value="OK">OK</option>
-                            <option value="Atenção">Atenção</option>
-                            <option value="Problema">Problema</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Iluminação Externa</label>
-                        <select name="iluminacao_externa">
-                            <option value="OK">OK</option>
-                            <option value="Atenção">Atenção</option>
-                            <option value="Problema">Problema</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Faixas Refletivas</label>
-                        <select name="faixas_refletivas">
-                            <option value="OK">OK</option>
-                            <option value="Atenção">Atenção</option>
-                            <option value="Problema">Problema</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Pneus</label>
-                        <select name="pneus">
-                            <option value="OK">OK</option>
-                            <option value="Atenção">Atenção</option>
-                            <option value="Problema">Problema</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Status Geral</label>
-                    <select name="status_geral">
-                        <option value="Aprovado">Aprovado</option>
-                        <option value="Aprovado com Ressalvas">Aprovado com Ressalvas</option>
-                        <option value="Reprovado">Reprovado</option>
-                    </select>
-                </div>
-            </form>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('checklist-modal')">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="saveChecklist()">
-                    <span class="btn-text">Salvar Checklist</span>
-                    <div class="loading" style="display: none;"></div>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast Notification -->
-    <div id="toast" class="toast">
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <i id="toast-icon" class="fas fa-check-circle"></i>
-            <div>
-                <div id="toast-title" style="font-weight: 600; margin-bottom: 2px;">Sucesso!</div>
-                <div id="toast-message" style="font-size: 14px; color: #666;">Operação realizada com sucesso.</div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Variáveis globais para armazenamento de dados
-        let vehicles = [
-            {
-                id: 1,
-                placa: "ABC-1234",
-                tipo: "Cavalo",
-                modelo: "Volvo FH 540",
-                ano: 2022,
-                km_atual: 125450,
-                status: "Ativo"
-            },
-            {
-                id: 2,
-                placa: "DEF-5678",
-                tipo: "Carreta",
-                modelo: "Randon Bitrem",
-                ano: 2021,
-                km_atual: 98720,
-                status: "Manutenção"
-            }
-        ];
-
-        let drivers = [
-            { id: 1, matricula: 12345, nome: "João Silva" },
-            { id: 2, matricula: 12346, nome: "Maria Santos" },
-            { id: 3, matricula: 12347, nome: "Pedro Oliveira" }
-        ];
-
-        let expenses = [
-            {
-                id: 1,
-                date: "2025-03-15",
-                vehicle: "ABC-1234",
-                supplier: "Oficina Central",
-                type: "Preventiva",
-                value: 1250.00,
-                status: "Pago"
-            },
-            {
-                id: 2,
-                date: "2025-03-20",
-                vehicle: "DEF-5678",
-                supplier: "Posto Shell",
-                type: "Combustível",
-                value: 890.50,
-                status: "Pendente"
-            }
-        ];
-
-        // Funções de navegação
-        function showSection(sectionId) {
-            // Esconder todas as seções
-            const sections = document.querySelectorAll('.content-section');
-            sections.forEach(section => {
-                section.classList.remove('active');
-            });
-
-            // Mostrar seção selecionada
-            document.getElementById(sectionId).classList.add('active');
-
-            // Atualizar menu ativo
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => {
-                item.classList.remove('active');
-            });
-            event.target.classList.add('active');
-
-            // Fechar sidebar no mobile
-            if (window.innerWidth <= 768) {
-                toggleSidebar();
-            }
-        }
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
-        }
-
-        // Funções para modais
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-            document.body.style.overflow = '';
-            
-            // Reset form
-            const form = document.querySelector(`#${modalId} form`);
-            if (form) {
-                form.reset();
-                clearFormErrors(form);
-            }
-        }
-
-        // Funções de validação
-        function validateForm(form) {
-            const inputs = form.querySelectorAll('input[required], select[required]');
-            let isValid = true;
-            
-            inputs.forEach(input => {
-                const formGroup = input.closest('.form-group');
-                
-                if (!input.value.trim()) {
-                    formGroup.classList.add('error');
-                    isValid = false;
-                } else {
-                    formGroup.classList.remove('error');
-                }
-            });
-            
-            return isValid;
-        }
-
-        function clearFormErrors(form) {
-            const errorGroups = form.querySelectorAll('.form-group.error');
-            errorGroups.forEach(group => {
-                group.classList.remove('error');
-            });
-        }
-
-        // Função para mostrar notificações
-        function showToast(title, message, type = 'success') {
-            const toast = document.getElementById('toast');
-            const icon = document.getElementById('toast-icon');
-            const titleEl = document.getElementById('toast-title');
-            const messageEl = document.getElementById('toast-message');
-            
-            // Remove classes anteriores
-            toast.className = 'toast';
-            
-            // Define o tipo
-            toast.classList.add(type);
-            
-            // Define o ícone
-            switch(type) {
-                case 'success':
-                    icon.className = 'fas fa-check-circle';
-                    break;
-                case 'error':
-                    icon.className = 'fas fa-times-circle';
-                    break;
-                case 'warning':
-                    icon.className = 'fas fa-exclamation-triangle';
-                    break;
-            }
-            
-            titleEl.textContent = title;
-            messageEl.textContent = message;
-            
-            toast.classList.add('show');
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 4000);
-        }
-
-        // Função para mostrar loading
-        function showLoading(button, show = true) {
-            const btnText = button.querySelector('.btn-text');
-            const loading = button.querySelector('.loading');
-            
-            if (show) {
-                btnText.style.display = 'none';
-                loading.style.display = 'inline-block';
-                button.disabled = true;
-            } else {
-                btnText.style.display = 'inline';
-                loading.style.display = 'none';
-                button.disabled = false;
-            }
-        }
-
-        // Funções para salvar dados
-        async function saveVehicle() {
-            const form = document.getElementById('vehicle-form');
-            const button = event.target;
-            
-            if (!validateForm(form)) {
-                showToast('Erro', 'Preencha todos os campos obrigatórios', 'error');
-                return;
-            }
-            
-            showLoading(button);
-            
-            // Simular salvamento
-            setTimeout(() => {
-                showLoading(button, false);
-                showToast('Sucesso', 'Veículo cadastrado com sucesso!');
-                closeModal('vehicle-modal');
-                // Aqui você faria a chamada real para a API
-            }, 1500);
-        }
-
-        async function saveDriver() {
-            const form = document.getElementById('driver-form');
-            const button = event.target;
-            
-            if (!validateForm(form)) {
-                showToast('Erro', 'Preencha todos os campos obrigatórios', 'error');
-                return;
-            }
-            
-            showLoading(button);
-            
-            setTimeout(() => {
-                showLoading(button, false);
-                showToast('Sucesso', 'Motorista cadastrado com sucesso!');
-                closeModal('driver-modal');
-            }, 1500);
-        }
-
-        async function saveExpense() {
-            const form = document.getElementById('expense-form');
-            const button = event.target;
-            
-            if (!validateForm(form)) {
-                showToast('Erro', 'Preencha todos os campos obrigatórios', 'error');
-                return;
-            }
-            
-            showLoading(button);
-            
-            setTimeout(() => {
-                showLoading(button, false);
-                showToast('Sucesso', 'Despesa registrada com sucesso!');
-                closeModal('expense-modal');
-            }, 1500);
-        }
-
-        async function saveFuel() {
-            const form = document.getElementById('fuel-form');
-            const button = event.target;
-            
-            if (!validateForm(form)) {
-                showToast('Erro', 'Preencha todos os campos obrigatórios', 'error');
-                return;
-            }
-            
-            showLoading(button);
-            
-            setTimeout(() => {
-                showLoading(button, false);
-                showToast('Sucesso', 'Abastecimento registrado com sucesso!');
-                closeModal('fuel-modal');
-            }, 1500);
-        }
-
-        async function saveMaintenance() {
-            const form = document.getElementById('maintenance-form');
-            const button = event.target;
-            
-            if (!validateForm(form)) {
-                showToast('Erro', 'Preencha todos os campos obrigatórios', 'error');
-                return;
-            }
-            
-            showLoading(button);
-            
-            setTimeout(() => {
-                showLoading(button, false);
-                showToast('Sucesso', 'Manutenção registrada com sucesso!');
-                closeModal('maintenance-modal');
-            }, 1500);
-        }
-
-        async function saveChecklist() {
-            const form = document.getElementById('checklist-form');
-            const button = event.target;
-            
-            if (!validateForm(form)) {
-                showToast('Erro', 'Preencha todos os campos obrigatórios', 'error');
-                return;
-            }
-            
-            showLoading(button);
-            
-            setTimeout(() => {
-                showLoading(button, false);
-                showToast('Sucesso', 'Checklist salvo com sucesso!');
-                closeModal('checklist-modal');
-            }, 1500);
-        }
-
-        // Funções auxiliares
-        function viewVehicleDetails(placa) {
-            showToast('Info', `Visualizando detalhes do veículo: ${placa}`, 'warning');
-            // Implementar modal ou página de detalhes
-        }
-
-        function editVehicle(placa) {
-            showToast('Info', `Editando veículo: ${placa}`, 'warning');
-            // Implementar edição do veículo
-        }
-
-        // Função para atualizar dados do dashboard
-        function updateDashboard() {
-            // Atualizar cards do dashboard com dados reais
-            document.getElementById('total-veiculos').textContent = vehicles.length;
-            
-            // Calcular despesas do mês
-            const totalExpenses = expenses.reduce((sum, expense) => sum + expense.value, 0);
-            document.getElementById('despesas-mes').textContent = 
-                'R$ ' + totalExpenses.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-            
-            // Simular outros valores
-            document.getElementById('manutencoes-pendentes').textContent = '8';
-            document.getElementById('alertas-vencimento').textContent = '12';
-        }
-
-        // Função para busca em tabelas
-        function setupTableSearch() {
-            const searchInputs = document.querySelectorAll('.search-input');
-            searchInputs.forEach(input => {
-                input.addEventListener('input', function() {
-                    const searchTerm = this.value.toLowerCase();
-                    const table = this.closest('.content-section').querySelector('table tbody');
-                    if (!table) return;
-                    
-                    const rows = table.querySelectorAll('tr');
-                    
-                    rows.forEach(row => {
-                        const text = row.textContent.toLowerCase();
-                        row.style.display = text.includes(searchTerm) ? '' : 'none';
-                    });
-                });
-            });
-        }
-
-        // Calcular valor total automaticamente no formulário de abastecimento
-        function setupFuelCalculation() {
-            const fuelForm = document.getElementById('fuel-form');
-            if (fuelForm) {
-                const litrosInput = fuelForm.querySelector('[name="litros"]');
-                const valorLitroInput = fuelForm.querySelector('[name="valor_litro"]');
-                const valorTotalInput = fuelForm.querySelector('[name="valor_total"]');
-                
-                function calculateTotal() {
-                    const litros = parseFloat(litrosInput.value) || 0;
-                    const valorLitro = parseFloat(valorLitroInput.value) || 0;
-                    const total = (litros * valorLitro).toFixed(2);
-                    valorTotalInput.value = total;
-                }
-                
-                litrosInput.addEventListener('input', calculateTotal);
-                valorLitroInput.addEventListener('input', calculateTotal);
-            }
-        }
-
-        // Fechar modais clicando fora
-        function setupModalCloseOnOutsideClick() {
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('modal')) {
-                    const modalId = e.target.id;
-                    closeModal(modalId);
-                }
-            });
-        }
-
-        // Tecla ESC para fechar modais
-        function setupEscapeKeyClose() {
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    const activeModal = document.querySelector('.modal.active');
-                    if (activeModal) {
-                        closeModal(activeModal.id);
-                    }
-                }
-            });
-        }
-
-        // Inicialização
-        document.addEventListener('DOMContentLoaded', function() {
-            updateDashboard();
-            setupTableSearch();
-            setupFuelCalculation();
-            setupModalCloseOnOutsideClick();
-            setupEscapeKeyClose();
-            
-            // Configurar responsividade
-            window.addEventListener('resize', function() {
-                if (window.innerWidth > 768) {
-                    const sidebar = document.getElementById('sidebar');
-                    const overlay = document.getElementById('sidebar-overlay');
-                    sidebar.classList.remove('active');
-                    overlay.classList.remove('active');
-                }
-            });
-
-            // Definir data atual como padrão nos formulários
-            const today = new Date().toISOString().split('T')[0];
-            document.querySelectorAll('input[type="date"]').forEach(input => {
-                if (!input.value) input.value = today;
-            });
-        });
-
-        // Formatação de valores monetários
-        function formatCurrency(value) {
-            return new Intl.NumberFormat('pt-BR', {
-                style: 'currency',
-                currency: 'BRL'
-            }).format(value);
-        }
-
-        // Formatação de datas
-        function formatDate(date) {
-            return new Intl.DateTimeFormat('pt-BR').format(new Date(date));
-        }
-    </script>
-</body>
-</html>btn btn-secondary btn-sm" onclick="viewVehicleDetails('ABC-1234')">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-primary btn-sm" onclick="editVehicle('ABC-1234')">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong>DEF-5678</strong></td>
-                                <td class="mobile-hide">Carreta</td>
-                                <td>Randon Bitrem</td>
-                                <td class="mobile-hide">2021</td>
-                                <td class="mobile-hide">98.720</td>
-                                <td><span class="status-badge status-warning">Manutenção</span></td>
-                                <td>
-                                    <div class="table-actions">
-                                        <button class="btn btn-secondary btn-sm" onclick="viewVehicleDetails('DEF-5678')">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-primary btn-sm" onclick="editVehicle('DEF-5678')">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <button class="fab" onclick="openModal('vehicle-modal')">
-                    <i class="fas fa-plus"></i>
-                </button>
-            </section>
-
-            <!-- Financeiro Section -->
-            <section id="financeiro" class="content-section">
-                <div class="page-header">
-                    <h1>Financeiro</h1>
-                    <p>Controle de despesas e orçamentos</p>
-                </div>
-
-                <div class="table-container">
-                    <div class="table-header">
-                        <h3>Despesas</h3>
-                        <div class="search-filters">
-                            <input type="date" class="form-control">
-                            <input type="date" class="form-control">
-                            <select class="form-control mobile-hide">
-                                <option>Todos os tipos</option>
-                                <option>Corretiva</option>
-                                <option>Preventiva</option>
-                                <option>Lavagem</option>
-                                <option>Combustível</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Data</th>
-                                <th>Veículo</th>
-                                <th class="mobile-hide">Fornecedor</th>
-                                <th class="mobile-hide">Tipo</th>
-                                <th>Valor</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>15/03/2025</td>
-                                <td><strong>ABC-1234</strong></td>
-                                <td class="mobile-hide">Oficina Central</td>
-                                <td class="mobile-hide">Preventiva</td>
-                                <td><strong>R$ 1.250,00</strong></td>
-                                <td><span class="status-badge status-ok">Pago</span></td>
-                                <td>
-                                    <div class="table-actions">
-                                        <button class="btn btn-secondary btn-sm">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-primary btn-sm">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>20/03/2025</td>
-                                <td><strong>DEF-5678</strong></td>
-                                <td class="mobile-hide">Posto Shell</td>
-                                <td class="mobile-hide">Combustível</td>
-                                <td><strong>R$ 890,50</strong></td>
-                                <td><span class="status-badge status-warning">Pendente</span></td>
-                                <td>
-                                    <div class="table-actions">
-                                        <button class="btn btn-secondary btn-sm">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-primary btn-sm">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <button class="fab" onclick="openModal('expense-modal')">
-                    <i class="fas fa-plus"></i>
-                </button>
-
-                <div class="chart-container">
-                    <h3>Evolução de Despesas - Últimos 6 Meses</h3>
-                    <p style="margin-top: 50px;">
-                        <i class="fas fa-chart-line" style="font-size: 3rem; color: #ddd;"></i><br>
-                        Gráfico de Evolução de Despesas<br>
-                        <small>Gráfico de linha mostrando a evolução mensal</small>
-                    </p>
-                </div>
-            </section>
-
-            <!-- Abastecimentos Section -->
-            <section id="abastecimentos" class="content-section">
-                <div class="page-header">
-                    <h1>Abastecimentos</h1>
-                    <p>Controle de abastecimentos e consumo</p>
-                </div>
-
-                <div class="table-container">
-                    <div class="table-header">
-                        <h3>Histórico de Abastecimentos</h3>
-                        <div class="search-filters">
-                            <input type="date" class="form-control">
-                            <input type="date" class="form-control">
-                            <select class="form-control mobile-hide">
-                                <option>Todos os combustíveis</option>
-                                <option>Diesel S-10</option>
-                                <option>Diesel Comum</option>
-                                <option>Arla 32</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Data</th>
-                                <th>Veículo</th>
-                                <th class="mobile-hide">Motorista</th>
-                                <th>Combustível</th>
-                                <th class="mobile-hide">Litros</th>
-                                <th>Valor</th>
-                                <th class="mobile-hide">Posto</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>25/03/2025</td>
-                                <td><strong>ABC-1234</strong></td>
-                                <td class="mobile-hide">João Silva</td>
-                                <td>Diesel S-10</td>
-                                <td class="mobile-hide">150L</td>
-                                <td><strong>R$ 795,00</strong></td>
-                                <td class="mobile-hide">Posto BR</td>
-                                <td>
-                                    <div class="table-actions">
-                                        <button class="<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestão de Frotas CDNE</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-
-        .container {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 280px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .sidebar-header {
-            padding: 20px;
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-            text-align: center;
-        }
-
-        .sidebar-header h2 {
-            font-size: 1.2rem;
-            margin-bottom: 5px;
-        }
-
-        .sidebar-header p {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-
-        .nav-menu {
-            padding: 20px 0;
-        }
-
-        .nav-item {
-            display: block;
-            padding: 15px 25px;
-            color: #333;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border-left: 4px solid transparent;
-        }
-
-        .nav-item:hover, .nav-item.active {
-            background: rgba(79, 172, 254, 0.1);
-            border-left-color: #4facfe;
-            color: #4facfe;
-        }
-
-        .nav-item i {
-            margin-right: 10px;
-            width: 20px;
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .page-header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
-
-        .page-header h1 {
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .page-header p {
-            color: #666;
-        }
-
-        /* Dashboard Cards */
-        .dashboard-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .card-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-        }
-
-        .card-icon.vehicles { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .card-icon.expenses { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-        .card-icon.maintenance { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-        .card-icon.alerts { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
-
-        .card-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .card-label {
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        /* Content Sections */
-        .content-section {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            display: none;
-        }
-
-        .content-section.active {
-            display: block;
-        }
-
-        /* Forms */
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #333;
-            font-weight: 500;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #4facfe;
-        }
-
-        /* Buttons */
-        .btn {
-            display: inline-block;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            text-align: center;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
-        }
-
-        .btn-secondary {
-            background: #f8f9fa;
-            color: #333;
-            border: 2px solid #e1e5e9;
-        }
-
-        .btn-secondary:hover {
-            background: #e9ecef;
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-        }
-
-        /* Tables */
-        .table-container {
-            overflow-x: auto;
-            margin-top: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #e1e5e9;
-        }
-
-        th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #333;
-        }
-
-        tr:hover {
-            background: #f8f9fa;
-        }
-
-        /* Status badges */
-        .status-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .status-ok { background: #d4edda; color: #155724; }
-        .status-warning { background: #fff3cd; color: #856404; }
-        .status-danger { background: #f8d7da; color: #721c24; }
-
-        /* Alerts */
-        .alert {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        .alert-warning {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-        }
-
-        .alert-danger {
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
-        }
-
-        /* Charts placeholder */
-        .chart-container {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            color: #666;
-        }
-
-        /* Search and filters */
-        .search-filters {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .search-input {
-            flex: 1;
-            min-width: 250px;
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 2000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            backdrop-filter: blur(5px);
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal.active {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            width: 100%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            animation: slideUp 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideUp {
-            from { 
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to { 
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        .modal-header h2 {
-            color: #333;
-            margin: 0;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #999;
-            padding: 5px;
-            border-radius: 50%;
-            width: 35px;
-            height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .modal-close:hover {
-            background: #f0f0f0;
-            color: #333;
-        }
-
-        .modal-footer {
-            display: flex;
-            gap: 15px;
-            justify-content: flex-end;
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 2px solid #f0f0f0;
-        }
-
-        /* Enhanced Form Styles */
-        .form-row {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .form-row .form-group {
-            flex: 1;
-            margin-bottom: 0;
-        }
-
-        .form-group label {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            border: 2px solid #e8ecef;
-            border-radius: 8px;
-            padding: 12px 15px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            background: #fafbfc;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            border-color: #4facfe;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
-        }
-
-        .form-group.error input,
-        .form-group.error select,
-        .form-group.error textarea {
-            border-color: #dc3545;
-            background: #ffedef;
-        }
-
-        .form-group .error-message {
-            color: #dc3545;
-            font-size: 12px;
-            margin-top: 5px;
-            display: none;
-        }
-
-        .form-group.error .error-message {
-            display: block;
-        }
-
-        /* Enhanced Button Styles */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            min-height: 44px;
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .btn-sm {
-            padding: 8px 12px;
-            font-size: 12px;
-            min-height: 36px;
-        }
-
-        .btn-lg {
-            padding: 16px 32px;
-            font-size: 16px;
-            min-height: 52px;
-        }
-
-        /* Enhanced Table Styles */
-        .table-actions {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-        }
-
-        .table-container {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border: 1px solid #f0f0f0;
-        }
-
-        .table-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 25px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .table-header h3 {
-            margin: 0;
-            color: #333;
-        }
-
-        /* Floating Action Button */
-        .fab {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
-            transition: all 0.3s ease;
-            z-index: 100;
-        }
-
-        .fab:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(79, 172, 254, 0.6);
-        }
-
-        /* Loading Spinner */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #4facfe;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Toast Notifications */
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: white;
-            padding: 16px 20px;
-            border-radius: 8px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            border-left: 4px solid #4facfe;
-            z-index: 2001;
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-            min-width: 300px;
-        }
-
-        .toast.show {
-            transform: translateX(0);
-        }
-
-        .toast.success { border-left-color: #28a745; }
-        .toast.error { border-left-color: #dc3545; }
-        .toast.warning { border-left-color: #ffc107; }
-
-        /* Mobile Responsiveness */
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-            }
-            
-            .sidebar {
-                width: 280px;
-                transform: translateX(-100%);
-                position: fixed;
-                top: 0;
-                left: 0;
-                height: 100vh;
-                z-index: 1000;
-                transition: transform 0.3s ease;
-            }
-            
-            .sidebar.active {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                padding: 80px 15px 15px 15px;
-                width: 100%;
-            }
-            
-            .dashboard-cards {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-            
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .form-row {
-                flex-direction: column;
-                gap: 0;
-            }
-
-            .search-filters {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .search-input {
-                min-width: auto;
-            }
-            
-            .page-header {
-                padding: 15px;
-                margin-bottom: 15px;
-            }
-            
-            .page-header h1 {
-                font-size: 1.5rem;
-            }
-            
-            .card {
-                padding: 20px;
-            }
-            
-            .card-value {
-                font-size: 1.5rem;
-            }
-            
-            .table-container {
-                overflow-x: auto;
-                margin: 0 -15px;
-                border-radius: 0;
-            }
-            
-            .table-header {
-                padding: 15px 20px;
-                flex-direction: column;
-                gap: 15px;
-                align-items: stretch;
-            }
-            
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .modal-content {
-                margin: 10px;
-                padding: 20px;
-                max-height: calc(100vh - 40px);
-            }
-            
-            .modal-footer {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .fab {
-                bottom: 20px;
-                right: 20px;
-                width: 56px;
-                height: 56px;
-            }
-
-            .toast {
-                top: 10px;
-                right: 10px;
-                left: 10px;
-                transform: translateY(-100px);
-                min-width: auto;
-            }
-
-            .toast.show {
-                transform: translateY(0);
-            }
-
-            /* Hide desktop elements on mobile */
-            .mobile-hide {
-                display: none;
-            }
-
-            /* Stack table actions vertically on small screens */
-            .table-actions {
-                flex-direction: column;
-                gap: 5px;
-            }
-
-            .table-actions .btn {
-                font-size: 12px;
-                padding: 6px 10px;
-                width: auto;
-                min-height: 32px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .main-content {
-                padding: 70px 10px 10px 10px;
-            }
-
-            .card {
-                padding: 15px;
-            }
-
-            .modal-content {
-                padding: 15px;
-            }
-
-            .btn {
-                padding: 10px 16px;
-                font-size: 13px;
-            }
-
-            .form-group input,
-            .form-group select,
-            .form-group textarea {
-                padding: 10px 12px;
-            }
-
-            /* Smaller table text */
-            table {
-                font-size: 13px;
-            }
-
-            th, td {
-                padding: 8px 6px;
-            }
-
-            .status-badge {
-                font-size: 10px;
-                padding: 3px 8px;
-            }
-        }
-
-        /* Mobile menu button */
-        .mobile-menu-btn {
-            display: none;
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1001;
-            background: rgba(79, 172, 254, 0.95);
-            backdrop-filter: blur(10px);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 12px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
-            transition: all 0.3s ease;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .mobile-menu-btn:hover {
-            background: rgba(79, 172, 254, 1);
-            transform: scale(1.05);
-        }
-
-        @media (max-width: 768px) {
-            .mobile-menu-btn {
-                display: flex;
-            }
-        }
-
-        /* Sidebar overlay for mobile */
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-        }
-
-        @media (max-width: 768px) {
-            .sidebar-overlay.active {
-                display: block;
-            }
-        }
-
-        /* Enhanced status badges */
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .status-badge::before {
-            content: '';
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-        }
-
-        .status-ok::before { background: #28a745; }
-        .status-warning::before { background: #ffc107; }
-        .status-danger::before { background: #dc3545; }
-
-        /* Enhanced card hover effects */
-        .card {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .card:hover::before {
-            left: 100%;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Gestão de Frotas CDNE</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    /* Reset e Layout */
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:'Segoe UI',Tahoma,Verdana,sans-serif;
+      background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      min-height:100vh;
+    }
+    .container{display:flex;min-height:100vh;}
+
+    /* Sidebar */
+    .sidebar{
+      width:280px;
+      background:rgba(255,255,255,0.95);
+      backdrop-filter:blur(10px);
+      box-shadow:0 8px 32px rgba(0,0,0,0.1);
+      transition:transform .3s ease;
+    }
+    .sidebar-header{
+      padding:20px;
+      background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);
+      color:white;text-align:center
+    }
+    .sidebar-header h2{font-size:1.2rem;margin-bottom:5px}
+    .sidebar-header p{font-size:.9rem;opacity:.9}
+    .nav-menu{padding:20px 0}
+    .nav-item{
+      display:block;padding:15px 25px;color:#333;text-decoration:none;
+      border-left:4px solid transparent;transition:.3s;
+    }
+    .nav-item:hover,.nav-item.active{
+      background:rgba(79,172,254,.1);border-left-color:#4facfe;color:#4facfe;
+    }
+    .nav-item i{margin-right:10px;width:20px}
+
+    /* Main */
+    .main-content{flex:1;padding:20px;overflow-y:auto}
+
+    .page-header{
+      background:rgba(255,255,255,.95);backdrop-filter:blur(10px);
+      padding:20px;border-radius:15px;margin-bottom:20px;
+      box-shadow:0 8px 32px rgba(0,0,0,.1);
+    }
+    .page-header h1{color:#333;margin-bottom:5px}
+    .page-header p{color:#666}
+
+    /* Dashboard Cards */
+    .dashboard-cards{
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+      gap:20px;margin-bottom:30px;
+    }
+    .card{
+      background:rgba(255,255,255,.95);backdrop-filter:blur(10px);
+      padding:25px;border-radius:15px;box-shadow:0 8px 32px rgba(0,0,0,.1);
+      transition:.3s;
+    }
+    .card:hover{transform:translateY(-5px)}
+    .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+    .card-icon{width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.5rem}
+    .card-icon.vehicles{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)}
+    .card-icon.expenses{background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%)}
+    .card-icon.maintenance{background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%)}
+    .card-icon.alerts{background:linear-gradient(135deg,#43e97b 0%,#38f9d7 100%)}
+    .card-value{font-size:2rem;font-weight:bold;color:#333}
+    .card-label{color:#666;font-size:.9rem}
+
+    /* Section */
+    .content-section{
+      background:rgba(255,255,255,.95);backdrop-filter:blur(10px);
+      border-radius:15px;padding:25px;margin-bottom:20px;
+      box-shadow:0 8px 32px rgba(0,0,0,.1);display:none
+    }
+    .content-section.active{display:block}
+  </style>
 </head>
 <body>
-    <button class="mobile-menu-btn" onclick="toggleSidebar()">
-        <i class="fas fa-bars"></i>
-    </button>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
-    <div class="container">
-        <!-- Sidebar -->
-        <nav class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <h2>CDNE Frotas</h2>
-                <p>Sistema de Gestão</p>
-            </div>
-            <div class="nav-menu">
-                <a href="#" class="nav-item active" onclick="showSection('dashboard')">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
-                </a>
-                <a href="#" class="nav-item" onclick="showSection('veiculos')">
-                    <i class="fas fa-truck"></i> Gestão de Frota
-                </a>
-                <a href="#" class="nav-item" onclick="showSection('financeiro')">
-                    <i class="fas fa-dollar-sign"></i> Financeiro
-                </a>
-                <a href="#" class="nav-item" onclick="showSection('manutencao')">
-                    <i class="fas fa-tools"></i> Manutenção
-                </a>
-                <a href="#" class="nav-item" onclick="showSection('relatorios')">
-                    <i class="fas fa-chart-bar"></i> Relatórios
-                </a>
-                <a href="#" class="nav-item" onclick="showSection('motoristas')">
-                    <i class="fas fa-users"></i> Motoristas
-                </a>
-            </div>
-        </nav>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Dashboard Section -->
-            <section id="dashboard" class="content-section active">
-                <div class="page-header">
-                    <h1>Dashboard</h1>
-                    <p>Visão geral da sua frota</p>
-                </div>
-
-                <div class="dashboard-cards">
-                    <div class="card">
-                        <div class="card-header">
-                            <div>
-                                <div class="card-value" id="total-veiculos">45</div>
-                                <div class="card-label">Total de Veículos</div>
-                            </div>
-                            <div class="card-icon vehicles">
-                                <i class="fas fa-truck"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <div>
-                                <div class="card-value" id="despesas-mes">R$ 45.230</div>
-                                <div class="card-label">Despesas do Mês</div>
-                            </div>
-                            <div class="card-icon expenses">
-                                <i class="fas fa-money-bill"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <div>
-                                <div class="card-value" id="manutencoes-pendentes">8</div>
-                                <div class="card-label">Manutenções Pendentes</div>
-                            </div>
-                            <div class="card-icon maintenance">
-                                <i class="fas fa-wrench"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <div>
-                                <div class="card-value" id="alertas-vencimento">12</div>
-                                <div class="card-label">Alertas de Vencimento</div>
-                            </div>
-                            <div class="card-icon alerts">
-                                <i class="fas fa-exclamation-triangle"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Alertas importantes -->
-                <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <strong>Atenção:</strong> 5 veículos possuem dedetização vencendo nos próximos 15 dias.
-                </div>
-
-                <div class="alert alert-danger">
-                    <i class="fas fa-times-circle"></i>
-                    <strong>Urgente:</strong> 3 veículos estão com opacidade vencida.
-                </div>
-
-                <!-- Gráficos e relatórios rápidos -->
-                <div class="chart-container">
-                    <h3>Despesas por Categoria - Mês Atual</h3>
-                    <p style="margin-top: 50px;">
-                        <i class="fas fa-chart-pie" style="font-size: 3rem; color: #ddd;"></i><br>
-                        Gráfico de Despesas por Categoria<br>
-                        <small>Integração com biblioteca de gráficos será implementada aqui</small>
-                    </p>
-                </div>
-            </section>
-
-            <!-- Gestão de Frota Section -->
-            <section id="veiculos" class="content-section">
-                <div class="page-header">
-                    <h1>Gestão de Frota</h1>
-                    <p>Cadastro e controle de veículos</p>
-                </div>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <button class="btn btn-primary" onclick="showVehicleForm()">
-                        <i class="fas fa-plus"></i> Novo Veículo
-                    </button>
-                    <div class="search-filters">
-                        <input type="text" class="form-control search-input" placeholder="Buscar por placa, modelo...">
-                        <select class="form-control">
-                            <option>Todos os tipos</option>
-                            <option>Cavalo</option>
-                            <option>Carreta</option>
-                            <option>Bitruck</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="table-container">
-                    <table id="veiculos-table">
-                        <thead>
-                            <tr>
-                                <th>Placa</th>
-                                <th>Tipo</th>
-                                <th>Modelo</th>
-                                <th>Ano</th>
-                                <th>KM Atual</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>ABC-1234</td>
-                                <td>Cavalo</td>
-                                <td>Volvo FH 540</td>
-                                <td>2022</td>
-                                <td>125.450</td>
-                                <td><span class="status-badge status-ok">Ativo</span></td>
-                                <td>
-                                    <button class="btn btn-secondary btn-sm" onclick="viewVehicleDetails('ABC-1234')">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button class="btn btn-primary btn-sm" onclick="editVehicle('ABC-1234')">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>DEF-5678</td>
-                                <td>Carreta</td>
-                                <td>Randon Bitrem</td>
-                                <td>2021</td>
-                                <td>98.720</td>
-                                <td><span class="status-badge status-warning">Manutenção</span></td>
-                                <td>
-                                    <button class="btn btn-secondary btn-sm" onclick="viewVehicleDetails('DEF-5678')">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button class="btn btn-primary btn-sm" onclick="editVehicle('DEF-5678')">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Formulário de cadastro de veículo (hidden) -->
-                <div id="vehicle-form" style="display: none; margin-top: 30px;">
-                    <h3>Cadastro de Veículo</h3>
-                    <form class="form-grid">
-                        <div class="form-group">
-                            <label>Placa</label>
-                            <input type="text" name="placa" placeholder="ABC-1234" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Placa TK</label>
-                            <input type="text" name="placa_tk" placeholder="TK123">
-                        </div>
-                        <div class="form-group">
-                            <label>Tipo</label>
-                            <select name="tipo" required>
-                                <option value="">Selecione</option>
-                                <option>Cavalo</option>
-                                <option>Carreta</option>
-                                <option>Bitruck</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Fabricante/Modelo</label>
-                            <input type="text" name="fabricante_modelo" placeholder="Volvo FH 540">
-                        </div>
-                        <div class="form-group">
-                            <label>Ano Fabricação</label>
-                            <input type="number" name="ano_fabricacao" min="1980" max="2025">
-                        </div>
-                        <div class="form-group">
-                            <label>Ano Modelo</label>
-                            <input type="number" name="ano_modelo" min="1980" max="2025">
-                        </div>
-                        <div class="form-group">
-                            <label>RENAVAM</label>
-                            <input type="text" name="renavam">
-                        </div>
-                        <div class="form-group">
-                            <label>Chassi</label>
-                            <input type="text" name="chassi">
-                        </div>
-                        <div class="form-group">
-                            <label>Capacidade do Tanque (L)</label>
-                            <input type="number" name="capacidade_tanque">
-                        </div>
-                        <div class="form-group">
-                            <label>KM Atual</label>
-                            <input type="number" name="km_atual">
-                        </div>
-                        <div class="form-group" style="grid-column: 1 / -1;">
-                            <label>Observações</label>
-                            <textarea name="observacao" rows="3"></textarea>
-                        </div>
-                    </form>
-                    <div style="margin-top: 20px;">
-                        <button class="btn btn-primary" onclick="saveVehicle()">Salvar</button>
-                        <button class="btn btn-secondary" onclick="hideVehicleForm()">Cancelar</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Financeiro Section -->
-            <section id="financeiro" class="content-section">
-                <div class="page-header">
-                    <h1>Financeiro</h1>
-                    <p>Controle de despesas e orçamentos</p>
-                </div>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <button class="btn btn-primary" onclick="showExpenseForm()">
-                        <i class="fas fa-plus"></i> Nova Despesa
-                    </button>
-                    <div class="search-filters">
-                        <input type="date" class="form-control">
-                        <input type="date" class="form-control">
-                        <select class="form-control">
-                            <option>Todos os tipos</option>
-                            <option>Corretiva</option>
-                            <option>Preventiva</option>
-                            <option>Lavagem</option>
-                            <option>Combustível</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Data</th>
-                                <th>Veículo</th>
-                                <th>Fornecedor</th>
-                                <th>Tipo</th>
-                                <th>Valor</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>15/03/2025</td>
-                                <td>ABC-1234</td>
-                                <td>Oficina Central</td>
-                                <td>Preventiva</td>
-                                <td>R$ 1.250,00</td>
-                                <td><span class="status-badge status-ok">Pago</span></td>
-                                <td>
-                                    <button class="btn btn-secondary btn-sm">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button class="btn btn-primary btn-sm">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>20/03/2025</td>
-                                <td>DEF-5678</td>
-                                <td>Posto Shell</td>
-                                <td>Combustível</td>
-                                <td>R$ 890,50</td>
-                                <td><span class="status-badge status-warning">Pendente</span></td>
-                                <td>
-                                    <button class="btn btn-secondary btn-sm">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button class="btn btn-primary btn-sm">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="chart-container">
-                    <h3>Evolução de Despesas - Últimos 6 Meses</h3>
-                    <p style="margin-top: 50px;">
-                        <i class="fas fa-chart-line" style="font-size: 3rem; color: #ddd;"></i><br>
-                        Gráfico de Evolução de Despesas<br>
-                        <small>Gráfico de linha mostrando a evolução mensal</small>
-                    </p>
-                </div>
-            </section>
-
-            <!-- Manutenção Section -->
-            <section id="manutencao" class="content-section">
-                <div class="page-header">
-                    <h1>Manutenção</h1>
-                    <p>Controle de manutenções e vencimentos</p>
-                </div>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <div>
-                        <button class="btn btn-primary" onclick="showMaintenanceForm()">
-                            <i class="fas fa-plus"></i> Nova Manutenção
-                        </button>
-                        <button class="btn btn-secondary" onclick="showChecklistForm()">
-                            <i class="fas fa-clipboard-check"></i> Checklist Baú
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Próximos Vencimentos -->
-                <h3>Próximos Vencimentos</h3>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Veículo</th>
-                                <th>Tipo</th>
-                                <th>Vencimento</th>
-                                <th>Status</th>
-                                <th>Fornecedor</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>ABC-1234</td>
-                                <td>Dedetização</td>
-                                <td>30/03/2025</td>
-                                <td><span class="status-badge status-warning">A Vencer</span></td>
-                                <td>Dedetizadora XYZ</td>
-                                <td>
-                                    <button class="btn btn-primary btn-sm">Renovar</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>DEF-5678</td>
-                                <td>Opacidade</td>
-                                <td>20/03/2025</td>
-                                <td><span class="status-badge status-danger">Vencido</span></td>
-                                <td>Inmetro Teste</td>
-                                <td>
-                                    <button class="btn btn-danger btn-sm">Urgente</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>GHI-9012</td>
-                                <td>Calibração</td>
-                                <td>15/04/2025</td>
-                                <td><span class="status-badge status-ok">OK</span></td>
-                                <td>Calibradora ABC</td>
-                                <td>
-                                    <button class="btn btn-secondary btn-sm">Ver</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Histórico de Manutenções -->
-                <h3 style="margin-top: 40px;">Histórico de Manutenções</h3>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Data</th>
-                                <th>Veículo</th>
-                                <th>Tipo</th>
-                                <th>Serviço</th>
-                                <th>Prestador</th>
-                                <th>Valor</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>10/03/2025</td>
-                                <td>ABC-1234</td>
-                                <td>Preventiva</td>
-                                <td>Troca de óleo e filtros</td>
-                                <td>Oficina Central</td>
-                                <td>R$ 450,00</td>
-                                <td><span class="status-badge status-ok">Concluída</span></td>
-                            </tr>
-                            <tr>
-                                <td>08/03/2025</td>
-                                <td>DEF-5678</td>
-                                <td>Corretiva</td>
-                                <td>Reparo sistema de freios</td>
-                                <td>Freios Express</td>
-                                <td>R$ 1.200,00</td>
-                                <td><span class="status-badge status-ok">Concluída</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Relatórios Section -->
-            <section id="relatorios" class="content-section">
-                <div class="page-header">
-                    <h1>Relatórios</h1>
-                    <p>Análises e relatórios da frota</p>
-                </div>
-
-                <div class="dashboard-cards">
-                    <div class="card">
-                        <h3>Relatório de Consumo</h3>
-                        <p>Análise de KM/Litro por veículo</p>
-                        <button class="btn btn-primary">Gerar Relatório</button>
-                    </div>
-                    <div class="card">
-                        <h3>Custos por Veículo</h3>
-                        <p>Ranking de custos de manutenção</p>
-                        <button class="btn btn-primary">Gerar Relatório</button>
-                    </div>
-                    <div class="card">
-                        <h3>Status da Frota</h3>
-                        <p>Relatório completo da situação</p>
-                        <button class="btn btn-primary">Gerar Relatório</button>
-                    </div>
-                    <div class="card">
-                        <h3>Análise Financeira</h3>
-                        <p>Despesas por categoria e período</p>
-                        <button class="btn btn-primary">Gerar Relatório</button>
-                    </div>
-                </div>
-
-                <!-- Filtros para relatórios -->
-                <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                    <h3>Filtros de Relatório</h3>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Período Inicial</label>
-                            <input type="date" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label>Período Final</label>
-                            <input type="date" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label>Tipo de Veículo</label>
-                            <select class="form-control">
-                                <option>Todos</option>
-                                <option>Cavalo</option>
-                                <option>Carreta</option>
-                                <option>Bitruck</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Categoria de Despesa</label>
-                            <select class="form-control">
-                                <option>Todas</option>
-                                <option>Manutenção</option>
-                                <option>Combustível</option>
-                                <option>Lavagem</option>
-                                <option>Outros</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary" style="margin-top: 15px;">Aplicar Filtros</button>
-                </div>
-
-                <!-- Gráficos de análise -->
-                <div class="chart-container">
-                    <h3>Top 10 Veículos - Maior Consumo</h3>
-                    <p style="margin-top: 50px;">
-                        <i class="fas fa-chart-bar" style="font-size: 3rem; color: #ddd;"></i><br>
-                        Gráfico de Barras - Consumo por Veículo<br>
-                        <small>Análise comparativa de consumo de combustível</small>
-                    </p>
-                </div>
-
-                <div class="chart-container">
-                    <h3>Evolução de Custos por Categoria</h3>
-                    <p style="margin-top: 50px;">
-                        <i class="fas fa-chart-area" style="font-size: 3rem; color: #ddd;"></i><br>
-                        Gráfico de Área - Custos por Categoria<br>
-                        <small>Evolução temporal dos custos separados por categoria</small>
-                    </p>
-                </div>
-            </section>
-
-            <!-- Motoristas Section -->
-            <section id="motoristas" class="content-section">
-                <div class="page-header">
-                    <h1>Motoristas</h1>
-                    <p>Cadastro e controle de motoristas</p>
-                </div>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <button class="btn btn-primary" onclick="showDriverForm()">
-                        <i class="fas fa-plus"></i> Novo Motorista
-                    </button>
-                    <div class="search-filters">
-                        <input type="text" class="form-control search-input" placeholder="Buscar por nome ou matrícula...">
-                    </div>
-                </div>
-
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Matrícula</th>
-                                <th>Nome</th>
-                                <th>Veículo Atual</th>
-                                <th>Total Abastecimentos</th>
-                                <th>Consumo Médio</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>12345</td>
-                                <td>João Silva</td>
-                                <td>ABC-1234</td>
-                                <td>45</td>
-                                <td>3.2 km/l</td>
-                                <td>
-                                    <button class="btn btn-secondary btn-sm">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button class="btn btn-primary btn-sm">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>12346</td>
-                                <td>Maria Santos</td>
-                                <td>DEF-5678</td>
-                                <td>38</td>
-                                <td>2.9 km/l</td>
-                                <td>
-                                    <button class="btn btn-secondary btn-sm">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button class="btn btn-primary btn-sm">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>12347</td>
-                                <td>Pedro Oliveira</td>
-                                <td>GHI-9012</td>
-                                <td>52</td>
-                                <td>3.1 km/l</td>
-                                <td>
-                                    <button class="btn btn-secondary btn-sm">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button class="btn btn-primary btn-sm">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Formulário de cadastro de motorista (hidden) -->
-                <div id="driver-form" style="display: none; margin-top: 30px;">
-                    <h3>Cadastro de Motorista</h3>
-                    <form class="form-grid">
-                        <div class="form-group">
-                            <label>Matrícula</label>
-                            <input type="number" name="matricula" placeholder="12345" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Nome Completo</label>
-                            <input type="text" name="nome" placeholder="Nome do motorista" required>
-                        </div>
-                    </form>
-                    <div style="margin-top: 20px;">
-                        <button class="btn btn-primary" onclick="saveDriver()">Salvar</button>
-                        <button class="btn btn-secondary" onclick="hideDriverForm()">Cancelar</button>
-                    </div>
-                </div>
-            </section>
-        </main>
+<div class="container">
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h2>CDNE Frotas</h2>
+      <p>Sistema de Gestão</p>
     </div>
+    <div class="nav-menu">
+      <a href="#" class="nav-item active" onclick="showSection('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+      <a href="#" class="nav-item" onclick="showSection('veiculos')"><i class="fas fa-truck"></i> Gestão de Frota</a>
+      <a href="#" class="nav-item" onclick="showSection('financeiro')"><i class="fas fa-dollar-sign"></i> Financeiro</a>
+      <a href="#" class="nav-item" onclick="showSection('manutencao')"><i class="fas fa-tools"></i> Manutenção</a>
+      <a href="#" class="nav-item" onclick="showSection('relatorios')"><i class="fas fa-chart-bar"></i> Relatórios</a>
+      <a href="#" class="nav-item" onclick="showSection('motoristas')"><i class="fas fa-users"></i> Motoristas</a>
+      <a href="#" class="nav-item" onclick="showSection('abastecimentos')"><i class="fas fa-gas-pump"></i> Abastecimentos</a>
+    </div>
+  </nav>
 
-    <script>
-        // Variáveis globais para armazenamento de dados
-        let vehicles = [
-            {
-                id: 1,
-                placa: "ABC-1234",
-                tipo: "Cavalo",
-                modelo: "Volvo FH 540",
-                ano: 2022,
-                km_atual: 125450,
-                status: "Ativo"
-            },
-            {
-                id: 2,
-                placa: "DEF-5678",
-                tipo: "Carreta",
-                modelo: "Randon Bitrem",
-                ano: 2021,
-                km_atual: 98720,
-                status: "Manutenção"
-            }
-        ];
+  <!-- Main -->
+  <main class="main-content">
+    <!-- Dashboard -->
+    <section id="dashboard" class="content-section active">
+      <div class="page-header">
+        <h1>Dashboard</h1>
+        <p>Visão geral da sua frota</p>
+      </div>
+      <div class="dashboard-cards">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-value" id="total-veiculos">0</div>
+              <div class="card-label">Total de Veículos</div>
+            </div>
+            <div class="card-icon vehicles"><i class="fas fa-truck"></i></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-value" id="despesas-mes">R$ 0,00</div>
+              <div class="card-label">Despesas do Mês</div>
+            </div>
+            <div class="card-icon expenses"><i class="fas fa-money-bill"></i></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-value" id="manutencoes-pendentes">0</div>
+              <div class="card-label">Manutenções Pendentes</div>
+            </div>
+            <div class="card-icon maintenance"><i class="fas fa-wrench"></i></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-value" id="alertas-vencimento">0</div>
+              <div class="card-label">Alertas de Vencimento</div>
+            </div>
+            <div class="card-icon alerts"><i class="fas fa-exclamation-triangle"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle"></i> <strong>Atenção:</strong> Veículos com dedetização a vencer.
+      </div>
+      <div class="alert alert-danger">
+        <i class="fas fa-times-circle"></i> <strong>Urgente:</strong> Veículos com opacidade vencida.
+      </div>
+    </section>
+    <!-- Gestão de Frota -->
+    <section id="veiculos" class="content-section">
+      <div class="page-header">
+        <h1>Gestão de Frota</h1>
+        <p>Cadastro e controle de veículos</p>
+      </div>
 
-        let drivers = [
-            { id: 1, matricula: 12345, nome: "João Silva" },
-            { id: 2, matricula: 12346, nome: "Maria Santos" },
-            { id: 3, matricula: 12347, nome: "Pedro Oliveira" }
-        ];
+      <div class="table-container">
+        <div class="table-header">
+          <h3>Lista de Veículos</h3>
+          <div class="search-filters">
+            <input type="text" class="form-control search-input" placeholder="Buscar por placa, modelo...">
+            <select class="form-control mobile-hide">
+              <option>Todos os tipos</option>
+              <option>Cavalo</option>
+              <option>Carreta</option>
+              <option>Bitruck</option>
+            </select>
+          </div>
+        </div>
 
-        let expenses = [
-            {
-                id: 1,
-                date: "2025-03-15",
-                vehicle: "ABC-1234",
-                supplier: "Oficina Central",
-                type: "Preventiva",
-                value: 1250.00,
-                status: "Pago"
-            },
-            {
-                id: 2,
-                date: "2025-03-20",
-                vehicle: "DEF-5678",
-                supplier: "Posto Shell",
-                type: "Combustível",
-                value: 890.50,
-                status: "Pendente"
-            }
-        ];
+        <table id="veiculos-table">
+          <thead>
+            <tr>
+              <th>Placa</th>
+              <th class="mobile-hide">Tipo</th>
+              <th>Modelo</th>
+              <th class="mobile-hide">Ano</th>
+              <th class="mobile-hide">KM Atual</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>ABC-1234</strong></td>
+              <td class="mobile-hide">Cavalo</td>
+              <td>Volvo FH 540</td>
+              <td class="mobile-hide">2022</td>
+              <td class="mobile-hide">125.450</td>
+              <td><span class="status-badge status-ok">Ativo</span></td>
+              <td>
+                <div class="table-actions">
+                  <button class="btn btn-secondary btn-sm" onclick="viewVehicleDetails('ABC-1234')"><i class="fas fa-eye"></i></button>
+                  <button class="btn btn-primary btn-sm" onclick="editVehicle('ABC-1234')"><i class="fas fa-edit"></i></button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>DEF-5678</strong></td>
+              <td class="mobile-hide">Carreta</td>
+              <td>Randon Bitrem</td>
+              <td class="mobile-hide">2021</td>
+              <td class="mobile-hide">98.720</td>
+              <td><span class="status-badge status-warning">Manutenção</span></td>
+              <td>
+                <div class="table-actions">
+                  <button class="btn btn-secondary btn-sm" onclick="viewVehicleDetails('DEF-5678')"><i class="fas fa-eye"></i></button>
+                  <button class="btn btn-primary btn-sm" onclick="editVehicle('DEF-5678')"><i class="fas fa-edit"></i></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-        // Funções de navegação
-        function showSection(sectionId) {
-            // Esconder todas as seções
-            const sections = document.querySelectorAll('.content-section');
-            sections.forEach(section => {
-                section.classList.remove('active');
-            });
+      <button class="fab" onclick="openModal('vehicle-modal')"><i class="fas fa-plus"></i></button>
+    </section>
 
-            // Mostrar seção selecionada
-            document.getElementById(sectionId).classList.add('active');
+    <!-- Financeiro -->
+    <section id="financeiro" class="content-section">
+      <div class="page-header">
+        <h1>Financeiro</h1>
+        <p>Controle de despesas e orçamentos</p>
+      </div>
 
-            // Atualizar menu ativo
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => {
-                item.classList.remove('active');
-            });
-            event.target.classList.add('active');
+      <div class="table-container">
+        <div class="table-header">
+          <h3>Despesas</h3>
+          <div class="search-filters">
+            <input type="date" class="form-control">
+            <input type="date" class="form-control">
+            <select class="form-control mobile-hide">
+              <option>Todos os tipos</option>
+              <option>Corretiva</option>
+              <option>Preventiva</option>
+              <option>Lavagem</option>
+              <option>Combustível</option>
+            </select>
+          </div>
+        </div>
 
-            // Fechar sidebar no mobile
-            if (window.innerWidth <= 768) {
-                toggleSidebar();
-            }
-        }
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Veículo</th>
+              <th class="mobile-hide">Fornecedor</th>
+              <th class="mobile-hide">Tipo</th>
+              <th>Valor</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>15/03/2025</td>
+              <td><strong>ABC-1234</strong></td>
+              <td class="mobile-hide">Oficina Central</td>
+              <td class="mobile-hide">Preventiva</td>
+              <td><strong>R$ 1.250,00</strong></td>
+              <td><span class="status-badge status-ok">Pago</span></td>
+              <td>
+                <div class="table-actions">
+                  <button class="btn btn-secondary btn-sm"><i class="fas fa-eye"></i></button>
+                  <button class="btn btn-primary btn-sm"><i class="fas fa-edit"></i></button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>20/03/2025</td>
+              <td><strong>DEF-5678</strong></td>
+              <td class="mobile-hide">Posto Shell</td>
+              <td class="mobile-hide">Combustível</td>
+              <td><strong>R$ 890,50</strong></td>
+              <td><span class="status-badge status-warning">Pendente</span></td>
+              <td>
+                <div class="table-actions">
+                  <button class="btn btn-secondary btn-sm"><i class="fas fa-eye"></i></button>
+                  <button class="btn btn-primary btn-sm"><i class="fas fa-edit"></i></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('active');
-        }
+      <button class="fab" onclick="openModal('expense-modal')"><i class="fas fa-plus"></i></button>
 
-        // Funções para veículos
-        function showVehicleForm() {
-            document.getElementById('vehicle-form').style.display = 'block';
-        }
+      <div class="chart-container">
+        <h3>Evolução de Despesas - Últimos 6 Meses</h3>
+        <p style="margin-top: 50px;">
+          <i class="fas fa-chart-line" style="font-size: 3rem; color: #ddd;"></i><br>
+          Gráfico de Evolução de Despesas<br>
+          <small>Gráfico de linha mostrando a evolução mensal</small>
+        </p>
+      </div>
+    </section>
+    <!-- Manutenção -->
+    <section id="manutencao" class="content-section">
+      <div class="page-header">
+        <h1>Manutenção</h1>
+        <p>Controle de manutenções e vencimentos</p>
+      </div>
 
-        function hideVehicleForm() {
-            document.getElementById('vehicle-form').style.display = 'none';
-        }
+      <!-- Próximos Vencimentos -->
+      <div class="table-container" style="margin-bottom: 30px;">
+        <div class="table-header">
+          <h3>Próximos Vencimentos</h3>
+          <button class="btn btn-primary" onclick="openModal('maintenance-modal')">
+            <i class="fas fa-plus"></i> <span class="mobile-hide">Nova Manutenção</span>
+          </button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Veículo</th>
+              <th>Tipo</th>
+              <th>Vencimento</th>
+              <th>Status</th>
+              <th class="mobile-hide">Fornecedor</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>ABC-1234</strong></td>
+              <td>Dedetização</td>
+              <td>30/03/2025</td>
+              <td><span class="status-badge status-warning">A Vencer</span></td>
+              <td class="mobile-hide">Dedetizadora XYZ</td>
+              <td><button class="btn btn-primary btn-sm">Renovar</button></td>
+            </tr>
+            <tr>
+              <td><strong>DEF-5678</strong></td>
+              <td>Opacidade</td>
+              <td>20/03/2025</td>
+              <td><span class="status-badge status-danger">Vencido</span></td>
+              <td class="mobile-hide">Inmetro Teste</td>
+              <td><button class="btn btn-danger btn-sm">Urgente</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-        function saveVehicle() {
-            // Aqui seria implementada a lógica para salvar o veículo
-            alert('Veículo salvo com sucesso!');
-            hideVehicleForm();
-            // Atualizar tabela de veículos
-        }
+      <!-- Histórico de Manutenções -->
+      <div class="table-container">
+        <div class="table-header">
+          <h3>Histórico de Manutenções</h3>
+          <button class="btn btn-secondary" onclick="openModal('checklist-modal')">
+            <i class="fas fa-clipboard-check"></i> <span class="mobile-hide">Checklist Baú</span>
+          </button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Veículo</th>
+              <th class="mobile-hide">Tipo</th>
+              <th>Serviço</th>
+              <th class="mobile-hide">Prestador</th>
+              <th>Valor</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>10/03/2025</td>
+              <td><strong>ABC-1234</strong></td>
+              <td class="mobile-hide">Preventiva</td>
+              <td>Troca de óleo e filtros</td>
+              <td class="mobile-hide">Oficina Central</td>
+              <td><strong>R$ 450,00</strong></td>
+              <td><span class="status-badge status-ok">Concluída</span></td>
+            </tr>
+            <tr>
+              <td>08/03/2025</td>
+              <td><strong>DEF-5678</strong></td>
+              <td class="mobile-hide">Corretiva</td>
+              <td>Reparo sistema de freios</td>
+              <td class="mobile-hide">Freios Express</td>
+              <td><strong>R$ 1.200,00</strong></td>
+              <td><span class="status-badge status-ok">Concluída</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-        function viewVehicleDetails(placa) {
-            alert(`Visualizar detalhes do veículo: ${placa}`);
-            // Implementar modal ou página de detalhes
-        }
+    <!-- Relatórios -->
+    <section id="relatorios" class="content-section">
+      <div class="page-header">
+        <h1>Relatórios</h1>
+        <p>Análises e relatórios da frota</p>
+      </div>
 
-        function editVehicle(placa) {
-            alert(`Editar veículo: ${placa}`);
-            // Implementar edição do veículo
-        }
+      <div class="dashboard-cards">
+        <div class="card">
+          <h3>Relatório de Consumo</h3>
+          <p>Análise de KM/Litro por veículo</p>
+          <button class="btn btn-primary">Gerar Relatório</button>
+        </div>
+        <div class="card">
+          <h3>Custos por Veículo</h3>
+          <p>Ranking de custos de manutenção</p>
+          <button class="btn btn-primary">Gerar Relatório</button>
+        </div>
+        <div class="card">
+          <h3>Status da Frota</h3>
+          <p>Relatório completo da situação</p>
+          <button class="btn btn-primary">Gerar Relatório</button>
+        </div>
+        <div class="card">
+          <h3>Análise Financeira</h3>
+          <p>Despesas por categoria e período</p>
+          <button class="btn btn-primary">Gerar Relatório</button>
+        </div>
+      </div>
 
-        // Funções para motoristas
-        function showDriverForm() {
-            document.getElementById('driver-form').style.display = 'block';
-        }
+      <div style="background:white;padding:20px;border-radius:8px;margin-bottom:20px;">
+        <h3>Filtros de Relatório</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Período Inicial</label>
+            <input type="date" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Período Final</label>
+            <input type="date" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Tipo de Veículo</label>
+            <select class="form-control">
+              <option>Todos</option>
+              <option>Cavalo</option>
+              <option>Carreta</option>
+              <option>Bitruck</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Categoria de Despesa</label>
+            <select class="form-control">
+              <option>Todas</option>
+              <option>Manutenção</option>
+              <option>Combustível</option>
+              <option>Lavagem</option>
+              <option>Outros</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" style="margin-top: 15px;">Aplicar Filtros</button>
+      </div>
 
-        function hideDriverForm() {
-            document.getElementById('driver-form').style.display = 'none';
-        }
+      <div class="chart-container">
+        <h3>Top 10 Veículos - Maior Consumo</h3>
+        <p style="margin-top: 50px;">
+          <i class="fas fa-chart-bar" style="font-size: 3rem; color: #ddd;"></i><br>
+          Gráfico de Barras - Consumo por Veículo<br>
+          <small>Análise comparativa de consumo de combustível</small>
+        </p>
+      </div>
 
-        function saveDriver() {
-            // Aqui seria implementada a lógica para salvar o motorista
-            alert('Motorista salvo com sucesso!');
-            hideDriverForm();
-            // Atualizar tabela de motoristas
-        }
+      <div class="chart-container">
+        <h3>Evolução de Custos por Categoria</h3>
+        <p style="margin-top: 50px;">
+          <i class="fas fa-chart-area" style="font-size: 3rem; color: #ddd;"></i><br>
+          Gráfico de Área - Custos por Categoria<br>
+          <small>Evolução temporal dos custos separados por categoria</small>
+        </p>
+      </div>
+    </section>
 
-        // Funções para despesas
-        function showExpenseForm() {
-            alert('Formulário de despesas será implementado');
-            // Implementar formulário de despesas
-        }
+    <!-- Motoristas -->
+    <section id="motoristas" class="content-section">
+      <div class="page-header">
+        <h1>Motoristas</h1>
+        <p>Cadastro e controle de motoristas</p>
+      </div>
 
-        // Funções para manutenção
-        function showMaintenanceForm() {
-            alert('Formulário de manutenção será implementado');
-            // Implementar formulário de manutenção
-        }
+      <div class="table-container">
+        <div class="table-header">
+          <h3>Lista de Motoristas</h3>
+          <div class="search-filters">
+            <input type="text" class="form-control search-input" placeholder="Buscar por nome ou matrícula...">
+          </div>
+        </div>
 
-        function showChecklistForm() {
-            alert('Checklist do baú será implementado');
-            // Implementar checklist do baú
-        }
+        <table>
+          <thead>
+            <tr>
+              <th>Matrícula</th>
+              <th>Nome</th>
+              <th class="mobile-hide">Veículo Atual</th>
+              <th class="mobile-hide">Total Abast.</th>
+              <th class="mobile-hide">Consumo Médio</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>12345</strong></td>
+              <td>João Silva</td>
+              <td class="mobile-hide">ABC-1234</td>
+              <td class="mobile-hide">45</td>
+              <td class="mobile-hide">3.2 km/l</td>
+              <td>
+                <div class="table-actions">
+                  <button class="btn btn-secondary btn-sm"><i class="fas fa-eye"></i></button>
+                  <button class="btn btn-primary btn-sm"><i class="fas fa-edit"></i></button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>12346</strong></td>
+              <td>Maria Santos</td>
+              <td class="mobile-hide">DEF-5678</td>
+              <td class="mobile-hide">38</td>
+              <td class="mobile-hide">2.9 km/l</td>
+              <td>
+                <div class="table-actions">
+                  <button class="btn btn-secondary btn-sm"><i class="fas fa-eye"></i></button>
+                  <button class="btn btn-primary btn-sm"><i class="fas fa-edit"></i></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-        // Função para atualizar dados do dashboard
-        function updateDashboard() {
-            // Atualizar cards do dashboard com dados reais
-            document.getElementById('total-veiculos').textContent = vehicles.length;
-            
-            // Calcular despesas do mês
-            const totalExpenses = expenses.reduce((sum, expense) => sum + expense.value, 0);
-            document.getElementById('despesas-mes').textContent = 
-                'R$ ' + totalExpenses.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-            
-            // Simular outros valores
-            document.getElementById('manutencoes-pendentes').textContent = '8';
-            document.getElementById('alertas-vencimento').textContent = '12';
-        }
+      <button class="fab" onclick="openModal('driver-modal')"><i class="fas fa-plus"></i></button>
+    </section>
+    <!-- Abastecimentos -->
+    <section id="abastecimentos" class="content-section">
+      <div class="page-header">
+        <h1>Abastecimentos</h1>
+        <p>Controle de abastecimentos realizados</p>
+      </div>
 
-        // Função para busca em tabelas
-        function setupTableSearch() {
-            const searchInputs = document.querySelectorAll('.search-input');
-            searchInputs.forEach(input => {
-                input.addEventListener('input', function() {
-                    const searchTerm = this.value.toLowerCase();
-                    const table = this.closest('.content-section').querySelector('table tbody');
-                    const rows = table.querySelectorAll('tr');
-                    
-                    rows.forEach(row => {
-                        const text = row.textContent.toLowerCase();
-                        row.style.display = text.includes(searchTerm) ? '' : 'none';
-                    });
-                });
-            });
-        }
+      <div class="table-container">
+        <div class="table-header">
+          <h3>Histórico de Abastecimentos</h3>
+          <button class="btn btn-primary" onclick="openModal('fuel-modal')">
+            <i class="fas fa-plus"></i> <span class="mobile-hide">Novo Abastecimento</span>
+          </button>
+        </div>
 
-        // Inicialização
-        document.addEventListener('DOMContentLoaded', function() {
-            updateDashboard();
-            setupTableSearch();
-            
-            // Configurar responsividade
-            window.addEventListener('resize', function() {
-                if (window.innerWidth > 768) {
-                    document.getElementById('sidebar').classList.remove('active');
-                }
-            });
-        });
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Veículo</th>
+              <th class="mobile-hide">Motorista</th>
+              <th>Litros</th>
+              <th>Valor</th>
+              <th class="mobile-hide">Posto</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>12/03/2025</td>
+              <td><strong>ABC-1234</strong></td>
+              <td class="mobile-hide">João Silva</td>
+              <td>120</td>
+              <td><strong>R$ 720,00</strong></td>
+              <td class="mobile-hide">Posto Ipiranga</td>
+              <td>
+                <div class="table-actions">
+                  <button class="btn btn-secondary btn-sm"><i class="fas fa-eye"></i></button>
+                  <button class="btn btn-primary btn-sm"><i class="fas fa-edit"></i></button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>10/03/2025</td>
+              <td><strong>DEF-5678</strong></td>
+              <td class="mobile-hide">Maria Santos</td>
+              <td>150</td>
+              <td><strong>R$ 915,00</strong></td>
+              <td class="mobile-hide">Posto Shell</td>
+              <td>
+                <div class="table-actions">
+                  <button class="btn btn-secondary btn-sm"><i class="fas fa-eye"></i></button>
+                  <button class="btn btn-primary btn-sm"><i class="fas fa-edit"></i></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
 
-        // Simulação de notificações
-        function showNotification(message, type = 'info') {
-            // Implementar sistema de notificações
-            console.log(`${type.toUpperCase()}: ${message}`);
-        }
+<!-- Modal Genérico -->
+<div id="vehicle-modal" class="modal">
+  <div class="modal-content">
+    <h2>Novo Veículo</h2>
+    <form>
+      <div class="form-group"><label>Placa</label><input type="text" class="form-control"></div>
+      <div class="form-group"><label>Modelo</label><input type="text" class="form-control"></div>
+      <div class="form-group"><label>Ano</label><input type="number" class="form-control"></div>
+      <button type="submit" class="btn btn-primary">Salvar</button>
+      <button type="button" class="btn btn-secondary" onclick="closeModal('vehicle-modal')">Cancelar</button>
+    </form>
+  </div>
+</div>
 
-        // Funções de exportação de dados
-        function exportToCSV(data, filename) {
-            // Implementar exportação para CSV
-            console.log(`Exportando ${filename} para CSV`);
-        }
+<div id="expense-modal" class="modal">
+  <div class="modal-content">
+    <h2>Nova Despesa</h2>
+    <form>
+      <div class="form-group"><label>Data</label><input type="date" class="form-control"></div>
+      <div class="form-group"><label>Valor</label><input type="number" class="form-control"></div>
+      <button type="submit" class="btn btn-primary">Salvar</button>
+      <button type="button" class="btn btn-secondary" onclick="closeModal('expense-modal')">Cancelar</button>
+    </form>
+  </div>
+</div>
 
-        function exportToPDF(data, filename) {
-            // Implementar exportação para PDF
-            console.log(`Exportando ${filename} para PDF`);
-        }
+<div id="maintenance-modal" class="modal">
+  <div class="modal-content">
+    <h2>Nova Manutenção</h2>
+    <form>
+      <div class="form-group"><label>Veículo</label><input type="text" class="form-control"></div>
+      <div class="form-group"><label>Serviço</label><input type="text" class="form-control"></div>
+      <button type="submit" class="btn btn-primary">Salvar</button>
+      <button type="button" class="btn btn-secondary" onclick="closeModal('maintenance-modal')">Cancelar</button>
+    </form>
+  </div>
+</div>
 
-        // Funções para gráficos (placeholder)
-        function initializeCharts() {
-            // Aqui seriam inicializados os gráficos usando Chart.js ou similar
-            console.log('Inicializando gráficos...');
-        }
+<div id="driver-modal" class="modal">
+  <div class="modal-content">
+    <h2>Novo Motorista</h2>
+    <form>
+      <div class="form-group"><label>Nome</label><input type="text" class="form-control"></div>
+      <div class="form-group"><label>Matrícula</label><input type="text" class="form-control"></div>
+      <button type="submit" class="btn btn-primary">Salvar</button>
+      <button type="button" class="btn btn-secondary" onclick="closeModal('driver-modal')">Cancelar</button>
+    </form>
+  </div>
+</div>
 
-        // Validação de formulários
-        function validateForm(formElement) {
-            const inputs = formElement.querySelectorAll('input[required], select[required]');
-            let isValid = true;
-            
-            inputs.forEach(input => {
-                if (!input.value.trim()) {
-                    input.style.borderColor = '#dc3545';
-                    isValid = false;
-                } else {
-                    input.style.borderColor = '#ced4da';
-                }
-            });
-            
-            return isValid;
-        }
+<div id="fuel-modal" class="modal">
+  <div class="modal-content">
+    <h2>Novo Abastecimento</h2>
+    <form>
+      <div class="form-group"><label>Data</label><input type="date" class="form-control"></div>
+      <div class="form-group"><label>Litros</label><input type="number" class="form-control"></div>
+      <div class="form-group"><label>Valor</label><input type="number" class="form-control"></div>
+      <button type="submit" class="btn btn-primary">Salvar</button>
+      <button type="button" class="btn btn-secondary" onclick="closeModal('fuel-modal')">Cancelar</button>
+    </form>
+  </div>
+</div>
 
-        // Formatação de valores monetários
-        function formatCurrency(value) {
-            return new Intl.NumberFormat('pt-BR', {
-                style: 'currency',
-                currency: 'BRL'
-            }).format(value);
-        }
+<!-- Scripts -->
+<script>
+  function showSection(sectionId) {
+    document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
+    document.getElementById(sectionId).classList.add('active');
 
-        // Formatação de datas
-        function formatDate(date) {
-            return new Intl.DateTimeFormat('pt-BR').format(new Date(date));
-        }
-    </script>
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    event.target.closest('.nav-item').classList.add('active');
+  }
+
+  function openModal(id) {
+    document.getElementById(id).style.display = 'flex';
+  }
+  function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+
+  function viewVehicleDetails(plate) {
+    alert("Detalhes do veículo: " + plate);
+  }
+  function editVehicle(plate) {
+    alert("Editar veículo: " + plate);
+  }
+
+  // Fechar modais ao clicar fora
+  window.onclick = function(event) {
+    document.querySelectorAll('.modal').forEach(modal => {
+      if (event.target === modal) {
+        modal.style.display = "none";
+      }
+    });
+  }
+</script>
 </body>
 </html>
