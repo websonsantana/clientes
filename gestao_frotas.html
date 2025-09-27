@@ -3,55 +3,296 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Frota CDNE</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Gestão de Frota - Carretas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .active-tab {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .sidebar {
+            transition: all 0.3s;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+    </style>
 </head>
 <body class="bg-gray-100">
-    <div class="min-h-screen flex flex-col">
-        <!-- Header -->
-        <header class="bg-blue-800 text-white p-4 shadow-md">
-            <div class="container mx-auto flex justify-between items-center">
-                <h1 class="text-2xl font-bold">Gestão de Frota CDNE</h1>
-                <nav>
-                    <ul class="flex space-x-6">
-                        <li><a href="dashboard.html" class="hover:text-blue-200"><i class="fas fa-tachometer-alt mr-2"></i>Dashboard</a></li>
-                        <li><a href="veiculos.html" class="hover:text-blue-200"><i class="fas fa-truck mr-2"></i>Veículos</a></li>
-                        <li><a href="financeiro.html" class="hover:text-blue-200"><i class="fas fa-money-bill-wave mr-2"></i>Financeiro</a></li>
-                        <li><a href="manutencao.html" class="hover:text-blue-200"><i class="fas fa-tools mr-2"></i>Manutenção</a></li>
-                        <li><a href="relatorios.html" class="hover:text-blue-200"><i class="fas fa-chart-bar mr-2"></i>Relatórios</a></li>
-                    </ul>
-                </nav>
+    <!-- Header -->
+    <header class="bg-blue-600 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center">
+                <button id="menu-toggle" class="md:hidden mr-4">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                <h1 class="text-xl font-bold">Gestão de Frota</h1>
             </div>
-        </header>
+            <div class="flex items-center">
+                <span class="mr-2">Admin</span>
+                <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="sidebar bg-white w-64 shadow-md fixed h-full md:relative z-10">
+            <nav class="p-4">
+                <ul>
+                    <li class="mb-2">
+                        <a href="#" class="tab-link flex items-center p-3 rounded-lg active-tab" data-tab="dashboard">
+                            <i class="fas fa-tachometer-alt mr-3"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="tab-link flex items-center p-3 rounded-lg hover:bg-blue-100" data-tab="veiculos">
+                            <i class="fas fa-truck-moving mr-3"></i>
+                            <span>Veículos</span>
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="tab-link flex items-center p-3 rounded-lg hover:bg-blue-100" data-tab="motoristas">
+                            <i class="fas fa-users mr-3"></i>
+                            <span>Motoristas</span>
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="tab-link flex items-center p-3 rounded-lg hover:bg-blue-100" data-tab="manutencoes">
+                            <i class="fas fa-tools mr-3"></i>
+                            <span>Manutenções</span>
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="tab-link flex items-center p-3 rounded-lg hover:bg-blue-100" data-tab="relatorios">
+                            <i class="fas fa-chart-bar mr-3"></i>
+                            <span>Relatórios</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
 
         <!-- Main Content -->
-        <main class="flex-grow container mx-auto p-4">
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h2 class="text-xl font-semibold mb-4">Bem-vindo ao Sistema de Gestão de Frota</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-blue-100 p-4 rounded-lg">
-                        <h3 class="font-medium mb-2"><i class="fas fa-truck mr-2"></i>Veículos Cadastrados</h3>
-                        <p class="text-3xl font-bold">125</p>
+        <main class="flex-1 p-4 md:p-6 overflow-auto">
+            <!-- Dashboard Tab -->
+            <div id="dashboard" class="tab-content">
+                <h2 class="text-2xl font-bold mb-6">Dashboard</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-gray-500">Total de Veículos</p>
+                                <h3 class="text-2xl font-bold" id="total-veiculos">0</h3>
+                            </div>
+                            <div class="bg-blue-100 p-3 rounded-full">
+                                <i class="fas fa-truck-moving text-blue-500 text-xl"></i>
+                            </div>
+                        </div>
                     </div>
-                    <div class="bg-yellow-100 p-4 rounded-lg">
-                        <h3 class="font-medium mb-2"><i class="fas fa-calendar-exclamation mr-2"></i>Vencimentos Próximos</h3>
-                        <p class="text-3xl font-bold">8</p>
+                    
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-gray-500">Total de Motoristas</p>
+                                <h3 class="text-2xl font-bold" id="total-motoristas">0</h3>
+                            </div>
+                            <div class="bg-green-100 p-3 rounded-full">
+                                <i class="fas fa-users text-green-500 text-xl"></i>
+                            </div>
+                        </div>
                     </div>
-                    <div class="bg-green-100 p-4 rounded-lg">
-                        <h3 class="font-medium mb-2"><i class="fas fa-tools mr-2"></i>Manutenções Pendentes</h3>
-                        <p class="text-3xl font-bold">5</p>
+                    
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-gray-500">Manutenções Pendentes</p>
+                                <h3 class="text-2xl font-bold" id="manutencoes-pendentes">0</h3>
+                            </div>
+                            <div class="bg-yellow-100 p-3 rounded-full">
+                                <i class="fas fa-tools text-yellow-500 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-gray-500">Veículos em Viagem</p>
+                                <h3 class="text-2xl font-bold" id="veiculos-viagem">0</h3>
+                            </div>
+                            <div class="bg-red-100 p-3 rounded-full">
+                                <i class="fas fa-road text-red-500 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-lg font-bold mb-4">Veículos por Status</h3>
+                        <canvas id="statusChart" width="400" height="200"></canvas>
+                    </div>
+                    
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-lg font-bold mb-4">Manutenções Próximas</h3>
+                        <div id="manutencoes-proximas">
+                            <!-- Conteúdo será carregado via JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Veículos Tab -->
+            <div id="veiculos" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">Gestão de Veículos</h2>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center" id="btn-novo-veiculo">
+                        <i class="fas fa-plus mr-2"></i> Novo Veículo
+                    </button>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Placa</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modelo</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ano</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-veiculos" class="bg-white divide-y divide-gray-200">
+                                <!-- Conteúdo será carregado via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Motoristas Tab -->
+            <div id="motoristas" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">Gestão de Motoristas</h2>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center" id="btn-novo-motorista">
+                        <i class="fas fa-plus mr-2"></i> Novo Motorista
+                    </button>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CNH</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefone</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-motoristas" class="bg-white divide-y divide-gray-200">
+                                <!-- Conteúdo será carregado via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manutenções Tab -->
+            <div id="manutencoes" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">Gestão de Manutenções</h2>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center" id="btn-nova-manutencao">
+                        <i class="fas fa-plus mr-2"></i> Nova Manutenção
+                    </button>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Veículo</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Custo</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-manutencoes" class="bg-white divide-y divide-gray-200">
+                                <!-- Conteúdo será carregado via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Relatórios Tab -->
+            <div id="relatorios" class="tab-content hidden">
+                <h2 class="text-2xl font-bold mb-6">Relatórios</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-lg font-bold mb-4">Relatório de Custos por Veículo</h3>
+                        <canvas id="custoVeiculosChart" width="400" height="300"></canvas>
+                    </div>
+                    
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-lg font-bold mb-4">Relatório de Manutenções por Tipo</h3>
+                        <canvas id="manutencoesTipoChart" width="400" height="300"></canvas>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h3 class="text-lg font-bold mb-4">Relatório Detalhado</h3>
+                    <div class="flex flex-wrap gap-4 mb-4">
+                        <select id="filtro-relatorio" class="border rounded p-2">
+                            <option value="veiculos">Veículos</option>
+                            <option value="motoristas">Motoristas</option>
+                            <option value="manutencoes">Manutenções</option>
+                        </select>
+                        <input type="date" id="data-inicio" class="border rounded p-2">
+                        <input type="date" id="data-fim" class="border rounded p-2">
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded" id="btn-gerar-relatorio">Gerar Relatório</button>
+                    </div>
+                    <div id="relatorio-detalhado" class="overflow-x-auto">
+                        <!-- Conteúdo será carregado via JavaScript -->
                     </div>
                 </div>
             </div>
         </main>
-
-        <!-- Footer -->
-        <footer class="bg-gray-800 text-white p-4">
-            <div class="container mx-auto text-center">
-                <p>Sistema de Gestão de Frota CDNE &copy; 2023</p>
-            </div>
-        </footer>
     </div>
+
+    <!-- Modal para formulários -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-20">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-4">
+            <div class="p-4 border-b">
+                <h3 id="modal-titulo" class="text-lg font-bold"></h3>
+                <button id="fechar-modal" class="float-right text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-4" id="modal-conteudo">
+                <!-- Conteúdo do modal será carregado via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/script.js"></script>
 </body>
 </html>
