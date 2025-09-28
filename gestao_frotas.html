@@ -293,6 +293,985 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="js/script.js"></script>
+    <script>// Variáveis globais
+let veiculos = [];
+let motoristas = [];
+let manutencoes = [];
+
+// Inicialização quando o DOM estiver carregado
+document.addEventListener('DOMContentLoaded', function() {
+    inicializarSistema();
+    
+    // Carregar dados iniciais
+    carregarDados();
+    
+    // Configurar eventos
+    configurarEventos();
+});
+
+// Inicializar o sistema
+function inicializarSistema() {
+    // Verificar se há dados salvos localmente
+    const dadosSalvos = localStorage.getItem('frotaCarretas');
+    if (dadosSalvos) {
+        const dados = JSON.parse(dadosSalvos);
+        veiculos = dados.veiculos || [];
+        motoristas = dados.motoristas || [];
+        manutencoes = dados.manutencoes || [];
+    } else {
+        // Dados de exemplo
+        veiculos = [
+            { id: 1, placa: 'ABC1234', modelo: 'Volvo FH 540', ano: 2020, status: 'Disponível' },
+            { id: 2, placa: 'DEF5678', modelo: 'Scania R500', ano: 2019, status: 'Em Viagem' },
+            { id: 3, placa: 'GHI9012', modelo: 'Mercedes Actros', ano: 2021, status: 'Manutenção' }
+        ];
+        
+        motoristas = [
+            { id: 1, nome: 'João Silva', cnh: '12345678901', telefone: '(11) 99999-9999', status: 'Disponível' },
+            { id: 2, nome: 'Maria Santos', cnh: '10987654321', telefone: '(11) 88888-8888', status: 'Em Viagem' },
+            { id: 3, nome: 'Pedro Oliveira', cnh: '11223344556', telefone: '(11) 77777-7777', status: 'Férias' }
+        ];
+        
+        manutencoes = [
+            { id: 1, veiculoId: 1, tipo: 'Preventiva', data: '2023-06-15', custo: 1500, status: 'Concluída' },
+            { id: 2, veiculoId: 2, tipo: 'Corretiva', data: '2023-07-20', custo: 3200, status: 'Agendada' },
+            { id: 3, veiculoId: 3, tipo: 'Preventiva', data: '2023-08-10', custo: 0, status: 'Pendente' }
+        ];
+        
+        salvarDados();
+    }
+    
+    // Atualizar interface
+    atualizarDashboard();
+    atualizarTabelaVeiculos();
+    atualizarTabelaMotoristas();
+    atualizarTabelaManutencoes();
+}
+
+// Configurar eventos
+function configurarEventos() {
+    // Menu toggle para mobile
+    document.getElementById('menu-toggle').addEventListener('click', function() {
+        document.querySelector('.sidebar').classList.toggle('open');
+    });
+    
+    // Navegação entre abas
+    document.querySelectorAll('.tab-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Remover classe ativa de todos os links
+            document.querySelectorAll('.tab-link').forEach(l => {
+                l.classList.remove('active-tab');
+                l.classList.add('hover:bg-blue-100');
+            });
+            
+            // Adicionar classe ativa ao link clicado
+            this.classList.add('active-tab');
+            this.classList.remove('hover:bg-blue-100');
+            
+            // Esconder todas as abas
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+            
+            // Mostrar a aba correspondente
+            const tabId = this.getAttribute('data-tab');
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            // Atualizar dados específicos da aba
+            if (tabId === 'dashboard') {
+                atualizarDashboard();
+            } else if (tabId === 'relatorios') {
+                atualizarRelatorios();
+            }
+            
+            // Fechar menu mobile após clicar em um link
+            if (window.innerWidth < 768) {
+                document.querySelector('.sidebar').classList.remove('open');
+            }
+        });
+    });
+    
+    // Botões de adicionar
+    document.getElementById('btn-novo-veiculo').addEventListener('click', function() {
+        abrirModalVeiculo();
+    });
+    
+    document.getElementById('btn-novo-motorista').addEventListener('click', function() {
+        abrirModalMotorista();
+    });
+    
+    document.getElementById('btn-nova-manutencao').addEventListener('click', function() {
+        abrirModalManutencao();
+    });
+    
+    // Fechar modal
+    document.getElementById('fechar-modal').addEventListener('click', function() {
+        document.getElementById('modal').classList.add('hidden');
+    });
+    
+    // Gerar relatório
+    document.getElementById('btn-gerar-relatorio').addEventListener('click', function() {
+        gerarRelatorio();
+    });
+}
+
+// Salvar dados no localStorage
+function salvarDados() {
+    const dados = {
+        veiculos: veiculos,
+        motoristas: motoristas,
+        manutencoes: manutencoes
+    };
+    localStorage.setItem('frotaCarretas', JSON.stringify(dados));
+}
+
+// Carregar dados (simulação de API)
+function carregarDados() {
+    // Simular carregamento de dados
+    setTimeout(() => {
+        atualizarDashboard();
+        atualizarTabelaVeiculos();
+        atualizarTabelaMotoristas();
+        atualizarTabelaManutencoes();
+    }, 500);
+}
+
+// Atualizar dashboard
+function atualizarDashboard() {
+    // Atualizar contadores
+    document.getElementById('total-veiculos').textContent = veiculos.length;
+    document.getElementById('total-motoristas').textContent = motoristas.length;
+    
+    const manutencoesPendentes = manutencoes.filter(m => m.status === 'Pendente' || m.status === 'Agendada').length;
+    document.getElementById('manutencoes-pendentes').textContent = manutencoesPendentes;
+    
+    const veiculosViagem = veiculos.filter(v => v.status === 'Em Viagem').length;
+    document.getElementById('veiculos-viagem').textContent = veiculosViagem;
+    
+    // Atualizar gráfico de status dos veículos
+    atualizarGraficoStatusVeiculos();
+    
+    // Atualizar lista de manutenções próximas
+    atualizarManutencoesProximas();
+}
+
+// Atualizar gráfico de status dos veículos
+function atualizarGraficoStatusVeiculos() {
+    const ctx = document.getElementById('statusChart').getContext('2d');
+    
+    // Contar veículos por status
+    const statusCount = {};
+    veiculos.forEach(veiculo => {
+        statusCount[veiculo.status] = (statusCount[veiculo.status] || 0) + 1;
+    });
+    
+    const labels = Object.keys(statusCount);
+    const data = Object.values(statusCount);
+    
+    // Cores para os status
+    const cores = {
+        'Disponível': '#10B981',
+        'Em Viagem': '#3B82F6',
+        'Manutenção': '#F59E0B',
+        'Indisponível': '#EF4444'
+    };
+    
+    const backgroundColors = labels.map(label => cores[label] || '#6B7280');
+    
+    // Destruir gráfico anterior se existir
+    if (window.statusChart) {
+        window.statusChart.destroy();
+    }
+    
+    // Criar novo gráfico
+    window.statusChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: backgroundColors,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+// Atualizar lista de manutenções próximas
+function atualizarManutencoesProximas() {
+    const container = document.getElementById('manutencoes-proximas');
+    
+    // Filtrar manutenções agendadas ou pendentes
+    const manutencoesProximas = manutencoes.filter(m => 
+        m.status === 'Agendada' || m.status === 'Pendente'
+    ).slice(0, 5); // Limitar a 5 itens
+    
+    if (manutencoesProximas.length === 0) {
+        container.innerHTML = '<p class="text-gray-500">Nenhuma manutenção próxima</p>';
+        return;
+    }
+    
+    let html = '';
+    manutencoesProximas.forEach(manutencao => {
+        const veiculo = veiculos.find(v => v.id === manutencao.veiculoId);
+        const veiculoNome = veiculo ? `${veiculo.placa} - ${veiculo.modelo}` : 'Veículo não encontrado';
+        
+        html += `
+            <div class="border-b py-2 last:border-b-0">
+                <div class="flex justify-between">
+                    <span class="font-medium">${veiculoNome}</span>
+                    <span class="text-sm ${manutencao.status === 'Agendada' ? 'text-blue-600' : 'text-yellow-600'}">${manutencao.status}</span>
+                </div>
+                <div class="text-sm text-gray-500">${manutencao.tipo} - ${formatarData(manutencao.data)}</div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+// Atualizar tabela de veículos
+function atualizarTabelaVeiculos() {
+    const tbody = document.getElementById('tabela-veiculos');
+    
+    if (veiculos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center">Nenhum veículo cadastrado</td></tr>';
+        return;
+    }
+    
+    let html = '';
+    veiculos.forEach(veiculo => {
+        // Determinar cor do status
+        let statusClass = '';
+        switch(veiculo.status) {
+            case 'Disponível': statusClass = 'bg-green-100 text-green-800'; break;
+            case 'Em Viagem': statusClass = 'bg-blue-100 text-blue-800'; break;
+            case 'Manutenção': statusClass = 'bg-yellow-100 text-yellow-800'; break;
+            default: statusClass = 'bg-gray-100 text-gray-800';
+        }
+        
+        html += `
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap">${veiculo.placa}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${veiculo.modelo}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${veiculo.ano}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">${veiculo.status}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button class="text-blue-600 hover:text-blue-900 mr-2 editar-veiculo" data-id="${veiculo.id}">Editar</button>
+                    <button class="text-red-600 hover:text-red-900 excluir-veiculo" data-id="${veiculo.id}">Excluir</button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    tbody.innerHTML = html;
+    
+    // Adicionar eventos aos botões de editar e excluir
+    document.querySelectorAll('.editar-veiculo').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = parseInt(this.getAttribute('data-id'));
+            abrirModalVeiculo(id);
+        });
+    });
+    
+    document.querySelectorAll('.excluir-veiculo').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = parseInt(this.getAttribute('data-id'));
+            excluirVeiculo(id);
+        });
+    });
+}
+
+// Atualizar tabela de motoristas
+function atualizarTabelaMotoristas() {
+    const tbody = document.getElementById('tabela-motoristas');
+    
+    if (motoristas.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center">Nenhum motorista cadastrado</td></tr>';
+        return;
+    }
+    
+    let html = '';
+    motoristas.forEach(motorista => {
+        // Determinar cor do status
+        let statusClass = '';
+        switch(motorista.status) {
+            case 'Disponível': statusClass = 'bg-green-100 text-green-800'; break;
+            case 'Em Viagem': statusClass = 'bg-blue-100 text-blue-800'; break;
+            case 'Férias': statusClass = 'bg-yellow-100 text-yellow-800'; break;
+            default: statusClass = 'bg-gray-100 text-gray-800';
+        }
+        
+        html += `
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap">${motorista.nome}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${motorista.cnh}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${motorista.telefone}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">${motorista.status}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button class="text-blue-600 hover:text-blue-900 mr-2 editar-motorista" data-id="${motorista.id}">Editar</button>
+                    <button class="text-red-600 hover:text-red-900 excluir-motorista" data-id="${motorista.id}">Excluir</button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    tbody.innerHTML = html;
+    
+    // Adicionar eventos aos botões de editar e excluir
+    document.querySelectorAll('.editar-motorista').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = parseInt(this.getAttribute('data-id'));
+            abrirModalMotorista(id);
+        });
+    });
+    
+    document.querySelectorAll('.excluir-motorista').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = parseInt(this.getAttribute('data-id'));
+            excluirMotorista(id);
+        });
+    });
+}
+
+// Atualizar tabela de manutenções
+function atualizarTabelaManutencoes() {
+    const tbody = document.getElementById('tabela-manutencoes');
+    
+    if (manutencoes.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center">Nenhuma manutenção cadastrada</td></tr>';
+        return;
+    }
+    
+    let html = '';
+    manutencoes.forEach(manutencao => {
+        const veiculo = veiculos.find(v => v.id === manutencao.veiculoId);
+        const veiculoInfo = veiculo ? `${veiculo.placa} - ${veiculo.modelo}` : 'Veículo não encontrado';
+        
+        // Determinar cor do status
+        let statusClass = '';
+        switch(manutencao.status) {
+            case 'Concluída': statusClass = 'bg-green-100 text-green-800'; break;
+            case 'Agendada': statusClass = 'bg-blue-100 text-blue-800'; break;
+            case 'Pendente': statusClass = 'bg-yellow-100 text-yellow-800'; break;
+            default: statusClass = 'bg-gray-100 text-gray-800';
+        }
+        
+        html += `
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap">${veiculoInfo}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${manutencao.tipo}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${formatarData(manutencao.data)}</td>
+                <td class="px-6 py-4 whitespace-nowrap">R$ ${manutencao.custo.toFixed(2)}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">${manutencao.status}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button class="text-blue-600 hover:text-blue-900 mr-2 editar-manutencao" data-id="${manutencao.id}">Editar</button>
+                    <button class="text-red-600 hover:text-red-900 excluir-manutencao" data-id="${manutencao.id}">Excluir</button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    tbody.innerHTML = html;
+    
+    // Adicionar eventos aos botões de editar e excluir
+    document.querySelectorAll('.editar-manutencao').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = parseInt(this.getAttribute('data-id'));
+            abrirModalManutencao(id);
+        });
+    });
+    
+    document.querySelectorAll('.excluir-manutencao').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = parseInt(this.getAttribute('data-id'));
+            excluirManutencao(id);
+        });
+    });
+}
+
+// Abrir modal para veículo
+function abrirModalVeiculo(id = null) {
+    const modal = document.getElementById('modal');
+    const titulo = document.getElementById('modal-titulo');
+    const conteudo = document.getElementById('modal-conteudo');
+    
+    const veiculo = id ? veiculos.find(v => v.id === id) : null;
+    
+    titulo.textContent = veiculo ? 'Editar Veículo' : 'Novo Veículo';
+    
+    conteudo.innerHTML = `
+        <form id="form-veiculo">
+            <input type="hidden" id="veiculo-id" value="${veiculo ? veiculo.id : ''}">
+            <div class="mb-4">
+                <label for="placa" class="block text-sm font-medium text-gray-700">Placa</label>
+                <input type="text" id="placa" class="mt-1 block w-full border border-gray-300 rounded-md p-2" value="${veiculo ? veiculo.placa : ''}" required>
+            </div>
+            <div class="mb-4">
+                <label for="modelo" class="block text-sm font-medium text-gray-700">Modelo</label>
+                <input type="text" id="modelo" class="mt-1 block w-full border border-gray-300 rounded-md p-2" value="${veiculo ? veiculo.modelo : ''}" required>
+            </div>
+            <div class="mb-4">
+                <label for="ano" class="block text-sm font-medium text-gray-700">Ano</label>
+                <input type="number" id="ano" class="mt-1 block w-full border border-gray-300 rounded-md p-2" value="${veiculo ? veiculo.ano : ''}" required>
+            </div>
+            <div class="mb-4">
+                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                <select id="status" class="mt-1 block w-full border border-gray-300 rounded-md p-2" required>
+                    <option value="Disponível" ${veiculo && veiculo.status === 'Disponível' ? 'selected' : ''}>Disponível</option>
+                    <option value="Em Viagem" ${veiculo && veiculo.status === 'Em Viagem' ? 'selected' : ''}>Em Viagem</option>
+                    <option value="Manutenção" ${veiculo && veiculo.status === 'Manutenção' ? 'selected' : ''}>Manutenção</option>
+                    <option value="Indisponível" ${veiculo && veiculo.status === 'Indisponível' ? 'selected' : ''}>Indisponível</option>
+                </select>
+            </div>
+            <div class="flex justify-end">
+                <button type="button" class="bg-gray-300 text-gray-700 px-4 py-2 rounded mr-2" id="cancelar-veiculo">Cancelar</button>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Salvar</button>
+            </div>
+        </form>
+    `;
+    
+    modal.classList.remove('hidden');
+    
+    // Configurar eventos do formulário
+    document.getElementById('form-veiculo').addEventListener('submit', function(e) {
+        e.preventDefault();
+        salvarVeiculo();
+    });
+    
+    document.getElementById('cancelar-veiculo').addEventListener('click', function() {
+        modal.classList.add('hidden');
+    });
+}
+
+// Abrir modal para motorista
+function abrirModalMotorista(id = null) {
+    const modal = document.getElementById('modal');
+    const titulo = document.getElementById('modal-titulo');
+    const conteudo = document.getElementById('modal-conteudo');
+    
+    const motorista = id ? motoristas.find(m => m.id === id) : null;
+    
+    titulo.textContent = motorista ? 'Editar Motorista' : 'Novo Motorista';
+    
+    conteudo.innerHTML = `
+        <form id="form-motorista">
+            <input type="hidden" id="motorista-id" value="${motorista ? motorista.id : ''}">
+            <div class="mb-4">
+                <label for="nome" class="block text-sm font-medium text-gray-700">Nome</label>
+                <input type="text" id="nome" class="mt-1 block w-full border border-gray-300 rounded-md p-2" value="${motorista ? motorista.nome : ''}" required>
+            </div>
+            <div class="mb-4">
+                <label for="cnh" class="block text-sm font-medium text-gray-700">CNH</label>
+                <input type="text" id="cnh" class="mt-1 block w-full border border-gray-300 rounded-md p-2" value="${motorista ? motorista.cnh : ''}" required>
+            </div>
+            <div class="mb-4">
+                <label for="telefone" class="block text-sm font-medium text-gray-700">Telefone</label>
+                <input type="text" id="telefone" class="mt-1 block w-full border border-gray-300 rounded-md p-2" value="${motorista ? motorista.telefone : ''}" required>
+            </div>
+            <div class="mb-4">
+                <label for="status-motorista" class="block text-sm font-medium text-gray-700">Status</label>
+                <select id="status-motorista" class="mt-1 block w-full border border-gray-300 rounded-md p-2" required>
+                    <option value="Disponível" ${motorista && motorista.status === 'Disponível' ? 'selected' : ''}>Disponível</option>
+                    <option value="Em Viagem" ${motorista && motorista.status === 'Em Viagem' ? 'selected' : ''}>Em Viagem</option>
+                    <option value="Férias" ${motorista && motorista.status === 'Férias' ? 'selected' : ''}>Férias</option>
+                    <option value="Indisponível" ${motorista && motorista.status === 'Indisponível' ? 'selected' : ''}>Indisponível</option>
+                </select>
+            </div>
+            <div class="flex justify-end">
+                <button type="button" class="bg-gray-300 text-gray-700 px-4 py-2 rounded mr-2" id="cancelar-motorista">Cancelar</button>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Salvar</button>
+            </div>
+        </form>
+    `;
+    
+    modal.classList.remove('hidden');
+    
+    // Configurar eventos do formulário
+    document.getElementById('form-motorista').addEventListener('submit', function(e) {
+        e.preventDefault();
+        salvarMotorista();
+    });
+    
+    document.getElementById('cancelar-motorista').addEventListener('click', function() {
+        modal.classList.add('hidden');
+    });
+}
+
+// Abrir modal para manutenção
+function abrirModalManutencao(id = null) {
+    const modal = document.getElementById('modal');
+    const titulo = document.getElementById('modal-titulo');
+    const conteudo = document.getElementById('modal-conteudo');
+    
+    const manutencao = id ? manutencoes.find(m => m.id === id) : null;
+    
+    titulo.textContent = manutencao ? 'Editar Manutenção' : 'Nova Manutenção';
+    
+    // Gerar opções de veículos
+    let opcoesVeiculos = '';
+    veiculos.forEach(veiculo => {
+        opcoesVeiculos += `<option value="${veiculo.id}" ${manutencao && manutencao.veiculoId === veiculo.id ? 'selected' : ''}>${veiculo.placa} - ${veiculo.modelo}</option>`;
+    });
+    
+    conteudo.innerHTML = `
+        <form id="form-manutencao">
+            <input type="hidden" id="manutencao-id" value="${manutencao ? manutencao.id : ''}">
+            <div class="mb-4">
+                <label for="veiculo" class="block text-sm font-medium text-gray-700">Veículo</label>
+                <select id="veiculo" class="mt-1 block w-full border border-gray-300 rounded-md p-2" required>
+                    <option value="">Selecione um veículo</option>
+                    ${opcoesVeiculos}
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="tipo" class="block text-sm font-medium text-gray-700">Tipo de Manutenção</label>
+                <select id="tipo" class="mt-1 block w-full border border-gray-300 rounded-md p-2" required>
+                    <option value="Preventiva" ${manutencao && manutencao.tipo === 'Preventiva' ? 'selected' : ''}>Preventiva</option>
+                    <option value="Corretiva" ${manutencao && manutencao.tipo === 'Corretiva' ? 'selected' : ''}>Corretiva</option>
+                    <option value="Preditiva" ${manutencao && manutencao.tipo === 'Preditiva' ? 'selected' : ''}>Preditiva</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="data-manutencao" class="block text-sm font-medium text-gray-700">Data</label>
+                <input type="date" id="data-manutencao" class="mt-1 block w-full border border-gray-300 rounded-md p-2" value="${manutencao ? manutencao.data : ''}" required>
+            </div>
+            <div class="mb-4">
+                <label for="custo" class="block text-sm font-medium text-gray-700">Custo (R$)</label>
+                <input type="number" step="0.01" id="custo" class="mt-1 block w-full border border-gray-300 rounded-md p-2" value="${manutencao ? manutencao.custo : ''}" required>
+            </div>
+            <div class="mb-4">
+                <label for="status-manutencao" class="block text-sm font-medium text-gray-700">Status</label>
+                <select id="status-manutencao" class="mt-1 block w-full border border-gray-300 rounded-md p-2" required>
+                    <option value="Pendente" ${manutencao && manutencao.status === 'Pendente' ? 'selected' : ''}>Pendente</option>
+                    <option value="Agendada" ${manutencao && manutencao.status === 'Agendada' ? 'selected' : ''}>Agendada</option>
+                    <option value="Concluída" ${manutencao && manutencao.status === 'Concluída' ? 'selected' : ''}>Concluída</option>
+                    <option value="Cancelada" ${manutencao && manutencao.status === 'Cancelada' ? 'selected' : ''}>Cancelada</option>
+                </select>
+            </div>
+            <div class="flex justify-end">
+                <button type="button" class="bg-gray-300 text-gray-700 px-4 py-2 rounded mr-2" id="cancelar-manutencao">Cancelar</button>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Salvar</button>
+            </div>
+        </form>
+    `;
+    
+    modal.classList.remove('hidden');
+    
+    // Configurar eventos do formulário
+    document.getElementById('form-manutencao').addEventListener('submit', function(e) {
+        e.preventDefault();
+        salvarManutencao();
+    });
+    
+    document.getElementById('cancelar-manutencao').addEventListener('click', function() {
+        modal.classList.add('hidden');
+    });
+}
+
+// Salvar veículo
+function salvarVeiculo() {
+    const id = document.getElementById('veiculo-id').value;
+    const placa = document.getElementById('placa').value;
+    const modelo = document.getElementById('modelo').value;
+    const ano = parseInt(document.getElementById('ano').value);
+    const status = document.getElementById('status').value;
+    
+    if (id) {
+        // Editar veículo existente
+        const index = veiculos.findIndex(v => v.id === parseInt(id));
+        if (index !== -1) {
+            veiculos[index] = { id: parseInt(id), placa, modelo, ano, status };
+        }
+    } else {
+        // Novo veículo
+        const novoId = veiculos.length > 0 ? Math.max(...veiculos.map(v => v.id)) + 1 : 1;
+        veiculos.push({ id: novoId, placa, modelo, ano, status });
+    }
+    
+    salvarDados();
+    atualizarTabelaVeiculos();
+    atualizarDashboard();
+    
+    document.getElementById('modal').classList.add('hidden');
+    
+    // Mostrar mensagem de sucesso
+    alert('Veículo salvo com sucesso!');
+}
+
+// Salvar motorista
+function salvarMotorista() {
+    const id = document.getElementById('motorista-id').value;
+    const nome = document.getElementById('nome').value;
+    const cnh = document.getElementById('cnh').value;
+    const telefone = document.getElementById('telefone').value;
+    const status = document.getElementById('status-motorista').value;
+    
+    if (id) {
+        // Editar motorista existente
+        const index = motoristas.findIndex(m => m.id === parseInt(id));
+        if (index !== -1) {
+            motoristas[index] = { id: parseInt(id), nome, cnh, telefone, status };
+        }
+    } else {
+        // Novo motorista
+        const novoId = motoristas.length > 0 ? Math.max(...motoristas.map(m => m.id)) + 1 : 1;
+        motoristas.push({ id: novoId, nome, cnh, telefone, status });
+    }
+    
+    salvarDados();
+    atualizarTabelaMotoristas();
+    atualizarDashboard();
+    
+    document.getElementById('modal').classList.add('hidden');
+    
+    // Mostrar mensagem de sucesso
+    alert('Motorista salvo com sucesso!');
+}
+
+// Salvar manutenção
+function salvarManutencao() {
+    const id = document.getElementById('manutencao-id').value;
+    const veiculoId = parseInt(document.getElementById('veiculo').value);
+    const tipo = document.getElementById('tipo').value;
+    const data = document.getElementById('data-manutencao').value;
+    const custo = parseFloat(document.getElementById('custo').value);
+    const status = document.getElementById('status-manutencao').value;
+    
+    if (id) {
+        // Editar manutenção existente
+        const index = manutencoes.findIndex(m => m.id === parseInt(id));
+        if (index !== -1) {
+            manutencoes[index] = { id: parseInt(id), veiculoId, tipo, data, custo, status };
+        }
+    } else {
+        // Nova manutenção
+        const novoId = manutencoes.length > 0 ? Math.max(...manutencoes.map(m => m.id)) + 1 : 1;
+        manutencoes.push({ id: novoId, veiculoId, tipo, data, custo, status });
+    }
+    
+    salvarDados();
+    atualizarTabelaManutencoes();
+    atualizarDashboard();
+    
+    document.getElementById('modal').classList.add('hidden');
+    
+    // Mostrar mensagem de sucesso
+    alert('Manutenção salva com sucesso!');
+}
+
+// Excluir veículo
+function excluirVeiculo(id) {
+    if (confirm('Tem certeza que deseja excluir este veículo?')) {
+        veiculos = veiculos.filter(v => v.id !== id);
+        salvarDados();
+        atualizarTabelaVeiculos();
+        atualizarDashboard();
+        alert('Veículo excluído com sucesso!');
+    }
+}
+
+// Excluir motorista
+function excluirMotorista(id) {
+    if (confirm('Tem certeza que deseja excluir este motorista?')) {
+        motoristas = motoristas.filter(m => m.id !== id);
+        salvarDados();
+        atualizarTabelaMotoristas();
+        atualizarDashboard();
+        alert('Motorista excluído com sucesso!');
+    }
+}
+
+// Excluir manutenção
+function excluirManutencao(id) {
+    if (confirm('Tem certeza que deseja excluir esta manutenção?')) {
+        manutencoes = manutencoes.filter(m => m.id !== id);
+        salvarDados();
+        atualizarTabelaManutencoes();
+        atualizarDashboard();
+        alert('Manutenção excluída com sucesso!');
+    }
+}
+
+// Atualizar relatórios
+function atualizarRelatorios() {
+    // Gráfico de custos por veículo
+    atualizarGraficoCustosVeiculos();
+    
+    // Gráfico de manutenções por tipo
+    atualizarGraficoManutencoesTipo();
+}
+
+// Atualizar gráfico de custos por veículo
+function atualizarGraficoCustosVeiculos() {
+    const ctx = document.getElementById('custoVeiculosChart').getContext('2d');
+    
+    // Calcular custos totais por veículo
+    const custosPorVeiculo = {};
+    manutencoes.forEach(manutencao => {
+        if (manutencao.status === 'Concluída') {
+            if (!custosPorVeiculo[manutencao.veiculoId]) {
+                custosPorVeiculo[manutencao.veiculoId] = 0;
+            }
+            custosPorVeiculo[manutencao.veiculoId] += manutencao.custo;
+        }
+    });
+    
+    const labels = [];
+    const data = [];
+    
+    for (const veiculoId in custosPorVeiculo) {
+        const veiculo = veiculos.find(v => v.id === parseInt(veiculoId));
+        if (veiculo) {
+            labels.push(veiculo.placa);
+            data.push(custosPorVeiculo[veiculoId]);
+        }
+    }
+    
+    // Destruir gráfico anterior se existir
+    if (window.custoVeiculosChart) {
+        window.custoVeiculosChart.destroy();
+    }
+    
+    // Criar novo gráfico
+    window.custoVeiculosChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Custo Total (R$)',
+                data: data,
+                backgroundColor: '#3B82F6',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// Atualizar gráfico de manutenções por tipo
+function atualizarGraficoManutencoesTipo() {
+    const ctx = document.getElementById('manutencoesTipoChart').getContext('2d');
+    
+    // Contar manutenções por tipo
+    const contagemPorTipo = {};
+    manutencoes.forEach(manutencao => {
+        contagemPorTipo[manutencao.tipo] = (contagemPorTipo[manutencao.tipo] || 0) + 1;
+    });
+    
+    const labels = Object.keys(contagemPorTipo);
+    const data = Object.values(contagemPorTipo);
+    
+    // Cores para os tipos
+    const cores = {
+        'Preventiva': '#10B981',
+        'Corretiva': '#F59E0B',
+        'Preditiva': '#3B82F6'
+    };
+    
+    const backgroundColors = labels.map(label => cores[label] || '#6B7280');
+    
+    // Destruir gráfico anterior se existir
+    if (window.manutencoesTipoChart) {
+        window.manutencoesTipoChart.destroy();
+    }
+    
+    // Criar novo gráfico
+    window.manutencoesTipoChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: backgroundColors,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+// Gerar relatório detalhado
+function gerarRelatorio() {
+    const tipo = document.getElementById('filtro-relatorio').value;
+    const dataInicio = document.getElementById('data-inicio').value;
+    const dataFim = document.getElementById('data-fim').value;
+    
+    let html = '';
+    
+    if (tipo === 'veiculos') {
+        html = gerarRelatorioVeiculos(dataInicio, dataFim);
+    } else if (tipo === 'motoristas') {
+        html = gerarRelatorioMotoristas(dataInicio, dataFim);
+    } else if (tipo === 'manutencoes') {
+        html = gerarRelatorioManutencoes(dataInicio, dataFim);
+    }
+    
+    document.getElementById('relatorio-detalhado').innerHTML = html;
+}
+
+// Gerar relatório de veículos
+function gerarRelatorioVeiculos(dataInicio, dataFim) {
+    let html = `
+        <table class="min-w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Placa</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modelo</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ano</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Custo Total</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+    `;
+    
+    veiculos.forEach(veiculo => {
+        // Calcular custo total do veículo
+        const custoTotal = manutencoes
+            .filter(m => m.veiculoId === veiculo.id && m.status === 'Concluída')
+            .reduce((total, manutencao) => total + manutencao.custo, 0);
+        
+        html += `
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap">${veiculo.placa}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${veiculo.modelo}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${veiculo.ano}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${veiculo.status}</td>
+                <td class="px-6 py-4 whitespace-nowrap">R$ ${custoTotal.toFixed(2)}</td>
+            </tr>
+        `;
+    });
+    
+    html += `
+            </tbody>
+        </table>
+    `;
+    
+    return html;
+}
+
+// Gerar relatório de motoristas
+function gerarRelatorioMotoristas(dataInicio, dataFim) {
+    let html = `
+        <table class="min-w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CNH</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefone</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+    `;
+    
+    motoristas.forEach(motorista => {
+        html += `
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap">${motorista.nome}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${motorista.cnh}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${motorista.telefone}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${motorista.status}</td>
+            </tr>
+        `;
+    });
+    
+    html += `
+            </tbody>
+        </table>
+    `;
+    
+    return html;
+}
+
+// Gerar relatório de manutenções
+function gerarRelatorioManutencoes(dataInicio, dataFim) {
+    let html = `
+        <table class="min-w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Veículo</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Custo</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+    `;
+    
+    // Filtrar manutenções por data, se fornecido
+    let manutencoesFiltradas = manutencoes;
+    
+    if (dataInicio) {
+        manutencoesFiltradas = manutencoesFiltradas.filter(m => m.data >= dataInicio);
+    }
+    
+    if (dataFim) {
+        manutencoesFiltradas = manutencoesFiltradas.filter(m => m.data <= dataFim);
+    }
+    
+    manutencoesFiltradas.forEach(manutencao => {
+        const veiculo = veiculos.find(v => v.id === manutencao.veiculoId);
+        const veiculoInfo = veiculo ? `${veiculo.placa} - ${veiculo.modelo}` : 'Veículo não encontrado';
+        
+        html += `
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap">${veiculoInfo}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${manutencao.tipo}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${formatarData(manutencao.data)}</td>
+                <td class="px-6 py-4 whitespace-nowrap">R$ ${manutencao.custo.toFixed(2)}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${manutencao.status}</td>
+            </tr>
+        `;
+    });
+    
+    html += `
+            </tbody>
+        </table>
+    `;
+    
+    return html;
+}
+
+// Função auxiliar para formatar data
+function formatarData(data) {
+    if (!data) return '';
+    
+    const dataObj = new Date(data);
+    return dataObj.toLocaleDateString('pt-BR');
+}
+</script>
 </body>
 </html>
