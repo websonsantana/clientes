@@ -4,216 +4,405 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alphabet Adventure Island</title>
-    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/feather-icons"></script>
-    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
     <style>
         @keyframes float {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-20px); }
         }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(147, 51, 234, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(147, 51, 234, 0.8); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
         .floating { animation: float 3s ease-in-out infinite; }
-        .interactive:hover { transform: scale(1.05); transition: transform 0.3s; }
-        .letter-tile { transition: all 0.3s; }
-        .letter-tile:hover { transform: scale(1.1) rotate(5deg); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2); }
-        .syllable-builder { transition: all 0.3s; }
-        .syllable-builder:hover { transform: scale(1.05); }
+        .letter-tile { transition: all 0.3s; cursor: pointer; }
+        .letter-tile:hover { transform: scale(1.15) rotate(5deg); box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.3); }
+        .letter-tile.selected { animation: pulse-glow 1s ease-in-out infinite; transform: scale(1.1); }
+        .card-flip { transform-style: preserve-3d; transition: transform 0.6s; }
+        .card-flip.flipped { transform: rotateY(180deg); }
+        .card-front, .card-back { backface-visibility: hidden; }
+        .card-back { transform: rotateY(180deg); position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .shake { animation: shake 0.5s; }
+        .success { animation: pulse-glow 1s; }
     </style>
 </head>
-<body class="bg-gradient-to-b from-blue-100 to-purple-100 min-h-screen font-sans">
-    <!-- Animated Background -->
-    <div id="vanta-bg" class="fixed inset-0 -z-10"></div>
-    
+<body class="bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 min-h-screen font-sans">
     <!-- Main Container -->
-    <div class="container mx-auto px-4 py-8 relative z-10">
-        <!-- Header -->
-        <header class="text-center mb-12">
-            <h1 class="text-5xl font-bold text-purple-800 mb-4 floating">Alphabet Adventure Island 🏝️</h1>
-            <p class="text-xl text-blue-600">Uma jornada mágica para aprender a ler!</p>
-            <div class="flex justify-center mt-6">
-                <div class="bg-yellow-200 p-3 rounded-full shadow-lg interactive">
-                    <i data-feather="sun" class="w-12 h-12 text-yellow-500"></i>
-                </div>
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header com Controles -->
+        <header class="text-center mb-8">
+            <h1 class="text-5xl font-bold text-purple-800 mb-2 floating">🏝️ Alphabet Adventure Island</h1>
+            <p class="text-xl text-blue-600 mb-4">Uma jornada mágica para aprender a ler!</p>
+            
+            <!-- Controles de Volume e Modo -->
+            <div class="flex justify-center gap-4 mb-4">
+                <button id="volumeBtn" class="bg-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all">
+                    <span class="text-2xl">🔊</span>
+                </button>
+                <button id="modeBtn" class="bg-white px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all font-bold text-purple-700">
+                    Modo: Normal
+                </button>
+            </div>
+            
+            <!-- Pontuação -->
+            <div class="bg-yellow-200 inline-block px-8 py-3 rounded-full shadow-lg">
+                <span class="text-2xl font-bold text-yellow-800">⭐ Pontos: <span id="score">0</span></span>
             </div>
         </header>
 
-        <!-- Main Content -->
-        <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Letter Explorer -->
-            <div class="bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-shadow duration-300">
-                <div class="flex items-center mb-4">
-                    <div class="bg-blue-100 p-3 rounded-full mr-4">
-                        <i data-feather="book" class="w-6 h-6 text-blue-600"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-blue-800">Explorador de Letras</h2>
+        <!-- Explorador de Letras Interativo -->
+        <section class="bg-white rounded-3xl p-8 shadow-2xl mb-8">
+            <h2 class="text-3xl font-bold text-blue-800 mb-6 flex items-center gap-3">
+                <span class="text-4xl">📚</span> Explorador de Letras
+            </h2>
+            
+            <!-- Display da Letra Atual -->
+            <div class="text-center mb-8">
+                <div id="currentLetter" class="inline-block bg-gradient-to-br from-blue-400 to-purple-500 text-white text-9xl font-bold rounded-3xl p-12 shadow-2xl min-w-[200px]">
+                    A
                 </div>
-                <p class="text-gray-600 mb-4">Toque nas letras para descobrir seus sons e formas!</p>
-                <div class="grid grid-cols-4 gap-3">
-                    <div class="letter-tile bg-blue-100 text-blue-800 text-3xl font-bold rounded-lg p-4 text-center cursor-pointer hover:bg-blue-200">A</div>
-                    <div class="letter-tile bg-green-100 text-green-800 text-3xl font-bold rounded-lg p-4 text-center cursor-pointer hover:bg-green-200">B</div>
-                    <div class="letter-tile bg-yellow-100 text-yellow-800 text-3xl font-bold rounded-lg p-4 text-center cursor-pointer hover:bg-yellow-200">C</div>
-                    <div class="letter-tile bg-red-100 text-red-800 text-3xl font-bold rounded-lg p-4 text-center cursor-pointer hover:bg-red-200">D</div>
+                <div class="mt-4">
+                    <button id="speakBtn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-full text-xl transition-all shadow-lg">
+                        🔊 Falar Letra
+                    </button>
                 </div>
-                <button class="mt-6 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-full transition duration-300">
-                    Ver Todas as Letras
-                </button>
             </div>
-
-            <!-- Syllable Builder -->
-            <div class="bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-shadow duration-300">
-                <div class="flex items-center mb-4">
-                    <div class="bg-purple-100 p-3 rounded-full mr-4">
-                        <i data-feather="grid" class="w-6 h-6 text-purple-600"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-purple-800">Construtor de Sílabas</h2>
-                </div>
-                <p class="text-gray-600 mb-4">Combine letras para formar sílabas divertidas!</p>
-                <div class="flex justify-center mb-4">
-                    <div class="syllable-builder bg-purple-100 text-purple-800 text-4xl font-bold rounded-lg p-6 text-center w-24 h-24 flex items-center justify-center">
-                        BA
-                    </div>
-                </div>
-                <div class="grid grid-cols-3 gap-2">
-                    <div class="bg-gray-100 text-gray-800 text-xl font-bold rounded-lg p-2 text-center cursor-pointer hover:bg-gray-200">B</div>
-                    <div class="bg-gray-100 text-gray-800 text-xl font-bold rounded-lg p-2 text-center cursor-pointer hover:bg-gray-200">A</div>
-                    <div class="bg-gray-100 text-gray-800 text-xl font-bold rounded-lg p-2 text-center cursor-pointer hover:bg-gray-200">C</div>
-                </div>
-                <button class="mt-6 w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-4 rounded-full transition duration-300">
-                    Criar Sílabas
-                </button>
-            </div>
-
-            <!-- Memory Game -->
-            <div class="bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-shadow duration-300">
-                <div class="flex items-center mb-4">
-                    <div class="bg-green-100 p-3 rounded-full mr-4">
-                        <i data-feather="zap" class="w-6 h-6 text-green-600"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-green-800">Jogo da Memória</h2>
-                </div>
-                <p class="text-gray-600 mb-4">Combine imagens com palavras usando sua memória fotográfica!</p>
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-gradient-to-r from-green-100 to-blue-100 rounded-lg p-4 text-center cursor-pointer hover:shadow-md">
-                        <img src="http://static.photos/animals/320x240/1" alt="Animal" class="w-full h-24 object-cover rounded mb-2">
-                        <span class="font-bold text-green-800">GATO</span>
-                    </div>
-                    <div class="bg-gradient-to-r from-yellow-100 to-red-100 rounded-lg p-4 text-center cursor-pointer hover:shadow-md">
-                        <img src="http://static.photos/food/320x240/2" alt="Food" class="w-full h-24 object-cover rounded mb-2">
-                        <span class="font-bold text-red-800">BOLA</span>
-                    </div>
-                </div>
-                <button class="mt-6 w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-full transition duration-300">
-                    Jogar Agora
-                </button>
-            </div>
-        </main>
-
-        <!-- Sensory Features Section -->
-        <section class="mt-16 bg-white bg-opacity-80 backdrop-blur-sm rounded-2xl p-8 shadow-lg">
-            <h2 class="text-3xl font-bold text-center text-blue-800 mb-8">Recursos Sensoriais</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="text-center">
-                    <div class="bg-pink-100 p-5 rounded-full inline-block mb-4">
-                        <i data-feather="eye" class="w-8 h-8 text-pink-600"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-pink-700 mb-2">Visual</h3>
-                    <p class="text-gray-600">Cores vibrantes e animações para estimular a memória fotográfica</p>
-                </div>
-                <div class="text-center">
-                    <div class="bg-blue-100 p-5 rounded-full inline-block mb-4">
-                        <i data-feather="volume-2" class="w-8 h-8 text-blue-600"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-blue-700 mb-2">Auditivo</h3>
-                    <p class="text-gray-600">Sons claros de cada letra e sílaba para reforçar o aprendizado</p>
-                </div>
-                <div class="text-center">
-                    <div class="bg-yellow-100 p-5 rounded-full inline-block mb-4">
-                        <i data-feather="mouse-pointer" class="w-8 h-8 text-yellow-600"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-yellow-700 mb-2">Tátil</h3>
-                    <p class="text-gray-600">Interações touch-friendly para engajamento motor fino</p>
-                </div>
+            
+            <!-- Alfabeto Completo -->
+            <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-9 gap-3" id="letterGrid">
+                <!-- Letras serão geradas dinamicamente -->
             </div>
         </section>
 
-        <!-- Parent Section -->
-        <section class="mt-16 bg-purple-50 rounded-2xl p-8 shadow-inner">
-            <div class="flex flex-col md:flex-row items-center">
-                <div class="md:w-1/2 mb-8 md:mb-0 md:pr-8">
-                    <h2 class="text-3xl font-bold text-purple-800 mb-4">Para Pais e Educadores</h2>
-                    <p class="text-gray-600 mb-4">Acompanhe o progresso da sua criança e personalize as atividades de acordo com suas necessidades especiais.</p>
-                    <ul class="space-y-2">
-                        <li class="flex items-start">
-                            <i data-feather="check-circle" class="w-5 h-5 text-green-500 mr-2 mt-1"></i>
-                            <span>Relatórios de progresso detalhados</span>
-                        </li>
-                        <li class="flex items-start">
-                            <i data-feather="check-circle" class="w-5 h-5 text-green-500 mr-2 mt-1"></i>
-                            <span>Customização de dificuldade</span>
-                        </li>
-                        <li class="flex items-start">
-                            <i data-feather="check-circle" class="w-5 h-5 text-green-500 mr-2 mt-1"></i>
-                            <span>Atividades adaptáveis ao TEA e TDAH</span>
-                        </li>
-                    </ul>
+        <!-- Construtor de Sílabas -->
+        <section class="bg-white rounded-3xl p-8 shadow-2xl mb-8">
+            <h2 class="text-3xl font-bold text-purple-800 mb-6 flex items-center gap-3">
+                <span class="text-4xl">🧩</span> Construtor de Sílabas
+            </h2>
+            
+            <div class="text-center mb-6">
+                <div id="syllableDisplay" class="inline-block bg-gradient-to-br from-purple-400 to-pink-500 text-white text-7xl font-bold rounded-3xl p-8 shadow-2xl min-w-[180px]">
+                    --
                 </div>
-                <div class="md:w-1/2">
-                    <img src="http://static.photos/family/640x360/1" alt="Family" class="rounded-xl shadow-md w-full">
+                <button id="speakSyllable" class="block mx-auto mt-4 bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-6 rounded-full transition-all">
+                    🔊 Falar Sílaba
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 max-w-md mx-auto">
+                <div>
+                    <p class="text-center font-bold text-gray-700 mb-2">Consoante</p>
+                    <div class="grid grid-cols-3 gap-2" id="consonantGrid"></div>
+                </div>
+                <div>
+                    <p class="text-center font-bold text-gray-700 mb-2">Vogal</p>
+                    <div class="grid grid-cols-3 gap-2" id="vowelGrid"></div>
                 </div>
             </div>
+            
+            <button id="clearSyllable" class="block mx-auto mt-6 bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-6 rounded-full transition-all">
+                🔄 Limpar
+            </button>
+        </section>
+
+        <!-- Jogo da Memória -->
+        <section class="bg-white rounded-3xl p-8 shadow-2xl mb-8">
+            <h2 class="text-3xl font-bold text-green-800 mb-6 flex items-center gap-3">
+                <span class="text-4xl">🎮</span> Jogo da Memória
+            </h2>
+            
+            <div class="text-center mb-6">
+                <p class="text-xl text-gray-700 mb-4">Encontre os pares! Tentativas: <span id="attempts" class="font-bold text-green-600">0</span></p>
+                <button id="startMemoryGame" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full text-xl transition-all shadow-lg">
+                    🎯 Começar Jogo
+                </button>
+            </div>
+            
+            <div id="memoryGrid" class="grid grid-cols-3 sm:grid-cols-4 gap-4 max-w-2xl mx-auto"></div>
         </section>
 
         <!-- Footer -->
-        <footer class="mt-16 text-center text-gray-600">
-            <p>Feito com ❤️ para crianças especiais</p>
-            <div class="flex justify-center space-x-4 mt-4">
-                <a href="#" class="text-blue-500 hover:text-blue-700"><i data-feather="facebook"></i></a>
-                <a href="#" class="text-pink-500 hover:text-pink-700"><i data-feather="instagram"></i></a>
-                <a href="#" class="text-blue-400 hover:text-blue-600"><i data-feather="twitter"></i></a>
-            </div>
+        <footer class="text-center text-gray-600 mt-12">
+            <p class="text-lg">Feito com ❤️ para crianças especiais</p>
+            <p class="text-sm mt-2">Otimizado para TEA, TDAH e aprendizado multissensorial</p>
         </footer>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
     <script>
-        // Initialize Vanta.js background
-        VANTA.GLOBE({
-            el: "#vanta-bg",
-            mouseControls: true,
-            touchControls: true,
-            gyroControls: false,
-            minHeight: 200.00,
-            minWidth: 200.00,
-            scale: 1.00,
-            scaleMobile: 1.00,
-            color: 0x7f7fff,
-            backgroundColor: 0xf0f4ff,
-            size: 0.80
-        });
-
-        // Initialize feather icons
-        feather.replace();
-
-        // Sound effects
-        const sounds = {
-            correct: new Howl({ src: ['https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3'] }),
-            wrong: new Howl({ src: ['https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3'] }),
-            letter: new Howl({ src: ['https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3'] })
+        // Estado da aplicação
+        const state = {
+            score: 0,
+            soundEnabled: true,
+            mode: 'normal', // normal, calm
+            currentLetter: 'A',
+            selectedConsonant: null,
+            selectedVowel: null,
+            memoryCards: [],
+            flippedCards: [],
+            matchedPairs: 0,
+            attempts: 0
         };
 
-        // Letter click handler
-        document.querySelectorAll('.letter-tile').forEach(tile => {
-            tile.addEventListener('click', () => {
-                sounds.letter.play();
-                tile.classList.add('animate-pulse');
-                setTimeout(() => {
-                    tile.classList.remove('animate-pulse');
-                }, 1000);
+        // Dados
+        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+        const consonants = ['B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Z'];
+        const vowels = ['A', 'E', 'I', 'O', 'U'];
+        const memoryPairs = [
+            { letter: 'A', emoji: '🍎', word: 'AVIÃO' },
+            { letter: 'B', emoji: '🎈', word: 'BOLA' },
+            { letter: 'C', emoji: '🐱', word: 'GATO' },
+            { letter: 'D', emoji: '🐕', word: 'DOG' },
+            { letter: 'E', emoji: '🐘', word: 'ELEFANTE' },
+            { letter: 'F', emoji: '🌸', word: 'FLOR' }
+        ];
+
+        // Sons usando Speech Synthesis
+        function speak(text, rate = 0.7) {
+            if (!state.soundEnabled) return;
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'pt-BR';
+            utterance.rate = rate;
+            utterance.pitch = 1.2;
+            speechSynthesis.cancel();
+            speechSynthesis.speak(utterance);
+        }
+
+        function playSound(type) {
+            if (!state.soundEnabled) return;
+            const audio = new Audio();
+            if (type === 'success') {
+                audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1e7bfzYIHm7A7+OZSQ==';
+            } else if (type === 'click') {
+                audio.src = 'data:audio/wav;base64,UklGRhIAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YU4AAAA=';
+            }
+            audio.play().catch(() => {});
+        }
+
+        function addScore(points) {
+            state.score += points;
+            document.getElementById('score').textContent = state.score;
+            document.getElementById('score').parentElement.classList.add('success');
+            setTimeout(() => {
+                document.getElementById('score').parentElement.classList.remove('success');
+            }, 500);
+        }
+
+        // Inicializar Grade de Letras
+        function initLetterGrid() {
+            const grid = document.getElementById('letterGrid');
+            const colors = ['blue', 'green', 'yellow', 'red', 'purple', 'pink', 'indigo', 'orange', 'teal'];
+            
+            alphabet.forEach((letter, index) => {
+                const color = colors[index % colors.length];
+                const tile = document.createElement('div');
+                tile.className = `letter-tile bg-${color}-100 text-${color}-800 text-3xl font-bold rounded-xl p-4 text-center`;
+                tile.textContent = letter;
+                tile.onclick = () => selectLetter(letter, tile);
+                grid.appendChild(tile);
             });
-        });
+        }
+
+        function selectLetter(letter, element) {
+            state.currentLetter = letter;
+            document.getElementById('currentLetter').textContent = letter;
+            document.querySelectorAll('.letter-tile').forEach(t => t.classList.remove('selected'));
+            element.classList.add('selected');
+            playSound('click');
+            speak(letter);
+            addScore(5);
+        }
+
+        // Construtor de Sílabas
+        function initSyllableBuilder() {
+            const consonantGrid = document.getElementById('consonantGrid');
+            const vowelGrid = document.getElementById('vowelGrid');
+            
+            consonants.slice(0, 9).forEach(letter => {
+                const tile = document.createElement('div');
+                tile.className = 'bg-purple-100 text-purple-800 text-2xl font-bold rounded-lg p-3 text-center cursor-pointer hover:bg-purple-200 transition-all';
+                tile.textContent = letter;
+                tile.onclick = () => selectConsonant(letter, tile);
+                consonantGrid.appendChild(tile);
+            });
+            
+            vowels.forEach(letter => {
+                const tile = document.createElement('div');
+                tile.className = 'bg-pink-100 text-pink-800 text-2xl font-bold rounded-lg p-3 text-center cursor-pointer hover:bg-pink-200 transition-all';
+                tile.textContent = letter;
+                tile.onclick = () => selectVowel(letter, tile);
+                vowelGrid.appendChild(tile);
+            });
+        }
+
+        function selectConsonant(letter, element) {
+            state.selectedConsonant = letter;
+            document.querySelectorAll('#consonantGrid > div').forEach(t => t.classList.remove('selected'));
+            element.classList.add('selected');
+            updateSyllable();
+        }
+
+        function selectVowel(letter, element) {
+            state.selectedVowel = letter;
+            document.querySelectorAll('#vowelGrid > div').forEach(t => t.classList.remove('selected'));
+            element.classList.add('selected');
+            updateSyllable();
+        }
+
+        function updateSyllable() {
+            const display = document.getElementById('syllableDisplay');
+            if (state.selectedConsonant && state.selectedVowel) {
+                const syllable = state.selectedConsonant + state.selectedVowel;
+                display.textContent = syllable;
+                speak(syllable);
+                playSound('success');
+                addScore(10);
+            } else if (state.selectedConsonant) {
+                display.textContent = state.selectedConsonant + '-';
+            } else if (state.selectedVowel) {
+                display.textContent = '-' + state.selectedVowel;
+            } else {
+                display.textContent = '--';
+            }
+        }
+
+        // Jogo da Memória
+        function initMemoryGame() {
+            const grid = document.getElementById('memoryGrid');
+            grid.innerHTML = '';
+            state.flippedCards = [];
+            state.matchedPairs = 0;
+            state.attempts = 0;
+            document.getElementById('attempts').textContent = '0';
+            
+            // Criar pares
+            const cards = [];
+            memoryPairs.slice(0, 6).forEach(pair => {
+                cards.push({ ...pair, id: Math.random(), type: 'emoji' });
+                cards.push({ ...pair, id: Math.random(), type: 'word' });
+            });
+            
+            // Embaralhar
+            cards.sort(() => Math.random() - 0.5);
+            state.memoryCards = cards;
+            
+            // Criar cards
+            cards.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'relative h-32 cursor-pointer';
+                cardElement.innerHTML = `
+                    <div class="card-flip w-full h-full">
+                        <div class="card-front absolute w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl flex items-center justify-center text-4xl shadow-lg">
+                            ❓
+                        </div>
+                        <div class="card-back absolute w-full h-full bg-white rounded-xl flex flex-col items-center justify-center text-2xl font-bold shadow-lg border-4 border-purple-300">
+                            <div>${card.type === 'emoji' ? card.emoji : card.word}</div>
+                        </div>
+                    </div>
+                `;
+                cardElement.onclick = () => flipCard(index, cardElement);
+                grid.appendChild(cardElement);
+            });
+        }
+
+        function flipCard(index, element) {
+            if (state.flippedCards.length >= 2) return;
+            if (state.flippedCards.includes(index)) return;
+            
+            const card = element.querySelector('.card-flip');
+            card.classList.add('flipped');
+            state.flippedCards.push(index);
+            playSound('click');
+            
+            if (state.flippedCards.length === 2) {
+                state.attempts++;
+                document.getElementById('attempts').textContent = state.attempts;
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            setTimeout(() => {
+                const [index1, index2] = state.flippedCards;
+                const card1 = state.memoryCards[index1];
+                const card2 = state.memoryCards[index2];
+                
+                if (card1.letter === card2.letter) {
+                    playSound('success');
+                    speak('Parabéns! Você encontrou um par!');
+                    state.matchedPairs++;
+                    addScore(20);
+                    
+                    if (state.matchedPairs === 6) {
+                        setTimeout(() => {
+                            speak('Incrível! Você completou o jogo!');
+                            alert('🎉 Parabéns! Você completou o jogo da memória!');
+                        }, 500);
+                    }
+                } else {
+                    const cards = document.querySelectorAll('.card-flip');
+                    cards[index1].classList.remove('flipped');
+                    cards[index2].classList.remove('flipped');
+                    cards[index1].classList.add('shake');
+                    cards[index2].classList.add('shake');
+                    setTimeout(() => {
+                        cards[index1].classList.remove('shake');
+                        cards[index2].classList.remove('shake');
+                    }, 500);
+                }
+                
+                state.flippedCards = [];
+            }, 800);
+        }
+
+        // Event Listeners
+        document.getElementById('volumeBtn').onclick = () => {
+            state.soundEnabled = !state.soundEnabled;
+            document.getElementById('volumeBtn').querySelector('span').textContent = state.soundEnabled ? '🔊' : '🔇';
+        };
+
+        document.getElementById('modeBtn').onclick = () => {
+            state.mode = state.mode === 'normal' ? 'calm' : 'normal';
+            document.getElementById('modeBtn').textContent = `Modo: ${state.mode === 'normal' ? 'Normal' : 'Calmo'}`;
+            document.body.style.animation = state.mode === 'calm' ? 'none' : '';
+        };
+
+        document.getElementById('speakBtn').onclick = () => {
+            speak(state.currentLetter);
+        };
+
+        document.getElementById('speakSyllable').onclick = () => {
+            if (state.selectedConsonant && state.selectedVowel) {
+                speak(state.selectedConsonant + state.selectedVowel);
+            }
+        };
+
+        document.getElementById('clearSyllable').onclick = () => {
+            state.selectedConsonant = null;
+            state.selectedVowel = null;
+            document.getElementById('syllableDisplay').textContent = '--';
+            document.querySelectorAll('#consonantGrid > div, #vowelGrid > div').forEach(t => t.classList.remove('selected'));
+        };
+
+        document.getElementById('startMemoryGame').onclick = () => {
+            initMemoryGame();
+        };
+
+        // Inicialização
+        initLetterGrid();
+        initSyllableBuilder();
+        initMemoryGame();
+        
+        // Mensagem de boas-vindas
+        setTimeout(() => {
+            speak('Bem-vindo ao Alphabet Adventure Island! Vamos aprender juntos!');
+        }, 500);
     </script>
 </body>
 </html>
