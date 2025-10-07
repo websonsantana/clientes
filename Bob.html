@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pastel Bobgood Paint Paradise</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        .color-option {
+            transition: all 0.3s ease;
+        }
+        .color-option:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .canvas-container {
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.05' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <header class="bg-gradient-to-r from-pink-200 to-purple-200 py-6 shadow-md">
+        <div class="container mx-auto px-4">
+            <h1 class="text-3xl md:text-4xl font-bold text-center text-purple-800">Pastel Bobgood Paint Paradise 🎨</h1>
+            <p class="text-center text-purple-600 mt-2">A relaxing digital painting experience for your wife</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Tools Panel -->
+            <div class="w-full lg:w-1/4 bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-semibold text-purple-700 mb-4 flex items-center">
+                    <i data-feather="sliders" class="mr-2"></i> Painting Tools
+                </h2>
+                
+                <!-- Brush Size -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Brush Size</label>
+                    <input type="range" min="1" max="50" value="10" 
+                           class="w-full h-2 bg-purple-200 rounded-lg appearance-none cursor-pointer" id="brushSize">
+                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>Small</span>
+                        <span>Large</span>
+                    </div>
+                </div>
+
+                <!-- Color Palette -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Pastel Colors</label>
+                    <div class="grid grid-cols-5 gap-2">
+                        <!-- 50 pastel colors -->
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-pink-100" data-color="#FFD1DC"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-pink-200" data-color="#FFB7D5"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-pink-300" data-color="#FF9AA2"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-purple-100" data-color="#E6E6FA"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-purple-200" data-color="#D8BFD8"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-purple-300" data-color="#DDA0DD"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-blue-100" data-color="#B0E0E6"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-blue-200" data-color="#ADD8E6"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-blue-300" data-color="#87CEFA"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-green-100" data-color="#98FB98"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-green-200" data-color="#90EE90"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-green-300" data-color="#77DD77"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-yellow-100" data-color="#FAFAD2"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-yellow-200" data-color="#FFFACD"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-yellow-300" data-color="#FFE4B5"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-red-100" data-color="#FFCCCB"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-red-200" data-color="#FFB6C1"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-red-300" data-color="#FFA07A"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-indigo-100" data-color="#C3CDE6"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-indigo-200" data-color="#B7C3D6"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-indigo-300" data-color="#A2ADD0"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-teal-100" data-color="#AFEEEE"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-teal-200" data-color="#7FFFD4"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-teal-300" data-color="#40E0D0"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-orange-100" data-color="#FFE5B4"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-orange-200" data-color="#FFDAB9"></div>
+                        <div class="color-option h-8 rounded-full cursor-pointer bg-orange-300" data-color="#FFC87C"></div>
+                    </div>
+                </div>
+
+                <!-- Bobgood Images -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Bobgood Templates</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <!-- 6 sample Bobgood images - in a real app you would have more -->
+                        <div class="border-2 border-purple-200 rounded-lg overflow-hidden">
+                            <img src="http://static.photos/animals/320x240/1" alt="Bobgood 1" class="w-full h-24 object-cover cursor-pointer template-img">
+                        </div>
+                        <div class="border-2 border-purple-200 rounded-lg overflow-hidden">
+                            <img src="http://static.photos/animals/320x240/2" alt="Bobgood 2" class="w-full h-24 object-cover cursor-pointer template-img">
+                        </div>
+                        <div class="border-2 border-purple-200 rounded-lg overflow-hidden">
+                            <img src="http://static.photos/animals/320x240/3" alt="Bobgood 3" class="w-full h-24 object-cover cursor-pointer template-img">
+                        </div>
+                        <div class="border-2 border-purple-200 rounded-lg overflow-hidden">
+                            <img src="http://static.photos/animals/320x240/4" alt="Bobgood 4" class="w-full h-24 object-cover cursor-pointer template-img">
+                        </div>
+                        <div class="border-2 border-purple-200 rounded-lg overflow-hidden">
+                            <img src="http://static.photos/animals/320x240/5" alt="Bobgood 5" class="w-full h-24 object-cover cursor-pointer template-img">
+                        </div>
+                        <div class="border-2 border-purple-200 rounded-lg overflow-hidden">
+                            <img src="http://static.photos/animals/320x240/6" alt="Bobgood 6" class="w-full h-24 object-cover cursor-pointer template-img">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="mt-6 space-y-3">
+                    <button id="clearBtn" class="w-full bg-purple-100 hover:bg-purple-200 text-purple-800 py-2 px-4 rounded-lg flex items-center justify-center">
+                        <i data-feather="trash-2" class="mr-2"></i> Clear Canvas
+                    </button>
+                    <button id="saveBtn" class="w-full bg-pink-100 hover:bg-pink-200 text-pink-800 py-2 px-4 rounded-lg flex items-center justify-center">
+                        <i data-feather="download" class="mr-2"></i> Save Painting
+                    </button>
+                </div>
+            </div>
+
+            <!-- Canvas Area -->
+            <div class="w-full lg:w-3/4">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="canvas-container p-4">
+                        <canvas id="paintCanvas" class="border-2 border-purple-100 rounded-lg bg-white w-full" width="800" height="600"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gradient-to-r from-pink-200 to-purple-200 py-4 mt-8">
+        <div class="container mx-auto px-4 text-center text-purple-700">
+            <p>Created with ❤️ for your wife to enjoy painting beautiful Bobgoods</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            feather.replace();
+            
+            // Canvas setup
+            const canvas = document.getElementById('paintCanvas');
+            const ctx = canvas.getContext('2d');
+            let isDrawing = false;
+            let currentColor = '#FFD1DC'; // Default pastel pink
+            let brushSize = 10;
+            
+            // Adjust canvas size for high DPI displays
+            function resizeCanvas() {
+                const ratio = window.devicePixelRatio || 1;
+                canvas.width = canvas.offsetWidth * ratio;
+                canvas.height = canvas.offsetHeight * ratio;
+                ctx.scale(ratio, ratio);
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // Drawing functions
+            function startDrawing(e) {
+                isDrawing = true;
+                draw(e);
+            }
+            
+            function stopDrawing() {
+                isDrawing = false;
+                ctx.beginPath();
+            }
+            
+            function draw(e) {
+                if (!isDrawing) return;
+                
+                ctx.lineWidth = brushSize;
+                ctx.lineCap = 'round';
+                ctx.strokeStyle = currentColor;
+                
+                // Get correct position accounting for canvas offset
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+                const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+                
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+            }
+            
+            // Event listeners for canvas
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            
+            // Touch support
+            canvas.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const mouseEvent = new MouseEvent('mousedown', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
+                canvas.dispatchEvent(mouseEvent);
+            });
+            
+            canvas.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const mouseEvent = new MouseEvent('mousemove', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
+                canvas.dispatchEvent(mouseEvent);
+            });
+            
+            canvas.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                const mouseEvent = new MouseEvent('mouseup', {});
+                canvas.dispatchEvent(mouseEvent);
+            });
+            
+            // Color selection
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    currentColor = this.getAttribute('data-color');
+                    // Add visual feedback
+                    document.querySelectorAll('.color-option').forEach(opt => {
+                        opt.classList.remove('ring-2', 'ring-purple-500');
+                    });
+                    this.classList.add('ring-2', 'ring-purple-500');
+                });
+            });
+            
+            // Brush size
+            document.getElementById('brushSize').addEventListener('input', function() {
+                brushSize = this.value;
+            });
+            
+            // Template images
+            document.querySelectorAll('.template-img').forEach(img => {
+                img.addEventListener('click', function() {
+                    // Clear canvas first
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Draw the template image
+                    const imgElement = new Image();
+                    imgElement.src = this.src;
+                    imgElement.onload = function() {
+                        const ratio = Math.min(
+                            canvas.width / imgElement.width,
+                            canvas.height / imgElement.height
+                        );
+                        const x = (canvas.width - imgElement.width * ratio) / 2;
+                        const y = (canvas.height - imgElement.height * ratio) / 2;
+                        ctx.drawImage(imgElement, x, y, imgElement.width * ratio, imgElement.height * ratio);
+                    };
+                });
+            });
+            
+            // Clear button
+            document.getElementById('clearBtn').addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear your beautiful artwork?')) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            });
+            
+            // Save button
+            document.getElementById('saveBtn').addEventListener('click', function() {
+                const link = document.createElement('a');
+                link.download = 'bobgood-painting.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        });
+    </script>
+</body>
+</html>
