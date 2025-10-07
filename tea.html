@@ -3,91 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alphabet Adventure Island - Plataforma Completa</title>
+    <title>Alphabet Adventure Island</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(147, 51, 234, 0.5); } 50% { box-shadow: 0 0 40px rgba(147, 51, 234, 0.8); } }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
         @keyframes bounce-in { 0% { transform: scale(0); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
         .floating { animation: float 3s ease-in-out infinite; }
-        .spin-slow { animation: spin-slow 20s linear infinite; }
         .game-card { transition: all 0.3s; cursor: pointer; }
         .game-card:hover { transform: translateY(-10px) scale(1.05); box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
-        .letter-tile { transition: all 0.3s; }
-        .letter-tile:hover { transform: scale(1.15) rotate(5deg); }
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); overflow-y: auto; }
-        .modal.active { display: flex; align-items: center; justify-content: center; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .canvas-container { background: white; touch-action: none; }
-        .drawing-canvas { touch-action: none; }
-        .color-option { transition: all 0.2s; }
-        .color-option:hover { transform: scale(1.2); }
-        .word-card { transition: all 0.3s; }
-        .word-card:hover { transform: scale(1.05); }
-        .number-tile { transition: all 0.3s; }
-        .number-tile:hover { transform: scale(1.1) rotate(5deg); }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); overflow-y: auto; }
+        .modal.active { display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 min-h-screen">
-    <!-- Header -->
     <header class="bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 text-white py-6 shadow-2xl sticky top-0 z-50">
-        <div class="container mx-auto px-4">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <span class="text-5xl floating">🏝️</span>
-                    <div>
-                        <h1 class="text-3xl font-bold">Alphabet Adventure Island</h1>
-                        <p class="text-sm opacity-90">Plataforma Completa de Aprendizagem</p>
-                    </div>
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <span class="text-5xl floating">🏝️</span>
+                <div>
+                    <h1 class="text-3xl font-bold">Alphabet Adventure Island</h1>
+                    <p class="text-sm opacity-90">40+ Atividades de Aprendizagem</p>
                 </div>
-                <div class="flex gap-3">
-                    <button id="soundToggle" class="bg-white/20 backdrop-blur p-3 rounded-full hover:bg-white/30 transition-all">
-                        <span class="text-2xl">🔊</span>
-                    </button>
-                    <div class="bg-yellow-400 px-6 py-3 rounded-full font-bold text-yellow-900 flex items-center gap-2">
-                        <span class="text-2xl">⭐</span>
-                        <span id="totalScore">0</span>
-                    </div>
+            </div>
+            <div class="flex gap-3">
+                <button id="soundToggle" class="bg-white/20 backdrop-blur p-3 rounded-full hover:bg-white/30 transition-all">
+                    <span class="text-2xl">🔊</span>
+                </button>
+                <div class="bg-yellow-400 px-6 py-3 rounded-full font-bold text-yellow-900 flex items-center gap-2">
+                    <span class="text-2xl">⭐</span>
+                    <span id="totalScore">0</span>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="container mx-auto px-4 py-8">
-        <!-- Navigation Tabs -->
         <div class="bg-white rounded-2xl shadow-xl p-2 mb-8 overflow-x-auto">
             <div class="flex gap-2 min-w-max">
-                <button onclick="showCategory('alfabeto')" class="category-btn px-6 py-3 rounded-xl font-bold transition-all bg-purple-500 text-white">
-                    📚 Alfabeto
-                </button>
-                <button onclick="showCategory('silabas')" class="category-btn px-6 py-3 rounded-xl font-bold transition-all hover:bg-purple-100">
-                    🧩 Sílabas
-                </button>
-                <button onclick="showCategory('palavras')" class="category-btn px-6 py-3 rounded-xl font-bold transition-all hover:bg-purple-100">
-                    📖 Palavras
-                </button>
-                <button onclick="showCategory('numeros')" class="category-btn px-6 py-3 rounded-xl font-bold transition-all hover:bg-purple-100">
-                    🔢 Números
-                </button>
-                <button onclick="showCategory('jogos')" class="category-btn px-6 py-3 rounded-xl font-bold transition-all hover:bg-purple-100">
-                    🎮 Jogos
-                </button>
-                <button onclick="showCategory('arte')" class="category-btn px-6 py-3 rounded-xl font-bold transition-all hover:bg-purple-100">
-                    🎨 Arte
-                </button>
+                <button onclick="showCategory('alfabeto')" class="cat-btn px-6 py-3 rounded-xl font-bold transition-all bg-purple-500 text-white">📚 Alfabeto</button>
+                <button onclick="showCategory('silabas')" class="cat-btn px-6 py-3 rounded-xl font-bold transition-all hover:bg-purple-100">🧩 Sílabas</button>
+                <button onclick="showCategory('palavras')" class="cat-btn px-6 py-3 rounded-xl font-bold transition-all hover:bg-purple-100">📖 Palavras</button>
+                <button onclick="showCategory('numeros')" class="cat-btn px-6 py-3 rounded-xl font-bold transition-all hover:bg-purple-100">🔢 Números</button>
+                <button onclick="showCategory('jogos')" class="cat-btn px-6 py-3 rounded-xl font-bold transition-all hover:bg-purple-100">🎮 Jogos</button>
+                <button onclick="showCategory('arte')" class="cat-btn px-6 py-3 rounded-xl font-bold transition-all hover:bg-purple-100">🎨 Arte</button>
             </div>
         </div>
-
-        <!-- Games Grid -->
-        <div id="gamesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <!-- Games will be dynamically loaded here -->
-        </div>
+        <div id="gamesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
     </main>
 
-    <!-- Universal Modal -->
     <div id="gameModal" class="modal">
         <div class="bg-white rounded-3xl shadow-2xl max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div class="bg-gradient-to-r from-purple-500 to-pink-500 p-6 flex justify-between items-center sticky top-0 z-10">
@@ -96,235 +59,132 @@
                     <span class="text-2xl text-white">✕</span>
                 </button>
             </div>
-            <div id="modalContent" class="p-8">
-                <!-- Game content will be loaded here -->
-            </div>
+            <div id="modalContent" class="p-8"></div>
         </div>
     </div>
 
     <script>
-        // Global State
-        const state = {
-            score: 0,
-            soundEnabled: true,
-            currentCategory: 'alfabeto',
-            gameData: {},
-            canvas: null,
-            ctx: null,
-            isDrawing: false,
-            currentColor: '#FF6B9D',
-            brushSize: 10
-        };
-
-        // Games Database - 40 atividades
-        const gamesDatabase = {
+        const state = { score: 0, soundEnabled: true, currentCategory: 'alfabeto', canvas: null, ctx: null, isDrawing: false, currentColor: '#FF6B9D', brushSize: 10 };
+        const games = {
             alfabeto: [
-                { id: 'letter-explorer', title: 'Explorador de Letras', icon: '📚', desc: 'Aprenda todas as letras do alfabeto', difficulty: 1 },
-                { id: 'letter-sounds', title: 'Sons das Letras', icon: '🔊', desc: 'Ouça e identifique sons', difficulty: 1 },
-                { id: 'letter-tracing', title: 'Traçar Letras', icon: '✍️', desc: 'Pratique escrita de letras', difficulty: 2 },
-                { id: 'letter-matching', title: 'Combinar Maiúsculas', icon: '🔤', desc: 'Combine letras maiúsculas e minúsculas', difficulty: 2 },
-                { id: 'alphabet-song', title: 'Música do Alfabeto', icon: '🎵', desc: 'Cante e aprenda o ABC', difficulty: 1 },
-                { id: 'find-letter', title: 'Encontre a Letra', icon: '🔍', desc: 'Procure letras escondidas', difficulty: 2 },
-                { id: 'letter-order', title: 'Ordem Alfabética', icon: '🎯', desc: 'Coloque as letras em ordem', difficulty: 3 },
-                { id: 'vowel-game', title: 'Jogo das Vogais', icon: '🅰️', desc: 'Identifique as vogais', difficulty: 1 }
+                { id: 'letter-explorer', title: 'Explorador de Letras', icon: '📚', desc: 'Aprenda o alfabeto', difficulty: 1 },
+                { id: 'letter-sounds', title: 'Sons das Letras', icon: '🔊', desc: 'Ouça sons', difficulty: 1 },
+                { id: 'letter-tracing', title: 'Traçar Letras', icon: '✍️', desc: 'Pratique escrita', difficulty: 2 },
+                { id: 'letter-matching', title: 'Combinar Letras', icon: '🔤', desc: 'Maiúsculas/minúsculas', difficulty: 2 },
+                { id: 'alphabet-song', title: 'Música ABC', icon: '🎵', desc: 'Cante o ABC', difficulty: 1 },
+                { id: 'find-letter', title: 'Encontre a Letra', icon: '🔍', desc: 'Busca visual', difficulty: 2 },
+                { id: 'letter-order', title: 'Ordem Alfabética', icon: '🎯', desc: 'Sequência', difficulty: 3 },
+                { id: 'vowel-game', title: 'Jogo das Vogais', icon: '🅰️', desc: 'A, E, I, O, U', difficulty: 1 }
             ],
             silabas: [
-                { id: 'syllable-builder', title: 'Construtor de Sílabas', icon: '🧩', desc: 'Forme sílabas combinando letras', difficulty: 2 },
-                { id: 'syllable-matching', title: 'Combinar Sílabas', icon: '🎴', desc: 'Encontre pares de sílabas', difficulty: 2 },
-                { id: 'syllable-sounds', title: 'Sons de Sílabas', icon: '🔊', desc: 'Ouça e repita sílabas', difficulty: 2 },
-                { id: 'syllable-puzzle', title: 'Quebra-Cabeça Silábico', icon: '🧩', desc: 'Monte palavras com sílabas', difficulty: 3 },
-                { id: 'syllable-family', title: 'Família Silábica', icon: '👨‍👩‍👧', desc: 'Explore famílias silábicas (BA, BE, BI)', difficulty: 2 },
-                { id: 'syllable-race', title: 'Corrida de Sílabas', icon: '🏃', desc: 'Forme sílabas rapidamente', difficulty: 3 },
-                { id: 'syllable-bingo', title: 'Bingo de Sílabas', icon: '🎰', desc: 'Jogue bingo com sílabas', difficulty: 2 },
-                { id: 'syllable-hunt', title: 'Caça Sílabas', icon: '🎯', desc: 'Encontre sílabas específicas', difficulty: 2 }
+                { id: 'syllable-builder', title: 'Construtor de Sílabas', icon: '🧩', desc: 'Forme sílabas', difficulty: 2 },
+                { id: 'syllable-matching', title: 'Combinar Sílabas', icon: '🎴', desc: 'Pares', difficulty: 2 },
+                { id: 'syllable-sounds', title: 'Sons de Sílabas', icon: '🔊', desc: 'Ouça', difficulty: 2 },
+                { id: 'syllable-puzzle', title: 'Quebra-Cabeça', icon: '🧩', desc: 'Monte palavras', difficulty: 3 },
+                { id: 'syllable-family', title: 'Família Silábica', icon: '👨‍👩‍👧', desc: 'BA BE BI', difficulty: 2 },
+                { id: 'syllable-race', title: 'Corrida', icon: '🏃', desc: 'Rápido', difficulty: 3 },
+                { id: 'syllable-bingo', title: 'Bingo', icon: '🎰', desc: 'Jogue bingo', difficulty: 2 },
+                { id: 'syllable-hunt', title: 'Caça Sílabas', icon: '🎯', desc: 'Encontre', difficulty: 2 }
             ],
             palavras: [
-                { id: 'word-builder', title: 'Construtor de Palavras', icon: '📝', desc: 'Monte palavras completas', difficulty: 3 },
-                { id: 'word-images', title: 'Palavra e Imagem', icon: '🖼️', desc: 'Associe palavras a imagens', difficulty: 2 },
-                { id: 'word-scramble', title: 'Embaralhar Palavras', icon: '🔀', desc: 'Desembaralhe as letras', difficulty: 3 },
-                { id: 'word-categories', title: 'Categorias', icon: '🗂️', desc: 'Classifique palavras por categoria', difficulty: 3 },
-                { id: 'rhyme-time', title: 'Hora da Rima', icon: '🎭', desc: 'Encontre palavras que rimam', difficulty: 3 },
-                { id: 'word-search', title: 'Caça-Palavras', icon: '🔍', desc: 'Encontre palavras escondidas', difficulty: 3 },
-                { id: 'word-spelling', title: 'Soletrar Palavras', icon: '🎤', desc: 'Soletre palavras corretamente', difficulty: 3 },
-                { id: 'word-opposites', title: 'Opostos', icon: '↔️', desc: 'Encontre palavras opostas', difficulty: 4 }
+                { id: 'word-builder', title: 'Construtor', icon: '📝', desc: 'Monte palavras', difficulty: 3 },
+                { id: 'word-images', title: 'Palavra e Imagem', icon: '🖼️', desc: 'Associe', difficulty: 2 },
+                { id: 'word-scramble', title: 'Embaralhar', icon: '🔀', desc: 'Desembaralhe', difficulty: 3 },
+                { id: 'word-categories', title: 'Categorias', icon: '🗂️', desc: 'Classifique', difficulty: 3 },
+                { id: 'rhyme-time', title: 'Rimas', icon: '🎭', desc: 'Encontre rimas', difficulty: 3 },
+                { id: 'word-search', title: 'Caça-Palavras', icon: '🔍', desc: 'Grade de busca', difficulty: 3 },
+                { id: 'word-spelling', title: 'Soletrar', icon: '🎤', desc: 'Ortografia', difficulty: 3 },
+                { id: 'word-opposites', title: 'Opostos', icon: '↔️', desc: 'Antônimos', difficulty: 4 }
             ],
             numeros: [
-                { id: 'number-explorer', title: 'Explorador de Números', icon: '🔢', desc: 'Aprenda números de 0 a 100', difficulty: 1 },
-                { id: 'counting-game', title: 'Jogo de Contar', icon: '🧮', desc: 'Conte objetos', difficulty: 1 },
-                { id: 'number-tracing', title: 'Traçar Números', icon: '✍️', desc: 'Pratique escrita de números', difficulty: 2 },
-                { id: 'number-matching', title: 'Combinar Números', icon: '🎯', desc: 'Combine números e quantidades', difficulty: 2 },
-                { id: 'math-basics', title: 'Matemática Básica', icon: '➕', desc: 'Adição e subtração simples', difficulty: 3 },
-                { id: 'number-order', title: 'Ordem Numérica', icon: '📊', desc: 'Coloque números em ordem', difficulty: 2 },
-                { id: 'skip-counting', title: 'Contar Pulando', icon: '🦘', desc: 'Conte de 2 em 2, 5 em 5', difficulty: 3 },
-                { id: 'number-patterns', title: 'Padrões Numéricos', icon: '🔢', desc: 'Complete sequências', difficulty: 3 }
+                { id: 'number-explorer', title: 'Explorador', icon: '🔢', desc: '0 a 100', difficulty: 1 },
+                { id: 'counting-game', title: 'Contar', icon: '🧮', desc: 'Conte objetos', difficulty: 1 },
+                { id: 'number-tracing', title: 'Traçar', icon: '✍️', desc: 'Escreva números', difficulty: 2 },
+                { id: 'number-matching', title: 'Combinar', icon: '🎯', desc: 'Número + quantidade', difficulty: 2 },
+                { id: 'math-basics', title: 'Matemática', icon: '➕', desc: '+  e  -', difficulty: 3 },
+                { id: 'number-order', title: 'Ordem', icon: '📊', desc: 'Sequência', difficulty: 2 },
+                { id: 'skip-counting', title: 'Pular', icon: '🦘', desc: '2, 5, 10', difficulty: 3 },
+                { id: 'number-patterns', title: 'Padrões', icon: '🔢', desc: 'Complete', difficulty: 3 }
             ],
             jogos: [
-                { id: 'memory-game', title: 'Jogo da Memória', icon: '🧠', desc: 'Encontre pares correspondentes', difficulty: 2 },
-                { id: 'simon-says', title: 'Simão Diz', icon: '👂', desc: 'Siga as instruções', difficulty: 2 },
-                { id: 'treasure-hunt', title: 'Caça ao Tesouro', icon: '💎', desc: 'Encontre tesouros escondidos', difficulty: 2 },
-                { id: 'quiz-master', title: 'Quiz do Mestre', icon: '❓', desc: 'Responda perguntas', difficulty: 3 },
-                { id: 'speed-challenge', title: 'Desafio de Velocidade', icon: '⚡', desc: 'Complete tarefas rapidamente', difficulty: 3 },
-                { id: 'puzzle-master', title: 'Mestre dos Puzzles', icon: '🧩', desc: 'Monte quebra-cabeças', difficulty: 3 },
-                { id: 'color-match', title: 'Combinar Cores', icon: '🎨', desc: 'Encontre cores correspondentes', difficulty: 1 },
-                { id: 'shape-sorter', title: 'Classificador de Formas', icon: '⬛', desc: 'Classifique formas', difficulty: 2 }
+                { id: 'memory-game', title: 'Memória', icon: '🧠', desc: 'Encontre pares', difficulty: 2 },
+                { id: 'simon-says', title: 'Simão Diz', icon: '👂', desc: 'Siga instruções', difficulty: 2 },
+                { id: 'treasure-hunt', title: 'Tesouro', icon: '💎', desc: 'Encontre', difficulty: 2 },
+                { id: 'quiz-master', title: 'Quiz', icon: '❓', desc: 'Perguntas', difficulty: 3 },
+                { id: 'speed-challenge', title: 'Velocidade', icon: '⚡', desc: 'Rápido', difficulty: 3 },
+                { id: 'puzzle-master', title: 'Puzzle', icon: '🧩', desc: 'Quebra-cabeça', difficulty: 3 },
+                { id: 'color-match', title: 'Cores', icon: '🎨', desc: 'Combine', difficulty: 1 },
+                { id: 'shape-sorter', title: 'Formas', icon: '⬛', desc: 'Classifique', difficulty: 2 }
             ],
             arte: [
-                { id: 'free-draw', title: 'Desenho Livre', icon: '🎨', desc: 'Desenhe livremente', difficulty: 1 },
-                { id: 'color-by-number', title: 'Colorir por Números', icon: '🖍️', desc: 'Pinte seguindo números', difficulty: 2 },
-                { id: 'pattern-maker', title: 'Criador de Padrões', icon: '🔲', desc: 'Crie padrões artísticos', difficulty: 2 },
-                { id: 'stamp-art', title: 'Arte de Carimbos', icon: '🖼️', desc: 'Use carimbos para criar arte', difficulty: 1 },
-                { id: 'coloring-book', title: 'Livro de Colorir', icon: '📚', desc: 'Pinte desenhos prontos', difficulty: 1 },
-                { id: 'sticker-scene', title: 'Cenário de Adesivos', icon: '✨', desc: 'Crie cenas com adesivos', difficulty: 1 },
-                { id: 'paint-splatter', title: 'Respingos de Tinta', icon: '💦', desc: 'Arte abstrata divertida', difficulty: 1 },
-                { id: 'doodle-master', title: 'Mestre do Rabisco', icon: '✏️', desc: 'Rabisque criativamente', difficulty: 1 }
+                { id: 'free-draw', title: 'Desenho Livre', icon: '🎨', desc: 'Desenhe', difficulty: 1 },
+                { id: 'color-by-number', title: 'Colorir', icon: '🖍️', desc: 'Por números', difficulty: 2 },
+                { id: 'pattern-maker', title: 'Padrões', icon: '🔲', desc: 'Crie padrões', difficulty: 2 },
+                { id: 'stamp-art', title: 'Carimbos', icon: '🖼️', desc: 'Use carimbos', difficulty: 1 },
+                { id: 'coloring-book', title: 'Colorir', icon: '📚', desc: 'Livro', difficulty: 1 },
+                { id: 'sticker-scene', title: 'Adesivos', icon: '✨', desc: 'Crie cenas', difficulty: 1 },
+                { id: 'paint-splatter', title: 'Respingos', icon: '💦', desc: 'Arte abstrata', difficulty: 1 },
+                { id: 'doodle-master', title: 'Rabisco', icon: '✏️', desc: 'Criativo', difficulty: 1 }
             ]
         };
 
-        // Initialize
-        function init() {
-            loadGames('alfabeto');
-            updateScore(0);
-        }
+        let currentLetter = 'A', selectedC = null, selectedV = null, memFlipped = [], memAttempts = 0, memPairs = 0, wordProg = [];
 
-        // Show Category
-        function showCategory(category) {
-            state.currentCategory = category;
-            
-            // Update button styles
-            document.querySelectorAll('.category-btn').forEach(btn => {
-                btn.classList.remove('bg-purple-500', 'text-white');
-                btn.classList.add('hover:bg-purple-100');
+        function init() { loadGames('alfabeto'); updateScore(0); }
+
+        function showCategory(cat) {
+            state.currentCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(b => {
+                b.className = 'cat-btn px-6 py-3 rounded-xl font-bold transition-all hover:bg-purple-100';
             });
-            event.target.classList.add('bg-purple-500', 'text-white');
-            event.target.classList.remove('hover:bg-purple-100');
-            
-            loadGames(category);
+            event.target.className = 'cat-btn px-6 py-3 rounded-xl font-bold transition-all bg-purple-500 text-white';
+            loadGames(cat);
         }
 
-        // Load Games
-        function loadGames(category) {
-            const container = document.getElementById('gamesContainer');
-            const games = gamesDatabase[category];
-            
-            container.innerHTML = games.map(game => `
-                <div class="game-card bg-white rounded-2xl shadow-lg p-6" onclick="openGame('${game.id}', '${category}')">
-                    <div class="text-6xl text-center mb-4">${game.icon}</div>
-                    <h3 class="text-xl font-bold text-purple-800 mb-2 text-center">${game.title}</h3>
-                    <p class="text-gray-600 text-sm text-center mb-4">${game.desc}</p>
-                    <div class="flex justify-center gap-1">
-                        ${Array(game.difficulty).fill('⭐').join('')}
-                    </div>
-                    <button class="mt-4 w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 rounded-xl hover:shadow-lg transition-all">
-                        Jogar Agora
-                    </button>
+        function loadGames(cat) {
+            const cont = document.getElementById('gamesContainer');
+            cont.innerHTML = games[cat].map(g => `
+                <div class="game-card bg-white rounded-2xl shadow-lg p-6" onclick="openGame('${g.id}', '${cat}')">
+                    <div class="text-6xl text-center mb-4">${g.icon}</div>
+                    <h3 class="text-xl font-bold text-purple-800 mb-2 text-center">${g.title}</h3>
+                    <p class="text-gray-600 text-sm text-center mb-4">${g.desc}</p>
+                    <div class="flex justify-center gap-1">${Array(g.difficulty).fill('⭐').join('')}</div>
+                    <button class="mt-4 w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 rounded-xl">Jogar</button>
                 </div>
             `).join('');
         }
 
-        // Open Game Modal
-        function openGame(gameId, category) {
-            const modal = document.getElementById('gameModal');
-            const title = document.getElementById('modalTitle');
-            const content = document.getElementById('modalContent');
-            
-            const game = gamesDatabase[category].find(g => g.id === gameId);
-            title.textContent = game.icon + ' ' + game.title;
-            
-            // Load game content based on ID
-            content.innerHTML = getGameContent(gameId, category);
-            
-            modal.classList.add('active');
-            
-            // Initialize game-specific logic
-            setTimeout(() => initGame(gameId), 100);
+        function openGame(id, cat) {
+            const g = games[cat].find(x => x.id === id);
+            document.getElementById('modalTitle').textContent = g.icon + ' ' + g.title;
+            document.getElementById('modalContent').innerHTML = getContent(id);
+            document.getElementById('gameModal').classList.add('active');
+            setTimeout(() => initGame(id), 100);
         }
 
-        // Close Modal
         function closeModal() {
-            const modal = document.getElementById('gameModal');
-            modal.classList.remove('active');
-            if (state.ctx) {
-                state.ctx.clearRect(0, 0, state.canvas.width, state.canvas.height);
-            }
+            document.getElementById('gameModal').classList.remove('active');
+            if (state.ctx) state.ctx.clearRect(0, 0, state.canvas.width, state.canvas.height);
         }
 
-        // Get Game Content
-        function getGameContent(gameId, category) {
-            const contentMap = {
-                'letter-explorer': getLetterExplorer(),
-                'syllable-builder': getSyllableBuilder(),
-                'memory-game': getMemoryGame(),
-                'word-images': getWordImages(),
-                'number-explorer': getNumberExplorer(),
-                'free-draw': getFreeDrawCanvas(),
-                'letter-tracing': getLetterTracing(),
-                'counting-game': getCountingGame(),
-                'word-builder': getWordBuilder(),
-                'color-match': getColorMatch()
+        function getContent(id) {
+            const map = {
+                'letter-explorer': `<div class="text-center mb-8"><div id="bigLetter" class="inline-block bg-gradient-to-br from-blue-400 to-purple-500 text-white text-9xl font-bold rounded-3xl p-12 shadow-2xl">A</div><button onclick="speak(currentLetter)" class="block mx-auto mt-6 bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-full text-xl">🔊 Falar</button></div><div class="grid grid-cols-6 sm:grid-cols-9 gap-3">${'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map((l,i) => {const c=['blue','green','yellow','red','purple','pink','indigo','orange','teal'][i%9]; return `<div class="bg-${c}-100 text-${c}-800 text-3xl font-bold rounded-xl p-4 text-center cursor-pointer hover:bg-${c}-200" onclick="selectLetter('${l}')">${l}</div>`}).join('')}</div>`,
+                
+                'syllable-builder': `<div class="text-center mb-8"><div id="sylDisp" class="inline-block bg-gradient-to-br from-purple-400 to-pink-500 text-white text-8xl font-bold rounded-3xl p-12 shadow-2xl min-w-[200px]">--</div><button onclick="speak(selectedC&&selectedV?selectedC+selectedV:'')" class="block mx-auto mt-6 bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-6 rounded-full">🔊 Falar</button></div><div class="grid grid-cols-2 gap-8 max-w-2xl mx-auto"><div><h3 class="text-center font-bold text-2xl text-purple-700 mb-4">Consoantes</h3><div class="grid grid-cols-3 gap-3">${['B','C','D','F','G','H','J','L','M','N','P','R','S','T','V'].map(c=>`<div class="bg-purple-100 text-purple-800 text-3xl font-bold rounded-xl p-4 text-center cursor-pointer hover:bg-purple-200" onclick="selectedC='${c}';updateSyl()">${c}</div>`).join('')}</div></div><div><h3 class="text-center font-bold text-2xl text-pink-700 mb-4">Vogais</h3><div class="grid grid-cols-3 gap-3">${['A','E','I','O','U'].map(v=>`<div class="bg-pink-100 text-pink-800 text-3xl font-bold rounded-xl p-4 text-center cursor-pointer hover:bg-pink-200" onclick="selectedV='${v}';updateSyl()">${v}</div>`).join('')}</div></div></div>`,
+                
+                'memory-game': `<div class="text-center mb-6"><p class="text-2xl font-bold text-purple-700">Tentativas: <span id="memAtt">0</span></p><p class="text-xl text-green-600 mt-2">Pares: <span id="memPair">0</span>/6</p></div><div class="grid grid-cols-3 sm:grid-cols-4 gap-4 max-w-3xl mx-auto">${[{e:'🍎',w:'MAÇÃ'},{e:'🎈',w:'BALÃO'},{e:'🐱',w:'GATO'},{e:'🌸',w:'FLOR'},{e:'⚽',w:'BOLA'},{e:'🌞',w:'SOL'}].flatMap((p,i)=>[{c:p.e,m:i},{c:p.w,m:i}]).sort(()=>Math.random()-.5).map((c,i)=>`<div class="mem-card h-32 cursor-pointer" onclick="flipMem(${i},${c.m})" data-f="0" data-m="0"><div class="w-full h-full relative" style="transform-style:preserve-3d;transition:transform 0.6s"><div class="absolute w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl flex items-center justify-center text-4xl shadow-lg">❓</div><div class="absolute w-full h-full bg-white rounded-xl flex items-center justify-center text-3xl font-bold shadow-lg border-4 border-purple-300" style="transform:rotateY(180deg);backface-visibility:hidden">${c.c}</div></div></div>`).join('')}</div>`,
+                
+                'word-images': `<div class="grid grid-cols-2 md:grid-cols-3 gap-6">${[{w:'GATO',e:'🐱',s:['GA','TO']},{w:'CASA',e:'🏠',s:['CA','SA']},{w:'BOLA',e:'⚽',s:['BO','LA']},{w:'FLOR',e:'🌸',s:['FLOR']},{w:'SOL',e:'🌞',s:['SOL']},{w:'LUA',e:'🌙',s:['LU','A']}].map(i=>`<div class="bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl p-6 text-center shadow-lg" onclick="speak('${i.w}')"><div class="text-7xl mb-4">${i.e}</div><h3 class="text-3xl font-bold text-purple-800 mb-2">${i.w}</h3><div class="flex justify-center gap-2 flex-wrap">${i.s.map(s=>`<span class="bg-white px-3 py-1 rounded-lg text-lg font-bold text-purple-600">${s}</span>`).join('')}</div><button class="mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full">🔊 Ouvir</button></div>`).join('')}</div>`,
+                
+                'number-explorer': `<div class="text-center mb-8"><div id="bigNum" class="inline-block bg-gradient-to-br from-green-400 to-blue-500 text-white text-9xl font-bold rounded-3xl p-12 shadow-2xl">1</div><button onclick="speak(document.getElementById('bigNum').textContent)" class="block mx-auto mt-6 bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-full text-xl">🔊 Falar</button></div><div class="grid grid-cols-5 sm:grid-cols-10 gap-3">${Array.from({length:20},(_,i)=>i+1).map((n,i)=>{const c=['green','blue','yellow','red','purple','pink','indigo','orange','teal','cyan'][i%10];return `<div class="bg-${c}-100 text-${c}-800 text-3xl font-bold rounded-xl p-4 text-center cursor-pointer hover:bg-${c}-200" onclick="document.getElementById('bigNum').textContent=${n};speak('${n}');updateScore(5)">${n}</div>`}).join('')}</div>`,
+                
+                'free-draw': `<div class="flex gap-6"><div class="flex-shrink-0"><div class="bg-purple-50 rounded-2xl p-4 mb-4"><h3 class="font-bold text-purple-700 mb-3">🎨 Cores</h3><div class="grid grid-cols-3 gap-2">${['#FF6B9D','#FFA07A','#FFD700','#98FB98','#87CEEB','#DDA0DD','#F0E68C','#FFB6C1','#B0E0E6','#FFDAB9','#E6E6FA','#FFC0CB'].map(c=>`<div class="w-12 h-12 rounded-full cursor-pointer border-4 border-white shadow-lg hover:border-purple-300" style="background:${c}" onclick="state.currentColor='${c}'"></div>`).join('')}</div></div><div class="bg-purple-50 rounded-2xl p-4 mb-4"><h3 class="font-bold text-purple-700 mb-3">🖌️ Tamanho</h3><input type="range" id="brSize" min="5" max="50" value="10" class="w-full" onchange="state.brushSize=this.value;document.getElementById('brDisp').textContent=this.value"><div class="text-center mt-2 font-bold text-purple-600"><span id="brDisp">10</span>px</div></div><button onclick="if(confirm('Limpar?'))state.ctx.clearRect(0,0,state.canvas.width,state.canvas.height)" class="w-full bg-red-400 hover:bg-red-500 text-white font-bold py-3 px-4 rounded-xl mb-2">🗑️ Limpar</button><button onclick="const l=document.createElement('a');l.download='desenho.png';l.href=state.canvas.toDataURL();l.click();speak('Salvo!');updateScore(20)" class="w-full bg-green-400 hover:bg-green-500 text-white font-bold py-3 px-4 rounded-xl">💾 Salvar</button></div><div class="flex-grow"><canvas id="drawCanvas" width="800" height="600" class="border-4 border-purple-300 rounded-2xl bg-white shadow-xl cursor-crosshair"></canvas></div></div>`,
+                
+                'counting-game': (() => { const items = ['🍎','🎈','⭐','🌸','🐱','🎨','⚽','🌞'], count = Math.floor(Math.random()*8)+3, item = items[Math.floor(Math.random()*items.length)]; return `<div class="text-center"><h3 class="text-3xl font-bold text-purple-700 mb-6">Quantos você vê?</h3><div class="bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl p-8 mb-6 inline-block"><div class="flex flex-wrap gap-4 justify-center max-w-2xl">${Array(count).fill(item).map(()=>`<span class="text-6xl">${item}</span>`).join('')}</div></div><div class="grid grid-cols-5 gap-4 max-w-xl mx-auto">${Array.from({length:10},(_,i)=>i+1).map(n=>`<button onclick="checkCount(${n},${count})" class="bg-green-100 hover:bg-green-200 text-green-800 font-bold text-3xl py-6 rounded-xl">${n}</button>`).join('')}</div><div id="cntRes" class="mt-6 text-2xl font-bold"></div></div>`})(),
+                
+                'word-builder': (() => { const words = ['GATO','BOLA','CASA','PATO','MALA'], word = words[Math.floor(Math.random()*words.length)], letters = word.split('').sort(()=>Math.random()-.5); return `<div class="text-center"><h3 class="text-2xl font-bold text-purple-700 mb-4">Monte a palavra!</h3><div class="text-6xl mb-8">${{GATO:'🐱',BOLA:'⚽',CASA:'🏠',PATO:'🦆',MALA:'🧳'}[word]}</div><div id="wbDisp" class="flex justify-center gap-2 mb-8">${word.split('').map(()=>`<div class="w-16 h-20 bg-purple-100 border-4 border-purple-300 rounded-xl flex items-center justify-center text-3xl font-bold">_</div>`).join('')}</div><div class="flex justify-center gap-3 flex-wrap">${letters.map(l=>`<button onclick="addLetter('${l}','${word}')" class="bg-blue-400 hover:bg-blue-500 text-white font-bold text-3xl w-16 h-16 rounded-xl">${l}</button>`).join('')}</div><button onclick="wordProg=[];document.querySelectorAll('#wbDisp div').forEach(d=>d.textContent='_');document.getElementById('wbRes').textContent=''" class="mt-6 bg-red-400 hover:bg-red-500 text-white font-bold py-3 px-8 rounded-full">🔄 Recomeçar</button><div id="wbRes" class="mt-4 text-2xl font-bold"></div></div>`})(),
+                
+                'color-match': `<div class="text-center"><h3 class="text-2xl font-bold text-purple-700 mb-6">Combine as cores!</h3><div class="grid grid-cols-2 md:grid-cols-3 gap-6 max-w-4xl mx-auto">${[{n:'VERMELHO',h:'#FF0000',e:'🔴'},{n:'AZUL',h:'#0000FF',e:'🔵'},{n:'VERDE',h:'#00FF00',e:'🟢'},{n:'AMARELO',h:'#FFFF00',e:'🟡'},{n:'ROXO',h:'#800080',e:'🟣'},{n:'ROSA',h:'#FFC0CB',e:'🌸'}].map(c=>`<div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 shadow-lg"><div class="text-6xl mb-4">${c.e}</div><div class="w-full h-24 rounded-xl mb-4 shadow-inner" style="background:${c.h}"></div><h4 class="text-2xl font-bold text-purple-800">${c.n}</h4><button onclick="speak('${c.n}')" class="mt-4 bg-purple-400 hover:bg-purple-500 text-white font-bold py-2 px-4 rounded-full">🔊 Ouvir</button></div>`).join('')}</div></div>`
             };
-            
-            return contentMap[gameId] || getDefaultGame(gameId);
-        }
-
-        // Game Content Templates
-        function getLetterExplorer() {
-            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-            return `
-                <div class="text-center mb-8">
-                    <div id="bigLetter" class="inline-block bg-gradient-to-br from-blue-400 to-purple-500 text-white text-9xl font-bold rounded-3xl p-12 shadow-2xl">
-                        A
-                    </div>
-                    <button onclick="speakLetter()" class="block mx-auto mt-6 bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-full text-xl">
-                        🔊 Falar Letra
-                    </button>
-                </div>
-                <div class="grid grid-cols-6 sm:grid-cols-9 gap-3">
-                    ${alphabet.map((letter, i) => {
-                        const colors = ['blue', 'green', 'yellow', 'red', 'purple', 'pink', 'indigo', 'orange', 'teal'];
-                        const color = colors[i % colors.length];
-                        return `<div class="letter-tile bg-${color}-100 text-${color}-800 text-3xl font-bold rounded-xl p-4 text-center cursor-pointer hover:bg-${color}-200" onclick="selectLetter('${letter}')">${letter}</div>`;
-                    }).join('')}
-                </div>
-            `;
-        }
-
-        function getSyllableBuilder() {
-            const consonants = ['B', 'C', 'D', 'F', 'G', 'H', 'J', 'L', 'M', 'N', 'P', 'R', 'S', 'T', 'V'];
-            const vowels = ['A', 'E', 'I', 'O', 'U'];
-            return `
-                <div class="text-center mb-8">
-                    <div id="syllableDisplay" class="inline-block bg-gradient-to-br from-purple-400 to-pink-500 text-white text-8xl font-bold rounded-3xl p-12 shadow-2xl min-w-[200px]">
-                        --
-                    </div>
-                    <button onclick="speakSyllable()" class="block mx-auto mt-6 bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-6 rounded-full">
-                        🔊 Falar Sílaba
-                    </button>
-                </div>
-                <div class="grid grid-cols-2 gap-8 max-w-2xl mx-auto">
-                    <div>
-                        <h3 class="text-center font-bold text-2xl text-purple-700 mb-4">Consoantes</h3>
-                        <div class="grid grid-cols-3 gap-3">
-                            ${consonants.map(c => `<div class="syllable-btn bg-purple-100 text-purple-800 text-3xl font-bold rounded-xl p-4 text-center cursor-pointer hover:bg-purple-200" onclick="selectConsonant('${c}')">${c}</div>`).join('')}
-                        </div>
-                    </div>
-                    <div>
-                        <h3 class="text-center font-bold text-2xl text-pink-700 mb-4">Vogais</h3>
-                        <div class="grid grid-cols-3 gap-3">
-                            ${vowels.map(v => `<div class="syllable-btn bg-pink-100 text-pink-800 text-3xl font-bold rounded-xl p-4 text-center cursor-pointer hover:bg-pink-200" onclick="selectVowel('${v}')">${v}</div>`).join('')}
-                        </div>
-                    </div>
-                </div>
-                <button onclick="clearSyllable()" class="block mx-auto mt-8 bg-red-400 hover:bg-red-500 text-white font-bold py-3 px-8 rounded-full">
-                    🔄 Limpar
-                </button>
-            `;
-        }
-
-        function getMemoryGame() {
-            const pairs = [
-                { emoji: '🍎', word: 'MAÇÃ' },
-                { emoji: '🎈', word: 'BALÃO' },
-                { emoji: '🐱', word: 'GATO' },
-                { emoji: '🌸', word: 'FLOR' },
-                { emoji: '⚽', word: 'BOLA' },
-         
+            return map[id] || `<div class="text-center py-16"><div class="text-8xl mb-6">🎮</div><h3 class="text-3xl font-bold text-purple-700 mb-4">Em Desenvolvimento!</h3><p class="text-xl text-gray-600 mb-6">Este jogo será adicionado em breve.</p><button onclick="closeModal()" class="bg-purple-500 hover
