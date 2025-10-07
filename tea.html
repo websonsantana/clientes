@@ -187,4 +187,192 @@
                 
                 'color-match': `<div class="text-center"><h3 class="text-2xl font-bold text-purple-700 mb-6">Combine as cores!</h3><div class="grid grid-cols-2 md:grid-cols-3 gap-6 max-w-4xl mx-auto">${[{n:'VERMELHO',h:'#FF0000',e:'🔴'},{n:'AZUL',h:'#0000FF',e:'🔵'},{n:'VERDE',h:'#00FF00',e:'🟢'},{n:'AMARELO',h:'#FFFF00',e:'🟡'},{n:'ROXO',h:'#800080',e:'🟣'},{n:'ROSA',h:'#FFC0CB',e:'🌸'}].map(c=>`<div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 shadow-lg"><div class="text-6xl mb-4">${c.e}</div><div class="w-full h-24 rounded-xl mb-4 shadow-inner" style="background:${c.h}"></div><h4 class="text-2xl font-bold text-purple-800">${c.n}</h4><button onclick="speak('${c.n}')" class="mt-4 bg-purple-400 hover:bg-purple-500 text-white font-bold py-2 px-4 rounded-full">🔊 Ouvir</button></div>`).join('')}</div></div>`
             };
-            return map[id] || `<div class="text-center py-16"><div class="text-8xl mb-6">🎮</div><h3 class="text-3xl font-bold text-purple-700 mb-4">Em Desenvolvimento!</h3><p class="text-xl text-gray-600 mb-6">Este jogo será adicionado em breve.</p><button onclick="closeModal()" class="bg-purple-500 hover
+            return map[id] || `<div class="text-center py-16"><div class="text-8xl mb-6">🎮</div><h3 class="text-3xl font-bold text-purple-700 mb-4">Em Desenvolvimento!</h3><p class="text-xl text-gray-600 mb-6">Este jogo será adicionado em breve.</p><button onclick="closeModal()" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-8 rounded-full">Voltar</button></div>`;
+        }
+
+        function initGame(id) {
+            if (id === 'free-draw') initCanvas();
+            else if (id === 'memory-game') { memFlipped = []; memAttempts = 0; memPairs = 0; }
+            else if (id === 'word-builder') wordProg = [];
+        }
+
+        function selectLetter(l) {
+            currentLetter = l;
+            document.getElementById('bigLetter').textContent = l;
+            speak(l);
+            updateScore(5);
+        }
+
+        function updateSyl() {
+            const d = document.getElementById('sylDisp');
+            if (selectedC && selectedV) {
+                d.textContent = selectedC + selectedV;
+                speak(selectedC + selectedV);
+                updateScore(10);
+            } else if (selectedC) {
+                d.textContent = selectedC + '-';
+            } else if (selectedV) {
+                d.textContent = '-' + selectedV;
+            }
+        }
+
+        function flipMem(idx, match) {
+            const cards = document.querySelectorAll('.mem-card');
+            const card = cards[idx];
+            if (card.dataset.f === '1' || card.dataset.m === '1' || memFlipped.length >= 2) return;
+            
+            card.dataset.f = '1';
+            card.querySelector('div').style.transform = 'rotateY(180deg)';
+            memFlipped.push({ idx, match });
+            
+            if (memFlipped.length === 2) {
+                memAttempts++;
+                document.getElementById('memAtt').textContent = memAttempts;
+                
+                setTimeout(() => {
+                    if (memFlipped[0].match === memFlipped[1].match) {
+                        cards[memFlipped[0].idx].dataset.m = '1';
+                        cards[memFlipped[1].idx].dataset.m = '1';
+                        memPairs++;
+                        document.getElementById('memPair').textContent = memPairs;
+                        updateScore(20);
+                        speak('Parabéns!');
+                        if (memPairs === 6) {
+                            setTimeout(() => {
+                                speak('Você completou o jogo!');
+                                alert('🎉 Você encontrou todos os pares!');
+                                updateScore(50);
+                            }, 500);
+                        }
+                    } else {
+                        cards[memFlipped[0].idx].dataset.f = '0';
+                        cards[memFlipped[1].idx].dataset.f = '0';
+                        cards[memFlipped[0].idx].querySelector('div').style.transform = '';
+                        cards[memFlipped[1].idx].querySelector('div').style.transform = '';
+                    }
+                    memFlipped = [];
+                }, 1000);
+            }
+        }
+
+        function checkCount(ans, correct) {
+            const res = document.getElementById('cntRes');
+            if (ans === correct) {
+                res.textContent = '🎉 Correto!';
+                res.className = 'mt-6 text-2xl font-bold text-green-600';
+                speak('Correto! Muito bem!');
+                updateScore(15);
+                setTimeout(() => {
+                    closeModal();
+                    openGame('counting-game', 'numeros');
+                }, 2000);
+            } else {
+                res.textContent = '❌ Tente novamente!';
+                res.className = 'mt-6 text-2xl font-bold text-red-600';
+            }
+        }
+
+        function addLetter(l, target) {
+            wordProg.push(l);
+            const slots = document.querySelectorAll('#wbDisp div');
+            if (wordProg.length <= target.length) {
+                slots[wordProg.length - 1].textContent = l;
+            }
+            if (wordProg.length === target.length) {
+                const built = wordProg.join('');
+                const res = document.getElementById('wbRes');
+                if (built === target) {
+                    res.textContent = '🎉 Perfeito!';
+                    res.className = 'mt-4 text-2xl font-bold text-green-600';
+                    speak('Parabéns!');
+                    updateScore(25);
+                } else {
+                    res.textContent = '❌ Tente novamente!';
+                    res.className = 'mt-4 text-2xl font-bold text-red-600';
+                    setTimeout(() => {
+                        wordProg = [];
+                        slots.forEach(s => s.textContent = '_');
+                        res.textContent = '';
+                    }, 1500);
+                }
+            }
+        }
+
+        function initCanvas() {
+            state.canvas = document.getElementById('drawCanvas');
+            if (!state.canvas) return;
+            state.ctx = state.canvas.getContext('2d');
+            state.ctx.lineCap = 'round';
+            state.ctx.lineJoin = 'round';
+            
+            const startDraw = (e) => {
+                state.isDrawing = true;
+                const pos = getPos(e);
+                state.ctx.beginPath();
+                state.ctx.moveTo(pos.x, pos.y);
+            };
+            
+            const draw = (e) => {
+                if (!state.isDrawing) return;
+                const pos = getPos(e);
+                state.ctx.strokeStyle = state.currentColor;
+                state.ctx.lineWidth = state.brushSize;
+                state.ctx.lineTo(pos.x, pos.y);
+                state.ctx.stroke();
+            };
+            
+            const stopDraw = () => { state.isDrawing = false; };
+            
+            const getPos = (e) => {
+                const rect = state.canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return {
+                    x: (clientX - rect.left) * (state.canvas.width / rect.width),
+                    y: (clientY - rect.top) * (state.canvas.height / rect.height)
+                };
+            };
+            
+            state.canvas.addEventListener('mousedown', startDraw);
+            state.canvas.addEventListener('mousemove', draw);
+            state.canvas.addEventListener('mouseup', stopDraw);
+            state.canvas.addEventListener('mouseout', stopDraw);
+            state.canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDraw(e); });
+            state.canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); });
+            state.canvas.addEventListener('touchend', (e) => { e.preventDefault(); stopDraw(); });
+        }
+
+        function speak(txt) {
+            if (!state.soundEnabled || !txt) return;
+            const u = new SpeechSynthesisUtterance(txt);
+            u.lang = 'pt-BR';
+            u.rate = 0.8;
+            u.pitch = 1.2;
+            speechSynthesis.cancel();
+            speechSynthesis.speak(u);
+        }
+
+        function updateScore(pts) {
+            state.score += pts;
+            document.getElementById('totalScore').textContent = state.score;
+            if (pts > 0) {
+                const el = document.getElementById('totalScore').parentElement;
+                el.style.animation = 'bounce-in 0.5s';
+                setTimeout(() => { el.style.animation = ''; }, 500);
+            }
+        }
+
+        document.getElementById('soundToggle').onclick = () => {
+            state.soundEnabled = !state.soundEnabled;
+            document.getElementById('soundToggle').querySelector('span').textContent = state.soundEnabled ? '🔊' : '🔇';
+        };
+
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            init();
+            setTimeout(() => speak('Bem-vindo ao Alphabet Adventure Island! Escolha uma atividade!'), 1000);
+        });
+    </script>
+</body>
+</html>
