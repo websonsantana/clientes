@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meu App Financeiro</title>
+<style>
+* {
+    box-sizing: border-box;
+    font-family: "Inter", Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: #f5f6fa;
+    color: #222;
+}
+
+.topo {
+    background: #002d72;
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+
+.menu {
+    display: flex;
+    justify-content: space-around;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+}
+
+.menu a {
+    padding: 12px 20px;
+    text-decoration: none;
+    color: #555;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.menu a.ativo {
+    color: #ff6600;
+    border-bottom: 3px solid #ff6600;
+}
+
+main {
+    padding: 20px;
+}
+
+.pagina {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.pagina.ativa {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+.pagina h2 {
+    margin-bottom: 10px;
+    color: #002d72;
+}
+
+.cartao {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    margin: 10px 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.vantagens button {
+    background: #ff6600;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.gerente {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    background: #ddd;
+    border-radius: 50%;
+}
+
+.avatar.grande {
+    width: 80px;
+    height: 80px;
+    font-size: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #002d72;
+    color: white;
+}
+
+.contatos {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.contatos button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    background: #002d72;
+    color: white;
+    cursor: pointer;
+}
+
+.mensagem {
+    background: #fff3e0;
+    border-left: 4px solid #ff6600;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.perfil {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.nivel, .config, .avaliacao {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    margin: 10px 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.config ul {
+    list-style: none;
+    margin-top: 10px;
+}
+
+.config li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.emojis {
+    font-size: 22px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+footer {
+    text-align: center;
+    padding: 10px;
+    background: #fff;
+    font-size: 13px;
+    color: #666;
+    border-top: 1px solid #ddd;
+}
+</style>
+</head>
+<body>
+
+<header class="topo">
+    <h1>Meu App Financeiro</h1>
+</header>
+
+<nav class="menu">
+    <a class="ativo" onclick="mostrarAba('inicio', this)">Início</a>
+    <a onclick="mostrarAba('gerente', this)">Gerente</a>
+    <a onclick="mostrarAba('perfil', this)">Perfil</a>
+</nav>
+
+<main>
+    <!-- INÍCIO -->
+    <section id="inicio" class="pagina ativa">
+        <h2>Olá, Webson!</h2>
+        <p>Seu saldo está disponível para consulta.</p>
+
+        <div class="cartao">
+            <h3>Conta Corrente</h3>
+            <p>Saldo disponível: <strong>R$ 3.250,00</strong></p>
+        </div>
+
+        <div class="cartao">
+            <h3>Cartão de Crédito</h3>
+            <p>Limite disponível: <strong>R$ 5.000,00</strong></p>
+        </div>
+
+        <div class="vantagens">
+            <h3>Minhas Vantagens</h3>
+            <p>Você está no nível 4. Aproveite descontos exclusivos!</p>
+            <button>Ver benefícios</button>
+        </div>
+    </section>
+
+    <!-- GERENTE -->
+    <section id="gerente" class="pagina">
+        <h2>Fale com seu gerente</h2>
+
+        <div class="cartao gerente">
+            <div class="avatar"></div>
+            <div>
+                <h3>Juliana Naomi Koyama</h3>
+                <p>Gerente de Relacionamento</p>
+            </div>
+        </div>
+
+        <ul class="contatos">
+            <li><button>💬 WhatsApp</button></li>
+            <li><button>💻 Chat</button></li>
+            <li><button>📧 E-mail</button></li>
+            <li><button>📞 Ligar</button></li>
+        </ul>
+
+        <div class="mensagem">
+            <h4>Mensagem especial da gerente</h4>
+            <p>"Oi Webson, tudo bem? Temos novidades para você!"</p>
+        </div>
+    </section>
+
+    <!-- PERFIL -->
+    <section id="perfil" class="pagina">
+        <div class="perfil">
+            <div class="avatar grande">WS</div>
+            <h2>Webson Santana</h2>
+            <p>Uniclass Ag 8231 CC 08623-0</p>
+        </div>
+
+        <div class="nivel">
+            <h3>Nível 4 - Minhas Vantagens</h3>
+            <p>Recupere passos para continuar aproveitando benefícios.</p>
+        </div>
+
+        <div class="config">
+            <h3>Configurações</h3>
+            <ul>
+                <li>📄 Dados cadastrais</li>
+                <li>🔒 Segurança</li>
+                <li>⚙️ Mais opções</li>
+            </ul>
+        </div>
+
+        <div class="avaliacao">
+            <h3>Queremos saber sua opinião</h3>
+            <p>Como foi sua experiência hoje?</p>
+            <div class="emojis">😞 😐 🙂 😃 🤩</div>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <p>© 2025 Meu App Financeiro</p>
+</footer>
+
+<script>
+function mostrarAba(aba, link) {
+    // esconder todas as páginas
+    document.querySelectorAll('.pagina').forEach(p => p.classList.remove('ativa'));
+    // mostrar página selecionada
+    document.getElementById(aba).classList.add('ativa');
+    // ajustar menu ativo
+    document.querySelectorAll('.menu a').forEach(a => a.classList.remove('ativo'));
+    link.classList.add('ativo');
+}
+</script>
+
+</body>
+</html>
