@@ -3,295 +3,343 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Infinity Bank - Seu banco digital</title>
+  <title>Meu App Financeiro – Estilo Itaú</title>
   <style>
-    /* ======== RESET E FONTE ======== */
+    :root {
+      --azul-escuro: #002d72;
+      --laranja: #ff6600;
+      --branco: #ffffff;
+      --cinza-fundo: #f5f6fa;
+      --sombra: 0 4px 10px rgba(0,0,0,0.08);
+    }
     * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: "Poppins", sans-serif;
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:"Inter",Arial,sans-serif;
     }
-
     body {
-      background: #f5f7fb;
-      color: #222;
+      background:var(--cinza-fundo);
+      color:#222;
+      display:flex;
+      flex-direction:column;
+      min-height:100vh;
     }
-
-    /* ======== CABEÇALHO ======== */
     header {
-      background: linear-gradient(90deg, #5a00e0, #7a2ae7);
-      color: white;
-      padding: 1rem 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+      background:var(--azul-escuro);
+      color:var(--branco);
+      padding:16px 20px;
+      text-align:center;
+      font-size:1.25rem;
+      font-weight:600;
+      position:sticky;
+      top:0;
+      z-index:10;
+      box-shadow: var(--sombra);
     }
-
-    header h1 {
-      font-size: 1.4rem;
-      font-weight: 600;
+    nav.menu {
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:space-around;
+      background:var(--branco);
+      border-bottom:1px solid #ddd;
     }
-
-    nav {
-      display: flex;
-      gap: 1rem;
+    nav.menu a {
+      flex:1;
+      text-align:center;
+      padding:12px 0;
+      text-decoration:none;
+      color:#555;
+      font-weight:500;
+      cursor:pointer;
     }
-
-    nav button {
-      background: transparent;
-      border: none;
-      color: white;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: 0.3s;
+    nav.menu a.ativo {
+      color: var(--laranja);
+      border-bottom:3px solid var(--laranja);
     }
-
-    nav button:hover,
-    nav button.active {
-      text-decoration: underline;
-      font-weight: bold;
-    }
-
-    /* ======== CONTEÚDO PRINCIPAL ======== */
     main {
-      padding: 2rem;
-      max-width: 1200px;
-      margin: auto;
-      transition: all 0.3s ease;
+      flex:1;
+      padding:20px;
     }
-
-    section {
-      display: none;
-      animation: fadeIn 0.5s ease-in-out;
+    section.pagina {
+      display:none;
+      animation: fadeIn 0.3s ease-in;
     }
-
-    section.active {
-      display: block;
+    section.pagina.ativa {
+      display:block;
     }
-
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {opacity:0; transform: translateY(8px);}
+      to {opacity:1; transform: translateY(0);}
     }
-
-    /* ======== DASHBOARD ======== */
-    .card {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 15px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      margin-bottom: 1.5rem;
+    .cartao {
+      background: var(--branco);
+      border-radius:12px;
+      padding:18px;
+      margin-bottom:16px;
+      box-shadow: var(--sombra);
     }
-
-    .saldo {
-      font-size: 2rem;
-      color: #5a00e0;
-      font-weight: 600;
+    .cartao h3 {
+      color: var(--azul-escuro);
+      margin-bottom:8px;
+      font-size:1rem;
     }
-
-    .resumo {
-      display: flex;
-      justify-content: space-between;
-      text-align: center;
+    .cartao p {
+      font-size:1.1rem;
+      color:#333;
     }
-
-    .resumo div {
-      flex: 1;
+    .cartao p strong {
+      color: var(--laranja);
+      font-size:1.4rem;
     }
-
-    .resumo h3 {
-      color: #666;
-      font-size: 1rem;
+    .botao-primario {
+      display:inline-block;
+      background: var(--laranja);
+      color: var(--branco);
+      border:none;
+      padding:10px 18px;
+      border-radius:8px;
+      font-weight:600;
+      cursor:pointer;
+      text-decoration:none;
+      text-align:center;
+      margin-top:10px;
+      transition: background 0.3s;
     }
-
-    .resumo p {
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #333;
+    .botao-primario:hover {
+      background: #e05500;
     }
-
-    /* ======== FORMULÁRIOS ======== */
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
+    /* Abas específicas */
+    .avatar {
+      width:60px;
+      height:60px;
+      background:#ddd;
+      border-radius:50%;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:24px;
+      color:#555;
+      margin-right:12px;
+      vertical-align:middle;
     }
-
-    input, select, button {
-      padding: 0.8rem 1rem;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      font-size: 1rem;
+    .avatar.grande {
+      width:90px;
+      height:90px;
+      font-size:30px;
+      color:var(--branco);
+      background: var(--azul-escuro);
+      margin:0 auto 12px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
     }
-
-    button {
-      background: #5a00e0;
-      color: white;
-      font-weight: bold;
-      border: none;
-      cursor: pointer;
-      transition: 0.3s;
+    .contatos {
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:12px;
+      margin:20px 0;
     }
-
-    button:hover {
-      background: #7a2ae7;
+    .contatos button {
+      padding:12px;
+      border:none;
+      background: var(--azul-escuro);
+      color: var(--branco);
+      border-radius:8px;
+      font-weight:500;
+      cursor:pointer;
+      transition: background 0.3s;
     }
-
-    /* ======== INVESTIMENTOS ======== */
-    .investimentos {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1rem;
+    .contatos button:hover {
+      background:#001b4d;
     }
-
-    .invest {
-      background: white;
-      padding: 1rem;
-      border-radius: 12px;
-      text-align: center;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-      transition: 0.3s;
+    .mensagem {
+      background:#fff3e0;
+      border-left:4px solid var(--laranja);
+      padding:14px;
+      border-radius:8px;
+      margin-top:10px;
     }
-
-    .invest:hover {
-      transform: scale(1.05);
+    .lista-notificacoes {
+      list-style:none;
+      padding:0;
     }
-
-    /* ======== FOOTER ======== */
+    .lista-notificacoes li {
+      background:var(--branco);
+      padding:14px;
+      border-radius:10px;
+      margin-bottom:12px;
+      box-shadow: var(--sombra);
+    }
+    .lista-notificacoes li span.data {
+      display:block;
+      font-size:0.85rem;
+      color:#777;
+      margin-top:6px;
+    }
+    .sincronizar-card {
+      background:var(--branco);
+      border-radius:12px;
+      padding:20px;
+      box-shadow: var(--sombra);
+      text-align:center;
+    }
+    .extrato-linha {
+      display:flex;
+      justify-content:space-between;
+      padding:12px 0;
+      border-bottom:1px solid #eee;
+    }
+    .extrato-linha:last-child {
+      border-bottom:none;
+    }
+    .extrato-linha .descricao {
+      font-size:1rem;
+      color:#333;
+    }
+    .extrato-linha .valor {
+      font-size:1rem;
+      font-weight:600;
+    }
+    .valor.positivo {
+      color:green;
+    }
+    .valor.negativo {
+      color:red;
+    }
     footer {
-      text-align: center;
-      padding: 1.5rem;
-      background: #f0f0f8;
-      margin-top: 2rem;
-      font-size: 0.9rem;
-      color: #777;
+      text-align:center;
+      padding:12px;
+      font-size:0.9rem;
+      color:#777;
+      background: var(--branco);
+      border-top:1px solid #ddd;
     }
-
-    /* ======== RESPONSIVIDADE ======== */
-    @media (max-width: 768px) {
-      nav {
-        flex-wrap: wrap;
-        gap: 0.5rem;
-      }
-      .resumo {
-        flex-direction: column;
-        gap: 1rem;
+    @media (max-width:768px) {
+      nav.menu a {
+        padding:10px 0;
+        font-size:0.9rem;
       }
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Infinity Bank</h1>
-    <nav>
-      <button class="active" onclick="showTab('dashboard')">Início</button>
-      <button onclick="showTab('transfer')">Transferir</button>
-      <button onclick="showTab('pagamentos')">Pagamentos</button>
-      <button onclick="showTab('investimentos')">Investimentos</button>
-      <button onclick="showTab('perfil')">Perfil</button>
-    </nav>
-  </header>
-
+  <header>Meu App Financeiro</header>
+  <nav class="menu">
+    <a class="ativo" onclick="trocarAba('inicio', this)">Início</a>
+    <a onclick="trocarAba('gerente', this)">Gerente</a>
+    <a onclick="trocarAba('perfil', this)">Perfil</a>
+    <a onclick="trocarAba('notificacoes', this)">Notificações</a>
+    <a onclick="trocarAba('sincronizar', this)">Sincronizar</a>
+    <a onclick="trocarAba('extrato', this)">Extrato</a>
+  </nav>
   <main>
-    <!-- DASHBOARD -->
-    <section id="dashboard" class="active">
-      <div class="card">
-        <h2>Olá, Webson 👋</h2>
-        <p>Saldo disponível:</p>
-        <p class="saldo">R$ 8.420,00</p>
+    <!-- INÍCIO -->
+    <section id="inicio" class="pagina ativa">
+      <h2 style="color:var(--azul-escuro); margin-bottom:8px;">Olá, Webson!</h2>
+      <p>Seu saldo disponível:</p>
+      <div class="cartao">
+        <h3>Conta Corrente</h3>
+        <p><strong>R$ 4.780,00</strong></p>
       </div>
-
-      <div class="resumo">
-        <div class="card">
-          <h3>Entradas</h3>
-          <p style="color: green;">R$ 3.500,00</p>
-        </div>
-        <div class="card">
-          <h3>Saídas</h3>
-          <p style="color: red;">R$ 1.270,00</p>
-        </div>
-        <div class="card">
-          <h3>Investido</h3>
-          <p style="color: blue;">R$ 4.000,00</p>
-        </div>
+      <div class="cartao">
+        <h3>Cartão de Crédito</h3>
+        <p>Limite disponível: <strong>R$ 6.500,00</strong></p>
+      </div>
+      <div class="cartao">
+        <h3>Nível de Cliente</h3>
+        <p>Você está no nível 4 — continue aproveitando seus benefícios!</p>
+        <a class="botao-primario" href="#">Ver benefícios</a>
       </div>
     </section>
 
-    <!-- TRANSFERÊNCIA -->
-    <section id="transfer">
-      <div class="card">
-        <h2>Fazer Transferência</h2>
-        <form>
-          <input type="text" placeholder="Nome do destinatário" required />
-          <input type="number" placeholder="Valor (R$)" required />
-          <input type="text" placeholder="Chave Pix ou Conta" required />
-          <button type="submit">Enviar</button>
-        </form>
+    <!-- GERENTE -->
+    <section id="gerente" class="pagina">
+      <h2 style="color:var(--azul-escuro); margin-bottom:8px;">Fale com seu Gerente</h2>
+      <div class="cartao gerente-info">
+        <div class="avatar">J</div>
+        <div style="display:inline-block; vertical-align:middle;">
+          <h3>Juliana Naomi Koyama</h3>
+          <p>Gerente de Relacionamento</p>
+        </div>
       </div>
-    </section>
-
-    <!-- PAGAMENTOS -->
-    <section id="pagamentos">
-      <div class="card">
-        <h2>Pagar Conta</h2>
-        <form>
-          <input type="text" placeholder="Código de barras ou chave PIX" required />
-          <button type="submit">Efetuar Pagamento</button>
-        </form>
+      <div class="contatos">
+        <button>💬 WhatsApp</button>
+        <button>💻 Chat</button>
+        <button>📧 E-mail</button>
+        <button>📞 Ligar</button>
       </div>
-    </section>
-
-    <!-- INVESTIMENTOS -->
-    <section id="investimentos">
-      <h2>Seus Investimentos</h2>
-      <div class="investimentos">
-        <div class="invest">
-          <h3>CDB Infinity</h3>
-          <p>Rendimento: 110% do CDI</p>
-          <button>Investir</button>
-        </div>
-        <div class="invest">
-          <h3>Cripto Infinity</h3>
-          <p>Rendimento variável</p>
-          <button>Investir</button>
-        </div>
-        <div class="invest">
-          <h3>Poupança Smart</h3>
-          <p>Rendimento: 0,8% a.m.</p>
-          <button>Investir</button>
-        </div>
+      <div class="mensagem">
+        <strong>Mensagem especial:</strong>
+        <p>"Oi Webson, tudo bem? Temos novidades para você!"</p>
       </div>
     </section>
 
     <!-- PERFIL -->
-    <section id="perfil">
-      <div class="card">
-        <h2>Meu Perfil</h2>
-        <form>
-          <input type="text" value="Webson Santana" />
-          <input type="email" value="webson@infinitybank.com" />
-          <select>
-            <option>Conta Corrente</option>
-            <option>Conta Poupança</option>
-          </select>
-          <button>Atualizar Dados</button>
-        </form>
+    <section id="perfil" class="pagina">
+      <div class="perfil">
+        <div class="avatar grande">WS</div>
+        <h2 style="color:var(--azul-escuro); margin-bottom:4px;">Webson Santana</h2>
+        <p>Uniclass – Ag 8231 CC 08623-0</p>
+      </div>
+      <div class="cartao">
+        <h3>Configurações</h3>
+        <ul style="list-style:none; margin-top:10px; padding-left:0;">
+          <li>📄 Dados cadastrais</li>
+          <li>🔒 Segurança</li>
+          <li>⚙️ Preferências</li>
+        </ul>
+      </div>
+      <div class="cartao">
+        <h3>Avaliação de experiência</h3>
+        <p>Como você avaliaria seu app hoje?</p>
+        <div style="font-size:24px; text-align:center; margin-top:10px;">😞 &nbsp; 😐 &nbsp; 🙂 &nbsp; 😃 &nbsp; 🤩</div>
       </div>
     </section>
+
+    <!-- NOTIFICAÇÕES -->
+    <section id="notificacoes" class="pagina">
+      <h2 style="color:var(--azul-escuro); margin-bottom:8px;">Notificações</h2>
+      <ul class="lista-notificacoes">
+        <li><strong>Pix recebido</strong><span class="data">20/10/2025 14:35</span></li>
+        <li><strong>Fatura do cartão fechada</strong><span class="data">19/10/2025 23:12</span></li>
+        <li><strong>Pagar mensalidade do nível 4</strong><span class="data">18/10/2025 08:47</span></li>
+      </ul>
+    </section>
+
+    <!-- SINCRONIZAR / CONEXÕES -->
+    <section id="sincronizar" class="pagina">
+      <h2 style="color:var(--azul-escuro); margin-bottom:8px;">Sincronizar & Conexões</h2>
+      <div class="sincronizar-card">
+        <p>Sincronize seus dados com:</p>
+        <button class="botao-primario">Adicionar conexão Open Finance</button>
+        <button class="botao-primario" style="margin-top:8px;">Gerenciar dispositivos conectados</button>
+      </div>
+    </section>
+
+    <!-- EXTRATO -->
+    <section id="extrato" class="pagina">
+      <h2 style="color:var(--azul-escuro); margin-bottom:8px;">Extrato Recentes</h2>
+      <div class="cartao">
+        <div class="extrato-linha"><span class="descricao">Transferência recebida</span><span class="valor positivo">+R$ 1.230,00</span></div>
+        <div class="extrato-linha"><span class="descricao">Pagamento de boleto</span><span class="valor negativo">-R$ 250,00</span></div>
+        <div class="extrato-linha"><span class="descricao">Compra com cartão</span><span class="valor negativo">-R$ 420,00</span></div>
+        <div class="extrato-linha"><span class="descricao">Rendimento investimento</span><span class="valor positivo">+R$ 95,00</span></div>
+      </div>
+      <a class="botao-primario" href="#">Ver todos os lançamentos</a>
+    </section>
+
   </main>
 
-  <footer>
-    Infinity Bank © 2025 — Desenvolvido com 💜 por Webson
-  </footer>
+  <footer>© 2025 Meu App Financeiro</footer>
 
   <script>
-    function showTab(tabId) {
-      document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
-      document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
-      document.getElementById(tabId).classList.add("active");
-      event.target.classList.add("active");
+    function trocarAba(abaId, elemento) {
+      document.querySelectorAll('section.pagina').forEach(sec => sec.classList.remove('ativa'));
+      document.getElementById(abaId).classList.add('ativa');
+
+      document.querySelectorAll('nav.menu a').forEach(a => a.classList.remove('ativo'));
+      elemento.classList.add('ativo');
     }
   </script>
 </body>
