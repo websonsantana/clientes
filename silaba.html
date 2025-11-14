@@ -14,7 +14,7 @@
 <style>
     #cameraFeed {
         width: 100%;
-        height: 400px; /* AUMENTADO */
+        height: 420px;
         object-fit: cover;
         border-radius: 10px;
     }
@@ -28,6 +28,7 @@
     .highlight-text {
         background: yellow;
         padding: 2px;
+        border-radius: 4px;
     }
 </style>
 
@@ -91,18 +92,28 @@ const photoCanvas = document.getElementById("photoCanvas");
 
 let stream;
 
-// Ligar câmera
+// Ligar câmera traseira
 startBtn.onclick = async () => {
     const syl = document.getElementById("syllable").value.trim();
     if (!syl) return alert("Digite uma sílaba!");
 
     cameraSection.classList.remove("hidden");
 
-    stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { exact: "environment" } }
+        });
+    } catch (e) {
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment" }
+        });
+    }
+
     video.srcObject = stream;
 
-    // Ajusta o canvas overlay
     video.onloadedmetadata = () => {
+        video.play();
+
         highlightCanvas.width = video.videoWidth;
         highlightCanvas.height = video.videoHeight;
     };
@@ -110,19 +121,23 @@ startBtn.onclick = async () => {
 
 // Capturar imagem
 captureBtn.onclick = async () => {
+    if (video.videoWidth === 0) {
+        return alert("A câmera ainda está carregando, aguarde 1 segundo...");
+    }
+
     const syl = document.getElementById("syllable").value.trim().toLowerCase();
     if (!syl) return;
 
-    const context = photoCanvas.getContext("2d");
     photoCanvas.width = video.videoWidth;
     photoCanvas.height = video.videoHeight;
 
-    context.drawImage(video, 0, 0);
+    const ctx = photoCanvas.getContext("2d");
+    ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
 
     // OCR
     const { data: { text } } = await Tesseract.recognize(photoCanvas, "por");
 
-    // Grifo no texto OCR
+    // Destacar sílaba no texto
     const highlightedText = text.replace(
         new RegExp(syl, "gi"),
         match => `<span class="highlight-text">${match}</span>`
@@ -131,11 +146,8 @@ captureBtn.onclick = async () => {
     resultsDiv.innerHTML = highlightedText;
     resultsSection.classList.remove("hidden");
 
-    // Grifo na imagem (simples: retângulo geral)
-    const ctx = photoCanvas.getContext("2d");
+    // Grifo simples na imagem
     ctx.fillStyle = "rgba(255,255,0,0.4)";
-
-    // Procurar linhas onde aparece a sílaba
     const lines = text.split("\n");
 
     lines.forEach((line, i) => {
