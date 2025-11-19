@@ -249,6 +249,51 @@
             margin-bottom: 20px;
         }
         
+        .user-info-form {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f0f7ff;
+            border-radius: 8px;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        
+        .user-details {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .user-meta {
+            color: #666;
+            font-size: 14px;
+        }
+        
         @media (max-width: 768px) {
             .main-content {
                 flex-direction: column;
@@ -296,6 +341,46 @@
                 <p><strong>Importante:</strong> Suas gravações de áudio e vídeo não são armazenadas em nossos servidores. Todo o processamento ocorre localmente em seu dispositivo.</p>
             </div>
             
+            <div id="user-info-form" class="user-info-form">
+                <h3>Identifique-se para começar</h3>
+                <p>Preencha os dados abaixo para personalizar sua experiência (não armazenamos estas informações):</p>
+                
+                <div class="form-group">
+                    <label for="user-name">Seu nome:</label>
+                    <input type="text" id="user-name" class="form-control" placeholder="Como gostaria de ser chamado?" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="user-age">Sua idade:</label>
+                    <input type="number" id="user-age" class="form-control" placeholder="Sua idade" min="1" max="120" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="user-country">Seu país:</label>
+                    <select id="user-country" class="form-control" required>
+                        <option value="">Selecione seu país</option>
+                        <option value="brasil">Brasil</option>
+                        <option value="portugal">Portugal</option>
+                        <option value="eua">Estados Unidos</option>
+                        <option value="espanha">Espanha</option>
+                        <option value="franca">França</option>
+                        <option value="alemanha">Alemanha</option>
+                        <option value="outro">Outro</option>
+                    </select>
+                </div>
+                
+                <button id="save-user-info" class="btn btn-accent">Salvar e Continuar</button>
+            </div>
+            
+            <div id="user-profile" class="user-profile hidden">
+                <div class="user-avatar" id="user-avatar">U</div>
+                <div class="user-details">
+                    <div class="user-name" id="profile-name">Usuário</div>
+                    <div class="user-meta" id="profile-meta">Idade, País</div>
+                </div>
+                <button id="change-user-info" class="btn">Alterar Dados</button>
+            </div>
+            
             <div class="main-content">
                 <div class="card">
                     <h2>Configurações de Prática</h2>
@@ -316,11 +401,6 @@
                             <option value="intermediate" selected>Intermediário</option>
                             <option value="advanced">Avançado</option>
                         </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Seu nome (opcional, para personalização):</label>
-                        <input type="text" id="user-name" class="form-control" placeholder="Como gostaria de ser chamado?">
                     </div>
                     
                     <button id="start-practice" class="btn btn-accent">Iniciar Sessão de Prática</button>
@@ -398,7 +478,7 @@
                 <p>Ao acessar e usar este sistema de prática de conversação em idiomas, você concorda em cumprir estes termos de uso.</p>
                 
                 <p><strong>2. Coleta de Dados</strong></p>
-                <p>Não coletamos ou armazenamos endereços de e-mail, números de telefone ou outras informações de contato. Seu nome (se fornecido) é usado apenas para personalizar sua experiência e não é armazenado após o fechamento da sessão.</p>
+                <p>Não coletamos ou armazenamos endereços de e-mail, números de telefone ou outras informações de contato. As informações de nome, idade e país são solicitadas apenas para personalizar sua experiência e não são armazenadas após o fechamento da sessão.</p>
                 
                 <p><strong>3. Uso de Câmera e Microfone</strong></p>
                 <p>Este sistema solicitará acesso à sua câmera e microfone para permitir a prática de conversação. As gravações de áudio e vídeo são processadas localmente em seu dispositivo e não são armazenadas em nossos servidores.</p>
@@ -413,7 +493,7 @@
                 <p>Reservamo-nos o direito de modificar estes termos a qualquer momento.</p>
                 
                 <p><strong>7. Acesso Sem Cadastro</strong></p>
-                <p>Este sistema não requer cadastro ou login para uso. Todas as funcionalidades estão disponíveis imediatamente.</p>
+                <p>Este sistema não requer cadastro ou login para uso. Todas as funcionalidades estão disponíveis imediatamente após fornecer nome, idade e país.</p>
             </div>
             <button id="back-from-terms" class="btn">Voltar para o Início</button>
         </div>
@@ -430,16 +510,27 @@
         const mainSection = document.getElementById('main-section');
         const practiceSection = document.getElementById('practice-section');
         const termsSection = document.getElementById('terms-section');
+        const userInfoForm = document.getElementById('user-info-form');
+        const userProfile = document.getElementById('user-profile');
         
         // Elementos de navegação
         const navHome = document.getElementById('nav-home');
         const navPractice = document.getElementById('nav-practice');
         const navTerms = document.getElementById('nav-terms');
         
+        // Elementos do formulário de usuário
+        const userNameInput = document.getElementById('user-name');
+        const userAgeInput = document.getElementById('user-age');
+        const userCountrySelect = document.getElementById('user-country');
+        const saveUserInfoBtn = document.getElementById('save-user-info');
+        const changeUserInfoBtn = document.getElementById('change-user-info');
+        const userAvatar = document.getElementById('user-avatar');
+        const profileName = document.getElementById('profile-name');
+        const profileMeta = document.getElementById('profile-meta');
+        
         // Elementos da prática
         const languageOptions = document.querySelectorAll('.language-option');
         const difficultySelect = document.getElementById('difficulty');
-        const userNameInput = document.getElementById('user-name');
         const startPracticeBtn = document.getElementById('start-practice');
         const currentLanguageSpan = document.getElementById('current-language');
         const userGreetingSpan = document.getElementById('user-greeting');
@@ -461,6 +552,7 @@
         let isMicOn = true;
         let practiceTimer = null;
         let seconds = 0;
+        let currentUser = null;
         
         // Prompts de conversação por idioma
         const conversationPrompts = {
@@ -494,11 +586,276 @@
                 "Vous avez besoin d'indications pour vous rendre à la gare la plus proche. Demandez de l'aide.",
                 "Parlez de votre passe-temps favori et expliquez pourquoi vous l'aimez.",
                 "Vous êtes en entretien d'embauche. Répondez aux questions sur votre expérience et vos compétences.",
-                "Décrivez vos dernières vacances. Où êtes-vous allé et qu'avez-vous fait?",
+                "Décrivez vos dernières vacaciones. Où êtes-vous allé et qu'avez-vous fait?",
                 "Parlez de votre film ou émission de télévision préféré et expliquez pourquoi vous l'aimez.",
                 "Vous êtes dans un magasin et devez retourner un produit. Expliquez la situation.",
                 "Planifiez une activité de week-end avec un ami. Discutez des options et prenez une décision.",
                 "Décrivez votre emploi de rêve et ce que ce serait que d'y travailler."
             ],
             de: [
-                "Stellen Sie sich vor, Sie sind in einem Restaurant und müssen Essen bestellen. Üben Sie, wie Sie das machen wür
+                "Stellen Sie sich vor, Sie sind in einem Restaurant und müssen Essen bestellen. Üben Sie, wie Sie das machen würden.",
+                "Sie treffen jemanden zum ersten Mal. Stellen Sie sich vor und fragen Sie nach seinen Interessen.",
+                "Sie benötigen Wegbeschreibungen zum nächsten Bahnhof. Bitten Sie um Hilfe.",
+                "Sprechen Sie über Ihr liebstes Hobby und warum es Ihnen gefällt.",
+                "Sie sind in einem Vorstellungsgespräch. Beantworten Sie Fragen zu Ihrer Erfahrung und Ihren Fähigkeiten.",
+                "Beschreiben Sie Ihren letzten Urlaub. Wo sind Sie hingegangen und was haben Sie gemacht?",
+                "Sprechen Sie über Ihren Lieblingsfilm oder Ihre Lieblingsserie und erklären Sie, warum Sie ihn/sie mögen.",
+                "Sie sind in einem Geschäft und müssen ein Produkt zurückgeben. Erklären Sie die situação.",
+                "Planen Sie eine Wochenendaktivität mit einem Freund. Besprechen Sie Optionen und treffen Sie eine Entscheidung.",
+                "Beschreiben Sie Ihren Traumjob und wie es wäre, dort zu arbeiten."
+            ]
+        };
+        
+        let currentPromptIndex = 0;
+        
+        // Event Listeners
+        navHome.addEventListener('click', showMainSection);
+        navPractice.addEventListener('click', showPracticeSection);
+        navTerms.addEventListener('click', showTerms);
+        
+        saveUserInfoBtn.addEventListener('click', saveUserInfo);
+        changeUserInfoBtn.addEventListener('click', showUserInfoForm);
+        
+        languageOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                languageOptions.forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+                selectedLanguage = option.getAttribute('data-lang');
+                updateCurrentLanguage();
+            });
+        });
+        
+        startPracticeBtn.addEventListener('click', startPractice);
+        toggleCameraBtn.addEventListener('click', toggleCamera);
+        toggleMicBtn.addEventListener('click', toggleMicrophone);
+        endPracticeBtn.addEventListener('click', endPractice);
+        previousPromptBtn.addEventListener('click', previousPrompt);
+        nextPromptBtn.addEventListener('click', nextPrompt);
+        backFromTermsBtn.addEventListener('click', showMainSection);
+        
+        // Funções
+        function showMainSection() {
+            mainSection.classList.remove('hidden');
+            practiceSection.classList.add('hidden');
+            termsSection.classList.add('hidden');
+        }
+        
+        function showPracticeSection() {
+            if (!currentUser) {
+                alert('Por favor, preencha seus dados antes de iniciar a prática.');
+                showUserInfoForm();
+                return;
+            }
+            
+            if (stream) {
+                // Se já está em uma sessão de prática, apenas mostra a seção
+                mainSection.classList.add('hidden');
+                practiceSection.classList.remove('hidden');
+                termsSection.classList.add('hidden');
+            } else {
+                // Se não, vai para a tela principal para iniciar a prática
+                showMainSection();
+            }
+        }
+        
+        function showTerms() {
+            mainSection.classList.add('hidden');
+            practiceSection.classList.add('hidden');
+            termsSection.classList.remove('hidden');
+        }
+        
+        function showUserInfoForm() {
+            userInfoForm.classList.remove('hidden');
+            userProfile.classList.add('hidden');
+        }
+        
+        function saveUserInfo() {
+            const name = userNameInput.value.trim();
+            const age = userAgeInput.value.trim();
+            const country = userCountrySelect.value;
+            
+            if (!name || !age || !country) {
+                alert('Por favor, preencha todos os campos.');
+                return;
+            }
+            
+            currentUser = {
+                name: name,
+                age: age,
+                country: country
+            };
+            
+            // Atualizar perfil do usuário
+            profileName.textContent = name;
+            profileMeta.textContent = `${age} anos, ${getCountryName(country)}`;
+            userAvatar.textContent = name.charAt(0).toUpperCase();
+            
+            // Mostrar perfil e esconder formulário
+            userInfoForm.classList.add('hidden');
+            userProfile.classList.remove('hidden');
+            
+            // Limpar formulário
+            userNameInput.value = '';
+            userAgeInput.value = '';
+            userCountrySelect.value = '';
+        }
+        
+        function getCountryName(countryCode) {
+            const countries = {
+                'brasil': 'Brasil',
+                'portugal': 'Portugal',
+                'eua': 'Estados Unidos',
+                'espanha': 'Espanha',
+                'franca': 'França',
+                'alemanha': 'Alemanha',
+                'outro': 'Outro'
+            };
+            return countries[countryCode] || countryCode;
+        }
+        
+        function updateCurrentLanguage() {
+            const languageNames = {
+                'en': 'Inglês',
+                'es': 'Espanhol',
+                'fr': 'Francês',
+                'de': 'Alemão'
+            };
+            currentLanguageSpan.textContent = languageNames[selectedLanguage];
+        }
+        
+        function updateUserGreeting() {
+            if (currentUser) {
+                userGreetingSpan.textContent = `Olá, ${currentUser.name}!`;
+            } else {
+                userGreetingSpan.textContent = 'Bem-vindo!';
+            }
+        }
+        
+        function startTimer() {
+            seconds = 0;
+            practiceTimer = setInterval(() => {
+                seconds++;
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                practiceTimerSpan.textContent = `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+        
+        function stopTimer() {
+            if (practiceTimer) {
+                clearInterval(practiceTimer);
+                practiceTimer = null;
+            }
+        }
+        
+        async function startPractice() {
+            if (!currentUser) {
+                alert('Por favor, preencha seus dados antes de iniciar a prática.');
+                showUserInfoForm();
+                return;
+            }
+            
+            try {
+                // Atualizar saudação do usuário
+                updateUserGreeting();
+                
+                // Solicitar permissão para câmera e microfone
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: true, 
+                    audio: true 
+                });
+                
+                videoElement.srcObject = stream;
+                isCameraOn = true;
+                isMicOn = true;
+                
+                // Atualizar UI
+                toggleCameraBtn.textContent = 'Desligar Câmera';
+                toggleMicBtn.textContent = 'Desligar Microfone';
+                
+                // Mostrar seção de prática
+                showPracticeSection();
+                
+                // Iniciar timer
+                startTimer();
+                
+                // Definir primeiro prompt
+                currentPromptIndex = 0;
+                promptTextarea.value = conversationPrompts[selectedLanguage][currentPromptIndex];
+                
+            } catch (error) {
+                console.error('Erro ao acessar câmera/microfone:', error);
+                alert('Não foi possível acessar a câmera e/ou microfone. Verifique as permissões do seu navegador.');
+            }
+        }
+        
+        function toggleCamera() {
+            if (!stream) return;
+            
+            const videoTrack = stream.getVideoTracks()[0];
+            if (videoTrack) {
+                if (isCameraOn) {
+                    videoTrack.enabled = false;
+                    toggleCameraBtn.textContent = 'Ligar Câmera';
+                } else {
+                    videoTrack.enabled = true;
+                    toggleCameraBtn.textContent = 'Desligar Câmera';
+                }
+                isCameraOn = !isCameraOn;
+            }
+        }
+        
+        function toggleMicrophone() {
+            if (!stream) return;
+            
+            const audioTrack = stream.getAudioTracks()[0];
+            if (audioTrack) {
+                if (isMicOn) {
+                    audioTrack.enabled = false;
+                    toggleMicBtn.textContent = 'Ligar Microfone';
+                } else {
+                    audioTrack.enabled = true;
+                    toggleMicBtn.textContent = 'Desligar Microfone';
+                }
+                isMicOn = !isMicOn;
+            }
+        }
+        
+        function endPractice() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            
+            // Parar timer
+            stopTimer();
+            practiceTimerSpan.textContent = '00:00';
+            
+            // Limpar resposta do usuário
+            userResponseTextarea.value = '';
+            
+            // Voltar para a tela principal
+            showMainSection();
+        }
+        
+        function previousPrompt() {
+            currentPromptIndex = (currentPromptIndex - 1 + conversationPrompts[selectedLanguage].length) % conversationPrompts[selectedLanguage].length;
+            promptTextarea.value = conversationPrompts[selectedLanguage][currentPromptIndex];
+            
+            // Limpar resposta do usuário
+            userResponseTextarea.value = '';
+        }
+        
+        function nextPrompt() {
+            currentPromptIndex = (currentPromptIndex + 1) % conversationPrompts[selectedLanguage].length;
+            promptTextarea.value = conversationPrompts[selectedLanguage][currentPromptIndex];
+            
+            // Limpar resposta do usuário
+            userResponseTextarea.value = '';
+        }
+        
+        // Inicialização
+        updateCurrentLanguage();
+    </script>
+</body>
+</html>
