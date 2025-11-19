@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prática de Conversação em Idiomas</title>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #6b8cbc;
+            --accent-color: #ff7e5f;
+            --light-color: #f5f7fa;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --error-color: #e74c3c;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        header h1 {
+            margin-bottom: 10px;
+        }
+        
+        nav {
+            background-color: var(--secondary-color);
+            padding: 10px 0;
+        }
+        
+        nav ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin: 0 15px;
+        }
+        
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        nav ul li a:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+        
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 30px 0;
+            gap: 20px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .card h2 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-accent {
+            background-color: var(--accent-color);
+        }
+        
+        .btn-accent:hover {
+            background-color: #ff6b4a;
+        }
+        
+        .video-container {
+            position: relative;
+            width: 100%;
+            background-color: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        
+        #videoElement {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .language-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .language-option {
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .language-option:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .language-option.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .practice-topics {
+            margin: 15px 0;
+        }
+        
+        .topic-item {
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-left: 4px solid var(--primary-color);
+            margin-bottom: 10px;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 30px;
+        }
+        
+        .terms {
+            font-size: 14px;
+            color: #777;
+            margin-top: 20px;
+        }
+        
+        .terms a {
+            color: var(--primary-color);
+        }
+        
+        .alert {
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        
+        .alert-success {
+            background-color: rgba(46, 204, 113, 0.2);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+        }
+        
+        .alert-error {
+            background-color: rgba(231, 76, 60, 0.2);
+            border: 1px solid var(--error-color);
+            color: var(--error-color);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            nav ul li {
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Prática de Conversação em Idiomas</h1>
+            <p>Desenvolva suas habilidades de conversação em diferentes idiomas</p>
+        </div>
+    </header>
+    
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="#" id="nav-home">Início</a></li>
+                <li><a href="#" id="nav-practice">Praticar</a></li>
+                <li><a href="#" id="nav-profile">Meu Perfil</a></li>
+                <li><a href="#" id="nav-logout" class="hidden">Sair</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <!-- Tela de Login/Cadastro -->
+        <div id="login-section" class="card">
+            <h2>Entrar / Cadastrar</h2>
+            <div class="form-group">
+                <label for="username">Nome de usuário</label>
+                <input type="text" id="username" class="form-control" placeholder="Escolha um nome de usuário">
+            </div>
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" class="form-control" placeholder="Crie uma senha">
+            </div>
+            <button id="login-btn" class="btn">Entrar / Cadastrar</button>
+            <div class="terms">
+                <p>Ao se cadastrar, você concorda com nossos <a href="#" id="terms-link">Termos de Uso</a>. Não armazenamos e-mail ou telefone.</p>
+            </div>
+        </div>
+        
+        <!-- Tela Principal após Login -->
+        <div id="main-section" class="hidden">
+            <div class="main-content">
+                <div class="card">
+                    <h2>Configurações de Prática</h2>
+                    <div class="form-group">
+                        <label>Selecione o idioma para praticar:</label>
+                        <div class="language-selector">
+                            <div class="language-option active" data-lang="en">Inglês</div>
+                            <div class="language-option" data-lang="es">Espanhol</div>
+                            <div class="language-option" data-lang="fr">Francês</div>
+                            <div class="language-option" data-lang="de">Alemão</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Nível de dificuldade:</label>
+                        <select id="difficulty" class="form-control">
+                            <option value="beginner">Iniciante</option>
+                            <option value="intermediate" selected>Intermediário</option>
+                            <option value="advanced">Avançado</option>
+                        </select>
+                    </div>
+                    
+                    <button id="start-practice" class="btn btn-accent">Iniciar Sessão de Prática</button>
+                </div>
+                
+                <div class="card">
+                    <h2>Tópicos para Prática</h2>
+                    <div class="practice-topics">
+                        <div class="topic-item">
+                            <h3>Apresentações</h3>
+                            <p>Pratique como se apresentar em situações formais e informais</p>
+                        </div>
+                        <div class="topic-item">
+                            <h3>Viagens</h3>
+                            <p>Conversas sobre reservas, direções e experiências de viagem</p>
+                        </div>
+                        <div class="topic-item">
+                            <h3>Trabalho</h3>
+                            <p>Discussões sobre ambiente de trabalho, reuniões e entrevistas</p>
+                        </div>
+                        <div class="topic-item">
+                            <h3>Hobbies</h3>
+                            <p>Converse sobre seus interesses e atividades de lazer</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tela de Prática -->
+        <div id="practice-section" class="hidden">
+            <div class="card">
+                <h2>Sessão de Prática: <span id="current-language">Inglês</span></h2>
+                <div class="video-container">
+                    <video id="videoElement" autoplay muted></video>
+                </div>
+                <div class="controls">
+                    <button id="toggle-camera" class="btn">Desligar Câmera</button>
+                    <button id="toggle-mic" class="btn">Desligar Microfone</button>
+                    <button id="end-practice" class="btn btn-accent">Finalizar Sessão</button>
+                </div>
+                
+                <div class="form-group">
+                    <label for="prompt">Prompt de conversação:</label>
+                    <textarea id="prompt" class="form-control" rows="4" readonly>Imagine que você está em um restaurante e precisa fazer um pedido. Pratique como você faria isso no idioma selecionado.</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="user-response">Sua resposta (opcional):</label>
+                    <textarea id="user-response" class="form-control" rows="4" placeholder="Digite sua resposta aqui para referência futura..."></textarea>
+                </div>
+                
+                <button id="next-prompt" class="btn">Próximo Prompt</button>
+            </div>
+        </div>
+        
+        <!-- Tela de Termos -->
+        <div id="terms-section" class="card hidden">
+            <h2>Termos de Uso</h2>
+            <div class="terms-content">
+                <p><strong>1. Aceitação dos Termos</strong></p>
+                <p>Ao acessar e usar este sistema de prática de conversação em idiomas, você concorda em cumprir estes termos de uso.</p>
+                
+                <p><strong>2. Coleta de Dados</strong></p>
+                <p>Não coletamos ou armazenamos endereços de e-mail, números de telefone ou outras informações de contato. Seu nome de usuário e senha são as únicas informações necessárias para criar uma conta.</p>
+                
+                <p><strong>3. Uso de Câmera e Microfone</strong></p>
+                <p>Este sistema solicitará acesso à sua câmera e microfone para permitir a prática de conversação. As gravações de áudio e vídeo são processadas localmente em seu dispositivo e não são armazenadas em nossos servidores.</p>
+                
+                <p><strong>4. Responsabilidade do Usuário</strong></p>
+                <p>Você é responsável por manter a confidencialidade de sua conta e por todas as atividades que ocorrem sob sua conta.</p>
+                
+                <p><strong>5. Limitações de Uso</strong></p>
+                <p>Você concorda em não usar este sistema para qualquer propósito ilegal ou não autorizado.</p>
+                
+                <p><strong>6. Alterações nos Termos</strong></p>
+                <p>Reservamo-nos o direito de modificar estes termos a qualquer momento. O uso continuado do sistema após tais modificações constitui sua aceitação dos novos termos.</p>
+            </div>
+            <button id="back-from-terms" class="btn">Voltar</button>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>Sistema de Prática de Conversação em Idiomas &copy; 2023</p>
+        </div>
+    </footer>
+
+    <script>
+        // Elementos da interface
+        const loginSection = document.getElementById('login-section');
+        const mainSection = document.getElementById('main-section');
+        const practiceSection = document.getElementById('practice-section');
+        const termsSection = document.getElementById('terms-section');
+        const navLogout = document.getElementById('nav-logout');
+        
+        // Elementos de login/cadastro
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('login-btn');
+        const termsLink = document.getElementById('terms-link');
+        const backFromTermsBtn = document.getElementById('back-from-terms');
+        
+        // Elementos de navegação
+        const navHome = document.getElementById('nav-home');
+        const navPractice = document.getElementById('nav-practice');
+        const navProfile = document.getElementById('nav-profile');
+        
+        // Elementos da prática
+        const languageOptions = document.querySelectorAll('.language-option');
+        const difficultySelect = document.getElementById('difficulty');
+        const startPracticeBtn = document.getElementById('start-practice');
+        const currentLanguageSpan = document.getElementById('current-language');
+        const videoElement = document.getElementById('videoElement');
+        const toggleCameraBtn = document.getElementById('toggle-camera');
+        const toggleMicBtn = document.getElementById('toggle-mic');
+        const endPracticeBtn = document.getElementById('end-practice');
+        const promptTextarea = document.getElementById('prompt');
+        const userResponseTextarea = document.getElementById('user-response');
+        const nextPromptBtn = document.getElementById('next-prompt');
+        
+        // Estado da aplicação
+        let isLoggedIn = false;
+        let currentUser = null;
+        let selectedLanguage = 'en';
+        let stream = null;
+        let isCameraOn = true;
+        let isMicOn = true;
+        
+        // Prompts de conversação por idioma
+        const conversationPrompts = {
+            en: [
+                "Imagine you're at a restaurant and need to order food. Practice how you would do this.",
+                "You're meeting someone for the first time. Introduce yourself and ask about their interests.",
+                "You need directions to the nearest train station. Ask for help.",
+                "Discuss your favorite hobby and why you enjoy it.",
+                "You're at a job interview. Answer questions about your experience and skills."
+            ],
+            es: [
+                "Imagina que estás en un restaurante y necesitas pedir comida. Practica cómo lo harías.",
+                "Estás conociendo a alguien por primera vez. Preséntate y pregunta sobre sus intereses.",
+                "Necesitas indicaciones para llegar a la estación de tren más cercana. Pide ayuda.",
+                "Habla sobre tu pasatiempo favorito y por qué te gusta.",
+                "Estás en una entrevista de trabajo. Responde preguntas sobre tu experiencia y habilidades."
+            ],
+            fr: [
+                "Imaginez que vous êtes au restaurant et que vous devez commander de la nourriture. Entraînez-vous à le faire.",
+                "Vous rencontrez quelqu'un pour la première fois. Présentez-vous et renseignez-vous sur ses centres d'intérêt.",
+                "Vous avez besoin d'indications pour vous rendre à la gare la plus proche. Demandez de l'aide.",
+                "Parlez de votre passe-temps favori et expliquez pourquoi vous l'aimez.",
+                "Vous êtes en entretien d'embauche. Répondez aux questions sur votre expérience et vos compétences."
+            ],
+            de: [
+                "Stellen Sie sich vor, Sie sind in einem Restaurant und müssen Essen bestellen. Üben Sie, wie Sie das machen würden.",
+                "Sie treffen jemanden zum ersten Mal. Stellen Sie sich vor und fragen Sie nach seinen Interessen.",
+                "Sie benötigen Wegbeschreibungen zum nächsten Bahnhof. Bitten Sie um Hilfe.",
+                "Sprechen Sie über Ihr liebstes Hobby und warum es Ihnen gefällt.",
+                "Sie sind in einem Vorstellungsgespräch. Beantworten Sie Fragen zu Ihrer Erfahrung und Ihren Fähigkeiten."
+            ]
+        };
+        
+        let currentPromptIndex = 0;
+        
+        // Event Listeners
+        loginBtn.addEventListener('click', handleLogin);
+        termsLink.addEventListener('click', showTerms);
+        backFromTermsBtn.addEventListener('click', hideTerms);
+        
+        navHome.addEventListener('click', showMainSection);
+        navPractice.addEventListener('click', showPracticeSection);
+        navProfile.addEventListener('click', showProfile);
+        navLogout.addEventListener('click', handleLogout);
+        
+        languageOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                languageOptions.forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+                selectedLanguage = option.getAttribute('data-lang');
+                updateCurrentLanguage();
+            });
+        });
+        
+        startPracticeBtn.addEventListener('click', startPractice);
+        toggleCameraBtn.addEventListener('click', toggleCamera);
+        toggleMicBtn.addEventListener('click', toggleMicrophone);
+        endPracticeBtn.addEventListener('click', endPractice);
+        nextPromptBtn.addEventListener('click', nextPrompt);
+        
+        // Funções
+        function handleLogin() {
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            if (!username || !password) {
+                alert('Por favor, preencha todos os campos.');
+                return;
+            }
+            
+            // Simulação de autenticação - em um sistema real, isso seria feito no servidor
+            currentUser = {
+                username: username
