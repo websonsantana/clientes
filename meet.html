@@ -241,6 +241,14 @@
             display: none;
         }
         
+        .permission-request {
+            background-color: rgba(255, 193, 7, 0.2);
+            border: 1px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
         @media (max-width: 768px) {
             .main-content {
                 flex-direction: column;
@@ -253,6 +261,10 @@
             
             nav ul li {
                 margin: 5px 0;
+            }
+            
+            .controls {
+                flex-direction: column;
             }
         }
     </style>
@@ -270,32 +282,20 @@
             <ul>
                 <li><a href="#" id="nav-home">Início</a></li>
                 <li><a href="#" id="nav-practice">Praticar</a></li>
-                <li><a href="#" id="nav-profile">Meu Perfil</a></li>
-                <li><a href="#" id="nav-logout" class="hidden">Sair</a></li>
+                <li><a href="#" id="nav-terms">Termos de Uso</a></li>
             </ul>
         </div>
     </nav>
     
     <div class="container">
-        <!-- Tela de Login/Cadastro -->
-        <div id="login-section" class="card">
-            <h2>Entrar / Cadastrar</h2>
-            <div class="form-group">
-                <label for="username">Nome de usuário</label>
-                <input type="text" id="username" class="form-control" placeholder="Escolha um nome de usuário">
+        <!-- Tela Principal -->
+        <div id="main-section">
+            <div class="permission-request">
+                <h3>⚠️ Permissões Necessárias</h3>
+                <p>Para usar este sistema, você precisará permitir o acesso à sua câmera e microfone quando solicitado. Esses recursos são essenciais para a prática de conversação.</p>
+                <p><strong>Importante:</strong> Suas gravações de áudio e vídeo não são armazenadas em nossos servidores. Todo o processamento ocorre localmente em seu dispositivo.</p>
             </div>
-            <div class="form-group">
-                <label for="password">Senha</label>
-                <input type="password" id="password" class="form-control" placeholder="Crie uma senha">
-            </div>
-            <button id="login-btn" class="btn">Entrar / Cadastrar</button>
-            <div class="terms">
-                <p>Ao se cadastrar, você concorda com nossos <a href="#" id="terms-link">Termos de Uso</a>. Não armazenamos e-mail ou telefone.</p>
-            </div>
-        </div>
-        
-        <!-- Tela Principal após Login -->
-        <div id="main-section" class="hidden">
+            
             <div class="main-content">
                 <div class="card">
                     <h2>Configurações de Prática</h2>
@@ -316,6 +316,11 @@
                             <option value="intermediate" selected>Intermediário</option>
                             <option value="advanced">Avançado</option>
                         </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Seu nome (opcional, para personalização):</label>
+                        <input type="text" id="user-name" class="form-control" placeholder="Como gostaria de ser chamado?">
                     </div>
                     
                     <button id="start-practice" class="btn btn-accent">Iniciar Sessão de Prática</button>
@@ -340,6 +345,10 @@
                             <h3>Hobbies</h3>
                             <p>Converse sobre seus interesses e atividades de lazer</p>
                         </div>
+                        <div class="topic-item">
+                            <h3>Compras</h3>
+                            <p>Interações em lojas, perguntas sobre produtos e negociação de preços</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -348,10 +357,12 @@
         <!-- Tela de Prática -->
         <div id="practice-section" class="hidden">
             <div class="card">
-                <h2>Sessão de Prática: <span id="current-language">Inglês</span></h2>
+                <h2>Sessão de Prática: <span id="current-language">Inglês</span> - <span id="user-greeting"></span></h2>
+                
                 <div class="video-container">
                     <video id="videoElement" autoplay muted></video>
                 </div>
+                
                 <div class="controls">
                     <button id="toggle-camera" class="btn">Desligar Câmera</button>
                     <button id="toggle-mic" class="btn">Desligar Microfone</button>
@@ -368,7 +379,14 @@
                     <textarea id="user-response" class="form-control" rows="4" placeholder="Digite sua resposta aqui para referência futura..."></textarea>
                 </div>
                 
-                <button id="next-prompt" class="btn">Próximo Prompt</button>
+                <div class="controls">
+                    <button id="previous-prompt" class="btn">Prompt Anterior</button>
+                    <button id="next-prompt" class="btn">Próximo Prompt</button>
+                </div>
+                
+                <div class="timer">
+                    <p>Tempo de prática: <span id="practice-timer">00:00</span></p>
+                </div>
             </div>
         </div>
         
@@ -380,70 +398,69 @@
                 <p>Ao acessar e usar este sistema de prática de conversação em idiomas, você concorda em cumprir estes termos de uso.</p>
                 
                 <p><strong>2. Coleta de Dados</strong></p>
-                <p>Não coletamos ou armazenamos endereços de e-mail, números de telefone ou outras informações de contato. Seu nome de usuário e senha são as únicas informações necessárias para criar uma conta.</p>
+                <p>Não coletamos ou armazenamos endereços de e-mail, números de telefone ou outras informações de contato. Seu nome (se fornecido) é usado apenas para personalizar sua experiência e não é armazenado após o fechamento da sessão.</p>
                 
                 <p><strong>3. Uso de Câmera e Microfone</strong></p>
                 <p>Este sistema solicitará acesso à sua câmera e microfone para permitir a prática de conversação. As gravações de áudio e vídeo são processadas localmente em seu dispositivo e não são armazenadas em nossos servidores.</p>
                 
                 <p><strong>4. Responsabilidade do Usuário</strong></p>
-                <p>Você é responsável por manter a confidencialidade de sua conta e por todas as atividades que ocorrem sob sua conta.</p>
+                <p>Você é responsável por usar este sistema de forma adequada e respeitosa.</p>
                 
                 <p><strong>5. Limitações de Uso</strong></p>
                 <p>Você concorda em não usar este sistema para qualquer propósito ilegal ou não autorizado.</p>
                 
                 <p><strong>6. Alterações nos Termos</strong></p>
-                <p>Reservamo-nos o direito de modificar estes termos a qualquer momento. O uso continuado do sistema após tais modificações constitui sua aceitação dos novos termos.</p>
+                <p>Reservamo-nos o direito de modificar estes termos a qualquer momento.</p>
+                
+                <p><strong>7. Acesso Sem Cadastro</strong></p>
+                <p>Este sistema não requer cadastro ou login para uso. Todas as funcionalidades estão disponíveis imediatamente.</p>
             </div>
-            <button id="back-from-terms" class="btn">Voltar</button>
+            <button id="back-from-terms" class="btn">Voltar para o Início</button>
         </div>
     </div>
     
     <footer>
         <div class="container">
-            <p>Sistema de Prática de Conversação em Idiomas &copy; 2023</p>
+            <p>Sistema de Prática de Conversação em Idiomas &copy; 2023 - Acesso Livre Sem Cadastro</p>
         </div>
     </footer>
 
     <script>
         // Elementos da interface
-        const loginSection = document.getElementById('login-section');
         const mainSection = document.getElementById('main-section');
         const practiceSection = document.getElementById('practice-section');
         const termsSection = document.getElementById('terms-section');
-        const navLogout = document.getElementById('nav-logout');
-        
-        // Elementos de login/cadastro
-        const usernameInput = document.getElementById('username');
-        const passwordInput = document.getElementById('password');
-        const loginBtn = document.getElementById('login-btn');
-        const termsLink = document.getElementById('terms-link');
-        const backFromTermsBtn = document.getElementById('back-from-terms');
         
         // Elementos de navegação
         const navHome = document.getElementById('nav-home');
         const navPractice = document.getElementById('nav-practice');
-        const navProfile = document.getElementById('nav-profile');
+        const navTerms = document.getElementById('nav-terms');
         
         // Elementos da prática
         const languageOptions = document.querySelectorAll('.language-option');
         const difficultySelect = document.getElementById('difficulty');
+        const userNameInput = document.getElementById('user-name');
         const startPracticeBtn = document.getElementById('start-practice');
         const currentLanguageSpan = document.getElementById('current-language');
+        const userGreetingSpan = document.getElementById('user-greeting');
         const videoElement = document.getElementById('videoElement');
         const toggleCameraBtn = document.getElementById('toggle-camera');
         const toggleMicBtn = document.getElementById('toggle-mic');
         const endPracticeBtn = document.getElementById('end-practice');
         const promptTextarea = document.getElementById('prompt');
         const userResponseTextarea = document.getElementById('user-response');
+        const previousPromptBtn = document.getElementById('previous-prompt');
         const nextPromptBtn = document.getElementById('next-prompt');
+        const practiceTimerSpan = document.getElementById('practice-timer');
+        const backFromTermsBtn = document.getElementById('back-from-terms');
         
         // Estado da aplicação
-        let isLoggedIn = false;
-        let currentUser = null;
         let selectedLanguage = 'en';
         let stream = null;
         let isCameraOn = true;
         let isMicOn = true;
+        let practiceTimer = null;
+        let seconds = 0;
         
         // Prompts de conversação por idioma
         const conversationPrompts = {
@@ -452,68 +469,36 @@
                 "You're meeting someone for the first time. Introduce yourself and ask about their interests.",
                 "You need directions to the nearest train station. Ask for help.",
                 "Discuss your favorite hobby and why you enjoy it.",
-                "You're at a job interview. Answer questions about your experience and skills."
+                "You're at a job interview. Answer questions about your experience and skills.",
+                "Describe your last vacation. Where did you go and what did you do?",
+                "Talk about your favorite movie or TV show and explain why you like it.",
+                "You're at a store and need to return a product. Explain the situation.",
+                "Plan a weekend activity with a friend. Discuss options and make a decision.",
+                "Describe your dream job and what it would be like to work there."
             ],
             es: [
                 "Imagina que estás en un restaurante y necesitas pedir comida. Practica cómo lo harías.",
                 "Estás conociendo a alguien por primera vez. Preséntate y pregunta sobre sus intereses.",
                 "Necesitas indicaciones para llegar a la estación de tren más cercana. Pide ayuda.",
                 "Habla sobre tu pasatiempo favorito y por qué te gusta.",
-                "Estás en una entrevista de trabajo. Responde preguntas sobre tu experiencia y habilidades."
+                "Estás en una entrevista de trabajo. Responde preguntas sobre tu experiencia y habilidades.",
+                "Describe tus últimas vacaciones. ¿Adónde fuiste y qué hiciste?",
+                "Habla sobre tu película o programa de TV favorito y explica por qué te gusta.",
+                "Estás en una tienda y necesitas devolver un producto. Explica la situación.",
+                "Planea una actividad de fin de semana con un amigo. Discute opciones y toma una decisión.",
+                "Describe tu trabajo ideal y cómo sería trabajar allí."
             ],
             fr: [
                 "Imaginez que vous êtes au restaurant et que vous devez commander de la nourriture. Entraînez-vous à le faire.",
                 "Vous rencontrez quelqu'un pour la première fois. Présentez-vous et renseignez-vous sur ses centres d'intérêt.",
                 "Vous avez besoin d'indications pour vous rendre à la gare la plus proche. Demandez de l'aide.",
                 "Parlez de votre passe-temps favori et expliquez pourquoi vous l'aimez.",
-                "Vous êtes en entretien d'embauche. Répondez aux questions sur votre expérience et vos compétences."
+                "Vous êtes en entretien d'embauche. Répondez aux questions sur votre expérience et vos compétences.",
+                "Décrivez vos dernières vacances. Où êtes-vous allé et qu'avez-vous fait?",
+                "Parlez de votre film ou émission de télévision préféré et expliquez pourquoi vous l'aimez.",
+                "Vous êtes dans un magasin et devez retourner un produit. Expliquez la situation.",
+                "Planifiez une activité de week-end avec un ami. Discutez des options et prenez une décision.",
+                "Décrivez votre emploi de rêve et ce que ce serait que d'y travailler."
             ],
             de: [
-                "Stellen Sie sich vor, Sie sind in einem Restaurant und müssen Essen bestellen. Üben Sie, wie Sie das machen würden.",
-                "Sie treffen jemanden zum ersten Mal. Stellen Sie sich vor und fragen Sie nach seinen Interessen.",
-                "Sie benötigen Wegbeschreibungen zum nächsten Bahnhof. Bitten Sie um Hilfe.",
-                "Sprechen Sie über Ihr liebstes Hobby und warum es Ihnen gefällt.",
-                "Sie sind in einem Vorstellungsgespräch. Beantworten Sie Fragen zu Ihrer Erfahrung und Ihren Fähigkeiten."
-            ]
-        };
-        
-        let currentPromptIndex = 0;
-        
-        // Event Listeners
-        loginBtn.addEventListener('click', handleLogin);
-        termsLink.addEventListener('click', showTerms);
-        backFromTermsBtn.addEventListener('click', hideTerms);
-        
-        navHome.addEventListener('click', showMainSection);
-        navPractice.addEventListener('click', showPracticeSection);
-        navProfile.addEventListener('click', showProfile);
-        navLogout.addEventListener('click', handleLogout);
-        
-        languageOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                languageOptions.forEach(opt => opt.classList.remove('active'));
-                option.classList.add('active');
-                selectedLanguage = option.getAttribute('data-lang');
-                updateCurrentLanguage();
-            });
-        });
-        
-        startPracticeBtn.addEventListener('click', startPractice);
-        toggleCameraBtn.addEventListener('click', toggleCamera);
-        toggleMicBtn.addEventListener('click', toggleMicrophone);
-        endPracticeBtn.addEventListener('click', endPractice);
-        nextPromptBtn.addEventListener('click', nextPrompt);
-        
-        // Funções
-        function handleLogin() {
-            const username = usernameInput.value.trim();
-            const password = passwordInput.value.trim();
-            
-            if (!username || !password) {
-                alert('Por favor, preencha todos os campos.');
-                return;
-            }
-            
-            // Simulação de autenticação - em um sistema real, isso seria feito no servidor
-            currentUser = {
-                username: username
+                "Stellen Sie sich vor, Sie sind in einem Restaurant und müssen Essen bestellen. Üben Sie, wie Sie das machen wür
