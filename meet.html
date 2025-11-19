@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prática de Conversação em Idiomas</title>
+    <title>ConnectSpeak - Conversação Global</title>
     <style>
         :root {
             --primary-color: #4a6fa5;
@@ -14,6 +14,7 @@
             --success-color: #2ecc71;
             --warning-color: #f39c12;
             --error-color: #e74c3c;
+            --busy-color: #e74c3c;
         }
         
         * {
@@ -35,16 +36,13 @@
             padding: 20px;
         }
         
+        /* Header & Nav */
         header {
             background-color: var(--primary-color);
             color: white;
             padding: 20px 0;
             text-align: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        header h1 {
-            margin-bottom: 10px;
         }
         
         nav {
@@ -74,48 +72,131 @@
         nav ul li a:hover {
             background-color: rgba(255,255,255,0.2);
         }
-        
-        .main-content {
+
+        /* Layout Principal */
+        .main-wrapper {
             display: flex;
-            flex-wrap: wrap;
-            margin: 30px 0;
             gap: 20px;
+            margin-top: 20px;
         }
-        
+
+        .content-area {
+            flex: 3;
+        }
+
+        /* Sidebar de Usuários Online (NOVO) */
+        .sidebar-users {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .online-count {
+            background: var(--success-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .user-card-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            transition: all 0.2s;
+        }
+
+        .user-card-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .user-avatar-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+            position: relative;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid white;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+        }
+
+        .status-online { background-color: var(--success-color); }
+        .status-busy { background-color: var(--busy-color); }
+
+        .user-info-list {
+            flex: 1;
+        }
+
+        .user-name-list {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .user-lang-list {
+            font-size: 0.8rem;
+            color: #777;
+        }
+
+        .btn-invite {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-invite:hover { background-color: var(--secondary-color); }
+        .btn-invite:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        /* Cards Gerais */
         .card {
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             padding: 20px;
-            flex: 1;
-            min-width: 300px;
+            margin-bottom: 20px;
         }
-        
-        .card h2 {
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-        }
-        
+
         .form-control {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            font-size: 16px;
+            margin-bottom: 15px;
         }
-        
+
         .btn {
             display: inline-block;
             background-color: var(--primary-color);
@@ -124,22 +205,13 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 16px;
             transition: background-color 0.3s;
         }
-        
-        .btn:hover {
-            background-color: var(--secondary-color);
-        }
-        
-        .btn-accent {
-            background-color: var(--accent-color);
-        }
-        
-        .btn-accent:hover {
-            background-color: #ff6b4a;
-        }
-        
+
+        .btn-accent { background-color: var(--accent-color); }
+        .btn-accent:hover { background-color: #ff6b4a; }
+
+        /* Video e Controles */
         .video-container {
             position: relative;
             width: 100%;
@@ -147,715 +219,374 @@
             border-radius: 8px;
             overflow: hidden;
             margin-bottom: 15px;
+            aspect-ratio: 16/9;
         }
         
         #videoElement {
             width: 100%;
-            height: auto;
-            display: block;
+            height: 100%;
+            object-fit: cover;
         }
-        
+
         .controls {
             display: flex;
             justify-content: center;
             gap: 10px;
             margin-top: 15px;
         }
-        
-        .language-selector {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin: 15px 0;
+
+        /* Notificações Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
         }
-        
-        .language-option {
-            flex: 1;
-            min-width: 120px;
-            text-align: center;
-            padding: 10px;
-            background-color: #f0f0f0;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .language-option:hover {
-            background-color: #e0e0e0;
-        }
-        
-        .language-option.active {
-            background-color: var(--primary-color);
-            color: white;
-        }
-        
-        .practice-topics {
-            margin: 15px 0;
-        }
-        
-        .topic-item {
-            padding: 10px;
-            background-color: #f9f9f9;
-            border-left: 4px solid var(--primary-color);
-            margin-bottom: 10px;
-            border-radius: 0 4px 4px 0;
-        }
-        
-        footer {
-            background-color: var(--dark-color);
-            color: white;
-            text-align: center;
-            padding: 20px 0;
-            margin-top: 30px;
-        }
-        
-        .terms {
-            font-size: 14px;
-            color: #777;
-            margin-top: 20px;
-        }
-        
-        .terms a {
-            color: var(--primary-color);
-        }
-        
-        .alert {
-            padding: 10px 15px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-        }
-        
-        .alert-success {
-            background-color: rgba(46, 204, 113, 0.2);
-            border: 1px solid var(--success-color);
-            color: var(--success-color);
-        }
-        
-        .alert-error {
-            background-color: rgba(231, 76, 60, 0.2);
-            border: 1px solid var(--error-color);
-            color: var(--error-color);
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .permission-request {
-            background-color: rgba(255, 193, 7, 0.2);
-            border: 1px solid #ffc107;
+
+        .toast {
+            background: white;
+            border-left: 5px solid var(--primary-color);
             padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        
-        .user-info-form {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid var(--primary-color);
-        }
-        
-        .user-profile {
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            margin-top: 10px;
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-            padding: 10px;
-            background-color: #f0f7ff;
-            border-radius: 8px;
+            justify-content: space-between;
+            min-width: 300px;
+            animation: slideIn 0.3s ease-out;
         }
-        
-        .user-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: var(--primary-color);
+
+        .toast-actions {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 20px;
+            gap: 5px;
+            margin-left: 15px;
         }
-        
-        .user-details {
-            flex: 1;
+
+        .btn-toast {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
         }
-        
-        .user-name {
-            font-weight: bold;
-            font-size: 18px;
+
+        .btn-accept { background-color: var(--success-color); color: white; }
+        .btn-decline { background-color: #eee; color: #333; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
-        
-        .user-meta {
-            color: #666;
-            font-size: 14px;
-        }
-        
+
+        .hidden { display: none; }
+
+        /* Responsividade */
         @media (max-width: 768px) {
-            .main-content {
-                flex-direction: column;
-            }
-            
-            nav ul {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            nav ul li {
-                margin: 5px 0;
-            }
-            
-            .controls {
-                flex-direction: column;
-            }
+            .main-wrapper { flex-direction: column-reverse; }
+            .sidebar-users { max-height: 300px; }
         }
     </style>
 </head>
 <body>
     <header>
         <div class="container">
-            <h1>Prática de Conversação em Idiomas</h1>
-            <p>Desenvolva suas habilidades de conversação em diferentes idiomas</p>
+            <h1>ConnectSpeak</h1>
+            <p>Conecte-se com falantes do mundo todo</p>
         </div>
     </header>
     
     <nav>
         <div class="container">
             <ul>
-                <li><a href="#" id="nav-home">Início</a></li>
-                <li><a href="#" id="nav-practice">Praticar</a></li>
-                <li><a href="#" id="nav-terms">Termos de Uso</a></li>
+                <li><a href="#" onclick="location.reload()">Lobby</a></li>
+                <li><a href="#">Meu Perfil</a></li>
             </ul>
         </div>
     </nav>
     
-    <div class="container">
-        <!-- Tela Principal -->
-        <div id="main-section">
-            <div class="permission-request">
-                <h3>⚠️ Permissões Necessárias</h3>
-                <p>Para usar este sistema, você precisará permitir o acesso à sua câmera e microfone quando solicitado. Esses recursos são essenciais para a prática de conversação.</p>
-                <p><strong>Importante:</strong> Suas gravações de áudio e vídeo não são armazenadas em nossos servidores. Todo o processamento ocorre localmente em seu dispositivo.</p>
-            </div>
+    <div class="container main-wrapper">
+        <div class="content-area">
             
-            <div id="user-info-form" class="user-info-form">
-                <h3>Identifique-se para começar</h3>
-                <p>Preencha os dados abaixo para personalizar sua experiência (não armazenamos estas informações):</p>
+            <div id="login-section" class="card">
+                <h2>Quem é você?</h2>
+                <p style="margin-bottom: 15px;">Identifique-se para entrar no lobby e ver outros usuários.</p>
                 
-                <div class="form-group">
-                    <label for="user-name">Seu nome:</label>
-                    <input type="text" id="user-name" class="form-control" placeholder="Como gostaria de ser chamado?" required>
-                </div>
+                <input type="text" id="user-name" class="form-control" placeholder="Seu nome" required>
                 
-                <div class="form-group">
-                    <label for="user-age">Sua idade:</label>
-                    <input type="number" id="user-age" class="form-control" placeholder="Sua idade" min="1" max="120" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="user-country">Seu país:</label>
-                    <select id="user-country" class="form-control" required>
-                        <option value="">Selecione seu país</option>
-                        <option value="brasil">Brasil</option>
-                        <option value="portugal">Portugal</option>
-                        <option value="eua">Estados Unidos</option>
-                        <option value="espanha">Espanha</option>
-                        <option value="franca">França</option>
-                        <option value="alemanha">Alemanha</option>
-                        <option value="outro">Outro</option>
-                    </select>
-                </div>
-                
-                <button id="save-user-info" class="btn btn-accent">Salvar e Continuar</button>
+                <label style="display:block; margin-bottom:5px;">Idioma que quero praticar:</label>
+                <select id="user-target-lang" class="form-control">
+                    <option value="Inglês">Inglês</option>
+                    <option value="Espanhol">Espanhol</option>
+                    <option value="Francês">Francês</option>
+                    <option value="Alemão">Alemão</option>
+                    <option value="Português">Português</option>
+                </select>
+
+                <button id="btn-enter" class="btn btn-accent">Entrar no Sistema</button>
             </div>
-            
-            <div id="user-profile" class="user-profile hidden">
-                <div class="user-avatar" id="user-avatar">U</div>
-                <div class="user-details">
-                    <div class="user-name" id="profile-name">Usuário</div>
-                    <div class="user-meta" id="profile-meta">Idade, País</div>
-                </div>
-                <button id="change-user-info" class="btn">Alterar Dados</button>
-            </div>
-            
-            <div class="main-content">
+
+            <div id="practice-section" class="hidden">
                 <div class="card">
-                    <h2>Configurações de Prática</h2>
-                    <div class="form-group">
-                        <label>Selecione o idioma para praticar:</label>
-                        <div class="language-selector">
-                            <div class="language-option active" data-lang="en">Inglês</div>
-                            <div class="language-option" data-lang="es">Espanhol</div>
-                            <div class="language-option" data-lang="fr">Francês</div>
-                            <div class="language-option" data-lang="de">Alemão</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h2>Sala de Conversação</h2>
+                        <span id="connection-status" style="color:var(--success-color); font-weight:bold;">● Conectado</span>
+                    </div>
+                    
+                    <div class="video-container">
+                        <video id="videoElement" autoplay muted></video>
+                        <div style="position:absolute; bottom:10px; left:10px; color:white; background:rgba(0,0,0,0.5); padding:5px; border-radius:4px;">
+                            Você
+                        </div>
+                        <div id="remote-video-placeholder" class="hidden" style="position:absolute; top:10px; right:10px; width:150px; height:100px; background:#333; border:2px solid white; display:flex; align-items:center; justify-content:center; color:white;">
+                            <span id="remote-user-name">Aguardando...</span>
                         </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label>Nível de dificuldade:</label>
-                        <select id="difficulty" class="form-control">
-                            <option value="beginner">Iniciante</option>
-                            <option value="intermediate" selected>Intermediário</option>
-                            <option value="advanced">Avançado</option>
-                        </select>
+                    <div class="controls">
+                        <button id="toggle-camera" class="btn">Desligar Câmera</button>
+                        <button id="toggle-mic" class="btn">Desligar Microfone</button>
+                        <button id="end-call" class="btn" style="background-color:var(--error-color);">Sair da Chamada</button>
                     </div>
-                    
-                    <button id="start-practice" class="btn btn-accent">Iniciar Sessão de Prática</button>
-                </div>
-                
-                <div class="card">
-                    <h2>Tópicos para Prática</h2>
-                    <div class="practice-topics">
-                        <div class="topic-item">
-                            <h3>Apresentações</h3>
-                            <p>Pratique como se apresentar em situações formais e informais</p>
-                        </div>
-                        <div class="topic-item">
-                            <h3>Viagens</h3>
-                            <p>Conversas sobre reservas, direções e experiências de viagem</p>
-                        </div>
-                        <div class="topic-item">
-                            <h3>Trabalho</h3>
-                            <p>Discussões sobre ambiente de trabalho, reuniões e entrevistas</p>
-                        </div>
-                        <div class="topic-item">
-                            <h3>Hobbies</h3>
-                            <p>Converse sobre seus interesses e atividades de lazer</p>
-                        </div>
-                        <div class="topic-item">
-                            <h3>Compras</h3>
-                            <p>Interações em lojas, perguntas sobre produtos e negociação de preços</p>
-                        </div>
+
+                    <div style="margin-top: 20px; background: #f9f9f9; padding: 15px; border-left: 4px solid var(--primary-color);">
+                        <h4>💡 Tópico Sugerido:</h4>
+                        <p id="topic-suggestion">Pergunte sobre como foi o dia da pessoa e quais são seus planos para o fim de semana.</p>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Tela de Prática -->
-        <div id="practice-section" class="hidden">
-            <div class="card">
-                <h2>Sessão de Prática: <span id="current-language">Inglês</span> - <span id="user-greeting"></span></h2>
-                
-                <div class="video-container">
-                    <video id="videoElement" autoplay muted></video>
-                </div>
-                
-                <div class="controls">
-                    <button id="toggle-camera" class="btn">Desligar Câmera</button>
-                    <button id="toggle-mic" class="btn">Desligar Microfone</button>
-                    <button id="end-practice" class="btn btn-accent">Finalizar Sessão</button>
-                </div>
-                
-                <div class="form-group">
-                    <label for="prompt">Prompt de conversação:</label>
-                    <textarea id="prompt" class="form-control" rows="4" readonly>Imagine que você está em um restaurante e precisa fazer um pedido. Pratique como você faria isso no idioma selecionado.</textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="user-response">Sua resposta (opcional):</label>
-                    <textarea id="user-response" class="form-control" rows="4" placeholder="Digite sua resposta aqui para referência futura..."></textarea>
-                </div>
-                
-                <div class="controls">
-                    <button id="previous-prompt" class="btn">Prompt Anterior</button>
-                    <button id="next-prompt" class="btn">Próximo Prompt</button>
-                </div>
-                
-                <div class="timer">
-                    <p>Tempo de prática: <span id="practice-timer">00:00</span></p>
-                </div>
+
+        <div class="sidebar-users hidden" id="users-sidebar">
+            <div class="sidebar-title">
+                Pessoas Online
+                <span class="online-count" id="online-count">0</span>
             </div>
-        </div>
-        
-        <!-- Tela de Termos -->
-        <div id="terms-section" class="card hidden">
-            <h2>Termos de Uso</h2>
-            <div class="terms-content">
-                <p><strong>1. Aceitação dos Termos</strong></p>
-                <p>Ao acessar e usar este sistema de prática de conversação em idiomas, você concorda em cumprir estes termos de uso.</p>
-                
-                <p><strong>2. Coleta de Dados</strong></p>
-                <p>Não coletamos ou armazenamos endereços de e-mail, números de telefone ou outras informações de contato. As informações de nome, idade e país são solicitadas apenas para personalizar sua experiência e não são armazenadas após o fechamento da sessão.</p>
-                
-                <p><strong>3. Uso de Câmera e Microfone</strong></p>
-                <p>Este sistema solicitará acesso à sua câmera e microfone para permitir a prática de conversação. As gravações de áudio e vídeo são processadas localmente em seu dispositivo e não são armazenadas em nossos servidores.</p>
-                
-                <p><strong>4. Responsabilidade do Usuário</strong></p>
-                <p>Você é responsável por usar este sistema de forma adequada e respeitosa.</p>
-                
-                <p><strong>5. Limitações de Uso</strong></p>
-                <p>Você concorda em não usar este sistema para qualquer propósito ilegal ou não autorizado.</p>
-                
-                <p><strong>6. Alterações nos Termos</strong></p>
-                <p>Reservamo-nos o direito de modificar estes termos a qualquer momento.</p>
-                
-                <p><strong>7. Acesso Sem Cadastro</strong></p>
-                <p>Este sistema não requer cadastro ou login para uso. Todas as funcionalidades estão disponíveis imediatamente após fornecer nome, idade e país.</p>
+            <div id="users-list">
+                <p style="text-align:center; color:#777; margin-top:20px;">Carregando usuários...</p>
             </div>
-            <button id="back-from-terms" class="btn">Voltar para o Início</button>
         </div>
     </div>
-    
-    <footer>
-        <div class="container">
-            <p>Sistema de Prática de Conversação em Idiomas &copy; 2023 - Acesso Livre Sem Cadastro</p>
-        </div>
-    </footer>
+
+    <div class="toast-container" id="toast-container"></div>
 
     <script>
-        // Elementos da interface
-        const mainSection = document.getElementById('main-section');
-        const practiceSection = document.getElementById('practice-section');
-        const termsSection = document.getElementById('terms-section');
-        const userInfoForm = document.getElementById('user-info-form');
-        const userProfile = document.getElementById('user-profile');
-        
-        // Elementos de navegação
-        const navHome = document.getElementById('nav-home');
-        const navPractice = document.getElementById('nav-practice');
-        const navTerms = document.getElementById('nav-terms');
-        
-        // Elementos do formulário de usuário
-        const userNameInput = document.getElementById('user-name');
-        const userAgeInput = document.getElementById('user-age');
-        const userCountrySelect = document.getElementById('user-country');
-        const saveUserInfoBtn = document.getElementById('save-user-info');
-        const changeUserInfoBtn = document.getElementById('change-user-info');
-        const userAvatar = document.getElementById('user-avatar');
-        const profileName = document.getElementById('profile-name');
-        const profileMeta = document.getElementById('profile-meta');
-        
-        // Elementos da prática
-        const languageOptions = document.querySelectorAll('.language-option');
-        const difficultySelect = document.getElementById('difficulty');
-        const startPracticeBtn = document.getElementById('start-practice');
-        const currentLanguageSpan = document.getElementById('current-language');
-        const userGreetingSpan = document.getElementById('user-greeting');
-        const videoElement = document.getElementById('videoElement');
-        const toggleCameraBtn = document.getElementById('toggle-camera');
-        const toggleMicBtn = document.getElementById('toggle-mic');
-        const endPracticeBtn = document.getElementById('end-practice');
-        const promptTextarea = document.getElementById('prompt');
-        const userResponseTextarea = document.getElementById('user-response');
-        const previousPromptBtn = document.getElementById('previous-prompt');
-        const nextPromptBtn = document.getElementById('next-prompt');
-        const practiceTimerSpan = document.getElementById('practice-timer');
-        const backFromTermsBtn = document.getElementById('back-from-terms');
-        
-        // Estado da aplicação
-        let selectedLanguage = 'en';
-        let stream = null;
+        // --- DADOS MOCKADOS (SIMULAÇÃO DE BANCO DE DADOS) ---
+        const mockUsers = [
+            { id: 1, name: "Sarah Jones", lang: "Inglês", status: "online" },
+            { id: 2, name: "Carlos Ruiz", lang: "Espanhol", status: "busy" },
+            { id: 3, name: "Pierre Dubois", lang: "Francês", status: "online" },
+            { id: 4, name: "Ana Silva", lang: "Português", status: "online" },
+            { id: 5, name: "Hans Müller", lang: "Alemão", status: "online" },
+            { id: 6, name: "Yuki Tanaka", lang: "Inglês", status: "busy" },
+            { id: 7, name: "Mike Ross", lang: "Inglês", status: "online" }
+        ];
+
+        const topics = [
+            "Viagens recentes e destinos dos sonhos",
+            "Comidas favoritas e culinária local",
+            "Hobbies e o que faz no tempo livre",
+            "Diferenças culturais entre seus países",
+            "Filmes e séries que assistiu recentemente"
+        ];
+
+        // --- ESTADO DA APLICAÇÃO ---
+        let currentUser = null;
+        let localStream = null;
         let isCameraOn = true;
         let isMicOn = true;
-        let practiceTimer = null;
-        let seconds = 0;
-        let currentUser = null;
-        
-        // Prompts de conversação por idioma
-        const conversationPrompts = {
-            en: [
-                "Imagine you're at a restaurant and need to order food. Practice how you would do this.",
-                "You're meeting someone for the first time. Introduce yourself and ask about their interests.",
-                "You need directions to the nearest train station. Ask for help.",
-                "Discuss your favorite hobby and why you enjoy it.",
-                "You're at a job interview. Answer questions about your experience and skills.",
-                "Describe your last vacation. Where did you go and what did you do?",
-                "Talk about your favorite movie or TV show and explain why you like it.",
-                "You're at a store and need to return a product. Explain the situation.",
-                "Plan a weekend activity with a friend. Discuss options and make a decision.",
-                "Describe your dream job and what it would be like to work there."
-            ],
-            es: [
-                "Imagina que estás en un restaurante y necesitas pedir comida. Practica cómo lo harías.",
-                "Estás conociendo a alguien por primera vez. Preséntate y pregunta sobre sus intereses.",
-                "Necesitas indicaciones para llegar a la estación de tren más cercana. Pide ayuda.",
-                "Habla sobre tu pasatiempo favorito y por qué te gusta.",
-                "Estás en una entrevista de trabajo. Responde preguntas sobre tu experiencia y habilidades.",
-                "Describe tus últimas vacaciones. ¿Adónde fuiste y qué hiciste?",
-                "Habla sobre tu película o programa de TV favorito y explica por qué te gusta.",
-                "Estás en una tienda y necesitas devolver un producto. Explica la situación.",
-                "Planea una actividad de fin de semana con un amigo. Discute opciones y toma una decisión.",
-                "Describe tu trabajo ideal y cómo sería trabajar allí."
-            ],
-            fr: [
-                "Imaginez que vous êtes au restaurant et que vous devez commander de la nourriture. Entraînez-vous à le faire.",
-                "Vous rencontrez quelqu'un pour la première fois. Présentez-vous et renseignez-vous sur ses centres d'intérêt.",
-                "Vous avez besoin d'indications pour vous rendre à la gare la plus proche. Demandez de l'aide.",
-                "Parlez de votre passe-temps favori et expliquez pourquoi vous l'aimez.",
-                "Vous êtes en entretien d'embauche. Répondez aux questions sur votre expérience et vos compétences.",
-                "Décrivez vos dernières vacaciones. Où êtes-vous allé et qu'avez-vous fait?",
-                "Parlez de votre film ou émission de télévision préféré et expliquez pourquoi vous l'aimez.",
-                "Vous êtes dans un magasin et devez retourner un produit. Expliquez la situation.",
-                "Planifiez une activité de week-end avec un ami. Discutez des options et prenez une décision.",
-                "Décrivez votre emploi de rêve et ce que ce serait que d'y travailler."
-            ],
-            de: [
-                "Stellen Sie sich vor, Sie sind in einem Restaurant und müssen Essen bestellen. Üben Sie, wie Sie das machen würden.",
-                "Sie treffen jemanden zum ersten Mal. Stellen Sie sich vor und fragen Sie nach seinen Interessen.",
-                "Sie benötigen Wegbeschreibungen zum nächsten Bahnhof. Bitten Sie um Hilfe.",
-                "Sprechen Sie über Ihr liebstes Hobby und warum es Ihnen gefällt.",
-                "Sie sind in einem Vorstellungsgespräch. Beantworten Sie Fragen zu Ihrer Erfahrung und Ihren Fähigkeiten.",
-                "Beschreiben Sie Ihren letzten Urlaub. Wo sind Sie hingegangen und was haben Sie gemacht?",
-                "Sprechen Sie über Ihren Lieblingsfilm oder Ihre Lieblingsserie und erklären Sie, warum Sie ihn/sie mögen.",
-                "Sie sind in einem Geschäft und müssen ein Produkt zurückgeben. Erklären Sie die situação.",
-                "Planen Sie eine Wochenendaktivität mit einem Freund. Besprechen Sie Optionen und treffen Sie eine Entscheidung.",
-                "Beschreiben Sie Ihren Traumjob und wie es wäre, dort zu arbeiten."
-            ]
-        };
-        
-        let currentPromptIndex = 0;
-        
-        // Event Listeners
-        navHome.addEventListener('click', showMainSection);
-        navPractice.addEventListener('click', showPracticeSection);
-        navTerms.addEventListener('click', showTerms);
-        
-        saveUserInfoBtn.addEventListener('click', saveUserInfo);
-        changeUserInfoBtn.addEventListener('click', showUserInfoForm);
-        
-        languageOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                languageOptions.forEach(opt => opt.classList.remove('active'));
-                option.classList.add('active');
-                selectedLanguage = option.getAttribute('data-lang');
-                updateCurrentLanguage();
+        let currentCallPartner = null;
+
+        // --- ELEMENTOS DOM ---
+        const loginSection = document.getElementById('login-section');
+        const practiceSection = document.getElementById('practice-section');
+        const usersSidebar = document.getElementById('users-sidebar');
+        const usersListEl = document.getElementById('users-list');
+        const onlineCountEl = document.getElementById('online-count');
+        const videoElement = document.getElementById('videoElement');
+        const toastContainer = document.getElementById('toast-container');
+        const remoteVideoPlaceholder = document.getElementById('remote-video-placeholder');
+        const remoteUserName = document.getElementById('remote-user-name');
+        const topicSuggestion = document.getElementById('topic-suggestion');
+
+        // --- INICIALIZAÇÃO ---
+        document.getElementById('btn-enter').addEventListener('click', enterSystem);
+        document.getElementById('toggle-camera').addEventListener('click', toggleCamera);
+        document.getElementById('toggle-mic').addEventListener('click', toggleMic);
+        document.getElementById('end-call').addEventListener('click', endCall);
+
+        function enterSystem() {
+            const name = document.getElementById('user-name').value;
+            const targetLang = document.getElementById('user-target-lang').value;
+
+            if (!name) {
+                alert("Por favor, digite seu nome.");
+                return;
+            }
+
+            currentUser = { name, targetLang, status: 'online' };
+            
+            // Transição de UI
+            loginSection.classList.add('hidden');
+            usersSidebar.classList.remove('hidden');
+            
+            // Simular carregamento e renderizar lista
+            renderUserList();
+            
+            // Iniciar sistema de "Polling" simulado (atualizar status aleatoriamente)
+            setInterval(simulateUserActivity, 5000);
+
+            showToast("Bem-vindo ao lobby! Escolha alguém para conversar.", "info");
+        }
+
+        // --- LÓGICA DE USUÁRIOS ---
+        function renderUserList() {
+            usersListEl.innerHTML = '';
+            let count = 0;
+
+            mockUsers.forEach(user => {
+                // Criar Card do Usuário
+                const div = document.createElement('div');
+                div.className = 'user-card-item';
+                
+                const statusClass = user.status === 'online' ? 'status-online' : 'status-busy';
+                const btnText = user.status === 'online' ? 'Convidar' : 'Ocupado';
+                const btnDisabled = user.status !== 'online' ? 'disabled' : '';
+
+                div.innerHTML = `
+                    <div class="user-avatar-small">
+                        ${user.name.charAt(0)}
+                        <div class="status-indicator ${statusClass}"></div>
+                    </div>
+                    <div class="user-info-list">
+                        <div class="user-name-list">${user.name}</div>
+                        <div class="user-lang-list">Fala: ${user.lang}</div>
+                    </div>
+                    <button class="btn-invite" onclick="sendInvite(${user.id})" ${btnDisabled} id="btn-${user.id}">
+                        ${btnText}
+                    </button>
+                `;
+                usersListEl.appendChild(div);
+                if(user.status === 'online') count++;
             });
-        });
-        
-        startPracticeBtn.addEventListener('click', startPractice);
-        toggleCameraBtn.addEventListener('click', toggleCamera);
-        toggleMicBtn.addEventListener('click', toggleMicrophone);
-        endPracticeBtn.addEventListener('click', endPractice);
-        previousPromptBtn.addEventListener('click', previousPrompt);
-        nextPromptBtn.addEventListener('click', nextPrompt);
-        backFromTermsBtn.addEventListener('click', showMainSection);
-        
-        // Funções
-        function showMainSection() {
-            mainSection.classList.remove('hidden');
+            
+            onlineCountEl.textContent = count;
+        }
+
+        // Simula mudanças de status na lista para parecer vivo
+        function simulateUserActivity() {
+            const randomUser = mockUsers[Math.floor(Math.random() * mockUsers.length)];
+            // Toggle status
+            randomUser.status = randomUser.status === 'online' ? 'busy' : 'online';
+            renderUserList();
+        }
+
+        // --- LÓGICA DE CONVITES ---
+        window.sendInvite = function(userId) {
+            const user = mockUsers.find(u => u.id === userId);
+            const btn = document.getElementById(`btn-${userId}`);
+            
+            if (!user) return;
+
+            // UI Feedback
+            btn.textContent = "Enviando...";
+            btn.disabled = true;
+
+            // Simular atraso de rede e resposta
+            setTimeout(() => {
+                // 80% de chance de aceitar
+                const accepted = Math.random() > 0.2;
+
+                if (accepted) {
+                    showToast(`${user.name} aceitou seu convite! Conectando...`, "success");
+                    startCall(user);
+                } else {
+                    showToast(`${user.name} recusou o convite no momento.`, "error");
+                    btn.textContent = "Convidar";
+                    btn.disabled = false;
+                }
+            }, 2000);
+        };
+
+        function startCall(partner) {
+            currentCallPartner = partner;
+            usersSidebar.classList.add('hidden'); // Focar na chamada
+            practiceSection.classList.remove('hidden');
+            
+            // Configurar UI da chamada
+            remoteUserName.textContent = partner.name;
+            remoteVideoPlaceholder.classList.remove('hidden');
+            remoteVideoPlaceholder.style.background = `url('https://ui-avatars.com/api/?name=${partner.name}&background=random') center/cover`;
+            
+            // Mudar tópico
+            topicSuggestion.textContent = topics[Math.floor(Math.random() * topics.length)];
+
+            setupMedia();
+        }
+
+        function endCall() {
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
+            videoElement.srcObject = null;
             practiceSection.classList.add('hidden');
-            termsSection.classList.add('hidden');
-        }
-        
-        function showPracticeSection() {
-            if (!currentUser) {
-                alert('Por favor, preencha seus dados antes de iniciar a prática.');
-                showUserInfoForm();
-                return;
-            }
+            usersSidebar.classList.remove('hidden');
             
-            if (stream) {
-                // Se já está em uma sessão de prática, apenas mostra a seção
-                mainSection.classList.add('hidden');
-                practiceSection.classList.remove('hidden');
-                termsSection.classList.add('hidden');
-            } else {
-                // Se não, vai para a tela principal para iniciar a prática
-                showMainSection();
-            }
-        }
-        
-        function showTerms() {
-            mainSection.classList.add('hidden');
-            practiceSection.classList.add('hidden');
-            termsSection.classList.remove('hidden');
-        }
-        
-        function showUserInfoForm() {
-            userInfoForm.classList.remove('hidden');
-            userProfile.classList.add('hidden');
-        }
-        
-        function saveUserInfo() {
-            const name = userNameInput.value.trim();
-            const age = userAgeInput.value.trim();
-            const country = userCountrySelect.value;
+            showToast("Chamada encerrada.", "info");
+            currentCallPartner = null;
             
-            if (!name || !age || !country) {
-                alert('Por favor, preencha todos os campos.');
-                return;
-            }
+            // Re-renderizar para resetar botões
+            renderUserList();
+        }
+
+        // --- SISTEMA DE NOTIFICAÇÕES (TOAST) ---
+        function showToast(message, type = "info") {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
             
-            currentUser = {
-                name: name,
-                age: age,
-                country: country
-            };
+            let color = 'var(--primary-color)';
+            if (type === 'success') color = 'var(--success-color)';
+            if (type === 'error') color = 'var(--error-color)';
             
-            // Atualizar perfil do usuário
-            profileName.textContent = name;
-            profileMeta.textContent = `${age} anos, ${getCountryName(country)}`;
-            userAvatar.textContent = name.charAt(0).toUpperCase();
+            toast.style.borderLeftColor = color;
+            toast.innerHTML = `<span>${message}</span>`;
             
-            // Mostrar perfil e esconder formulário
-            userInfoForm.classList.add('hidden');
-            userProfile.classList.remove('hidden');
-            
-            // Limpar formulário
-            userNameInput.value = '';
-            userAgeInput.value = '';
-            userCountrySelect.value = '';
+            toastContainer.appendChild(toast);
+
+            // Auto remover
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
         }
-        
-        function getCountryName(countryCode) {
-            const countries = {
-                'brasil': 'Brasil',
-                'portugal': 'Portugal',
-                'eua': 'Estados Unidos',
-                'espanha': 'Espanha',
-                'franca': 'França',
-                'alemanha': 'Alemanha',
-                'outro': 'Outro'
-            };
-            return countries[countryCode] || countryCode;
-        }
-        
-        function updateCurrentLanguage() {
-            const languageNames = {
-                'en': 'Inglês',
-                'es': 'Espanhol',
-                'fr': 'Francês',
-                'de': 'Alemão'
-            };
-            currentLanguageSpan.textContent = languageNames[selectedLanguage];
-        }
-        
-        function updateUserGreeting() {
-            if (currentUser) {
-                userGreetingSpan.textContent = `Olá, ${currentUser.name}!`;
-            } else {
-                userGreetingSpan.textContent = 'Bem-vindo!';
-            }
-        }
-        
-        function startTimer() {
-            seconds = 0;
-            practiceTimer = setInterval(() => {
-                seconds++;
-                const minutes = Math.floor(seconds / 60);
-                const remainingSeconds = seconds % 60;
-                practiceTimerSpan.textContent = `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-            }, 1000);
-        }
-        
-        function stopTimer() {
-            if (practiceTimer) {
-                clearInterval(practiceTimer);
-                practiceTimer = null;
-            }
-        }
-        
-        async function startPractice() {
-            if (!currentUser) {
-                alert('Por favor, preencha seus dados antes de iniciar a prática.');
-                showUserInfoForm();
-                return;
-            }
-            
+
+        // --- MÍDIA (CAMERA/MIC) ---
+        async function setupMedia() {
             try {
-                // Atualizar saudação do usuário
-                updateUserGreeting();
-                
-                // Solicitar permissão para câmera e microfone
-                stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: true, 
-                    audio: true 
-                });
-                
-                videoElement.srcObject = stream;
-                isCameraOn = true;
-                isMicOn = true;
-                
-                // Atualizar UI
-                toggleCameraBtn.textContent = 'Desligar Câmera';
-                toggleMicBtn.textContent = 'Desligar Microfone';
-                
-                // Mostrar seção de prática
-                showPracticeSection();
-                
-                // Iniciar timer
-                startTimer();
-                
-                // Definir primeiro prompt
-                currentPromptIndex = 0;
-                promptTextarea.value = conversationPrompts[selectedLanguage][currentPromptIndex];
-                
-            } catch (error) {
-                console.error('Erro ao acessar câmera/microfone:', error);
-                alert('Não foi possível acessar a câmera e/ou microfone. Verifique as permissões do seu navegador.');
+                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                videoElement.srcObject = localStream;
+            } catch (err) {
+                console.error("Erro ao acessar mídia:", err);
+                showToast("Erro ao acessar câmera. Verifique permissões.", "error");
             }
         }
-        
+
         function toggleCamera() {
-            if (!stream) return;
-            
-            const videoTrack = stream.getVideoTracks()[0];
-            if (videoTrack) {
-                if (isCameraOn) {
-                    videoTrack.enabled = false;
-                    toggleCameraBtn.textContent = 'Ligar Câmera';
-                } else {
-                    videoTrack.enabled = true;
-                    toggleCameraBtn.textContent = 'Desligar Câmera';
-                }
-                isCameraOn = !isCameraOn;
-            }
+            if (!localStream) return;
+            const track = localStream.getVideoTracks()[0];
+            isCameraOn = !isCameraOn;
+            track.enabled = isCameraOn;
+            document.getElementById('toggle-camera').textContent = isCameraOn ? "Desligar Câmera" : "Ligar Câmera";
         }
-        
-        function toggleMicrophone() {
-            if (!stream) return;
-            
-            const audioTrack = stream.getAudioTracks()[0];
-            if (audioTrack) {
-                if (isMicOn) {
-                    audioTrack.enabled = false;
-                    toggleMicBtn.textContent = 'Ligar Microfone';
-                } else {
-                    audioTrack.enabled = true;
-                    toggleMicBtn.textContent = 'Desligar Microfone';
-                }
-                isMicOn = !isMicOn;
-            }
+
+        function toggleMic() {
+            if (!localStream) return;
+            const track = localStream.getAudioTracks()[0];
+            isMicOn = !isMicOn;
+            track.enabled = isMicOn;
+            document.getElementById('toggle-mic').textContent = isMicOn ? "Desligar Microfone" : "Ligar Microfone";
         }
-        
-        function endPractice() {
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-                stream = null;
-            }
-            
-            // Parar timer
-            stopTimer();
-            practiceTimerSpan.textContent = '00:00';
-            
-            // Limpar resposta do usuário
-            userResponseTextarea.value = '';
-            
-            // Voltar para a tela principal
-            showMainSection();
-        }
-        
-        function previousPrompt() {
-            currentPromptIndex = (currentPromptIndex - 1 + conversationPrompts[selectedLanguage].length) % conversationPrompts[selectedLanguage].length;
-            promptTextarea.value = conversationPrompts[selectedLanguage][currentPromptIndex];
-            
-            // Limpar resposta do usuário
-            userResponseTextarea.value = '';
-        }
-        
-        function nextPrompt() {
-            currentPromptIndex = (currentPromptIndex + 1) % conversationPrompts[selectedLanguage].length;
-            promptTextarea.value = conversationPrompts[selectedLanguage][currentPromptIndex];
-            
-            // Limpar resposta do usuário
-            userResponseTextarea.value = '';
-        }
-        
-        // Inicialização
-        updateCurrentLanguage();
+
     </script>
 </body>
 </html>
