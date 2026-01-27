@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistema de Treino - Controle Diário</title>
+<title>Sistema Completo de Treino</title>
 
 <style>
 * {
@@ -20,11 +20,12 @@ body {
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 20px;
 }
 
+/* Header */
 header {
   text-align: center;
   padding: 30px 20px;
@@ -35,24 +36,192 @@ header {
 }
 
 header h1 {
-  font-size: 2em;
+  font-size: 2.5em;
   margin-bottom: 10px;
 }
 
-.user-info {
+/* Navigation */
+.nav-tabs {
   display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
   justify-content: center;
-  gap: 30px;
-  margin-top: 15px;
+}
+
+.nav-tab {
+  padding: 15px 30px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1em;
+  font-weight: 600;
+  color: white;
+}
+
+.nav-tab:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.nav-tab.active {
+  background: #005fa3;
+  border-color: #4fc3f7;
+}
+
+/* Sections */
+.section {
+  display: none;
+  animation: fadeIn 0.5s ease;
+}
+
+.section.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Tela de Boas-vindas */
+.welcome-screen {
+  text-align: center;
+  padding: 60px 20px;
+  background: linear-gradient(135deg, #1a4d2e, #0d3320);
+  border-radius: 15px;
+  margin-bottom: 30px;
+}
+
+.welcome-screen h2 {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+  color: #4CAF50;
+}
+
+.welcome-screen p {
+  font-size: 1.2em;
+  margin-bottom: 30px;
+  opacity: 0.9;
+}
+
+.welcome-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
   flex-wrap: wrap;
 }
 
-.user-info span {
-  font-size: 1.1em;
+/* Formulários */
+.form-card {
+  background: rgba(255, 255, 255, 0.95);
+  color: #333;
+  padding: 30px;
+  border-radius: 15px;
+  max-width: 800px;
+  margin: 0 auto;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
 }
 
-/* Resumo de Progresso */
-.progress-summary {
+.form-card h2 {
+  color: #005fa3;
+  margin-bottom: 25px;
+  font-size: 2em;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1em;
+  transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #005fa3;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+/* Botões */
+.btn {
+  padding: 15px 35px;
+  font-size: 1.1em;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-primary {
+  background: #4CAF50;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+}
+
+.btn-secondary {
+  background: #2196F3;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #1976D2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
+}
+
+.btn-warning {
+  background: #ff9800;
+  color: white;
+}
+
+.btn-warning:hover {
+  background: #e68900;
+}
+
+.btn-danger {
+  background: #f44336;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #da190b;
+}
+
+/* Cards de Estatísticas */
+.stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
@@ -72,7 +241,6 @@ header h1 {
   opacity: 0.9;
   margin-bottom: 10px;
   text-transform: uppercase;
-  letter-spacing: 1px;
 }
 
 .stat-card .value {
@@ -81,103 +249,192 @@ header h1 {
   color: #4CAF50;
 }
 
-.stat-card .value.warning {
-  color: #FFC107;
+/* Timeline */
+.timeline {
+  position: relative;
+  padding: 20px 0;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
-/* Treino do Dia */
-.hoje {
-  background: linear-gradient(135deg, #1a4d2e, #0d3320);
-  border: 3px solid #4CAF50;
-  border-radius: 15px;
-  padding: 25px;
-  margin-bottom: 30px;
-  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, #4CAF50, #2196F3);
+  transform: translateX(-50%);
 }
 
-.hoje h2 {
-  color: #4CAF50;
-  font-size: 1.8em;
-  margin-bottom: 20px;
+.timeline-item {
+  position: relative;
+  margin-bottom: 40px;
+  width: 45%;
+  background: rgba(255, 255, 255, 0.95);
+  color: #333;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.timeline-item:nth-child(odd) {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.timeline-item:nth-child(even) {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  top: 25px;
+  width: 20px;
+  height: 20px;
+  background: #4CAF50;
+  border: 4px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px #4CAF50;
+}
+
+.timeline-item:nth-child(odd)::before {
+  right: -60px;
+}
+
+.timeline-item:nth-child(even)::before {
+  left: -60px;
+}
+
+.timeline-date {
+  font-weight: bold;
+  color: #005fa3;
+  margin-bottom: 10px;
+}
+
+.timeline-content h3 {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+/* Modal de Exercício */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.modal.active {
   display: flex;
   align-items: center;
-  gap: 10px;
-}
-
-.hoje h2::before {
-  content: "📍";
-  font-size: 1.2em;
-}
-
-/* Check-in/Check-out */
-.checkin-section {
-  background: rgba(255, 255, 255, 0.1);
+  justify-content: center;
   padding: 20px;
-  border-radius: 10px;
-  margin-bottom: 20px;
 }
 
-.checkin-buttons {
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
-  margin-bottom: 15px;
+.modal-content {
+  background: white;
+  color: #333;
+  border-radius: 15px;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
 }
 
-.btn {
-  padding: 15px 30px;
-  font-size: 1em;
-  font-weight: bold;
+.modal-header {
+  background: #005fa3;
+  color: white;
+  padding: 20px;
+  border-radius: 15px 15px 0 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.modal-header h2 {
+  margin: 0;
+}
+
+.modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.2);
   border: none;
-  border-radius: 8px;
+  color: white;
+  font-size: 1.5em;
   cursor: pointer;
-  transition: all 0.3s ease;
-  flex: 1;
-  min-width: 150px;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.btn-checkin {
-  background: #4CAF50;
-  color: white;
+.modal-body {
+  padding: 30px;
 }
 
-.btn-checkin:hover {
-  background: #45a049;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+/* Avatar de Exercício */
+.exercise-demo {
+  background: #f5f5f5;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  text-align: center;
 }
 
-.btn-checkout {
-  background: #ff9800;
-  color: white;
+.avatar-container {
+  width: 100%;
+  max-width: 400px;
+  height: 400px;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.btn-checkout:hover {
-  background: #e68900;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+.avatar {
+  width: 200px;
+  height: 300px;
+  position: relative;
 }
 
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none !important;
+/* Animações de exercício */
+@keyframes shoulderPress {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-30px); }
 }
 
-.checkin-status {
-  background: rgba(255, 255, 255, 0.15);
-  padding: 15px;
-  border-radius: 8px;
-  font-size: 1em;
+@keyframes pulldown {
+  0%, 100% { transform: translateY(-20px); }
+  50% { transform: translateY(20px); }
 }
 
-.checkin-status.active {
-  background: rgba(76, 175, 80, 0.2);
-  border: 2px solid #4CAF50;
+@keyframes squat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(40px); }
 }
 
-/* Tabelas de Treino */
-.dia {
+@keyframes pushup {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(10px) rotate(2deg); }
+}
+
+/* Treino Card */
+.treino-card {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   padding: 20px;
@@ -185,10 +442,18 @@ header h1 {
   border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
-.dia h2 {
-  margin-bottom: 15px;
+.treino-card h2 {
   color: #4fc3f7;
-  font-size: 1.5em;
+  margin-bottom: 15px;
+}
+
+.treino-card.hoje {
+  background: linear-gradient(135deg, #1a4d2e, #0d3320);
+  border: 3px solid #4CAF50;
+}
+
+.treino-card.hoje h2 {
+  color: #4CAF50;
 }
 
 table {
@@ -198,7 +463,6 @@ table {
   color: black;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
 th {
@@ -207,9 +471,6 @@ th {
   padding: 12px 8px;
   text-align: left;
   font-weight: 600;
-  text-transform: uppercase;
-  font-size: 0.85em;
-  letter-spacing: 0.5px;
 }
 
 td {
@@ -217,91 +478,106 @@ td {
   border-bottom: 1px solid #e0e0e0;
 }
 
-tr:last-child td {
-  border-bottom: none;
-}
-
 tr:hover {
   background: #f5f5f5;
 }
 
-/* Checkbox para completar exercício */
-.exercise-check {
+.btn-demo {
+  padding: 8px 15px;
+  font-size: 0.9em;
+  background: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-demo:hover {
+  background: #1976D2;
+}
+
+/* Profile Card */
+.profile-card {
+  background: rgba(255, 255, 255, 0.95);
+  color: #333;
+  padding: 30px;
+  border-radius: 15px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.profile-avatar {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4CAF50, #2196F3);
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  font-size: 4em;
+  margin: 0 auto 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
 }
 
-.exercise-check input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-}
-
-.exercise-check label {
-  cursor: pointer;
-}
-
-.exercise-completed {
-  text-decoration: line-through;
-  opacity: 0.6;
-}
-
-/* Medidas */
-.medidas {
-  background: rgba(255, 255, 255, 0.95);
-  color: black;
-  padding: 30px;
-  border-radius: 12px;
-  margin-top: 30px;
-}
-
-.medidas h2 {
+.profile-info h2 {
   color: #005fa3;
-  margin-bottom: 25px;
-  font-size: 1.8em;
+  margin-bottom: 10px;
 }
 
-.grid {
+.profile-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+/* Medições Grid */
+.medicoes-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px;
+  margin-top: 20px;
 }
 
-.grid div {
-  background: #f8f9fa;
+.medicao-card {
+  background: rgba(255, 255, 255, 0.95);
+  color: #333;
   padding: 20px;
-  border-radius: 10px;
-  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
-.grid h3 {
+.medicao-card h3 {
   color: #005fa3;
   margin-bottom: 15px;
-  font-size: 1.2em;
+  border-bottom: 2px solid #4CAF50;
+  padding-bottom: 10px;
 }
 
-.grid p {
-  margin: 8px 0;
-  font-size: 1em;
+.medicao-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
 }
 
-/* Histórico */
-.historico {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 25px;
-  border-radius: 12px;
+.medicao-item:last-child {
+  border-bottom: none;
+}
+
+.medicao-label {
+  font-weight: 600;
+}
+
+.medicao-value {
+  color: #4CAF50;
+  font-weight: bold;
+}
+
+/* Histórico de Medições */
+.medicoes-historico {
   margin-top: 30px;
-}
-
-.historico h2 {
-  margin-bottom: 20px;
-  color: #4fc3f7;
-}
-
-.historico-list {
-  max-height: 400px;
-  overflow-y: auto;
 }
 
 .historico-item {
@@ -309,73 +585,43 @@ tr:hover {
   padding: 15px;
   border-radius: 8px;
   margin-bottom: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.historico-item.completo {
   border-left: 4px solid #4CAF50;
-}
-
-.historico-item.incompleto {
-  border-left: 4px solid #ff9800;
-}
-
-/* Footer */
-footer {
-  text-align: center;
-  padding: 30px;
-  margin-top: 40px;
-}
-
-.btn-print {
-  background: #2196F3;
-  color: white;
-  padding: 15px 40px;
-  font-size: 1.1em;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.btn-print:hover {
-  background: #1976D2;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
 }
 
 /* Responsivo */
 @media (max-width: 768px) {
-  .checkin-buttons {
-    flex-direction: column;
+  .timeline::before {
+    left: 30px;
   }
   
-  .btn {
-    width: 100%;
+  .timeline-item {
+    width: calc(100% - 60px);
+    margin-left: 60px !important;
   }
   
-  table {
-    font-size: 0.9em;
+  .timeline-item::before {
+    left: -40px !important;
   }
   
-  th, td {
-    padding: 8px 5px;
+  .nav-tabs {
+    overflow-x: auto;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
   }
 }
 
 @media print {
+  .nav-tabs,
+  .btn,
+  .modal {
+    display: none !important;
+  }
+  
   body {
     background: white;
     color: black;
-  }
-  
-  .checkin-section,
-  .btn,
-  footer,
-  .historico {
-    display: none !important;
   }
 }
 </style>
@@ -386,133 +632,473 @@ footer {
 <div class="container">
 
 <header>
-  <h1>💪 Ficha de Treino</h1>
-  <div class="user-info">
-    <span><strong>Aluno:</strong> Sibele</span>
-    <span><strong>Data Ficha:</strong> 11/11/2024</span>
-    <span id="dataHoje"></span>
-  </div>
+  <h1>💪 Sistema de Treino Completo</h1>
+  <p id="userDisplay" style="font-size: 1.2em; margin-top: 10px;"></p>
 </header>
 
-<!-- Resumo de Progresso -->
-<div class="progress-summary">
-  <div class="stat-card">
-    <h3>Treinos Este Mês</h3>
-    <div class="value" id="treinosMes">0</div>
-  </div>
-  <div class="stat-card">
-    <h3>Sequência Atual</h3>
-    <div class="value" id="sequencia">0</div>
-  </div>
-  <div class="stat-card">
-    <h3>Total de Treinos</h3>
-    <div class="value" id="totalTreinos">0</div>
-  </div>
-  <div class="stat-card">
-    <h3>Taxa de Conclusão</h3>
-    <div class="value" id="taxaConclusao">0%</div>
+<!-- Tela de Boas-vindas -->
+<div id="welcomeScreen" class="welcome-screen">
+  <h2>👋 Bem-vindo ao seu Sistema de Treino!</h2>
+  <p>Comece criando seu cadastro para ter acesso completo à plataforma</p>
+  <div class="welcome-buttons">
+    <button class="btn btn-primary" onclick="mostrarCadastro()">📝 Fazer Cadastro</button>
+    <button class="btn btn-secondary" onclick="verificarUsuario()">🔑 Já tenho cadastro</button>
   </div>
 </div>
 
-<!-- Treino de Hoje -->
-<div class="hoje" id="treinoHoje">
-  <!-- Será preenchido dinamicamente -->
+<!-- Navegação -->
+<nav class="nav-tabs" id="mainNav" style="display: none;">
+  <button class="nav-tab active" onclick="mudarAba('perfil')">👤 Perfil</button>
+  <button class="nav-tab" onclick="mudarAba('treinos')">🏋️ Treinos</button>
+  <button class="nav-tab" onclick="mudarAba('medicoes')">📊 Medições</button>
+  <button class="nav-tab" onclick="mudarAba('timeline')">📅 Timeline</button>
+  <button class="nav-tab" onclick="mudarAba('cadastro')">⚙️ Configurações</button>
+</nav>
+
+<!-- Seção: Cadastro/Perfil -->
+<section id="cadastro" class="section">
+  <div class="form-card">
+    <h2>📋 Cadastro de Aluno</h2>
+    <form id="formCadastro" onsubmit="salvarCadastro(event)">
+      <div class="form-group">
+        <label>Nome Completo *</label>
+        <input type="text" id="nome" required>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>Data de Nascimento *</label>
+          <input type="date" id="dataNascimento" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Sexo *</label>
+          <select id="sexo" required>
+            <option value="">Selecione</option>
+            <option value="M">Masculino</option>
+            <option value="F">Feminino</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="email">
+        </div>
+        
+        <div class="form-group">
+          <label>Telefone</label>
+          <input type="tel" id="telefone">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>Objetivo do Treino</label>
+        <select id="objetivo">
+          <option value="emagrecimento">Emagrecimento</option>
+          <option value="hipertrofia">Ganho de Massa Muscular</option>
+          <option value="condicionamento">Condicionamento Físico</option>
+          <option value="saude">Saúde e Bem-estar</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label>Observações Médicas</label>
+        <textarea id="observacoes" rows="3" placeholder="Ex: problemas cardíacos, lesões, restrições..."></textarea>
+      </div>
+      
+      <div style="text-align: center; margin-top: 25px;">
+        <button type="submit" class="btn btn-primary">💾 Salvar Cadastro</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- Seção: Perfil -->
+<section id="perfil" class="section">
+  <div class="profile-card">
+    <div class="profile-avatar" id="profileAvatar">👤</div>
+    <div class="profile-info">
+      <h2 id="profileNome">-</h2>
+      <p><strong>Idade:</strong> <span id="profileIdade">-</span> anos</p>
+      <p><strong>Objetivo:</strong> <span id="profileObjetivo">-</span></p>
+      <div class="profile-actions">
+        <button class="btn btn-secondary" onclick="mudarAba('medicoes')">📊 Nova Medição</button>
+        <button class="btn btn-warning" onclick="mudarAba('cadastro')">✏️ Editar Perfil</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="stats-grid">
+    <div class="stat-card">
+      <h3>Treinos Este Mês</h3>
+      <div class="value" id="statTreinosMes">0</div>
+    </div>
+    <div class="stat-card">
+      <h3>Medições Registradas</h3>
+      <div class="value" id="statMedicoes">0</div>
+    </div>
+    <div class="stat-card">
+      <h3>Peso Atual</h3>
+      <div class="value" id="statPeso">-</div>
+    </div>
+    <div class="stat-card">
+      <h3>IMC</h3>
+      <div class="value" id="statIMC">-</div>
+    </div>
+  </div>
+</section>
+
+<!-- Seção: Treinos -->
+<section id="treinos" class="section">
+  <h2 style="margin-bottom: 20px; font-size: 2em;">🏋️ Seus Treinos</h2>
+  <div id="treinosContainer"></div>
+</section>
+
+<!-- Seção: Medições -->
+<section id="medicoes" class="section">
+  <div class="form-card">
+    <h2>📏 Nova Avaliação Física</h2>
+    <form id="formMedicoes" onsubmit="salvarMedicao(event)">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Data da Avaliação *</label>
+          <input type="date" id="dataMedicao" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Peso (kg) *</label>
+          <input type="number" step="0.1" id="peso" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Altura (m) *</label>
+          <input type="number" step="0.01" id="altura" required>
+        </div>
+      </div>
+      
+      <h3 style="margin: 20px 0 15px; color: #005fa3;">Composição Corporal</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>% Gordura</label>
+          <input type="number" step="0.1" id="gordura">
+        </div>
+        
+        <div class="form-group">
+          <label>% Massa Muscular</label>
+          <input type="number" step="0.1" id="massaMuscular">
+        </div>
+        
+        <div class="form-group">
+          <label>Metabolismo Basal</label>
+          <input type="number" id="metabolismo">
+        </div>
+      </div>
+      
+      <h3 style="margin: 20px 0 15px; color: #005fa3;">Medidas Corporais (cm)</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>Pescoço</label>
+          <input type="number" step="0.1" id="pescoco">
+        </div>
+        
+        <div class="form-group">
+          <label>Ombros</label>
+          <input type="number" step="0.1" id="ombros">
+        </div>
+        
+        <div class="form-group">
+          <label>Peitoral</label>
+          <input type="number" step="0.1" id="peitoral">
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>Braço Esquerdo</label>
+          <input type="number" step="0.1" id="bracoEsq">
+        </div>
+        
+        <div class="form-group">
+          <label>Braço Direito</label>
+          <input type="number" step="0.1" id="bracoDir">
+        </div>
+        
+        <div class="form-group">
+          <label>Cintura</label>
+          <input type="number" step="0.1" id="cintura">
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>Abdômen</label>
+          <input type="number" step="0.1" id="abdomen">
+        </div>
+        
+        <div class="form-group">
+          <label>Quadril</label>
+          <input type="number" step="0.1" id="quadril">
+        </div>
+        
+        <div class="form-group">
+          <label>Coxa Esquerda</label>
+          <input type="number" step="0.1" id="coxaEsq">
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>Coxa Direita</label>
+          <input type="number" step="0.1" id="coxaDir">
+        </div>
+        
+        <div class="form-group">
+          <label>Panturrilha Esquerda</label>
+          <input type="number" step="0.1" id="panturrilhaEsq">
+        </div>
+        
+        <div class="form-group">
+          <label>Panturrilha Direita</label>
+          <input type="number" step="0.1" id="panturrilhaDir">
+        </div>
+      </div>
+      
+      <div style="text-align: center; margin-top: 25px;">
+        <button type="submit" class="btn btn-primary">💾 Salvar Medição</button>
+      </div>
+    </form>
+  </div>
+  
+  <div class="medicoes-historico" id="medicoesHistorico"></div>
+</section>
+
+<!-- Seção: Timeline -->
+<section id="timeline" class="section">
+  <h2 style="text-align: center; margin-bottom: 40px; font-size: 2.5em;">📅 Sua Jornada</h2>
+  <div class="timeline" id="timelineContainer"></div>
+</section>
+
+<!-- Modal de Demonstração de Exercício -->
+<div id="exerciseModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="modalExerciseName"></h2>
+      <button class="modal-close" onclick="fecharModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="exercise-demo">
+        <div class="avatar-container" id="avatarContainer"></div>
+        <p style="font-size: 1.1em; margin-top: 15px;"><strong>Repetições:</strong> <span id="modalReps"></span></p>
+        <p style="font-size: 1.1em;"><strong>Séries:</strong> <span id="modalSets"></span></p>
+        <p style="font-size: 1.1em;"><strong>Descanso:</strong> <span id="modalRest"></span></p>
+      </div>
+      
+      <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-top: 20px;">
+        <h3 style="color: #005fa3; margin-bottom: 15px;">📝 Como Executar:</h3>
+        <div id="modalInstructions"></div>
+      </div>
+      
+      <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #ffc107;">
+        <h4 style="color: #856404; margin-bottom: 10px;">⚠️ Dicas Importantes:</h4>
+        <div id="modalTips"></div>
+      </div>
+    </div>
+  </div>
 </div>
-
-<!-- Outros Treinos -->
-<section class="treinos" id="outrosTreinos">
-  <!-- Será preenchido dinamicamente -->
-</section>
-
-<!-- Histórico -->
-<section class="historico">
-  <h2>📊 Histórico de Treinos</h2>
-  <div class="historico-list" id="historicoList">
-    <!-- Será preenchido dinamicamente -->
-  </div>
-</section>
-
-<!-- Medidas -->
-<section class="medidas">
-  <h2>📏 Medidas Corporais</h2>
-  <div class="grid">
-    <div>
-      <h3>Dados Pessoais</h3>
-      <p><strong>Idade:</strong> 30 anos</p>
-      <p><strong>Altura:</strong> 1.64m</p>
-      <p><strong>Peso Atual:</strong> 48.7kg</p>
-      <p><strong>IMC:</strong> 17.9</p>
-    </div>
-
-    <div>
-      <h3>Composição Corporal</h3>
-      <p><strong>Gordura:</strong> 17.9%</p>
-      <p><strong>Massa Muscular:</strong> 44.3%</p>
-      <p><strong>Metabolismo:</strong> 1152 kcal</p>
-      <p><strong>Água:</strong> 55.3%</p>
-    </div>
-
-    <div>
-      <h3>Metas</h3>
-      <p><strong>Meta Peso:</strong> 50.3kg</p>
-      <p><strong>Meta IMC:</strong> 18.5</p>
-      <p><strong>Meta Gordura:</strong> 21%</p>
-      <p><strong>Meta Peso (Gordura):</strong> 10.2kg</p>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <button class="btn-print" onclick="window.print()">🖨️ Imprimir Ficha</button>
-</footer>
 
 </div>
 
 <script>
-// Dados dos treinos
+// Banco de dados de exercícios com instruções
+const exerciciosDB = {
+  'Desenvolvimento com barra': {
+    instrucoes: [
+      'Sente-se em um banco com apoio para as costas',
+      'Pegue a barra com as mãos na largura dos ombros',
+      'Empurre a barra para cima até estender completamente os braços',
+      'Desça controladamente até a altura dos ombros',
+      'Mantenha o core contraído durante todo o movimento'
+    ],
+    dicas: [
+      'Não arqueie as costas',
+      'Mantenha os cotovelos alinhados com os pulsos',
+      'Expire ao subir, inspire ao descer'
+    ],
+    avatar: 'shoulderPress',
+    musculos: ['Ombros (deltoides)', 'Tríceps']
+  },
+  'Pulldown com barra': {
+    instrucoes: [
+      'Sente-se na máquina e ajuste a almofada nas coxas',
+      'Pegue a barra com as mãos mais abertas que os ombros',
+      'Puxe a barra em direção ao peito, contraindo as escápulas',
+      'Suba controladamente até a extensão completa dos braços',
+      'Mantenha o tronco ligeiramente inclinado para trás'
+    ],
+    dicas: [
+      'Foque em puxar com as costas, não com os braços',
+      'Não balance o corpo',
+      'Desça a barra até a linha dos mamilos'
+    ],
+    avatar: 'pulldown',
+    musculos: ['Grande dorsal', 'Bíceps', 'Trapézio']
+  },
+  'Stiff com barra': {
+    instrucoes: [
+      'Fique em pé com os pés na largura do quadril',
+      'Segure a barra com as mãos na frente das coxas',
+      'Mantendo os joelhos levemente flexionados, incline o tronco para frente',
+      'Desça a barra deslizando pelas pernas até sentir alongamento posterior',
+      'Retorne à posição inicial contraindo glúteos e posterior de coxa'
+    ],
+    dicas: [
+      'Mantenha as costas retas durante todo o movimento',
+      'Não dobre muito os joelhos',
+      'Foque em empurrar o quadril para trás'
+    ],
+    avatar: 'squat',
+    musculos: ['Posterior de coxa', 'Glúteos', 'Lombar']
+  },
+  'Crucifixo inclinado': {
+    instrucoes: [
+      'Deite-se em um banco inclinado (30-45 graus)',
+      'Segure os halteres acima do peito com os braços estendidos',
+      'Abra os braços em arco até sentir alongamento no peitoral',
+      'Retorne à posição inicial contraindo o peitoral',
+      'Mantenha uma leve flexão nos cotovelos'
+    ],
+    dicas: [
+      'Não desça os halteres muito além da linha dos ombros',
+      'Mantenha os pés firmes no chão',
+      'Controle o movimento na descida'
+    ],
+    avatar: 'pushup',
+    musculos: ['Peitoral superior', 'Ombros anteriores']
+  },
+  'Cadeira extensora': {
+    instrucoes: [
+      'Sente-se na máquina e ajuste o apoio dos pés',
+      'Segure nas alças laterais para estabilização',
+      'Estenda as pernas até a contração completa do quadríceps',
+      'Retorne controladamente à posição inicial',
+      'Mantenha as costas apoiadas no banco'
+    ],
+    dicas: [
+      'Não trave os joelhos no topo do movimento',
+      'Evite movimentos bruscos',
+      'Contraia o quadríceps no topo por 1 segundo'
+    ],
+    avatar: 'squat',
+    musculos: ['Quadríceps (frente da coxa)']
+  },
+  'Elevação lateral': {
+    instrucoes: [
+      'Fique em pé com os pés na largura dos ombros',
+      'Segure um halter em cada mão ao lado do corpo',
+      'Eleve os braços lateralmente até a altura dos ombros',
+      'Desça controladamente até a posição inicial',
+      'Mantenha uma leve flexão nos cotovelos'
+    ],
+    dicas: [
+      'Não balance o corpo',
+      'Não eleve acima da linha dos ombros',
+      'Lidereopor com os cotovelos, não com as mãos'
+    ],
+    avatar: 'shoulderPress',
+    musculos: ['Ombros laterais (deltoide medial)']
+  },
+  'Remada baixa': {
+    instrucoes: [
+      'Sente-se na máquina com os pés apoiados',
+      'Segure a barra/manopla com os braços estendidos',
+      'Puxe em direção ao abdômen contraindo as escápulas',
+      'Retorne controladamente à posição inicial',
+      'Mantenha as costas eretas'
+    ],
+    dicas: [
+      'Não arqueie as costas',
+      'Puxe os cotovelos para trás, não para baixo',
+      'Mantenha o core contraído'
+    ],
+    avatar: 'pulldown',
+    musculos: ['Dorsais', 'Trapézio médio', 'Bíceps']
+  },
+  'Agachamento livre': {
+    instrucoes: [
+      'Posicione a barra nas costas (trapézio superior)',
+      'Pés na largura dos ombros, pontas levemente para fora',
+      'Desça flexionando joelhos e quadril simultaneamente',
+      'Desça até as coxas ficarem paralelas ao chão',
+      'Suba empurrando o chão, mantendo o peso nos calcanhares'
+    ],
+    dicas: [
+      'Mantenha o peito para cima',
+      'Joelhos alinhados com os pés',
+      'Não deixe os joelhos ultrapassarem muito os pés'
+    ],
+    avatar: 'squat',
+    musculos: ['Quadríceps', 'Glúteos', 'Posterior de coxa']
+  },
+  'Supino reto': {
+    instrucoes: [
+      'Deite-se no banco com os pés firmes no chão',
+      'Segure a barra ligeiramente mais aberta que os ombros',
+      'Desça a barra até tocar o peito (linha dos mamilos)',
+      'Empurre a barra para cima até extensão completa',
+      'Mantenha as escápulas retraídas'
+    ],
+    dicas: [
+      'Não tire os glúteos do banco',
+      'Controle a descida da barra',
+      'Mantenha os pulsos retos'
+    ],
+    avatar: 'pushup',
+    musculos: ['Peitoral', 'Ombros anteriores', 'Tríceps']
+  }
+};
+
+// Dados de treinos
 const treinos = {
   'Segunda': {
-    nome: 'Treino A - Ombros',
+    nome: 'Treino A - Ombros e Peito',
     exercicios: [
       { metodo: 'Tradicional', exercicio: 'Desenvolvimento com barra', series: 3, reps: 10, descanso: '90s' },
-      { metodo: 'Tradicional', exercicio: 'Elevação lateral', series: 3, reps: 12, descanso: '60s' },
-      { metodo: 'Tradicional', exercicio: 'Elevação frontal', series: 3, reps: 12, descanso: '60s' }
+      { metodo: 'Tradicional', exercicio: 'Elevação lateral', series: 3, reps: 12, descanso: '60s' }
     ]
   },
   'Terça': {
     nome: 'Treino B - Costas',
     exercicios: [
       { metodo: 'Tradicional', exercicio: 'Pulldown com barra', series: 4, reps: 12, descanso: '90s' },
-      { metodo: 'Tradicional', exercicio: 'Remada baixa', series: 3, reps: 12, descanso: '90s' },
-      { metodo: 'Tradicional', exercicio: 'Pullover', series: 3, reps: 15, descanso: '60s' }
+      { metodo: 'Tradicional', exercicio: 'Remada baixa', series: 3, reps: 12, descanso: '90s' }
     ]
   },
   'Quarta': {
     nome: 'Treino C - Pernas',
     exercicios: [
       { metodo: 'Tradicional', exercicio: 'Stiff com barra', series: 3, reps: 12, descanso: '90s' },
-      { metodo: 'Tradicional', exercicio: 'Agachamento livre', series: 4, reps: 10, descanso: '120s' },
-      { metodo: 'Tradicional', exercicio: 'Leg press', series: 3, reps: 15, descanso: '90s' }
+      { metodo: 'Tradicional', exercicio: 'Agachamento livre', series: 4, reps: 10, descanso: '120s' }
     ]
   },
   'Quinta': {
     nome: 'Treino A - Peito',
     exercicios: [
-      { metodo: 'Tradicional', exercicio: 'Crucifixo inclinado', series: 3, reps: 10, descanso: '90s' },
       { metodo: 'Tradicional', exercicio: 'Supino reto', series: 4, reps: 10, descanso: '120s' },
-      { metodo: 'Tradicional', exercicio: 'Flexão de braço', series: 3, reps: 15, descanso: '60s' }
+      { metodo: 'Tradicional', exercicio: 'Crucifixo inclinado', series: 3, reps: 10, descanso: '90s' }
     ]
   },
   'Sexta': {
     nome: 'Treino B - Pernas',
     exercicios: [
-      { metodo: 'Tradicional', exercicio: 'Cadeira extensora', series: 3, reps: 15, descanso: '120s' },
-      { metodo: 'Tradicional', exercicio: 'Cadeira flexora', series: 3, reps: 12, descanso: '90s' },
-      { metodo: 'Bi-set', exercicio: 'Cadeira abdutora + adutora', series: 3, reps: '15 + 15', descanso: '90s' }
+      { metodo: 'Tradicional', exercicio: 'Cadeira extensora', series: 3, reps: 15, descanso: '120s' }
     ]
   },
   'Sábado': {
-    nome: 'Treino opcional ou descanso',
+    nome: 'Descanso ou Treino Leve',
     exercicios: []
   },
   'Domingo': {
@@ -521,192 +1107,291 @@ const treinos = {
   }
 };
 
-// Funções de localStorage
-function salvarDados(chave, dados) {
+// LocalStorage helpers
+function salvar(chave, dados) {
   localStorage.setItem(chave, JSON.stringify(dados));
 }
 
-function carregarDados(chave) {
+function carregar(chave) {
   const dados = localStorage.getItem(chave);
   return dados ? JSON.parse(dados) : null;
 }
 
-function obterDataHoje() {
-  const hoje = new Date();
-  return hoje.toISOString().split('T')[0];
-}
-
-function obterDiaSemana() {
-  const dias = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
-  return dias[new Date().getDay()];
-}
-
-function formatarData(data) {
-  const d = new Date(data + 'T00:00:00');
-  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-}
-
-function formatarHora(data) {
-  return new Date(data).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-}
-
-// Gerenciamento de Check-in/Check-out
-function fazerCheckin() {
-  const hoje = obterDataHoje();
-  const diaSemana = obterDiaSemana();
-  const agora = new Date().toISOString();
+// Funções de inicialização
+function init() {
+  const usuario = carregar('usuario');
   
-  const checkin = {
-    data: hoje,
-    diaSemana: diaSemana,
-    horarioCheckin: agora,
-    treino: treinos[diaSemana].nome,
-    exerciciosCompletos: []
+  if (usuario) {
+    document.getElementById('welcomeScreen').style.display = 'none';
+    document.getElementById('mainNav').style.display = 'flex';
+    document.getElementById('userDisplay').textContent = `Olá, ${usuario.nome}! 👋`;
+    carregarDadosUsuario();
+    mudarAba('perfil');
+  } else {
+    document.getElementById('welcomeScreen').style.display = 'block';
+    document.getElementById('mainNav').style.display = 'none';
+  }
+}
+
+function mostrarCadastro() {
+  document.getElementById('welcomeScreen').style.display = 'none';
+  document.getElementById('mainNav').style.display = 'flex';
+  mudarAba('cadastro');
+}
+
+function verificarUsuario() {
+  const usuario = carregar('usuario');
+  if (usuario) {
+    init();
+  } else {
+    alert('Nenhum cadastro encontrado. Por favor, faça seu cadastro primeiro.');
+    mostrarCadastro();
+  }
+}
+
+// Navegação entre abas
+function mudarAba(abaId) {
+  // Remover active de todas as abas
+  document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+  
+  // Ativar aba selecionada
+  event?.target?.classList.add('active');
+  document.getElementById(abaId).classList.add('active');
+  
+  // Carregar conteúdo específico
+  if (abaId === 'treinos') {
+    renderizarTreinos();
+  } else if (abaId === 'timeline') {
+    renderizarTimeline();
+  } else if (abaId === 'medicoes') {
+    renderizarHistoricoMedicoes();
+  } else if (abaId === 'cadastro') {
+    preencherFormularioCadastro();
+  } else if (abaId === 'perfil') {
+    atualizarPerfil();
+  }
+}
+
+// Cadastro de usuário
+function salvarCadastro(e) {
+  e.preventDefault();
+  
+  const usuario = {
+    nome: document.getElementById('nome').value,
+    dataNascimento: document.getElementById('dataNascimento').value,
+    sexo: document.getElementById('sexo').value,
+    email: document.getElementById('email').value,
+    telefone: document.getElementById('telefone').value,
+    objetivo: document.getElementById('objetivo').value,
+    observacoes: document.getElementById('observacoes').value,
+    dataCadastro: new Date().toISOString()
   };
   
-  salvarDados('checkinAtual', checkin);
-  salvarDados('ultimoCheckin', hoje);
+  salvar('usuario', usuario);
   
-  renderizarTreinoHoje();
-  atualizarEstatisticas();
+  alert('✅ Cadastro salvo com sucesso!');
+  init();
+  mudarAba('perfil');
 }
 
-function fazerCheckout() {
-  const checkin = carregarDados('checkinAtual');
-  if (!checkin) return;
-  
-  const agora = new Date().toISOString();
-  checkin.horarioCheckout = agora;
-  
-  // Calcular duração
-  const inicio = new Date(checkin.horarioCheckin);
-  const fim = new Date(agora);
-  const duracao = Math.round((fim - inicio) / 1000 / 60); // minutos
-  checkin.duracao = duracao;
-  
-  // Salvar no histórico
-  let historico = carregarDados('historicoTreinos') || [];
-  historico.unshift(checkin);
-  salvarDados('historicoTreinos', historico);
-  
-  // Limpar check-in atual
-  localStorage.removeItem('checkinAtual');
-  
-  renderizarTreinoHoje();
-  renderizarHistorico();
-  atualizarEstatisticas();
+function preencherFormularioCadastro() {
+  const usuario = carregar('usuario');
+  if (usuario) {
+    document.getElementById('nome').value = usuario.nome || '';
+    document.getElementById('dataNascimento').value = usuario.dataNascimento || '';
+    document.getElementById('sexo').value = usuario.sexo || '';
+    document.getElementById('email').value = usuario.email || '';
+    document.getElementById('telefone').value = usuario.telefone || '';
+    document.getElementById('objetivo').value = usuario.objetivo || 'saude';
+    document.getElementById('observacoes').value = usuario.observacoes || '';
+  }
 }
 
-function marcarExercicioCompleto(index) {
-  const checkin = carregarDados('checkinAtual');
-  if (!checkin) return;
+function calcularIdade(dataNascimento) {
+  const hoje = new Date();
+  const nascimento = new Date(dataNascimento);
+  let idade = hoje.getFullYear() - nascimento.getFullYear();
+  const mes = hoje.getMonth() - nascimento.getMonth();
   
-  const exercicioId = `ex-${index}`;
-  const idx = checkin.exerciciosCompletos.indexOf(exercicioId);
-  
-  if (idx > -1) {
-    checkin.exerciciosCompletos.splice(idx, 1);
-  } else {
-    checkin.exerciciosCompletos.push(exercicioId);
+  if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
+    idade--;
   }
   
-  salvarDados('checkinAtual', checkin);
-  renderizarTreinoHoje();
+  return idade;
 }
 
-// Renderização
-function renderizarTreinoHoje() {
-  const diaSemana = obterDiaSemana();
-  const treino = treinos[diaSemana];
-  const checkin = carregarDados('checkinAtual');
-  const hoje = obterDataHoje();
-  const ultimoCheckin = carregarDados('ultimoCheckin');
+// Perfil
+function atualizarPerfil() {
+  const usuario = carregar('usuario');
+  const medicoes = carregar('medicoes') || [];
+  const ultimaMedicao = medicoes[0];
   
-  const podeCheckin = !checkin && ultimoCheckin !== hoje;
-  const podeCheckout = checkin && checkin.data === hoje;
-  
-  let html = `
-    <h2>${diaSemana} - ${treino.nome}</h2>
+  if (usuario) {
+    document.getElementById('profileNome').textContent = usuario.nome;
+    document.getElementById('profileIdade').textContent = calcularIdade(usuario.dataNascimento);
     
-    <div class="checkin-section">
-      <div class="checkin-buttons">
-        <button class="btn btn-checkin" onclick="fazerCheckin()" ${!podeCheckin ? 'disabled' : ''}>
-          ✅ Fazer Check-in
-        </button>
-        <button class="btn btn-checkout" onclick="fazerCheckout()" ${!podeCheckout ? 'disabled' : ''}>
-          🏁 Fazer Check-out
-        </button>
-      </div>
-      
-      <div class="checkin-status ${checkin ? 'active' : ''}">
-        ${checkin ? `
-          <strong>✓ Check-in realizado às ${formatarHora(checkin.horarioCheckin)}</strong><br>
-          Exercícios concluídos: ${checkin.exerciciosCompletos.length}/${treino.exercicios.length}
-        ` : `
-          ${ultimoCheckin === hoje ? 
-            '✓ Treino de hoje já realizado!' : 
-            'Faça o check-in para iniciar o treino'}
-        `}
-      </div>
-    </div>
-  `;
-  
-  if (treino.exercicios.length > 0) {
-    html += `
-      <table>
-        <thead>
-          <tr>
-            <th style="width:40px">✓</th>
-            <th>Método</th>
-            <th>Exercício</th>
-            <th>Séries</th>
-            <th>Reps</th>
-            <th>Descanso</th>
-          </tr>
-        </thead>
-        <tbody>
-    `;
+    const objetivos = {
+      'emagrecimento': 'Emagrecimento',
+      'hipertrofia': 'Ganho de Massa Muscular',
+      'condicionamento': 'Condicionamento Físico',
+      'saude': 'Saúde e Bem-estar'
+    };
+    document.getElementById('profileObjetivo').textContent = objetivos[usuario.objetivo] || '-';
     
-    treino.exercicios.forEach((ex, i) => {
-      const completo = checkin && checkin.exerciciosCompletos.includes(`ex-${i}`);
-      html += `
-        <tr class="${completo ? 'exercise-completed' : ''}">
-          <td>
-            <input type="checkbox" 
-              ${completo ? 'checked' : ''} 
-              ${checkin ? '' : 'disabled'}
-              onchange="marcarExercicioCompleto(${i})">
-          </td>
-          <td>${ex.metodo}</td>
-          <td>${ex.exercicio}</td>
-          <td>${ex.series}</td>
-          <td>${ex.reps}</td>
-          <td>${ex.descanso}</td>
-        </tr>
-      `;
-    });
-    
-    html += `
-        </tbody>
-      </table>
-    `;
-  } else {
-    html += `<p style="text-align:center; padding:20px; font-size:1.2em;">🎉 Dia de descanso! Aproveite para recuperar.</p>`;
+    // Avatar com inicial do nome
+    const inicial = usuario.nome.charAt(0).toUpperCase();
+    document.getElementById('profileAvatar').textContent = inicial;
   }
   
-  document.getElementById('treinoHoje').innerHTML = html;
+  // Atualizar estatísticas
+  document.getElementById('statMedicoes').textContent = medicoes.length;
+  
+  if (ultimaMedicao) {
+    document.getElementById('statPeso').textContent = ultimaMedicao.peso + ' kg';
+    const imc = (ultimaMedicao.peso / (ultimaMedicao.altura * ultimaMedicao.altura)).toFixed(1);
+    document.getElementById('statIMC').textContent = imc;
+  } else {
+    document.getElementById('statPeso').textContent = '-';
+    document.getElementById('statIMC').textContent = '-';
+  }
 }
 
-function renderizarOutrosTreinos() {
+function carregarDadosUsuario() {
+  atualizarPerfil();
+}
+
+// Medições
+function salvarMedicao(e) {
+  e.preventDefault();
+  
+  const medicao = {
+    data: document.getElementById('dataMedicao').value,
+    peso: parseFloat(document.getElementById('peso').value),
+    altura: parseFloat(document.getElementById('altura').value),
+    gordura: parseFloat(document.getElementById('gordura').value) || null,
+    massaMuscular: parseFloat(document.getElementById('massaMuscular').value) || null,
+    metabolismo: parseInt(document.getElementById('metabolismo').value) || null,
+    medidas: {
+      pescoco: parseFloat(document.getElementById('pescoco').value) || null,
+      ombros: parseFloat(document.getElementById('ombros').value) || null,
+      peitoral: parseFloat(document.getElementById('peitoral').value) || null,
+      bracoEsq: parseFloat(document.getElementById('bracoEsq').value) || null,
+      bracoDir: parseFloat(document.getElementById('bracoDir').value) || null,
+      cintura: parseFloat(document.getElementById('cintura').value) || null,
+      abdomen: parseFloat(document.getElementById('abdomen').value) || null,
+      quadril: parseFloat(document.getElementById('quadril').value) || null,
+      coxaEsq: parseFloat(document.getElementById('coxaEsq').value) || null,
+      coxaDir: parseFloat(document.getElementById('coxaDir').value) || null,
+      panturrilhaEsq: parseFloat(document.getElementById('panturrilhaEsq').value) || null,
+      panturrilhaDir: parseFloat(document.getElementById('panturrilhaDir').value) || null
+    },
+    timestamp: new Date().toISOString()
+  };
+  
+  // Calcular IMC
+  medicao.imc = (medicao.peso / (medicao.altura * medicao.altura)).toFixed(1);
+  
+  let medicoes = carregar('medicoes') || [];
+  medicoes.unshift(medicao);
+  salvar('medicoes', medicoes);
+  
+  alert('✅ Medição salva com sucesso!');
+  document.getElementById('formMedicoes').reset();
+  renderizarHistoricoMedicoes();
+  atualizarPerfil();
+  
+  // Adicionar à timeline
+  adicionarEventoTimeline({
+    tipo: 'medicao',
+    data: medicao.data,
+    titulo: 'Nova Avaliação Física',
+    descricao: `Peso: ${medicao.peso}kg | IMC: ${medicao.imc}`
+  });
+}
+
+function renderizarHistoricoMedicoes() {
+  const medicoes = carregar('medicoes') || [];
+  const container = document.getElementById('medicoesHistorico');
+  
+  if (medicoes.length === 0) {
+    container.innerHTML = '<p style="text-align: center; padding: 20px; color: white;">Nenhuma medição registrada ainda.</p>';
+    return;
+  }
+  
+  let html = '<h2 style="color: #4fc3f7; margin: 30px 0 20px;">📊 Histórico de Medições</h2>';
+  
+  medicoes.forEach((med, idx) => {
+    html += `
+      <div class="medicoes-grid" style="margin-bottom: 30px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+        <div class="medicao-card">
+          <h3>📅 ${new Date(med.data).toLocaleDateString('pt-BR')}</h3>
+          <div class="medicao-item">
+            <span class="medicao-label">Peso:</span>
+            <span class="medicao-value">${med.peso} kg</span>
+          </div>
+          <div class="medicao-item">
+            <span class="medicao-label">Altura:</span>
+            <span class="medicao-value">${med.altura} m</span>
+          </div>
+          <div class="medicao-item">
+            <span class="medicao-label">IMC:</span>
+            <span class="medicao-value">${med.imc}</span>
+          </div>
+        </div>
+        
+        ${med.gordura || med.massaMuscular ? `
+        <div class="medicao-card">
+          <h3>💪 Composição Corporal</h3>
+          ${med.gordura ? `
+          <div class="medicao-item">
+            <span class="medicao-label">% Gordura:</span>
+            <span class="medicao-value">${med.gordura}%</span>
+          </div>` : ''}
+          ${med.massaMuscular ? `
+          <div class="medicao-item">
+            <span class="medicao-label">% Massa Muscular:</span>
+            <span class="medicao-value">${med.massaMuscular}%</span>
+          </div>` : ''}
+          ${med.metabolismo ? `
+          <div class="medicao-item">
+            <span class="medicao-label">Metabolismo:</span>
+            <span class="medicao-value">${med.metabolismo} kcal</span>
+          </div>` : ''}
+        </div>` : ''}
+        
+        ${Object.values(med.medidas).some(v => v !== null) ? `
+        <div class="medicao-card">
+          <h3>📏 Medidas (cm)</h3>
+          ${med.medidas.pescoco ? `<div class="medicao-item"><span class="medicao-label">Pescoço:</span><span class="medicao-value">${med.medidas.pescoco} cm</span></div>` : ''}
+          ${med.medidas.ombros ? `<div class="medicao-item"><span class="medicao-label">Ombros:</span><span class="medicao-value">${med.medidas.ombros} cm</span></div>` : ''}
+          ${med.medidas.peitoral ? `<div class="medicao-item"><span class="medicao-label">Peitoral:</span><span class="medicao-value">${med.medidas.peitoral} cm</span></div>` : ''}
+          ${med.medidas.bracoEsq ? `<div class="medicao-item"><span class="medicao-label">Braço Esq:</span><span class="medicao-value">${med.medidas.bracoEsq} cm</span></div>` : ''}
+          ${med.medidas.cintura ? `<div class="medicao-item"><span class="medicao-label">Cintura:</span><span class="medicao-value">${med.medidas.cintura} cm</span></div>` : ''}
+          ${med.medidas.quadril ? `<div class="medicao-item"><span class="medicao-label">Quadril:</span><span class="medicao-value">${med.medidas.quadril} cm</span></div>` : ''}
+        </div>` : ''}
+      </div>
+    `;
+  });
+  
+  container.innerHTML = html;
+}
+
+// Treinos
+function renderizarTreinos() {
   const diaAtual = obterDiaSemana();
   let html = '';
   
   for (const [dia, treino] of Object.entries(treinos)) {
-    if (dia === diaAtual || treino.exercicios.length === 0) continue;
+    const ehHoje = dia === diaAtual;
     
     html += `
-      <div class="dia">
-        <h2>${dia} - ${treino.nome}</h2>
+      <div class="treino-card ${ehHoje ? 'hoje' : ''}">
+        <h2>${ehHoje ? '📍 ' : ''}${dia} - ${treino.nome}</h2>
+    `;
+    
+    if (treino.exercicios.length > 0) {
+      html += `
         <table>
           <thead>
             <tr>
@@ -715,130 +1400,282 @@ function renderizarOutrosTreinos() {
               <th>Séries</th>
               <th>Reps</th>
               <th>Descanso</th>
+              <th>Demonstração</th>
             </tr>
           </thead>
           <tbody>
-    `;
-    
-    treino.exercicios.forEach(ex => {
-      html += `
-        <tr>
-          <td>${ex.metodo}</td>
-          <td>${ex.exercicio}</td>
-          <td>${ex.series}</td>
-          <td>${ex.reps}</td>
-          <td>${ex.descanso}</td>
-        </tr>
       `;
-    });
-    
-    html += `
+      
+      treino.exercicios.forEach(ex => {
+        html += `
+          <tr>
+            <td>${ex.metodo}</td>
+            <td><strong>${ex.exercicio}</strong></td>
+            <td>${ex.series}</td>
+            <td>${ex.reps}</td>
+            <td>${ex.descanso}</td>
+            <td>
+              <button class="btn-demo" onclick='mostrarExercicio(${JSON.stringify(ex)})'>
+                👁️ Ver
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+      
+      html += `
           </tbody>
         </table>
+      `;
+    } else {
+      html += '<p style="text-align: center; padding: 20px; font-size: 1.2em;">🎉 Dia de descanso!</p>';
+    }
+    
+    html += '</div>';
+  }
+  
+  document.getElementById('treinosContainer').innerHTML = html;
+}
+
+function obterDiaSemana() {
+  const dias = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+  return dias[new Date().getDay()];
+}
+
+// Modal de exercício
+function mostrarExercicio(exercicio) {
+  const modal = document.getElementById('exerciseModal');
+  const exercicioInfo = exerciciosDB[exercicio.exercicio];
+  
+  document.getElementById('modalExerciseName').textContent = exercicio.exercicio;
+  document.getElementById('modalReps').textContent = exercicio.reps;
+  document.getElementById('modalSets').textContent = exercicio.series;
+  document.getElementById('modalRest').textContent = exercicio.descanso;
+  
+  if (exercicioInfo) {
+    // Instruções
+    let instrucoesHTML = '<ol style="padding-left: 20px;">';
+    exercicioInfo.instrucoes.forEach(instrucao => {
+      instrucoesHTML += `<li style="margin: 8px 0; line-height: 1.6;">${instrucao}</li>`;
+    });
+    instrucoesHTML += '</ol>';
+    
+    instrucoesHTML += `<p style="margin-top: 15px; padding: 10px; background: #e3f2fd; border-radius: 6px;"><strong>Músculos trabalhados:</strong> ${exercicioInfo.musculos.join(', ')}</p>`;
+    
+    document.getElementById('modalInstructions').innerHTML = instrucoesHTML;
+    
+    // Dicas
+    let dicasHTML = '<ul style="padding-left: 20px;">';
+    exercicioInfo.dicas.forEach(dica => {
+      dicasHTML += `<li style="margin: 8px 0; line-height: 1.6;">${dica}</li>`;
+    });
+    dicasHTML += '</ul>';
+    
+    document.getElementById('modalTips').innerHTML = dicasHTML;
+    
+    // Avatar animado
+    renderizarAvatar(exercicioInfo.avatar);
+  } else {
+    document.getElementById('modalInstructions').innerHTML = '<p>Informações detalhadas não disponíveis para este exercício.</p>';
+    document.getElementById('modalTips').innerHTML = '<p>Consulte seu instrutor para orientações específicas.</p>';
+    renderizarAvatar('default');
+  }
+  
+  modal.classList.add('active');
+}
+
+function fecharModal() {
+  document.getElementById('exerciseModal').classList.remove('active');
+}
+
+function renderizarAvatar(tipo) {
+  const container = document.getElementById('avatarContainer');
+  
+  const avatars = {
+    'shoulderPress': `
+      <svg width="200" height="300" viewBox="0 0 200 300" style="animation: shoulderPress 2s ease-in-out infinite;">
+        <!-- Cabeça -->
+        <circle cx="100" cy="30" r="20" fill="#FFD700" stroke="#333" stroke-width="2"/>
+        <!-- Corpo -->
+        <rect x="85" y="50" width="30" height="60" fill="#4CAF50" rx="5"/>
+        <!-- Braços -->
+        <rect x="50" y="60" width="30" height="8" fill="#FFA726" rx="4"/>
+        <rect x="120" y="60" width="30" height="8" fill="#FFA726" rx="4"/>
+        <!-- Barra -->
+        <rect x="40" y="55" width="120" height="6" fill="#666" rx="3"/>
+        <!-- Pesos -->
+        <rect x="30" y="50" width="15" height="16" fill="#333" rx="2"/>
+        <rect x="155" y="50" width="15" height="16" fill="#333" rx="2"/>
+        <!-- Pernas -->
+        <rect x="85" y="110" width="12" height="50" fill="#2196F3" rx="3"/>
+        <rect x="103" y="110" width="12" height="50" fill="#2196F3" rx="3"/>
+        <!-- Pés -->
+        <ellipse cx="91" cy="165" rx="8" ry="4" fill="#333"/>
+        <ellipse cx="109" cy="165" rx="8" ry="4" fill="#333"/>
+        <text x="100" y="200" text-anchor="middle" font-size="14" fill="#fff">Desenvolvimento</text>
+        <text x="100" y="220" text-anchor="middle" font-size="12" fill="#4CAF50">↑ Empurre para cima</text>
+      </svg>
+    `,
+    'pulldown': `
+      <svg width="200" height="300" viewBox="0 0 200 300" style="animation: pulldown 2s ease-in-out infinite;">
+        <!-- Cabeça -->
+        <circle cx="100" cy="80" r="20" fill="#FFD700" stroke="#333" stroke-width="2"/>
+        <!-- Corpo -->
+        <rect x="85" y="100" width="30" height="60" fill="#4CAF50" rx="5"/>
+        <!-- Braços puxando -->
+        <line x1="100" y1="40" x2="60" y2="105" stroke="#FFA726" stroke-width="8" stroke-linecap="round"/>
+        <line x1="100" y1="40" x2="140" y2="105" stroke="#FFA726" stroke-width="8" stroke-linecap="round"/>
+        <!-- Barra -->
+        <rect x="40" y="35" width="120" height="6" fill="#666" rx="3"/>
+        <!-- Cabo -->
+        <line x1="100" y1="10" x2="100" y2="35" stroke="#999" stroke-width="2" stroke-dasharray="5,5"/>
+        <!-- Pernas sentadas -->
+        <rect x="70" y="160" width="15" height="40" fill="#2196F3" rx="3" transform="rotate(45 77.5 180)"/>
+        <rect x="115" y="160" width="15" height="40" fill="#2196F3" rx="3" transform="rotate(-45 122.5 180)"/>
+        <text x="100" y="240" text-anchor="middle" font-size="14" fill="#fff">Pulldown</text>
+        <text x="100" y="260" text-anchor="middle" font-size="12" fill="#4CAF50">↓ Puxe para baixo</text>
+      </svg>
+    `,
+    'squat': `
+      <svg width="200" height="300" viewBox="0 0 200 300" style="animation: squat 2s ease-in-out infinite;">
+        <!-- Cabeça -->
+        <circle cx="100" cy="40" r="20" fill="#FFD700" stroke="#333" stroke-width="2"/>
+        <!-- Corpo -->
+        <rect x="85" y="60" width="30" height="70" fill="#4CAF50" rx="5"/>
+        <!-- Braços -->
+        <rect x="70" y="70" width="10" height="50" fill="#FFA726" rx="3"/>
+        <rect x="120" y="70" width="10" height="50" fill="#FFA726" rx="3"/>
+        <!-- Barra nas costas -->
+        <rect x="50" y="55" width="100" height="8" fill="#666" rx="4"/>
+        <rect x="40" y="50" width="15" height="18" fill="#333" rx="2"/>
+        <rect x="145" y="50" width="15" height="18" fill="#333" rx="2"/>
+        <!-- Pernas -->
+        <rect x="80" y="130" width="15" height="60" fill="#2196F3" rx="3"/>
+        <rect x="105" y="130" width="15" height="60" fill="#2196F3" rx="3"/>
+        <!-- Pés -->
+        <ellipse cx="87.5" cy="195" rx="12" ry="6" fill="#333"/>
+        <ellipse cx="112.5" cy="195" rx="12" ry="6" fill="#333"/>
+        <text x="100" y="230" text-anchor="middle" font-size="14" fill="#fff">Agachamento</text>
+        <text x="100" y="250" text-anchor="middle" font-size="12" fill="#4CAF50">↕ Suba e desça</text>
+      </svg>
+    `,
+    'pushup': `
+      <svg width="200" height="300" viewBox="0 0 200 300" style="animation: pushup 2s ease-in-out infinite;">
+        <!-- Cabeça -->
+        <circle cx="60" cy="120" r="20" fill="#FFD700" stroke="#333" stroke-width="2"/>
+        <!-- Corpo inclinado -->
+        <rect x="75" y="115" width="70" height="25" fill="#4CAF50" rx="5" transform="rotate(-15 110 127)"/>
+        <!-- Braços -->
+        <rect x="75" y="135" width="8" height="30" fill="#FFA726" rx="3" transform="rotate(60 79 150)"/>
+        <rect x="137" y="135" width="8" height="30" fill="#FFA726" rx="3" transform="rotate(-60 141 150)"/>
+        <!-- Pernas -->
+        <rect x="130" y="120" width="12" height="45" fill="#2196F3" rx="3" transform="rotate(-15 136 142)"/>
+        <rect x="145" y="120" width="12" height="45" fill="#2196F3" rx="3" transform="rotate(-15 151 142)"/>
+        <!-- Banco inclinado -->
+        <rect x="20" y="180" width="160" height="15" fill="#8D6E63" rx="3" transform="rotate(-10 100 187)"/>
+        <text x="100" y="240" text-anchor="middle" font-size="14" fill="#fff">Crucifixo/Supino</text>
+        <text x="100" y="260" text-anchor="middle" font-size="12" fill="#4CAF50">↕ Abra e feche</text>
+      </svg>
+    `,
+    'default': `
+      <svg width="200" height="300" viewBox="0 0 200 300">
+        <circle cx="100" cy="60" r="25" fill="#FFD700" stroke="#333" stroke-width="2"/>
+        <rect x="82" y="85" width="36" height="80" fill="#4CAF50" rx="5"/>
+        <rect x="60" y="95" width="12" height="65" fill="#FFA726" rx="3"/>
+        <rect x="128" y="95" width="12" height="65" fill="#FFA726" rx="3"/>
+        <rect x="82" y="165" width="15" height="70" fill="#2196F3" rx="3"/>
+        <rect x="103" y="165" width="15" height="70" fill="#2196F3" rx="3"/>
+        <ellipse cx="89.5" cy="240" rx="10" ry="5" fill="#333"/>
+        <ellipse cx="110.5" cy="240" rx="10" ry="5" fill="#333"/>
+        <text x="100" y="280" text-anchor="middle" font-size="14" fill="#fff">Avatar do Exercício</text>
+      </svg>
+    `
+  };
+  
+  container.innerHTML = avatars[tipo] || avatars['default'];
+}
+
+// Timeline
+function adicionarEventoTimeline(evento) {
+  let timeline = carregar('timeline') || [];
+  timeline.unshift(evento);
+  salvar('timeline', timeline);
+}
+
+function renderizarTimeline() {
+  let timeline = carregar('timeline') || [];
+  const medicoes = carregar('medicoes') || [];
+  const usuario = carregar('usuario');
+  
+  // Criar eventos automáticos se timeline estiver vazia
+  if (timeline.length === 0 && usuario) {
+    timeline.push({
+      tipo: 'cadastro',
+      data: usuario.dataCadastro.split('T')[0],
+      titulo: '🎉 Início da Jornada',
+      descricao: `${usuario.nome} iniciou sua jornada fitness!`
+    });
+    
+    medicoes.forEach(med => {
+      timeline.push({
+        tipo: 'medicao',
+        data: med.data,
+        titulo: '📊 Avaliação Física',
+        descricao: `Peso: ${med.peso}kg | IMC: ${med.imc}`
+      });
+    });
+    
+    salvar('timeline', timeline);
+  }
+  
+  // Ordenar por data
+  timeline.sort((a, b) => new Date(b.data) - new Date(a.data));
+  
+  const container = document.getElementById('timelineContainer');
+  
+  if (timeline.length === 0) {
+    container.innerHTML = '<p style="text-align: center; color: white; font-size: 1.2em;">Sua jornada começará em breve! 🚀</p>';
+    return;
+  }
+  
+  let html = '';
+  timeline.forEach(evento => {
+    const icones = {
+      'cadastro': '🎉',
+      'medicao': '📊',
+      'treino': '💪',
+      'meta': '🎯'
+    };
+    
+    html += `
+      <div class="timeline-item">
+        <div class="timeline-date">${new Date(evento.data).toLocaleDateString('pt-BR')}</div>
+        <div class="timeline-content">
+          <h3>${icones[evento.tipo] || '📌'} ${evento.titulo}</h3>
+          <p>${evento.descricao}</p>
+        </div>
       </div>
     `;
-  }
+  });
   
-  document.getElementById('outrosTreinos').innerHTML = html;
+  container.innerHTML = html;
 }
 
-function renderizarHistorico() {
-  const historico = carregarDados('historicoTreinos') || [];
-  const html = historico.length === 0 ? 
-    '<p style="text-align:center; opacity:0.7;">Nenhum treino registrado ainda</p>' :
-    historico.map(h => {
-      const totalExercicios = treinos[h.diaSemana]?.exercicios.length || 0;
-      const completo = h.exerciciosCompletos.length === totalExercicios;
-      
-      return `
-        <div class="historico-item ${completo ? 'completo' : 'incompleto'}">
-          <div>
-            <strong>${h.diaSemana} - ${formatarData(h.data)}</strong><br>
-            <small>${h.treino}</small><br>
-            <small>Check-in: ${formatarHora(h.horarioCheckin)} | Check-out: ${formatarHora(h.horarioCheckout)}</small><br>
-            <small>Duração: ${h.duracao} min | Exercícios: ${h.exerciciosCompletos.length}/${totalExercicios}</small>
-          </div>
-          <div style="font-size:2em">
-            ${completo ? '✅' : '⚠️'}
-          </div>
-        </div>
-      `;
-    }).join('');
-  
-  document.getElementById('historicoList').innerHTML = html;
-}
-
-function atualizarEstatisticas() {
-  const historico = carregarDados('historicoTreinos') || [];
-  
-  // Treinos este mês
-  const hoje = new Date();
-  const mesAtual = hoje.getMonth();
-  const anoAtual = hoje.getFullYear();
-  const treinosMes = historico.filter(h => {
-    const data = new Date(h.data + 'T00:00:00');
-    return data.getMonth() === mesAtual && data.getFullYear() === anoAtual;
-  }).length;
-  
-  // Sequência atual
-  let sequencia = 0;
-  const datasOrdenadas = historico.map(h => h.data).sort().reverse();
-  let dataEsperada = obterDataHoje();
-  
-  for (const data of datasOrdenadas) {
-    if (data === dataEsperada) {
-      sequencia++;
-      const d = new Date(data + 'T00:00:00');
-      d.setDate(d.getDate() - 1);
-      dataEsperada = d.toISOString().split('T')[0];
-    } else {
-      break;
-    }
-  }
-  
-  // Taxa de conclusão
-  const treinosCompletos = historico.filter(h => {
-    const totalExercicios = treinos[h.diaSemana]?.exercicios.length || 0;
-    return h.exerciciosCompletos.length === totalExercicios;
-  }).length;
-  const taxaConclusao = historico.length > 0 ? 
-    Math.round((treinosCompletos / historico.length) * 100) : 0;
-  
-  // Atualizar DOM
-  document.getElementById('treinosMes').textContent = treinosMes;
-  document.getElementById('sequencia').textContent = sequencia;
-  document.getElementById('totalTreinos').textContent = historico.length;
-  document.getElementById('taxaConclusao').textContent = taxaConclusao + '%';
-  
-  // Adicionar classes de warning se necessário
-  if (sequencia === 0) {
-    document.getElementById('sequencia').classList.add('warning');
-  } else {
-    document.getElementById('sequencia').classList.remove('warning');
+// Fechar modal ao clicar fora
+window.onclick = function(event) {
+  const modal = document.getElementById('exerciseModal');
+  if (event.target === modal) {
+    fecharModal();
   }
 }
 
-// Inicialização
-function init() {
-  const hoje = new Date();
-  document.getElementById('dataHoje').innerHTML = 
-    `<strong>Hoje:</strong> ${hoje.toLocaleDateString('pt-BR', { 
-      weekday: 'long', 
-      day: '2-digit', 
-      month: 'long', 
-      year: 'numeric' 
-    })}`;
-  
-  renderizarTreinoHoje();
-  renderizarOutrosTreinos();
-  renderizarHistorico();
-  atualizarEstatisticas();
-}
-
-// Executar ao carregar
+// Inicializar
 document.addEventListener('DOMContentLoaded', init);
 
-console.log("✅ Sistema de treino com check-in/check-out carregado!");
+// Preencher data atual no formulário de medição
+document.getElementById('dataMedicao')?.setAttribute('value', new Date().toISOString().split('T')[0]);
+
+console.log('✅ Sistema completo carregado!');
 </script>
 
 </body>
