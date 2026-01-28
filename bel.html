@@ -426,6 +426,13 @@ body {
   padding: 15px;
   margin-bottom: 10px;
   border-left: 4px solid var(--primary-color);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.exercicio-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 .exercicio-nome {
@@ -449,6 +456,28 @@ body {
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+.exercicio-gif-container {
+  margin-top: 10px;
+  border-radius: 8px;
+  overflow: hidden;
+  display: none;
+}
+
+.exercicio-gif {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.gif-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 180px;
+  background: rgba(0,0,0,0.3);
 }
 
 /* Modal */
@@ -517,32 +546,31 @@ body {
   padding: 20px;
 }
 
-/* Avatar Container */
-.avatar-container {
+/* GIF Container */
+.gif-container {
   background: linear-gradient(135deg, #1a1a2e, #0f0f1e);
   border-radius: 16px;
-  padding: 20px;
+  padding: 10px;
   margin-bottom: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 300px;
+  min-height: 250px;
   position: relative;
   overflow: hidden;
 }
 
-.avatar-container::before {
-  content: '';
-  position: absolute;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(76, 175, 80, 0.1) 0%, transparent 70%);
-  animation: pulse 3s ease-in-out infinite;
+.gif-display {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 12px;
 }
 
-@keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 0.5; }
-  50% { transform: scale(1.1); opacity: 0.8; }
+.gif-loading-text {
+  position: absolute;
+  color: var(--text-secondary);
+  font-size: 0.9em;
 }
 
 /* Instruções */
@@ -803,27 +831,6 @@ body {
   to { transform: rotate(360deg); }
 }
 
-/* Animations */
-@keyframes shoulderPress {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-25px); }
-}
-
-@keyframes pulldown {
-  0%, 100% { transform: translateY(-15px); }
-  50% { transform: translateY(15px); }
-}
-
-@keyframes squat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(35px); }
-}
-
-@keyframes pushup {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(8px) rotate(1deg); }
-}
-
 /* Toast Notification */
 .toast {
   position: fixed;
@@ -848,32 +855,6 @@ body {
 @keyframes slideDown {
   from { transform: translate(-50%, -100px); opacity: 0; }
   to { transform: translate(-50%, 0); opacity: 1; }
-}
-
-/* Swipe Actions */
-.swipe-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.swipe-btn {
-  flex: 1;
-  padding: 10px;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.85em;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-/* Pull to Refresh Indicator */
-.pull-refresh {
-  text-align: center;
-  padding: 10px;
-  color: var(--text-secondary);
-  font-size: 0.9em;
-  display: none;
 }
 
 /* Responsive ajustes */
@@ -974,6 +955,9 @@ input, select, textarea {
   <div id="treinosPage" class="page">
     <div class="section-header">
       <div class="section-title">🏋️ Meus Treinos</div>
+      <button class="btn btn-small btn-primary" onclick="carregarTreinosDoArquivo()">
+        🔄 Atualizar GIFs
+      </button>
     </div>
     <div id="treinosContainer"></div>
   </div>
@@ -1037,7 +1021,7 @@ input, select, textarea {
   </button>
   <button class="nav-item" onclick="navegarPara('timeline')">
     <div class="nav-icon">📅</div>
-    <div class="nav-label">Timeline</div>
+    <div class="nav-label">Jornada</div>
   </button>
   <button class="nav-item" onclick="navegarPara('perfil')">
     <div class="nav-icon">👤</div>
@@ -1045,1185 +1029,1054 @@ input, select, textarea {
   </button>
 </nav>
 
-<!-- Modal: Exercício -->
-<div id="exerciseModal" class="modal">
+<!-- Modal de GIF do Exercício -->
+<div id="exercicioModal" class="modal">
   <div class="modal-content">
     <div class="modal-header">
-      <h2 id="modalExerciseName" style="padding-right: 40px;"></h2>
-      <button class="modal-close" onclick="fecharModal('exerciseModal')">×</button>
+      <div id="modalExercicioNome"></div>
+      <button class="modal-close" onclick="fecharModal()">×</button>
     </div>
     <div class="modal-body">
-      <div class="avatar-container" id="avatarContainer"></div>
-      
-      <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-        <div class="stat-card" style="flex: 1; padding: 12px;">
-          <div class="stat-label" style="font-size: 0.7em;">Séries</div>
-          <div class="stat-value" style="font-size: 1.5em;" id="modalSets"></div>
-        </div>
-        <div class="stat-card" style="flex: 1; padding: 12px;">
-          <div class="stat-label" style="font-size: 0.7em;">Reps</div>
-          <div class="stat-value" style="font-size: 1.5em;" id="modalReps"></div>
-        </div>
-        <div class="stat-card" style="flex: 1; padding: 12px;">
-          <div class="stat-label" style="font-size: 0.7em;">Descanso</div>
-          <div class="stat-value" style="font-size: 1.5em;" id="modalRest"></div>
-        </div>
+      <div class="gif-container">
+        <div class="gif-loading-text" id="gifLoadingText">Carregando GIF...</div>
+        <img id="modalGif" class="gif-display" style="display: none;">
       </div>
       
-      <div id="modalMusculos" style="margin-bottom: 15px;"></div>
-      
       <div class="instrucoes-box">
-        <h4>📝 Como Executar</h4>
-        <div id="modalInstructions"></div>
+        <h4>📝 Instruções do Exercício</h4>
+        <div id="modalInstrucoes"></div>
       </div>
       
       <div class="dicas-box">
-        <h4>⚠️ Dicas Importantes</h4>
-        <div id="modalTips"></div>
+        <h4>💡 Dicas Importantes</h4>
+        <ul id="modalDicas"></ul>
+      </div>
+      
+      <div>
+        <h4 style="margin-bottom: 10px;">💪 Músculos Trabalhados</h4>
+        <div id="modalMusculos"></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Modal: Formulário de Cadastro -->
+<!-- Modal de Cadastro -->
 <div id="cadastroModal" class="modal">
   <div class="modal-content">
     <div class="modal-header">
-      <h2>📋 Meu Perfil</h2>
-      <button class="modal-close" onclick="fecharModal('cadastroModal')">×</button>
+      <div>👤 Cadastro do Usuário</div>
+      <button class="modal-close" onclick="fecharModal()">×</button>
     </div>
     <div class="modal-body">
-      <form id="formCadastro" onsubmit="salvarCadastro(event)">
-        <div class="form-group">
-          <label class="form-label">Nome Completo *</label>
-          <input type="text" class="form-input" id="nome" required placeholder="Seu nome">
-        </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Nascimento *</label>
-            <input type="date" class="form-input" id="dataNascimento" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Sexo *</label>
-            <select class="form-select" id="sexo" required>
-              <option value="">Selecione</option>
-              <option value="M">Masculino</option>
-              <option value="F">Feminino</option>
-            </select>
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">Email</label>
-          <input type="email" class="form-input" id="email" placeholder="seu@email.com">
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">Telefone</label>
-          <input type="tel" class="form-input" id="telefone" placeholder="(00) 00000-0000">
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">Objetivo</label>
-          <select class="form-select" id="objetivo">
-            <option value="emagrecimento">🔥 Emagrecimento</option>
-            <option value="hipertrofia">💪 Ganho de Massa</option>
-            <option value="condicionamento">🏃 Condicionamento</option>
-            <option value="saude">❤️ Saúde e Bem-estar</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">Observações Médicas</label>
-          <textarea class="form-textarea" id="observacoes" rows="3" placeholder="Lesões, restrições..."></textarea>
-        </div>
-        
-        <button type="submit" class="btn btn-primary">💾 Salvar Perfil</button>
-      </form>
+      <div class="form-group">
+        <label class="form-label">Nome Completo</label>
+        <input type="text" id="nomeInput" class="form-input" placeholder="Seu nome">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Data de Nascimento</label>
+        <input type="date" id="dataNascimentoInput" class="form-input">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Altura (cm)</label>
+        <input type="number" id="alturaInput" class="form-input" placeholder="Ex: 175">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sexo</label>
+        <select id="sexoInput" class="form-select">
+          <option value="">Selecione</option>
+          <option value="masculino">Masculino</option>
+          <option value="feminino">Feminino</option>
+          <option value="outro">Outro</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="salvarCadastro()">Salvar Cadastro</button>
     </div>
   </div>
 </div>
 
-<!-- Modal: Nova Medição -->
+<!-- Modal de Medição -->
 <div id="medicaoModal" class="modal">
   <div class="modal-content">
     <div class="modal-header">
-      <h2>📏 Nova Medição</h2>
-      <button class="modal-close" onclick="fecharModal('medicaoModal')">×</button>
+      <div>📊 Nova Medição</div>
+      <button class="modal-close" onclick="fecharModal()">×</button>
     </div>
     <div class="modal-body">
-      <form id="formMedicao" onsubmit="salvarMedicao(event)">
+      <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Data *</label>
-          <input type="date" class="form-input" id="dataMedicao" required>
+          <label class="form-label">Peso (kg)</label>
+          <input type="number" id="pesoInput" class="form-input" step="0.1" placeholder="Ex: 70.5">
         </div>
-        
-        <div class="form-row-3">
-          <div class="form-group">
-            <label class="form-label">Peso (kg) *</label>
-            <input type="number" step="0.1" class="form-input" id="peso" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Altura (m) *</label>
-            <input type="number" step="0.01" class="form-input" id="altura" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">% Gordura</label>
-            <input type="number" step="0.1" class="form-input" id="gordura">
-          </div>
+        <div class="form-group">
+          <label class="form-label">IMC</label>
+          <input type="number" id="imcInput" class="form-input" step="0.1" placeholder="Ex: 23.5">
         </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">% Massa Muscular</label>
-            <input type="number" step="0.1" class="form-input" id="massaMuscular">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Metabolismo</label>
-            <input type="number" class="form-input" id="metabolismo">
-          </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">% Gordura</label>
+          <input type="number" id="gorduraInput" class="form-input" step="0.1" placeholder="Ex: 18.5">
         </div>
-        
-        <h4 style="margin: 20px 0 10px; color: var(--text-secondary); font-size: 0.9em;">Medidas Corporais (cm)</h4>
-        
-        <div class="form-row-3">
-          <div class="form-group">
-            <label class="form-label">Pescoço</label>
-            <input type="number" step="0.1" class="form-input" id="pescoco">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Ombros</label>
-            <input type="number" step="0.1" class="form-input" id="ombros">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Peitoral</label>
-            <input type="number" step="0.1" class="form-input" id="peitoral">
-          </div>
+        <div class="form-group">
+          <label class="form-label">Braço (cm)</label>
+          <input type="number" id="bracoInput" class="form-input" step="0.1" placeholder="Ex: 32.5">
         </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Braço Esq</label>
-            <input type="number" step="0.1" class="form-input" id="bracoEsq">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Braço Dir</label>
-            <input type="number" step="0.1" class="form-input" id="bracoDir">
-          </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Cintura (cm)</label>
+          <input type="number" id="cinturaInput" class="form-input" step="0.1" placeholder="Ex: 85.0">
         </div>
-        
-        <div class="form-row-3">
-          <div class="form-group">
-            <label class="form-label">Cintura</label>
-            <input type="number" step="0.1" class="form-input" id="cintura">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Abdômen</label>
-            <input type="number" step="0.1" class="form-input" id="abdomen">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Quadril</label>
-            <input type="number" step="0.1" class="form-input" id="quadril">
-          </div>
+        <div class="form-group">
+          <label class="form-label">Quadril (cm)</label>
+          <input type="number" id="quadrilInput" class="form-input" step="0.1" placeholder="Ex: 95.0">
         </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Coxa Esq</label>
-            <input type="number" step="0.1" class="form-input" id="coxaEsq">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Coxa Dir</label>
-            <input type="number" step="0.1" class="form-input" id="coxaDir">
-          </div>
-        </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Panturrilha Esq</label>
-            <input type="number" step="0.1" class="form-input" id="panturrilhaEsq">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Panturrilha Dir</label>
-            <input type="number" step="0.1" class="form-input" id="panturrilhaDir">
-          </div>
-        </div>
-        
-        <button type="submit" class="btn btn-primary">💾 Salvar Medição</button>
-      </form>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Coxa (cm)</label>
+        <input type="number" id="coxaInput" class="form-input" step="0.1" placeholder="Ex: 55.0">
+      </div>
+      <button class="btn btn-primary" onclick="salvarMedicao()">Salvar Medição</button>
     </div>
   </div>
 </div>
 
-<!-- Toast Notification -->
+<!-- Toast -->
 <div id="toast" class="toast"></div>
 
 </div>
 
 <script>
-// Banco de dados de exercícios
-const exerciciosDB = {
-  'Desenvolvimento com barra': {
-    instrucoes: [
-      'Sente-se em um banco com apoio para as costas',
-      'Pegue a barra com as mãos na largura dos ombros',
-      'Empurre a barra para cima até estender completamente os braços',
-      'Desça controladamente até a altura dos ombros',
-      'Mantenha o core contraído durante todo o movimento'
-    ],
-    dicas: [
-      'Não arqueie as costas',
-      'Mantenha os cotovelos alinhados com os pulsos',
-      'Expire ao subir, inspire ao descer'
-    ],
-    avatar: 'shoulderPress',
-    musculos: ['Ombros', 'Tríceps']
-  },
-  'Pulldown com barra': {
-    instrucoes: [
-      'Sente-se na máquina e ajuste a almofada nas coxas',
-      'Pegue a barra com as mãos mais abertas que os ombros',
-      'Puxe a barra em direção ao peito, contraindo as escápulas',
-      'Suba controladamente até a extensão completa dos braços',
-      'Mantenha o tronco ligeiramente inclinado para trás'
-    ],
-    dicas: [
-      'Foque em puxar com as costas, não com os braços',
-      'Não balance o corpo',
-      'Desça a barra até a linha dos mamilos'
-    ],
-    avatar: 'pulldown',
-    musculos: ['Costas', 'Bíceps', 'Trapézio']
-  },
-  'Stiff com barra': {
-    instrucoes: [
-      'Fique em pé com os pés na largura do quadril',
-      'Segure a barra com as mãos na frente das coxas',
-      'Mantendo os joelhos levemente flexionados, incline o tronco para frente',
-      'Desça a barra deslizando pelas pernas até sentir alongamento',
-      'Retorne à posição inicial contraindo glúteos'
-    ],
-    dicas: [
-      'Mantenha as costas retas',
-      'Não dobre muito os joelhos',
-      'Foque em empurrar o quadril para trás'
-    ],
-    avatar: 'squat',
-    musculos: ['Posterior', 'Glúteos', 'Lombar']
-  },
-  'Crucifixo inclinado': {
-    instrucoes: [
-      'Deite-se em um banco inclinado (30-45 graus)',
-      'Segure os halteres acima do peito com os braços estendidos',
-      'Abra os braços em arco até sentir alongamento no peitoral',
-      'Retorne à posição inicial contraindo o peitoral',
-      'Mantenha uma leve flexão nos cotovelos'
-    ],
-    dicas: [
-      'Não desça muito além da linha dos ombros',
-      'Mantenha os pés firmes no chão',
-      'Controle o movimento na descida'
-    ],
-    avatar: 'pushup',
-    musculos: ['Peitoral Superior', 'Ombros']
-  },
-  'Cadeira extensora': {
-    instrucoes: [
-      'Sente-se na máquina e ajuste o apoio dos pés',
-      'Segure nas alças laterais para estabilização',
-      'Estenda as pernas até a contração completa do quadríceps',
-      'Retorne controladamente à posição inicial',
-      'Mantenha as costas apoiadas no banco'
-    ],
-    dicas: [
-      'Não trave os joelhos no topo',
-      'Evite movimentos bruscos',
-      'Contraia o quadríceps no topo por 1 segundo'
-    ],
-    avatar: 'squat',
-    musculos: ['Quadríceps']
-  },
-  'Elevação lateral': {
-    instrucoes: [
-      'Fique em pé com os pés na largura dos ombros',
-      'Segure um halter em cada mão ao lado do corpo',
-      'Eleve os braços lateralmente até a altura dos ombros',
-      'Desça controladamente até a posição inicial',
-      'Mantenha uma leve flexão nos cotovelos'
-    ],
-    dicas: [
-      'Não balance o corpo',
-      'Não eleve acima da linha dos ombros',
-      'Lidere com os cotovelos'
-    ],
-    avatar: 'shoulderPress',
-    musculos: ['Ombros Laterais']
-  },
-  'Remada baixa': {
-    instrucoes: [
-      'Sente-se na máquina com os pés apoiados',
-      'Segure a barra/manopla com os braços estendidos',
-      'Puxe em direção ao abdômen contraindo as escápulas',
-      'Retorne controladamente à posição inicial',
-      'Mantenha as costas eretas'
-    ],
-    dicas: [
-      'Não arqueie as costas',
-      'Puxe os cotovelos para trás',
-      'Mantenha o core contraído'
-    ],
-    avatar: 'pulldown',
-    musculos: ['Dorsais', 'Trapézio', 'Bíceps']
-  },
-  'Agachamento livre': {
-    instrucoes: [
-      'Posicione a barra nas costas (trapézio superior)',
-      'Pés na largura dos ombros, pontas levemente para fora',
-      'Desça flexionando joelhos e quadril simultaneamente',
-      'Desça até as coxas ficarem paralelas ao chão',
-      'Suba empurrando o chão'
-    ],
-    dicas: [
-      'Mantenha o peito para cima',
-      'Joelhos alinhados com os pés',
-      'Peso nos calcanhares'
-    ],
-    avatar: 'squat',
-    musculos: ['Quadríceps', 'Glúteos', 'Posterior']
-  },
-  'Supino reto': {
-    instrucoes: [
-      'Deite-se no banco com os pés firmes no chão',
-      'Segure a barra ligeiramente mais aberta que os ombros',
-      'Desça a barra até tocar o peito',
-      'Empurre a barra para cima até extensão completa',
-      'Mantenha as escápulas retraídas'
-    ],
-    dicas: [
-      'Não tire os glúteos do banco',
-      'Controle a descida da barra',
-      'Mantenha os pulsos retos'
-    ],
-    avatar: 'pushup',
-    musculos: ['Peitoral', 'Ombros', 'Tríceps']
-  },
-  'Leg press': {
-    instrucoes: [
-      'Sente-se na máquina com as costas bem apoiadas',
-      'Posicione os pés na plataforma na largura dos ombros',
-      'Destrave o peso e desça controladamente',
-      'Desça até os joelhos formarem 90 graus',
-      'Empurre a plataforma até quase estender as pernas'
-    ],
-    dicas: [
-      'Não trave os joelhos completamente',
-      'Mantenha a lombar apoiada',
-      'Não arredonde as costas'
-    ],
-    avatar: 'squat',
-    musculos: ['Quadríceps', 'Glúteos']
-  },
-  'Pullover': {
-    instrucoes: [
-      'Deite-se no banco perpendicular (só as costas apoiadas)',
-      'Segure um halter com as duas mãos acima do peito',
-      'Mantendo os braços levemente flexionados, leve o halter para trás',
-      'Desça até sentir alongamento no peito e costas',
-      'Retorne à posição inicial'
-    ],
-    dicas: [
-      'Mantenha o quadril baixo',
-      'Não dobre muito os cotovelos',
-      'Respire profundamente'
-    ],
-    avatar: 'pulldown',
-    musculos: ['Grande Dorsal', 'Peitoral', 'Serrátil']
-  },
-  'Flexão de braço': {
-    instrucoes: [
-      'Posicione-se em prancha com mãos na largura dos ombros',
-      'Mantenha o corpo reto da cabeça aos pés',
-      'Desça o corpo flexionando os cotovelos',
-      'Desça até o peito quase tocar o chão',
-      'Empurre o corpo de volta à posição inicial'
-    ],
-    dicas: [
-      'Mantenha o core contraído',
-      'Não deixe o quadril cair',
-      'Cotovelos próximos ao corpo'
-    ],
-    avatar: 'pushup',
-    musculos: ['Peitoral', 'Tríceps', 'Core']
-  },
-  'Cadeira flexora': {
-    instrucoes: [
-      'Deite-se de bruços na máquina',
-      'Ajuste o apoio nos calcanhares',
-      'Flexione as pernas trazendo os calcanhares em direção aos glúteos',
-      'Contraia o posterior de coxa no topo',
-      'Retorne controladamente'
-    ],
-    dicas: [
-      'Mantenha os quadris no banco',
-      'Não use impulso',
-      'Controle a descida'
-    ],
-    avatar: 'squat',
-    musculos: ['Posterior de Coxa', 'Panturrilhas']
-  },
-  'Cadeira abdutora': {
-    instrucoes: [
-      'Sente-se na máquina com as costas apoiadas',
-      'Posicione as pernas nas almofadas',
-      'Afaste as pernas contra a resistência',
-      'Abra o máximo possível mantendo controle',
-      'Retorne à posição inicial'
-    ],
-    dicas: [
-      'Mantenha as costas apoiadas',
-      'Movimento controlado',
-      'Não use impulso'
-    ],
-    avatar: 'squat',
-    musculos: ['Glúteo Médio', 'Abdutores']
-  },
-  'Cadeira adutora': {
-    instrucoes: [
-      'Sente-se na máquina com as costas apoiadas',
-      'Posicione as pernas nas almofadas (abertas)',
-      'Feche as pernas contra a resistência',
-      'Junte completamente as pernas',
-      'Retorne controladamente'
-    ],
-    dicas: [
-      'Mantenha as costas apoiadas',
-      'Movimento controlado',
-      'Contraia a parte interna das coxas'
-    ],
-    avatar: 'squat',
-    musculos: ['Adutores', 'Parte Interna da Coxa']
-  }
+// ============ CONFIGURAÇÕES DA API ============
+const GIPHY_API_KEY = 'pLURtkhVrUXr3KG25Gy5IvzziV5OrZGa'; // Chave pública do GIPHY (pode substituir por sua própria)
+const GIPHY_API_URL = 'https://api.giphy.com/v1/gifs/search';
+
+// ============ DADOS DO USUÁRIO ============
+let usuario = null;
+let medicoes = [];
+let treinos = [];
+
+// ============ DADOS DOS EXERCÍCIOS ============
+const exerciciosInfo = {
+    // Exercícios de Peito/Ombro/Tríceps (Segunda: A)
+    'DESENVOLVIMENTO COM BARRA NO BANCO SINATRO': {
+        desc: 'Desenvolvimento de ombros com barra no banco reto',
+        musculos: ['Deltóide Anterior', 'Tríceps', 'Trapézio'],
+        instrucoes: '1. Sente-se no banco com apoio para as costas\n2. Pegue a barra com as mãos na largura dos ombros\n3. Levante a barra acima da cabeça até estender os braços\n4. Desça controladamente até a altura dos ombros',
+        dicas: ['Mantenha o core contraído', 'Não arqueie as costas', 'Controle o movimento na descida']
+    },
+    'SUPINO INCLINADO': {
+        desc: 'Supino inclinado para trabalhar porção superior do peitoral',
+        musculos: ['Peitoral Superior', 'Deltóide Anterior', 'Tríceps'],
+        instrucoes: '1. Ajuste o banco em 30-45 graus\n2. Pegue a barra com as mãos na largura dos ombros\n3. Desça a barra até o peito superior\n4. Empurre para cima até estender os braços',
+        dicas: ['Mantenha os pés no chão', 'Não levante os quadris', 'Controle o movimento']
+    },
+    'TRÊPES CORDA': {
+        desc: 'Tríceps no pulley com corda',
+        musculos: ['Tríceps'],
+        instrucoes: '1. Fique de frente para o pulley\n2. Segure a corda com as duas mãos\n3. Mantenha os cotovelos fixos ao lado do corpo\n4. Estenda os braços para baixo\n5. Retorne à posição inicial',
+        dicas: ['Mantenha os cotovelos fixos', 'Não balance o corpo', 'Controle o movimento']
+    },
+    'SLEVAÇÃO FRONTAL COM ANILHA': {
+        desc: 'Elevação frontal com anilha para deltóides anteriores',
+        musculos: ['Deltóide Anterior'],
+        instrucoes: '1. Fique em pé com os pés na largura dos ombros\n2. Segure a anilha com as duas mãos\n3. Levante a anilha até a altura dos ombros\n4. Desça controladamente',
+        dicas: ['Mantenha o core contraído', 'Não use impulso', 'Controle o movimento']
+    },
+    'FECKDECK': {
+        desc: 'Fly no peck deck para peitoral',
+        musculos: ['Peitoral Maior', 'Peitoral Menor'],
+        instrucoes: '1. Sente-se no aparelho com as costas apoiadas\n2. Pegue as alças com os braços levemente flexionados\n3. Una as alças à frente do peito\n4. Retorne à posição inicial',
+        dicas: ['Mantenha os braços levemente flexionados', 'Não encoste as alças', 'Controle o movimento']
+    },
+    'TRÊPES TESTA COM BARRA NO BANCO RETO': {
+        desc: 'Tríceps testa com barra no banco reto',
+        musculos: ['Tríceps'],
+        instrucoes: '1. Deite-se no banco reto\n2. Segure a barra com as mãos na largura dos ombros\n3. Desça a barra em direção à testa\n4. Estenda os braços para cima',
+        dicas: ['Mantenha os cotovelos fixos', 'Não arqueie as costas', 'Controle o movimento']
+    },
+    'LATERAL DE OMBROS': {
+        desc: 'Elevação lateral para deltóides laterais',
+        musculos: ['Deltóide Lateral'],
+        instrucoes: '1. Fique em pé com os pés na largura dos ombros\n2. Segure os halteres ao lado do corpo\n3. Levante os halteres até a altura dos ombros\n4. Desça controladamente',
+        dicas: ['Mantenha os cotovelos levemente flexionados', 'Não use impulso', 'Controle o movimento']
+    },
+    
+    // Exercícios de Costas/Bíceps (Terça: B)
+    'REMADA SUPRANDA COM BARRA': {
+        desc: 'Remada supinada com barra para costas',
+        musculos: ['Dorsal', 'Trapézio', 'Bíceps'],
+        instrucoes: '1. Fique em pé com os pés na largura dos ombros\n2. Incline o tronco para frente mantendo as costas retas\n3. Puxe a barra em direção ao abdômen\n4. Retorne à posição inicial',
+        dicas: ['Mantenha as costas retas', 'Contraia as escapulas', 'Controle o movimento']
+    },
+    'CRUCIFIXION VERSO': {
+        desc: 'Crucifixo inverso para deltóides posteriores',
+        musculos: ['Deltóide Posterior', 'Trapézio'],
+        instrucoes: '1. Sente-se no banco inclinado para frente\n2. Segure os halteres com os braços estendidos\n3. Una os halteres à frente do corpo\n4. Abra os braços em um movimento de vôo',
+        dicas: ['Mantenha o peito aberto', 'Contraia as costas', 'Controle o movimento']
+    },
+    'PULLDOWN COM EARRÁ GRANDE NO PULLEY': {
+        desc: 'Pulldown com pegada larga no pulley',
+        musculos: ['Dorsal', 'Bíceps'],
+        instrucoes: '1. Sente-se no pulley com as coxas fixadas\n2. Pegue a barra com as mãos na largura maior que os ombros\n3. Puxe a barra em direção ao peito\n4. Retorne à posição inicial',
+        dicas: ['Mantenha o peito aberto', 'Contraia as escapulas', 'Não balance o corpo']
+    },
+    'KEMUDA SHURUI': {
+        desc: 'Puxada na máquina para costas',
+        musculos: ['Dorsal', 'Bíceps'],
+        instrucoes: '1. Sente-se na máquina com ajuste de carga\n2. Pegue as alças com as mãos\n3. Puxe as alças em direção ao corpo\n4. Retorne à posição inicial',
+        dicas: ['Mantenha o peito aberto', 'Contraia as costas', 'Controle o movimento']
+    },
+    'REMADA CAVALHINHO LIVRE': {
+        desc: 'Remada cavalinho livre para costas',
+        musculos: ['Dorsal', 'Trapézio', 'Bíceps'],
+        instrucoes: '1. Apoie um joelho e uma mão no banco\n2. Segure o haltere com a outra mão\n3. Puxe o haltere em direção ao quadril\n4. Retorne à posição inicial',
+        dicas: ['Mantenha a coluna neutra', 'Contraia as escapulas', 'Não gire o tronco']
+    },
+    'BICEPS CONCENTRADO COM BARRA NO BANCO SLOTT': {
+        desc: 'Rosca concentrada com barra no banco Scott',
+        musculos: ['Bíceps'],
+        instrucoes: '1. Sente-se no banco Scott\n2. Apoie os braços no apoio inclinado\n3. Faça a flexão de cotovelo com a barra\n4. Retorne à posição inicial',
+        dicas: ['Mantenha os cotovelos apoiados', 'Contraia o bíceps no topo', 'Controle o movimento']
+    },
+    'ANTIFRACÇÃO NÃO INFLUENTE': {
+        desc: 'Exercício para antebraço',
+        musculos: ['Antebraço'],
+        instrucoes: '1. Sente-se no banco com os antebraços apoiados\n2. Segure a barra com as palmas para cima\n3. Faça a flexão de punho\n4. Retorne à posição inicial',
+        dicas: ['Controle o movimento', 'Não use peso excessivo', 'Mantenha os antebraços apoiados']
+    },
+    'BICEPS MARTELO NO BANCO INCLINADO': {
+        desc: 'Rosca martelo no banco inclinado para bíceps',
+        musculos: ['Bíceps', 'Braquial'],
+        instrucoes: '1. Sente-se no banco inclinado\n2. Segure os halteres com as palmas voltadas para dentro\n3. Faça a flexão de cotovelo\n4. Retorne à posição inicial',
+        dicas: ['Mantenha os cotovelos fixos', 'Contraia o bíceps no topo', 'Não balance o corpo']
+    },
+    
+    // Exercícios de Pernas (Sexta: B)
+    'AGACHAMENTO LIVRE': {
+        desc: 'Agachamento livre com barra',
+        musculos: ['Quadríceps', 'Glúteos', 'Posterior da Coxa'],
+        instrucoes: '1. Posicione a barra sobre os trapézios\n2. Pés na largura dos ombros\n3. Desça flexionando joelhos e quadris\n4. Volte à posição inicial',
+        dicas: ['Mantenha as costas retas', 'Joelhos não devem passar dos pés', 'Controle o movimento']
+    },
+    'AGACHAMENTO COM ANILHA NOS PÉS': {
+        desc: 'Agachamento com anilha como peso adicional',
+        musculos: ['Quadríceps', 'Glúteos'],
+        instrucoes: '1. Segure a anilha junto ao peito\n2. Pés na largura dos ombros\n3. Desça até os joelhos formarem 90 graus\n4. Volte à posição inicial',
+        dicas: ['Mantenha o core contraído', 'Olhe para frente', 'Não levante os calcanhares']
+    },
+    'LEG 90 E LEG AMPLIA (CONCENTRADO)': {
+        desc: 'Leg press 90 graus e leg press amplo',
+        musculos: ['Quadríceps', 'Glúteos', 'Posterior da Coxa'],
+        instrucoes: '1. Sente-se na máquina de leg press\n2. Apoie os pés na plataforma\n3. Empurre a plataforma até estender as pernas\n4. Retorne controladamente',
+        dicas: ['Não trave os joelhos', 'Controle o movimento', 'Mantenha as costas apoiadas']
+    },
+    'COCE NAPOLIA': {
+        desc: 'Cadeira extensora para quadríceps',
+        musculos: ['Quadríceps'],
+        instrucoes: '1. Sente-se na cadeira extensora\n2. Ajuste o apoio para as pernas\n3. Estenda as pernas contra a resistência\n4. Retorne à posição inicial',
+        dicas: ['Contraia o quadríceps no topo', 'Não use impulso', 'Controle o movimento']
+    },
+    'CADIRRA FLEXORA': {
+        desc: 'Cadeira flexora para posterior da coxa',
+        musculos: ['Posterior da Coxa', 'Glúteos'],
+        instrucoes: '1. Deite-se na cadeira flexora\n2. Ajuste o apoio para os tornozelos\n3. Flexione as pernas contra a resistência\n4. Retorne à posição inicial',
+        dicas: ['Contraia o posterior no topo', 'Controle o movimento', 'Não levante o quadril']
+    },
+    'CADIRRA ABDUTORA': {
+        desc: 'Cadeira abdutora para glúteos laterais',
+        musculos: ['Glúteos Médio', 'Glúteos Mínimo'],
+        instrucoes: '1. Sente-se na cadeira abdutora\n2. Posicione as pernas nos apoios\n3. Abra as pernas contra a resistência\n4. Retorne à posição inicial',
+        dicas: ['Mantenha as costas apoiadas', 'Contraia os glúteos', 'Controle o movimento']
+    },
+    'AFUNDO': {
+        desc: 'Afundo com barra ou halteres',
+        musculos: ['Quadríceps', 'Glúteos', 'Posterior da Coxa'],
+        instrucoes: '1. Fique em pé segurando os pesos\n2. Dê um passo à frente\n3. Desça até o joelho traseiro quase tocar o chão\n4. Volte à posição inicial',
+        dicas: ['Mantenha o tronco ereto', 'Joelho dianteiro não passa do pé', 'Controle o movimento']
+    },
+    'BÚLGARO COM CARGA E SM CARGA': {
+        desc: 'Agachamento búlgaro com carga',
+        musculos: ['Quadríceps', 'Glúteos'],
+        instrucoes: '1. Posicione um pé atrás em um banco\n2. Segure os pesos nas mãos\n3. Desça flexionando o joelho dianteiro\n4. Volte à posição inicial',
+        dicas: ['Mantenha o tronco ereto', 'Controle o equilíbrio', 'Não deixe o joelho passar do pé']
+    },
+    
+    // Exercícios de Abdominal/Posterior (Quarta: C)
+    'STIFF COM BARRA PEQUENA': {
+        desc: 'Stiff com barra para posterior da coxa',
+        musculos: ['Posterior da Coxa', 'Glúteos', 'Eretores da Espinha'],
+        instrucoes: '1. Fique em pé com os pés na largura dos ombros\n2. Segure a barra com as mãos na largura dos ombros\n3. Incline o tronco para frente mantendo as costas retas\n4. Volte à posição inicial',
+        dicas: ['Mantenha as costas retas', 'Não arqueie as costas', 'Controle o movimento']
+    },
+    'HALC LINHAR': {
+        desc: 'Levantamento terra para costas e posterior',
+        musculos: ['Posterior da Coxa', 'Glúteos', 'Dorsal', 'Trapézio'],
+        instrucoes: '1. Fique em pé com os pés na largura dos ombros\n2. Agache e segure a barra\n3. Levante mantendo as costas retas\n4. Retorne à posição inicial',
+        dicas: ['Mantenha as costas retas', 'Contraia o core', 'Não arqueie as costas']
+    },
+    'TREADMINUS': {
+        desc: 'Extensão de tronco no banco',
+        musculos: ['Eretores da Espinha', 'Glúteos'],
+        instrucoes: '1. Posicione-se no banco de hiperextensão\n2. Cruze os braços no peito\n3. Desça o tronco controladamente\n4. Suba até a posição neutra',
+        dicas: ['Não hiperestenda as costas', 'Controle o movimento', 'Contraia os glúteos']
+    },
+    'ADDUÇÃO NA TOULA': {
+        desc: 'Adução na máquina para coxas internas',
+        musculos: ['Adutores'],
+        instrucoes: '1. Sente-se na máquina de adução\n2. Posicione as pernas nos apoios\n3. Una as pernas contra a resistência\n4. Retorne à posição inicial',
+        dicas: ['Controle o movimento', 'Não use impulso', 'Mantenha as costas apoiadas']
+    },
+    'PANTURRILHA EM PÉ': {
+        desc: 'Elevação de panturrilha em pé',
+        musculos: ['Gastrocnêmio', 'Sóleo'],
+        instrucoes: '1. Fique em pé na máquina de panturrilha\n2. Posicione os ombros sob as almofadas\n3. Elevar os calcanhares o máximo possível\n4. Desça controladamente',
+        dicas: ['Faça o movimento completo', 'Contraia a panturrilha no topo', 'Controle a descida']
+    },
+    'CADIRA EXTENSORA': {
+        desc: 'Cadeira extensora para quadríceps',
+        musculos: ['Quadríceps'],
+        instrucoes: '1. Sente-se na cadeira extensora\n2. Ajuste o apoio para as pernas\n3. Estenda as pernas contra a resistência\n4. Retorne à posição inicial',
+        dicas: ['Contraia o quadríceps no topo', 'Não trave os joelhos', 'Controle o movimento']
+    },
+    
+    // Exercícios de Peito/Ombro (Quinta: A)
+    'CRUCIFIXO NO BANCO INCLINADO': {
+        desc: 'Crucifixo no banco inclinado para peitoral',
+        musculos: ['Peitoral Superior', 'Deltóide Anterior'],
+        instrucoes: '1. Deite-se no banco inclinado\n2. Segure os halteres com os braços estendidos\n3. Abra os braços em um arco até a altura do peito\n4. Retorne à posição inicial',
+        dicas: ['Mantenha os braços levemente flexionados', 'Controle o movimento', 'Não encoste os halteres']
+    },
+    'CRUCIFIXO NO BANCO DECLINADO': {
+        desc: 'Crucifixo no banco declinado para peitoral inferior',
+        musculos: ['Peitoral Inferior', 'Deltóide Anterior'],
+        instrucoes: '1. Deite-se no banco declinado\n2. Segure os halteres com os braços estendidos\n3. Abra os braços em um arco até a altura do peito\n4. Retorne à posição inicial',
+        dicas: ['Mantenha os braços levemente flexionados', 'Controle o movimento', 'Não encoste os halteres']
+    },
+    'ABDOMEN SEM ROTAÇÃO': {
+        desc: 'Abdominal sem rotação',
+        musculos: ['Reto Abdominal'],
+        instrucoes: '1. Deite-se no chão com os joelhos flexionados\n2. Mãos atrás da cabeça ou cruzadas no peito\n3. Levante o tronco contraindo o abdômen\n4. Retorne à posição inicial',
+        dicas: ['Não puxe o pescoço', 'Expire ao subir', 'Contraia o abdômen no topo']
+    },
+    'REMADA ALTA NO PULLEY': {
+        desc: 'Remada alta no pulley para trapézios',
+        musculos: ['Trapézio', 'Deltóide Lateral'],
+        instrucoes: '1. Fique em pé segurando a barra curta\n2. Puxe a barra em direção ao queixo\n3. Mantenha os cotovelos acima das mãos\n4. Retorne à posição inicial',
+        dicas: ['Não balance o corpo', 'Mantenha o tronco ereto', 'Controle o movimento']
+    },
+    'SUPINO NO BANCO DECLINADO': {
+        desc: 'Supino declinado para peitoral inferior',
+        musculos: ['Peitoral Inferior', 'Deltóide Anterior', 'Tríceps'],
+        instrucoes: '1. Deite-se no banco declinado\n2. Pegue a barra com as mãos na largura dos ombros\n3. Desça a barra até o peito inferior\n4. Empurre para cima até estender os braços',
+        dicas: ['Mantenha os pés fixos', 'Não arqueie as costas', 'Controle o movimento']
+    },
+    'FACEPULL': {
+        desc: 'Face pull para deltóides posteriores',
+        musculos: ['Deltóide Posterior', 'Trapézio'],
+        instrucoes: '1. Ajuste o pulley na altura dos olhos\n2. Segure a corda com as duas mãos\n3. Puxe em direção ao rosto separando as mãos\n4. Retorne à posição inicial',
+        dicas: ['Mantenha o peito aberto', 'Contraia as costas', 'Controle o movimento']
+    },
+    'ENCOLHIMENTO DE OMBROS NO BANCO SENTADO': {
+        desc: 'Encolhimento de ombros para trapézios',
+        musculos: ['Trapézio'],
+        instrucoes: '1. Sente-se no banco segurando halteres\n2. Mantenha os braços estendidos ao lado do corpo\n3. Eleve os ombros em direção às orelhas\n4. Retorne à posição inicial',
+        dicas: ['Não gire os ombros', 'Contraia o trapézio no topo', 'Controle o movimento']
+    }
 };
 
-// Dados dos treinos
-const treinos = {
-  'Segunda': {
-    nome: 'Ombros e Peito',
-    exercicios: [
-      { metodo: 'Tradicional', exercicio: 'Desenvolvimento com barra', series: 3, reps: 10, descanso: '90s' },
-      { metodo: 'Tradicional', exercicio: 'Elevação lateral', series: 3, reps: 12, descanso: '60s' },
-      { metodo: 'Tradicional', exercicio: 'Supino reto', series: 3, reps: 10, descanso: '90s' }
-    ]
-  },
-  'Terça': {
-    nome: 'Costas e Bíceps',
-    exercicios: [
-      { metodo: 'Tradicional', exercicio: 'Pulldown com barra', series: 4, reps: 12, descanso: '90s' },
-      { metodo: 'Tradicional', exercicio: 'Remada baixa', series: 3, reps: 12, descanso: '90s' },
-      { metodo: 'Tradicional', exercicio: 'Pullover', series: 3, reps: 15, descanso: '60s' }
-    ]
-  },
-  'Quarta': {
-    nome: 'Pernas Completo',
-    exercicios: [
-      { metodo: 'Tradicional', exercicio: 'Agachamento livre', series: 4, reps: 10, descanso: '120s' },
-      { metodo: 'Tradicional', exercicio: 'Leg press', series: 3, reps: 15, descanso: '90s' },
-      { metodo: 'Tradicional', exercicio: 'Stiff com barra', series: 3, reps: 12, descanso: '90s' }
-    ]
-  },
-  'Quinta': {
-    nome: 'Peito e Tríceps',
-    exercicios: [
-      { metodo: 'Tradicional', exercicio: 'Supino reto', series: 4, reps: 10, descanso: '120s' },
-      { metodo: 'Tradicional', exercicio: 'Crucifixo inclinado', series: 3, reps: 10, descanso: '90s' },
-      { metodo: 'Tradicional', exercicio: 'Flexão de braço', series: 3, reps: 15, descanso: '60s' }
-    ]
-  },
-  'Sexta': {
-    nome: 'Pernas e Glúteos',
-    exercicios: [
-      { metodo: 'Tradicional', exercicio: 'Leg press', series: 4, reps: 15, descanso: '90s' },
-      { metodo: 'Tradicional', exercicio: 'Cadeira extensora', series: 3, reps: 15, descanso: '90s' },
-      { metodo: 'Tradicional', exercicio: 'Cadeira flexora', series: 3, reps: 12, descanso: '90s' },
-      { metodo: 'Bi-set', exercicio: 'Cadeira abdutora', series: 3, reps: 15, descanso: '60s' }
-    ]
-  },
-  'Sábado': {
-    nome: 'Treino Leve ou Descanso',
-    exercicios: []
-  },
-  'Domingo': {
-    nome: 'Descanso',
-    exercicios: []
-  }
-};
-
-// LocalStorage helpers
-function salvar(chave, dados) {
-  localStorage.setItem(chave, JSON.stringify(dados));
+// ============ FUNÇÕES DE GIF ============
+async function buscarGIF(exercicioNome) {
+    try {
+        const exercicioInfo = exerciciosInfo[exercicioNome.toUpperCase()];
+        let searchTerm = exercicioNome;
+        
+        if (exercicioInfo && exercicioInfo.desc) {
+            searchTerm = exercicioInfo.desc.split(' ')[0];
+        }
+        
+        const response = await fetch(
+            `${GIPHY_API_URL}?api_key=${GIPHY_API_KEY}&q=${encodeURIComponent(searchTerm + ' exercise')}&limit=5&rating=g&lang=pt`
+        );
+        
+        if (!response.ok) {
+            throw new Error('Erro na API do GIPHY');
+        }
+        
+        const data = await response.json();
+        
+        if (data.data && data.data.length > 0) {
+            return data.data[0].images.fixed_height.url;
+        }
+        
+        return null;
+    } catch (error) {
+        console.error('Erro ao buscar GIF:', error);
+        return null;
+    }
 }
 
-function carregar(chave) {
-  const dados = localStorage.getItem(chave);
-  return dados ? JSON.parse(dados) : null;
+async function carregarGIFParaExercicio(exercicioNome, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    const gifContainer = container.querySelector('.exercicio-gif-container');
+    if (!gifContainer) return;
+    
+    const gifImg = gifContainer.querySelector('.exercicio-gif');
+    const loadingText = gifContainer.querySelector('.gif-loading');
+    
+    gifContainer.style.display = 'block';
+    loadingText.style.display = 'flex';
+    gifImg.style.display = 'none';
+    
+    const gifUrl = await buscarGIF(exercicioNome);
+    
+    loadingText.style.display = 'none';
+    
+    if (gifUrl) {
+        gifImg.src = gifUrl;
+        gifImg.style.display = 'block';
+        gifImg.onload = () => {
+            gifImg.style.opacity = '1';
+        };
+    } else {
+        gifContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text-secondary);">GIF não disponível para este exercício</div>';
+    }
 }
 
-function obterDiaSemana() {
-  const dias = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
-  return dias[new Date().getDay()];
+function mostrarExercicioModal(exercicioNome) {
+    const modal = document.getElementById('exercicioModal');
+    const exercicioInfo = exerciciosInfo[exercicioNome.toUpperCase()];
+    
+    document.getElementById('modalExercicioNome').textContent = exercicioNome;
+    
+    if (exercicioInfo) {
+        document.getElementById('modalInstrucoes').innerHTML = exercicioInfo.instrucoes.replace(/\n/g, '<br>');
+        
+        const dicasHtml = exercicioInfo.dicas.map(dica => `<li>${dica}</li>`).join('');
+        document.getElementById('modalDicas').innerHTML = dicasHtml;
+        
+        const musculosHtml = exercicioInfo.musculos.map(musculo => 
+            `<span class="musculos-tag">${musculo}</span>`
+        ).join('');
+        document.getElementById('modalMusculos').innerHTML = musculosHtml;
+        
+        // Carregar GIF
+        const gifImg = document.getElementById('modalGif');
+        const loadingText = document.getElementById('gifLoadingText');
+        
+        gifImg.style.display = 'none';
+        loadingText.style.display = 'block';
+        
+        buscarGIF(exercicioNome).then(gifUrl => {
+            loadingText.style.display = 'none';
+            if (gifUrl) {
+                gifImg.src = gifUrl;
+                gifImg.style.display = 'block';
+            } else {
+                gifImg.alt = 'GIF não disponível';
+            }
+        });
+    } else {
+        document.getElementById('modalInstrucoes').textContent = 'Instruções não disponíveis para este exercício.';
+        document.getElementById('modalDicas').innerHTML = '<li>Execute com atenção à técnica</li><li>Controle o movimento</li><li>Mantenha a postura adequada</li>';
+        document.getElementById('modalMusculos').innerHTML = '<span class="musculos-tag">Músculos Principais</span>';
+    }
+    
+    modal.classList.add('active');
 }
 
-function calcularIdade(dataNascimento) {
-  const hoje = new Date();
-  const nascimento = new Date(dataNascimento);
-  let idade = hoje.getFullYear() - nascimento.getFullYear();
-  const mes = hoje.getMonth() - nascimento.getMonth();
-  
-  if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
-    idade--;
-  }
-  
-  return idade;
+// ============ FUNÇÕES DE TREINO ============
+function carregarTreinosDoArquivo() {
+    // Dados do arquivo fornecido
+    treinos = [
+        {
+            dia: 'SEGUNDA: A',
+            exercicios: [
+                { metodo: 'TRADICIONAL', nome: 'DESENVOLVIMENTO COM BARRA NO BANCO SINATRO', series: 3, repeticoes: 10, descanso: '1ª 15\' MINUTOS' },
+                { metodo: 'BI-SET', nome: 'SUPINO INCLINADO - TRÊPES CORDA', series: 3, repeticoes: '12 + 15', descanso: '1ª 20\' MINUTOS' },
+                { metodo: 'TRADICIONAL', nome: 'SLEVAÇÃO FRONTAL COM ANILHA', series: 4, repeticoes: 10, descanso: '1ª MINUTO' },
+                { metodo: 'TRADICIONAL', nome: 'FECKDECK', series: 3, repeticoes: 15, descanso: '1ª 15\' MINUTOS' },
+                { metodo: 'TRADICIONAL', nome: 'TRÊPES TESTA COM BARRA NO BANCO RETO', series: 3, repeticoes: 10, descanso: '1ª MINUTO' },
+                { metodo: 'DROP-SET', nome: 'LATERAL DE OMBROS', series: 3, repeticoes: '10 + 15', descanso: '1ª 20\' MINUTOS' }
+            ]
+        },
+        {
+            dia: 'TERÇA: B',
+            exercicios: [
+                { metodo: 'BI-SET', nome: 'REMADA SUPRANDA COM BARRA + CRUCIFIXION VERSO', series: 3, repeticoes: 12, descanso: '1ª 15\' MINUTOS' },
+                { metodo: 'TRADICIONAL', nome: 'PULLDOWN COM EARRÁ GRANDE NO PULLEY', series: 4, repeticoes: 12, descanso: '1ª MINUTO' },
+                { metodo: 'TRADICIONAL', nome: 'KEMUDA SHURUI', series: 3, repeticoes: 15, descanso: '1ª 15\' MINUTOS' },
+                { metodo: 'RESTYNA PAUSE', nome: 'REMADA CAVALHINHO LIVRE', series: 3, repeticoes: '10 + 15', descanso: '2ª MINUTOS' },
+                { metodo: 'TRADICIONAL', nome: 'BICEPS CONCENTRADO COM BARRA NO BANCO SLOTT', series: 3, repeticoes: 12, descanso: '1ª 20\' MINUTOS' },
+                { metodo: 'TRADICIONAL', nome: 'ANTIFRACÇÃO NÃO INFLUENTE', series: 3, repeticoes: 15, descanso: '1ª MINUTO' },
+                { metodo: 'TRADICIONAL', nome: 'BICEPS MARTELO NO BANCO INCLINADO', series: 3, repeticoes: 12, descanso: '1ª MINUTO' }
+            ]
+        },
+        {
+            dia: 'SEXTA: B',
+            exercicios: [
+                { metodo: 'BI-SET', nome: 'AGACHAMENTO LIVRE + AGACHAMENTO COM ANILHA NOS PÉS', series: 3, repeticoes: '12 + 15', descanso: '2ª MINUTOS' },
+                { metodo: 'TRADICIONAL', nome: 'LEG 90 E LEG AMPLIA (CONCENTRADO)', series: 4, repeticoes: 10, descanso: '1ª 15\' MINUTOS' },
+                { metodo: 'TRADICIONAL', nome: 'COCE NAPOLIA', series: 3, repeticoes: 15, descanso: '1ª 15\' MINUTOS' },
+                { metodo: 'RESTYNA PAUSE', nome: 'CADIRRA FLEXORA', series: 3, repeticoes: '10 + 15', descanso: '2ª MINUTOS' },
+                { metodo: 'BI-SET', nome: 'CADIRRA ABDUTORA + AFUNDO', series: 3, repeticoes: '15 + 10', descanso: '2ª MINUTOS' },
+                { metodo: 'BI-SET', nome: 'BÚLGARO COM CARGA E SM CARGA', series: 3, repeticoes: '10 + 15', descanso: '1ª 20\' MINUTOS' }
+            ]
+        },
+        {
+            dia: 'QUARTA: C',
+            exercicios: [
+                { metodo: 'BI-SET', nome: 'STIFF COM BARRA PEQUENA + HALC LINHAR', series: 3, repeticoes: 10, descanso: '1ª 15\' MINUTOS' },
+                { metodo: 'BI-SET', nome: 'TREADMINUS + CADIRRA ABDUTORA', series: 3, repeticoes: '10 + 15', descanso: '1ª 20\' MINUTOS' },
+                { metodo: 'TRADICIONAL', nome: 'ADDUÇÃO NA TOULA', series: 4, repeticoes: 12, descanso: '1ª 15\' MINUTOS' },
+                { metodo: 'TRADICIONAL', nome: 'PANTURRILHA EM PÉ', series: 4, repeticoes: 20, descanso: '1ª MINUTO' },
+                { metodo: 'GVT', nome: 'CADIRA EXTENSORA', series: 3, repeticoes: 10, descanso: '1ª MINUTO' }
+            ]
+        },
+        {
+            dia: 'QUINTA: A',
+            exercicios: [
+                { metodo: 'TRADICIONAL', nome: 'CRUCIFIXO NO BANCO INCLINADO', series: 3, repeticoes: 15, descanso: '1ª MINUTO' },
+                { metodo: 'TRADICIONAL', nome: 'ABDOMEN SEM ROTAÇÃO', series: 3, repeticoes: 10, descanso: '1ª MINUTO' },
+                { metodo: 'TRADICIONAL', nome: 'REMADA ALTA NO PULLEY', series: 4, repeticoes: 10, descanso: '1ª MINUTO' },
+                { metodo: 'TRADICIONAL', nome: 'SUPINO NO BANCO DECLINADO', series: 3, repeticoes: 15, descanso: '1ª MINUTO' },
+                { metodo: 'BI-SET', nome: 'FACEPULL + ENCOLHIMENTO DE OMBROS NO BANCO SENTADO', series: 3, repeticoes: 10, descanso: '1ª MINUTO' }
+            ]
+        }
+    ];
+    
+    renderizarTreinos();
 }
 
-// Toast notification
-function mostrarToast(mensagem) {
-  const toast = document.getElementById('toast');
-  toast.textContent = mensagem;
-  toast.classList.add('show');
-  
-  setTimeout(() => {
-    toast.classList.remove('show');
-  }, 3000);
+function renderizarTreinos() {
+    const container = document.getElementById('treinosContainer');
+    if (!container) return;
+    
+    let html = '';
+    
+    treinos.forEach((treino, index) => {
+        const hoje = new Date().getDay();
+        const dias = ['DOMINGO', 'SEGUNDA', 'TERÇA', 'QUARTA', 'QUINTA', 'SEXTA', 'SÁBADO'];
+        const diaTreino = treino.dia.split(':')[0].trim();
+        const eHoje = dias[hoje] === diaTreino.toUpperCase();
+        
+        html += `
+            <div class="treino-card ${eHoje ? 'hoje' : ''}">
+                <div class="treino-header">
+                    <div>
+                        <div class="treino-dia">${treino.dia}</div>
+                        <div class="treino-nome">Treino ${treino.dia.split(':')[1].trim()}</div>
+                    </div>
+                    ${eHoje ? '<span class="badge badge-hoje">HOJE</span>' : ''}
+                </div>
+                
+                ${treino.exercicios.map((ex, exIndex) => `
+                    <div class="exercicio-item" onclick="mostrarExercicioModal('${ex.nome}')">
+                        <div class="exercicio-nome">
+                            <span>${ex.nome}</span>
+                            <span style="font-size: 0.8em; color: var(--accent-color);">${ex.metodo}</span>
+                        </div>
+                        <div class="exercicio-detalhes">
+                            <span>${ex.series} séries</span>
+                            <span>${ex.repeticoes} reps</span>
+                            <span>Descanso: ${ex.descanso}</span>
+                        </div>
+                        <div class="exercicio-gif-container" id="gif-${index}-${exIndex}">
+                            <div class="gif-loading">
+                                <div class="spinner"></div>
+                            </div>
+                            <img class="exercicio-gif" style="opacity: 0; transition: opacity 0.3s;">
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html || '<div class="empty-state"><div class="empty-icon">🏋️</div><div class="empty-text">Nenhum treino carregado</div></div>';
+    
+    // Carregar GIFs para todos os exercícios
+    setTimeout(() => {
+        treinos.forEach((treino, index) => {
+            treino.exercicios.forEach((ex, exIndex) => {
+                carregarGIFParaExercicio(ex.nome, `gif-${index}-${exIndex}`);
+            });
+        });
+    }, 500);
 }
 
-// Navegação
-function navegarPara(pagina) {
-  // Remover active de todas as páginas e nav items
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  
-  // Ativar página e nav item
-  document.getElementById(pagina + 'Page').classList.add('active');
-  
-  // Ativar nav item correspondente
-  const navItems = document.querySelectorAll('.nav-item');
-  const pageIndex = ['home', 'treinos', 'medicoes', 'timeline', 'perfil'].indexOf(pagina);
-  if (pageIndex !== -1 && navItems[pageIndex]) {
-    navItems[pageIndex].classList.add('active');
-  }
-  
-  // Carregar conteúdo específico
-  if (pagina === 'home') {
-    carregarHome();
-  } else if (pagina === 'treinos') {
-    carregarTreinos();
-  } else if (pagina === 'medicoes') {
-    carregarMedicoes();
-  } else if (pagina === 'timeline') {
-    carregarTimeline();
-  } else if (pagina === 'perfil') {
-    carregarPerfil();
-  }
-  
-  // Scroll to top
-  window.scrollTo(0, 0);
+function atualizarTreinoHoje() {
+    const hoje = new Date().getDay();
+    const dias = ['DOMINGO', 'SEGUNDA', 'TERÇA', 'QUARTA', 'QUINTA', 'SEXTA', 'SÁBADO'];
+    const diaAtual = dias[hoje];
+    
+    const treinoHoje = treinos.find(t => {
+        const diaTreino = t.dia.split(':')[0].trim().toUpperCase();
+        return diaTreino === diaAtual;
+    });
+    
+    const container = document.getElementById('treinoHojeCard');
+    if (!container) return;
+    
+    if (treinoHoje) {
+        let html = `
+            <div class="treino-header">
+                <div>
+                    <div class="treino-dia">${treinoHoje.dia}</div>
+                    <div class="treino-nome">Treino ${treinoHoje.dia.split(':')[1].trim()}</div>
+                </div>
+                <span class="badge badge-hoje">HOJE</span>
+            </div>
+        `;
+        
+        // Mostrar apenas os primeiros 3 exercícios na home
+        treinoHoje.exercicios.slice(0, 3).forEach((ex, index) => {
+            html += `
+                <div class="exercicio-item" onclick="mostrarExercicioModal('${ex.nome}')">
+                    <div class="exercicio-nome">
+                        <span>${ex.nome}</span>
+                        <span style="font-size: 0.8em; color: var(--accent-color);">${ex.metodo}</span>
+                    </div>
+                    <div class="exercicio-detalhes">
+                        <span>${ex.series} séries</span>
+                        <span>${ex.repeticoes} reps</span>
+                    </div>
+                    <div class="exercicio-gif-container" id="gif-hoje-${index}">
+                        <div class="gif-loading">
+                            <div class="spinner"></div>
+                        </div>
+                        <img class="exercicio-gif" style="opacity: 0; transition: opacity 0.3s;">
+                    </div>
+                </div>
+            `;
+        });
+        
+        if (treinoHoje.exercicios.length > 3) {
+            html += `<div style="text-align: center; margin-top: 10px; color: var(--text-secondary); font-size: 0.9em;">+ ${treinoHoje.exercicios.length - 3} exercícios restantes</div>`;
+        }
+        
+        container.innerHTML = html;
+        
+        // Carregar GIFs para os exercícios da home
+        setTimeout(() => {
+            treinoHoje.exercicios.slice(0, 3).forEach((ex, index) => {
+                carregarGIFParaExercicio(ex.nome, `gif-hoje-${index}`);
+            });
+        }, 500);
+    } else {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 30px;">
+                <div style="font-size: 3em; margin-bottom: 10px;">😴</div>
+                <div style="color: var(--text-secondary);">Hoje é dia de descanso!</div>
+                <div style="font-size: 0.9em; margin-top: 5px;">Aproveite para se recuperar.</div>
+            </div>
+        `;
+    }
 }
 
-// Inicialização
-function init() {
-  const usuario = carregar('usuario');
-  
-  if (usuario) {
+// ============ FUNÇÕES DE USUÁRIO E MEDIÇÕES ============
+function verificarUsuario() {
+    usuario = JSON.parse(localStorage.getItem('fitTrackUsuario'));
+    
+    if (usuario) {
+        iniciarApp();
+        mostrarToast('Bem-vindo de volta, ' + usuario.nome + '!');
+    } else {
+        mostrarCadastro();
+    }
+}
+
+function mostrarCadastro() {
+    document.getElementById('welcomeScreen').style.display = 'none';
+    document.getElementById('cadastroModal').classList.add('active');
+}
+
+function salvarCadastro() {
+    const nome = document.getElementById('nomeInput').value;
+    const dataNascimento = document.getElementById('dataNascimentoInput').value;
+    const altura = document.getElementById('alturaInput').value;
+    const sexo = document.getElementById('sexoInput').value;
+    
+    if (!nome || !dataNascimento || !altura || !sexo) {
+        mostrarToast('Por favor, preencha todos os campos!', 'error');
+        return;
+    }
+    
+    usuario = {
+        nome,
+        dataNascimento,
+        altura: parseInt(altura),
+        sexo,
+        dataCadastro: new Date().toISOString()
+    };
+    
+    localStorage.setItem('fitTrackUsuario', JSON.stringify(usuario));
+    
+    // Carregar dados iniciais do arquivo
+    const dadosArquivo = {
+        nome: 'SIBELE',
+        altura: 1.64,
+        peso: 48.75,
+        imc: 17.9,
+        gordura: 17.9,
+        idade: 30,
+        medidas: {
+            ombros: 85,
+            peito: 76.5,
+            cintura: 62,
+            bracoDireitoRelaxado: 22,
+            bracoDireitoFlexionado: 23,
+            antebracoDireito: 15,
+            abdomenSuperior: 52.5,
+            abdomenInferior: 70.5,
+            coxaDireita: 47,
+            panturrilhaDireita: 19,
+            quadril: 75
+        }
+    };
+    
+    // Adicionar medição inicial baseada no arquivo
+    const medicaoInicial = {
+        data: '11/11/2024',
+        peso: dadosArquivo.peso,
+        imc: dadosArquivo.imc,
+        gordura: dadosArquivo.gordura,
+        medidas: dadosArquivo.medidas
+    };
+    
+    medicoes = [medicaoInicial];
+    localStorage.setItem('fitTrackMedicoes', JSON.stringify(medicoes));
+    
+    fecharModal();
+    iniciarApp();
+    mostrarToast('Cadastro realizado com sucesso!');
+}
+
+function iniciarApp() {
     document.getElementById('welcomeScreen').style.display = 'none';
     document.getElementById('appHeader').style.display = 'block';
     document.getElementById('appContent').style.display = 'block';
     document.getElementById('bottomNav').style.display = 'flex';
     
-    document.getElementById('headerUser').textContent = usuario.nome.split(' ')[0];
+    // Carregar dados do localStorage
+    medicoes = JSON.parse(localStorage.getItem('fitTrackMedicoes')) || [];
     
-    navegarPara('home');
-  } else {
-    document.getElementById('welcomeScreen').style.display = 'flex';
-  }
-}
-
-function mostrarCadastro() {
-  document.getElementById('welcomeScreen').style.display = 'none';
-  document.getElementById('appHeader').style.display = 'block';
-  document.getElementById('appContent').style.display = 'block';
-  document.getElementById('bottomNav').style.display = 'flex';
-  abrirFormCadastro();
-}
-
-function verificarUsuario() {
-  const usuario = carregar('usuario');
-  if (usuario) {
-    init();
-  } else {
-    mostrarToast('⚠️ Nenhum cadastro encontrado');
-    setTimeout(mostrarCadastro, 1000);
-  }
-}
-
-// Cadastro
-function abrirFormCadastro() {
-  const usuario = carregar('usuario');
-  if (usuario) {
-    document.getElementById('nome').value = usuario.nome || '';
-    document.getElementById('dataNascimento').value = usuario.dataNascimento || '';
-    document.getElementById('sexo').value = usuario.sexo || '';
-    document.getElementById('email').value = usuario.email || '';
-    document.getElementById('telefone').value = usuario.telefone || '';
-    document.getElementById('objetivo').value = usuario.objetivo || 'saude';
-    document.getElementById('observacoes').value = usuario.observacoes || '';
-  }
-  
-  document.getElementById('cadastroModal').classList.add('active');
-}
-
-function salvarCadastro(e) {
-  e.preventDefault();
-  
-  const usuario = {
-    nome: document.getElementById('nome').value,
-    dataNascimento: document.getElementById('dataNascimento').value,
-    sexo: document.getElementById('sexo').value,
-    email: document.getElementById('email').value,
-    telefone: document.getElementById('telefone').value,
-    objetivo: document.getElementById('objetivo').value,
-    observacoes: document.getElementById('observacoes').value,
-    dataCadastro: carregar('usuario')?.dataCadastro || new Date().toISOString()
-  };
-  
-  salvar('usuario', usuario);
-  
-  fecharModal('cadastroModal');
-  mostrarToast('✅ Perfil salvo com sucesso!');
-  
-  // Adicionar à timeline se for primeiro cadastro
-  const timeline = carregar('timeline') || [];
-  if (timeline.length === 0) {
-    adicionarEventoTimeline({
-      tipo: 'cadastro',
-      data: usuario.dataCadastro.split('T')[0],
-      titulo: 'Início da Jornada',
-      descricao: `${usuario.nome} iniciou no FitTrack!`
-    });
-  }
-  
-  init();
-}
-
-// Home
-function carregarHome() {
-  const usuario = carregar('usuario');
-  const medicoes = carregar('medicoes') || [];
-  const ultimaMedicao = medicoes[0];
-  
-  if (usuario) {
-    const inicial = usuario.nome.charAt(0).toUpperCase();
-    document.getElementById('homeAvatar').textContent = inicial;
-    document.getElementById('homeName').textContent = usuario.nome.split(' ')[0];
+    // Atualizar interface
+    atualizarInterfaceUsuario();
+    carregarTreinosDoArquivo();
     
-    const objetivos = {
-      'emagrecimento': '🔥 Emagrecimento',
-      'hipertrofia': '💪 Ganho de Massa',
-      'condicionamento': '🏃 Condicionamento',
-      'saude': '❤️ Saúde'
-    };
-    
-    document.getElementById('homeInfo').innerHTML = `
-      ${calcularIdade(usuario.dataNascimento)} anos • ${objetivos[usuario.objetivo] || ''}
-    `;
-  }
-  
-  // Estatísticas
-  document.getElementById('statMedicoes').textContent = medicoes.length;
-  
-  if (ultimaMedicao) {
-    document.getElementById('statPeso').textContent = ultimaMedicao.peso + 'kg';
-    document.getElementById('statIMC').textContent = ultimaMedicao.imc;
-  }
-  
-  // Treino de hoje
-  const diaAtual = obterDiaSemana();
-  const treinoHoje = treinos[diaAtual];
-  
-  let html = `
-    <div style="text-align: center; margin-bottom: 10px;">
-      <div class="badge badge-hoje">${diaAtual}</div>
-    </div>
-    <h3 style="margin-bottom: 15px; text-align: center;">${treinoHoje.nome}</h3>
-  `;
-  
-  if (treinoHoje.exercicios.length > 0) {
-    html += `<div style="font-size: 0.85em; color: var(--text-secondary); margin-bottom: 10px;">
-      ${treinoHoje.exercicios.length} exercício${treinoHoje.exercicios.length > 1 ? 's' : ''} hoje
-    </div>`;
-    
-    treinoHoje.exercicios.slice(0, 2).forEach(ex => {
-      html += `
-        <div class="exercicio-item" style="margin-bottom: 8px;">
-          <div style="font-size: 0.9em; font-weight: 600;">${ex.exercicio}</div>
-          <div style="font-size: 0.75em; color: var(--text-secondary); margin-top: 4px;">
-            ${ex.series}x${ex.reps} • ${ex.descanso}
-          </div>
-        </div>
-      `;
-    });
-    
-    if (treinoHoje.exercicios.length > 2) {
-      html += `<div style="text-align: center; margin-top: 10px; color: var(--text-secondary); font-size: 0.85em;">
-        +${treinoHoje.exercicios.length - 2} exercício${treinoHoje.exercicios.length - 2 > 1 ? 's' : ''}
-      </div>`;
+    if (medicoes.length > 0) {
+        atualizarStats();
+        renderizarMedicoes();
+        renderizarTimeline();
     }
-  } else {
-    html += '<div style="text-align: center; padding: 20px; font-size: 1.2em;">🎉 Dia de descanso!</div>';
-  }
-  
-  document.getElementById('treinoHojeCard').innerHTML = html;
 }
 
-// Treinos
-function carregarTreinos() {
-  const diaAtual = obterDiaSemana();
-  let html = '';
-  
-  for (const [dia, treino] of Object.entries(treinos)) {
-    const ehHoje = dia === diaAtual;
+function atualizarInterfaceUsuario() {
+    if (!usuario) return;
     
-    html += `
-      <div class="treino-card ${ehHoje ? 'hoje' : ''}">
-        <div class="treino-header">
-          <div>
-            <div class="treino-dia">${dia}</div>
-            <div class="treino-nome">${treino.nome}</div>
-          </div>
-          ${ehHoje ? '<div class="badge badge-hoje">HOJE</div>' : ''}
-        </div>
-    `;
-    
-    if (treino.exercicios.length > 0) {
-      treino.exercicios.forEach(ex => {
-        html += `
-          <div class="exercicio-item">
-            <div class="exercicio-nome">
-              <span>${ex.exercicio}</span>
-              <button class="btn-small btn-primary" onclick='mostrarExercicio(${JSON.stringify(ex).replace(/'/g, "\\'")})'  style="padding: 6px 12px; font-size: 0.8em;">
-                👁️
-              </button>
-            </div>
-            <div class="exercicio-detalhes">
-              <span>📊 ${ex.series}x${ex.reps}</span>
-              <span>⏱️ ${ex.descanso}</span>
-              <span>💪 ${ex.metodo}</span>
-            </div>
-          </div>
-        `;
-      });
-    } else {
-      html += '<div style="text-align: center; padding: 20px; color: var(--text-secondary);">🎉 Dia de descanso</div>';
-    }
-    
-    html += '</div>';
-  }
-  
-  document.getElementById('treinosContainer').innerHTML = html;
-}
-
-// Modal de exercício
-function mostrarExercicio(exercicio) {
-  const modal = document.getElementById('exerciseModal');
-  const exercicioInfo = exerciciosDB[exercicio.exercicio];
-  
-  document.getElementById('modalExerciseName').textContent = exercicio.exercicio;
-  document.getElementById('modalSets').textContent = exercicio.series;
-  document.getElementById('modalReps').textContent = exercicio.reps;
-  document.getElementById('modalRest').textContent = exercicio.descanso;
-  
-  if (exercicioInfo) {
-    // Músculos
-    let musculosHTML = '';
-    exercicioInfo.musculos.forEach(m => {
-      musculosHTML += `<span class="musculos-tag">${m}</span>`;
-    });
-    document.getElementById('modalMusculos').innerHTML = musculosHTML;
-    
-    // Instruções
-    let instrucoesHTML = '<ol>';
-    exercicioInfo.instrucoes.forEach(instrucao => {
-      instrucoesHTML += `<li>${instrucao}</li>`;
-    });
-    instrucoesHTML += '</ol>';
-    document.getElementById('modalInstructions').innerHTML = instrucoesHTML;
-    
-    // Dicas
-    let dicasHTML = '<ul>';
-    exercicioInfo.dicas.forEach(dica => {
-      dicasHTML += `<li>${dica}</li>`;
-    });
-    dicasHTML += '</ul>';
-    document.getElementById('modalTips').innerHTML = dicasHTML;
-    
-    // Avatar
-    renderizarAvatar(exercicioInfo.avatar);
-  } else {
-    document.getElementById('modalMusculos').innerHTML = '';
-    document.getElementById('modalInstructions').innerHTML = '<p>Consulte seu instrutor</p>';
-    document.getElementById('modalTips').innerHTML = '<p>Informações não disponíveis</p>';
-    renderizarAvatar('default');
-  }
-  
-  modal.classList.add('active');
-}
-
-function renderizarAvatar(tipo) {
-  const container = document.getElementById('avatarContainer');
-  
-  const avatars = {
-    'shoulderPress': `
-      <svg width="180" height="280" viewBox="0 0 200 300" style="animation: shoulderPress 2s ease-in-out infinite;">
-        <circle cx="100" cy="30" r="20" fill="#FFD700" stroke="#333" stroke-width="2"/>
-        <rect x="85" y="50" width="30" height="60" fill="#4CAF50" rx="5"/>
-        <rect x="50" y="60" width="30" height="8" fill="#FFA726" rx="4"/>
-        <rect x="120" y="60" width="30" height="8" fill="#FFA726" rx="4"/>
-        <rect x="40" y="55" width="120" height="6" fill="#666" rx="3"/>
-        <rect x="30" y="50" width="15" height="16" fill="#333" rx="2"/>
-        <rect x="155" y="50" width="15" height="16" fill="#333" rx="2"/>
-        <rect x="85" y="110" width="12" height="50" fill="#2196F3" rx="3"/>
-        <rect x="103" y="110" width="12" height="50" fill="#2196F3" rx="3"/>
-        <ellipse cx="91" cy="165" rx="8" ry="4" fill="#333"/>
-        <ellipse cx="109" cy="165" rx="8" ry="4" fill="#333"/>
-      </svg>
-    `,
-    'pulldown': `
-      <svg width="180" height="280" viewBox="0 0 200 300" style="animation: pulldown 2s ease-in-out infinite;">
-        <circle cx="100" cy="80" r="20" fill="#FFD700" stroke="#333" stroke-width="2"/>
-        <rect x="85" y="100" width="30" height="60" fill="#4CAF50" rx="5"/>
-        <line x1="100" y1="40" x2="60" y2="105" stroke="#FFA726" stroke-width="8" stroke-linecap="round"/>
-        <line x1="100" y1="40" x2="140" y2="105" stroke="#FFA726" stroke-width="8" stroke-linecap="round"/>
-        <rect x="40" y="35" width="120" height="6" fill="#666" rx="3"/>
-        <line x1="100" y1="10" x2="100" y2="35" stroke="#999" stroke-width="2" stroke-dasharray="5,5"/>
-        <rect x="70" y="160" width="15" height="40" fill="#2196F3" rx="3" transform="rotate(45 77.5 180)"/>
-        <rect x="115" y="160" width="15" height="40" fill="#2196F3" rx="3" transform="rotate(-45 122.5 180)"/>
-      </svg>
-    `,
-    'squat': `
-      <svg width="180" height="280" viewBox="0 0 200 300" style="animation: squat 2s ease-in-out infinite;">
-        <circle cx="100" cy="40" r="20" fill="#FFD700" stroke="#333" stroke-width="2"/>
-        <rect x="85" y="60" width="30" height="70" fill="#4CAF50" rx="5"/>
-        <rect x="70" y="70" width="10" height="50" fill="#FFA726" rx="3"/>
-        <rect x="120" y="70" width="10" height="50" fill="#FFA726" rx="3"/>
-        <rect x="50" y="55" width="100" height="8" fill="#666" rx="4"/>
-        <rect x="40" y="50" width="15" height="18" fill="#333" rx="2"/>
-        <rect x="145" y="50" width="15" height="18" fill="#333" rx="2"/>
-        <rect x="80" y="130" width="15" height="60" fill="#2196F3" rx="3"/>
-        <rect x="105" y="130" width="15" height="60" fill="#2196F3" rx="3"/>
-        <ellipse cx="87.5" cy="195" rx="12" ry="6" fill="#333"/>
-        <ellipse cx="112.5" cy="195" rx="12" ry="6" fill="#333"/>
-      </svg>
-    `,
-    'pushup': `
-      <svg width="180" height="280" viewBox="0 0 200 300" style="animation: pushup 2s ease-in-out infinite;">
-        <circle cx="60" cy="120" r="20" fill="#FFD700" stroke="#333" stroke-width="2"/>
-        <rect x="75" y="115" width="70" height="25" fill="#4CAF50" rx="5" transform="rotate(-15 110 127)"/>
-        <rect x="75" y="135" width="8" height="30" fill="#FFA726" rx="3" transform="rotate(60 79 150)"/>
-        <rect x="137" y="135" width="8" height="30" fill="#FFA726" rx="3" transform="rotate(-60 141 150)"/>
-        <rect x="130" y="120" width="12" height="45" fill="#2196F3" rx="3" transform="rotate(-15 136 142)"/>
-        <rect x="145" y="120" width="12" height="45" fill="#2196F3" rx="3" transform="rotate(-15 151 142)"/>
-        <rect x="20" y="180" width="160" height="15" fill="#8D6E63" rx="3" transform="rotate(-10 100 187)"/>
-      </svg>
-    `,
-    'default': `
-      <svg width="180" height="280" viewBox="0 0 200 300">
-        <circle cx="100" cy="60" r="25" fill="#FFD700" stroke="#333" stroke-width="2"/>
-        <rect x="82" y="85" width="36" height="80" fill="#4CAF50" rx="5"/>
-        <rect x="60" y="95" width="12" height="65" fill="#FFA726" rx="3"/>
-        <rect x="128" y="95" width="12" height="65" fill="#FFA726" rx="3"/>
-        <rect x="82" y="165" width="15" height="70" fill="#2196F3" rx="3"/>
-        <rect x="103" y="165" width="15" height="70" fill="#2196F3" rx="3"/>
-        <ellipse cx="89.5" cy="240" rx="10" ry="5" fill="#333"/>
-        <ellipse cx="110.5" cy="240" rx="10" ry="5" fill="#333"/>
-      </svg>
-    `
-  };
-  
-  container.innerHTML = avatars[tipo] || avatars['default'];
-}
-
-// Medições
-function abrirFormMedicao() {
-  document.getElementById('dataMedicao').value = new Date().toISOString().split('T')[0];
-  
-  // Preencher altura do cadastro se disponível
-  const medicoes = carregar('medicoes') || [];
-  if (medicoes.length > 0) {
-    document.getElementById('altura').value = medicoes[0].altura;
-  }
-  
-  document.getElementById('medicaoModal').classList.add('active');
-}
-
-function salvarMedicao(e) {
-  e.preventDefault();
-  
-  const medicao = {
-    data: document.getElementById('dataMedicao').value,
-    peso: parseFloat(document.getElementById('peso').value),
-    altura: parseFloat(document.getElementById('altura').value),
-    gordura: parseFloat(document.getElementById('gordura').value) || null,
-    massaMuscular: parseFloat(document.getElementById('massaMuscular').value) || null,
-    metabolismo: parseInt(document.getElementById('metabolismo').value) || null,
-    medidas: {
-      pescoco: parseFloat(document.getElementById('pescoco').value) || null,
-      ombros: parseFloat(document.getElementById('ombros').value) || null,
-      peitoral: parseFloat(document.getElementById('peitoral').value) || null,
-      bracoEsq: parseFloat(document.getElementById('bracoEsq').value) || null,
-      bracoDir: parseFloat(document.getElementById('bracoDir').value) || null,
-      cintura: parseFloat(document.getElementById('cintura').value) || null,
-      abdomen: parseFloat(document.getElementById('abdomen').value) || null,
-      quadril: parseFloat(document.getElementById('quadril').value) || null,
-      coxaEsq: parseFloat(document.getElementById('coxaEsq').value) || null,
-      coxaDir: parseFloat(document.getElementById('coxaDir').value) || null,
-      panturrilhaEsq: parseFloat(document.getElementById('panturrilhaEsq').value) || null,
-      panturrilhaDir: parseFloat(document.getElementById('panturrilhaDir').value) || null
-    },
-    timestamp: new Date().toISOString()
-  };
-  
-  medicao.imc = (medicao.peso / (medicao.altura * medicao.altura)).toFixed(1);
-  
-  let medicoes = carregar('medicoes') || [];
-  medicoes.unshift(medicao);
-  salvar('medicoes', medicoes);
-  
-  fecharModal('medicaoModal');
-  mostrarToast('✅ Medição salva!');
-  document.getElementById('formMedicao').reset();
-  
-  // Adicionar à timeline
-  adicionarEventoTimeline({
-    tipo: 'medicao',
-    data: medicao.data,
-    titulo: 'Avaliação Física',
-    descricao: `Peso: ${medicao.peso}kg • IMC: ${medicao.imc}`
-  });
-  
-  carregarMedicoes();
-  carregarHome();
-}
-
-function carregarMedicoes() {
-  const medicoes = carregar('medicoes') || [];
-  const container = document.getElementById('medicoesContainer');
-  
-  if (medicoes.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">📊</div>
-        <div class="empty-text">Nenhuma medição registrada</div>
-        <button class="btn btn-primary" onclick="abrirFormMedicao()" style="max-width: 200px; margin: 20px auto 0;">
-          ➕ Adicionar Primeira
-        </button>
-      </div>
-    `;
-    return;
-  }
-  
-  let html = '';
-  medicoes.forEach(med => {
-    html += `
-      <div class="medicao-resumo">
-        <div class="medicao-data">📅 ${new Date(med.data + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}</div>
-        <div class="medicao-grid">
-          <div class="medicao-item">
-            <div class="medicao-label">Peso</div>
-            <div class="medicao-valor">${med.peso}kg</div>
-          </div>
-          <div class="medicao-item">
-            <div class="medicao-label">IMC</div>
-            <div class="medicao-valor">${med.imc}</div>
-          </div>
-          ${med.gordura ? `
-          <div class="medicao-item">
-            <div class="medicao-label">Gordura</div>
-            <div class="medicao-valor">${med.gordura}%</div>
-          </div>
-          ` : '<div></div>'}
-        </div>
-      </div>
-    `;
-  });
-  
-  container.innerHTML = html;
-}
-
-// Timeline
-function adicionarEventoTimeline(evento) {
-  let timeline = carregar('timeline') || [];
-  
-  // Evitar duplicatas
-  const existe = timeline.some(e => 
-    e.tipo === evento.tipo && 
-    e.data === evento.data && 
-    e.titulo === evento.titulo
-  );
-  
-  if (!existe) {
-    timeline.unshift(evento);
-    salvar('timeline', timeline);
-  }
-}
-
-function carregarTimeline() {
-  let timeline = carregar('timeline') || [];
-  const medicoes = carregar('medicoes') || [];
-  const usuario = carregar('usuario');
-  
-  // Criar eventos iniciais
-  if (timeline.length === 0 && usuario) {
-    timeline.push({
-      tipo: 'cadastro',
-      data: usuario.dataCadastro.split('T')[0],
-      titulo: 'Início da Jornada',
-      descricao: `${usuario.nome} começou no FitTrack! 🎉`
-    });
-    
-    medicoes.forEach(med => {
-      timeline.push({
-        tipo: 'medicao',
-        data: med.data,
-        titulo: 'Avaliação Física',
-        descricao: `Peso: ${med.peso}kg • IMC: ${med.imc}`
-      });
-    });
-    
-    salvar('timeline', timeline);
-  }
-  
-  timeline.sort((a, b) => new Date(b.data) - new Date(a.data));
-  
-  const container = document.getElementById('timelineContainer');
-  
-  if (timeline.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">📅</div>
-        <div class="empty-text">Sua jornada começará em breve!</div>
-      </div>
-    `;
-    return;
-  }
-  
-  let html = '';
-  const icones = {
-    'cadastro': '🎉',
-    'medicao': '📊',
-    'treino': '💪',
-    'meta': '🎯'
-  };
-  
-  timeline.forEach(evento => {
-    html += `
-      <div class="timeline-item">
-        <div class="timeline-dot"></div>
-        <div class="timeline-content">
-          <div class="timeline-date">${new Date(evento.data + 'T00:00:00').toLocaleDateString('pt-BR')}</div>
-          <div class="timeline-title">${icones[evento.tipo] || '📌'} ${evento.titulo}</div>
-          <div style="color: var(--text-secondary); font-size: 0.9em; margin-top: 5px;">${evento.descricao}</div>
-        </div>
-      </div>
-    `;
-  });
-  
-  container.innerHTML = html;
-}
-
-// Perfil
-function carregarPerfil() {
-  const usuario = carregar('usuario');
-  const medicoes = carregar('medicoes') || [];
-  
-  if (usuario) {
-    const inicial = usuario.nome.charAt(0).toUpperCase();
-    document.getElementById('perfilAvatar').textContent = inicial;
+    document.getElementById('headerUser').textContent = usuario.nome;
+    document.getElementById('homeName').textContent = usuario.nome;
     document.getElementById('perfilName').textContent = usuario.nome;
     
-    const objetivos = {
-      'emagrecimento': '🔥 Emagrecimento',
-      'hipertrofia': '💪 Ganho de Massa',
-      'condicionamento': '🏃 Condicionamento',
-      'saude': '❤️ Saúde e Bem-estar'
+    const idade = calcularIdade(usuario.dataNascimento);
+    document.getElementById('homeInfo').textContent = `${idade} anos • ${usuario.altura/100}m • ${usuario.sexo}`;
+    document.getElementById('perfilInfo').textContent = `${idade} anos • ${usuario.altura/100}m • ${usuario.sexo}`;
+    
+    document.getElementById('homeAvatar').textContent = usuario.sexo === 'feminino' ? '👩' : usuario.sexo === 'masculino' ? '👨' : '👤';
+    document.getElementById('perfilAvatar').textContent = usuario.sexo === 'feminino' ? '👩' : usuario.sexo === 'masculino' ? '👨' : '👤';
+}
+
+function calcularIdade(dataNascimento) {
+    const hoje = new Date();
+    const nascimento = new Date(dataNascimento);
+    let idade = hoje.getFullYear() - nascimento.getFullYear();
+    const mes = hoje.getMonth() - nascimento.getMonth();
+    
+    if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
+        idade--;
+    }
+    
+    return idade;
+}
+
+function atualizarStats() {
+    if (medicoes.length === 0) return;
+    
+    const ultimaMedicao = medicoes[medicoes.length - 1];
+    
+    document.getElementById('statTreinosMes').textContent = '4'; // Baseado na rotina
+    document.getElementById('statMedicoes').textContent = medicoes.length;
+    document.getElementById('statPeso').textContent = ultimaMedicao.peso + 'kg';
+    document.getElementById('statIMC').textContent = ultimaMedicao.imc;
+    
+    atualizarTreinoHoje();
+}
+
+function abrirFormMedicao() {
+    if (medicoes.length > 0) {
+        const ultimaMedicao = medicoes[medicoes.length - 1];
+        document.getElementById('pesoInput').value = ultimaMedicao.peso || '';
+        document.getElementById('imcInput').value = ultimaMedicao.imc || '';
+        document.getElementById('gorduraInput').value = ultimaMedicao.gordura || '';
+        document.getElementById('bracoInput').value = ultimaMedicao.medidas?.bracoDireitoRelaxado || '';
+        document.getElementById('cinturaInput').value = ultimaMedicao.medidas?.cintura || '';
+        document.getElementById('quadrilInput').value = ultimaMedicao.medidas?.quadril || '';
+        document.getElementById('coxaInput').value = ultimaMedicao.medidas?.coxaDireita || '';
+    }
+    
+    document.getElementById('medicaoModal').classList.add('active');
+}
+
+function salvarMedicao() {
+    const peso = parseFloat(document.getElementById('pesoInput').value);
+    const imc = parseFloat(document.getElementById('imcInput').value);
+    const gordura = parseFloat(document.getElementById('gorduraInput').value);
+    const braco = parseFloat(document.getElementById('bracoInput').value);
+    const cintura = parseFloat(document.getElementById('cinturaInput').value);
+    const quadril = parseFloat(document.getElementById('quadrilInput').value);
+    const coxa = parseFloat(document.getElementById('coxaInput').value);
+    
+    if (!peso || !imc) {
+        mostrarToast('Peso e IMC são obrigatórios!', 'error');
+        return;
+    }
+    
+    const novaMedicao = {
+        data: new Date().toLocaleDateString('pt-BR'),
+        peso,
+        imc,
+        gordura,
+        medidas: {
+            bracoDireitoRelaxado: braco,
+            cintura,
+            quadril,
+            coxaDireita: coxa
+        }
     };
     
-    document.getElementById('perfilInfo').innerHTML = `
-      ${calcularIdade(usuario.dataNascimento)} anos • ${objetivos[usuario.objetivo] || ''}
-      <br>
-      <span style="font-size: 0.85em; opacity: 0.8;">
-        ${usuario.email || 'Sem email'} • ${medicoes.length} medições
-      </span>
-    `;
-  }
+    medicoes.push(novaMedicao);
+    localStorage.setItem('fitTrackMedicoes', JSON.stringify(medicoes));
+    
+    fecharModal();
+    atualizarStats();
+    renderizarMedicoes();
+    renderizarTimeline();
+    mostrarToast('Medição salva com sucesso!');
 }
 
-// Modais
-function fecharModal(modalId) {
-  document.getElementById(modalId).classList.remove('active');
-}
-
-// Fechar modal ao clicar fora
-window.onclick = function(event) {
-  if (event.target.classList.contains('modal')) {
-    event.target.classList.remove('active');
-  }
-}
-
-// Menu
-function abrirMenu() {
-  if (confirm('🚀 FitTrack v1.0\n\nDeseja ver mais opções?')) {
-    navegarPara('perfil');
-  }
-}
-
-// Exportar dados
-function exportarDados() {
-  const dados = {
-    usuario: carregar('usuario'),
-    medicoes: carregar('medicoes'),
-    timeline: carregar('timeline')
-  };
-  
-  const dataStr = JSON.stringify(dados, null, 2);
-  const dataBlob = new Blob([dataStr], {type: 'application/json'});
-  
-  const url = URL.createObjectURL(dataBlob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'fittrack-backup.json';
-  link.click();
-  
-  mostrarToast('✅ Dados exportados!');
-}
-
-// Limpar dados
-function limparDados() {
-  if (confirm('⚠️ Tem certeza que deseja apagar TODOS os dados?\n\nEsta ação não pode ser desfeita!')) {
-    if (confirm('🚨 ÚLTIMA CONFIRMAÇÃO: Apagar tudo mesmo?')) {
-      localStorage.clear();
-      mostrarToast('🗑️ Dados apagados');
-      setTimeout(() => {
-        location.reload();
-      }, 1500);
+function renderizarMedicoes() {
+    const container = document.getElementById('medicoesContainer');
+    if (!container) return;
+    
+    if (medicoes.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-text">Nenhuma medição registrada</div></div>';
+        return;
     }
-  }
+    
+    let html = '';
+    
+    [...medicoes].reverse().forEach((medicao, index) => {
+        html += `
+            <div class="medicao-resumo">
+                <div class="medicao-data">${medicao.data}</div>
+                <div class="medicao-grid">
+                    <div class="medicao-item">
+                        <div class="medicao-label">Peso</div>
+                        <div class="medicao-valor">${medicao.peso}kg</div>
+                    </div>
+                    <div class="medicao-item">
+                        <div class="medicao-label">IMC</div>
+                        <div class="medicao-valor">${medicao.imc}</div>
+                    </div>
+                    <div class="medicao-item">
+                        <div class="medicao-label">% Gordura</div>
+                        <div class="medicao-valor">${medicao.gordura || '-'}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
 }
 
-// Inicializar app
-document.addEventListener('DOMContentLoaded', init);
+function renderizarTimeline() {
+    const container = document.getElementById('timelineContainer');
+    if (!container) return;
+    
+    let eventos = [];
+    
+    // Adicionar cadastro
+    if (usuario) {
+        eventos.push({
+            data: new Date(usuario.dataCadastro).toLocaleDateString('pt-BR'),
+            titulo: 'Cadastro no FitTrack',
+            descricao: 'Início da sua jornada fitness'
+        });
+    }
+    
+    // Adicionar medições
+    medicoes.forEach(medicao => {
+        eventos.push({
+            data: medicao.data,
+            titulo: 'Nova Medição',
+            descricao: `Peso: ${medicao.peso}kg • IMC: ${medicao.imc}`
+        });
+    });
+    
+    // Adicionar início do treino (do arquivo)
+    eventos.push({
+        data: '11/11/2024',
+        titulo: 'Início da Rotina de Treinos',
+        descricao: 'Começo do programa de treinamento ABC'
+    });
+    
+    // Ordenar por data
+    eventos.sort((a, b) => new Date(b.data.split('/').reverse().join('-')) - new Date(a.data.split('/').reverse().join('-')));
+    
+    let html = '';
+    
+    eventos.forEach((evento, index) => {
+        html += `
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">${evento.data}</div>
+                    <div class="timeline-title">${evento.titulo}</div>
+                    <div style="color: var(--text-secondary); font-size: 0.9em;">${evento.descricao}</div>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html || '<div class="empty-state"><div class="empty-icon">📅</div><div class="empty-text">Nenhum evento registrado</div></div>';
+}
 
-console.log('✅ FitTrack Mobile App carregado!');
+// ============ FUNÇÕES DE NAVEGAÇÃO ============
+function navegarPara(pagina) {
+    // Remover classe active de todas as páginas e botões
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    
+    // Adicionar classe active à página selecionada
+    document.getElementById(pagina + 'Page').classList.add('active');
+    
+    // Adicionar classe active ao botão correspondente
+    const navItems = document.querySelectorAll('.nav-item');
+    const pageIndex = ['home', 'treinos', 'medicoes', 'timeline', 'perfil'].indexOf(pagina);
+    if (navItems[pageIndex]) {
+        navItems[pageIndex].classList.add('active');
+    }
+    
+    // Atualizar conteúdo específico da página
+    if (pagina === 'treinos') {
+        carregarTreinosDoArquivo();
+    } else if (pagina === 'medicoes') {
+        renderizarMedicoes();
+    } else if (pagina === 'timeline') {
+        renderizarTimeline();
+    }
+}
+
+function abrirMenu() {
+    navegarPara('perfil');
+}
+
+function abrirFormCadastro() {
+    if (usuario) {
+        document.getElementById('nomeInput').value = usuario.nome;
+        document.getElementById('dataNascimentoInput').value = usuario.dataNascimento;
+        document.getElementById('alturaInput').value = usuario.altura;
+        document.getElementById('sexoInput').value = usuario.sexo;
+    }
+    document.getElementById('cadastroModal').classList.add('active');
+}
+
+function fecharModal() {
+    document.querySelectorAll('.modal').forEach(modal => modal.classList.remove('active'));
+}
+
+function exportarDados() {
+    const dados = {
+        usuario,
+        medicoes,
+        treinos,
+        dataExportacao: new Date().toISOString()
+    };
+    
+    const dadosStr = JSON.stringify(dados, null, 2);
+    const blob = new Blob([dadosStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `fittrack-dados-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    
+    mostrarToast('Dados exportados com sucesso!');
+}
+
+function limparDados() {
+    if (confirm('Tem certeza que deseja limpar todos os dados? Esta ação não pode ser desfeita.')) {
+        localStorage.clear();
+        usuario = null;
+        medicoes = [];
+        treinos = [];
+        
+        document.getElementById('welcomeScreen').style.display = 'flex';
+        document.getElementById('appHeader').style.display = 'none';
+        document.getElementById('appContent').style.display = 'none';
+        document.getElementById('bottomNav').style.display = 'none';
+        
+        mostrarToast('Todos os dados foram limpos.');
+    }
+}
+
+function mostrarToast(mensagem, tipo = 'sucesso') {
+    const toast = document.getElementById('toast');
+    toast.textContent = mensagem;
+    toast.className = 'toast';
+    toast.classList.add('show');
+    
+    if (tipo === 'error') {
+        toast.style.background = 'var(--danger-color)';
+    } else if (tipo === 'warning') {
+        toast.style.background = 'var(--accent-color)';
+    } else {
+        toast.style.background = 'var(--primary-color)';
+    }
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
+
+// ============ INICIALIZAÇÃO ============
+document.addEventListener('DOMContentLoaded', function() {
+    // Verificar se há usuário salvo
+    verificarUsuario();
+    
+    // Fechar modal ao clicar fora
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                fecharModal();
+            }
+        });
+    });
+    
+    // Fechar modal com ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            fecharModal();
+        }
+    });
+});
 </script>
 
 </body>
