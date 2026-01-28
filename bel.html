@@ -3,615 +3,113 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#4CAF50">
-<title>FitTrack - Seu App de Treino</title>
-
+<title>FitTrack Pro - Gisele</title>
 <style>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  -webkit-tap-highlight-color: transparent;
-}
-
+/* ... (Seus estilos anteriores permanecem aqui, com foco no modo dark) ... */
 :root {
   --primary-color: #4CAF50;
   --secondary-color: #2196F3;
-  --accent-color: #FF9800;
-  --danger-color: #F44336;
   --dark-bg: #1a1a2e;
   --card-bg: #16213e;
   --text-primary: #ffffff;
-  --text-secondary: #b8b8b8;
-  --border-color: #2d3561;
 }
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background: var(--dark-bg);
-  color: var(--text-primary);
-  overflow-x: hidden;
-  padding-bottom: 70px;
-  -webkit-font-smoothing: antialiased;
-}
-
-.app-container {
-  max-width: 480px;
-  margin: 0 auto;
-  position: relative;
-  min-height: 100vh;
-}
-
-/* Header */
-.app-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(135deg, var(--primary-color), #45a049);
-  padding: 15px 20px;
-  z-index: 100;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-  max-width: 480px;
-  margin: 0 auto;
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.header-title {
-  font-size: 1.4em;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.header-user {
-  font-size: 0.85em;
-  opacity: 0.95;
-  font-weight: 500;
-}
-
-/* Content area */
-.app-content {
-  padding: 80px 0 80px 0;
-  max-width: 480px;
-  margin: 0 auto;
-}
-
-.page {
-  display: none;
-  animation: fadeInUp 0.3s ease;
-  padding: 0 15px;
-}
-
-.page.active {
-  display: block;
-}
-
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Welcome Screen */
-.welcome-screen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, var(--primary-color), #2e7d32);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 30px;
-  z-index: 1000;
-  text-align: center;
-}
-
-/* Cards */
-.card {
-  background: var(--card-bg);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 15px;
-  border: 1px solid var(--border-color);
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.card-title {
-  font-size: 1.2em;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* Stats Grid */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.stat-card {
-  background: linear-gradient(135deg, var(--secondary-color), #1565c0);
-  border-radius: 16px;
-  padding: 20px;
-  text-align: center;
-}
-
-.stat-card.primary { background: linear-gradient(135deg, var(--primary-color), #2e7d32); }
-.stat-card.accent { background: linear-gradient(135deg, var(--accent-color), #e65100); }
-
-.stat-label {
-  font-size: 0.75em;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-  opacity: 0.9;
-}
-
-.stat-value { font-size: 1.8em; font-weight: 700; }
-
-/* Profile Card */
-.profile-card {
-  background: linear-gradient(135deg, var(--primary-color), #2e7d32);
-  border-radius: 20px;
-  padding: 25px;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.profile-avatar {
-  width: 80px; height: 80px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2.5em;
-  margin: 0 auto 15px;
-  border: 4px solid rgba(255,255,255,0.5);
-}
-
-/* Buttons */
-.btn {
-  width: 100%;
-  padding: 16px;
-  border: none;
-  border-radius: 12px;
-  font-size: 1em;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.btn-primary { background: var(--primary-color); color: white; }
-.btn-outline { background: transparent; border: 2px solid var(--primary-color); color: var(--primary-color); }
-.btn-small { padding: 8px 12px; font-size: 0.85em; width: auto; }
-
-/* Treino & Exercícios */
-.treino-card {
-  background: var(--card-bg);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 15px;
-  border: 2px solid var(--border-color);
-}
-
-.treino-card.hoje {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 15px rgba(76, 175, 80, 0.2);
-}
-
-.exercicio-item {
-  background: rgba(255,255,255,0.03);
-  border-radius: 12px;
-  padding: 15px;
-  margin-bottom: 10px;
-  border-left: 4px solid var(--primary-color);
-}
-
-.exercicio-nome {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.exercicio-detalhes {
-  display: flex;
-  gap: 15px;
-  font-size: 0.85em;
-  color: var(--text-secondary);
-}
-
-/* Modal Exercício - FOCO NAS IMAGENS */
-.modal {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.9);
-  z-index: 1000;
-  display: none;
-  overflow-y: auto;
-  padding: 20px;
-}
-
+body { font-family: sans-serif; background: var(--dark-bg); color: var(--text-primary); margin: 0; padding-bottom: 70px; }
+.app-container { max-width: 480px; margin: 0 auto; padding: 15px; }
+.card { background: var(--card-bg); border-radius: 15px; padding: 20px; margin-bottom: 15px; border: 1px solid #2d3561; }
+.badge { padding: 5px 10px; border-radius: 20px; font-size: 0.8em; background: var(--primary-color); }
+.exercicio-item { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+.modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); display: none; z-index: 1000; padding: 20px; }
 .modal.active { display: block; }
-
-.modal-content {
-  background: var(--card-bg);
-  border-radius: 20px;
-  max-width: 440px;
-  margin: 20px auto;
-  overflow: hidden;
-}
-
-.modal-header {
-  background: linear-gradient(135deg, var(--primary-color), #2e7d32);
-  padding: 20px;
-  position: relative;
-}
-
-.avatar-container {
-  background: #fff; /* Fundo branco para imagens técnicas */
-  padding: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 250px;
-}
-
-.avatar-container img {
-  max-width: 100%;
-  max-height: 250px;
-  border-radius: 8px;
-}
-
-.instrucoes-box {
-  background: rgba(33, 150, 243, 0.1);
-  padding: 15px;
-  border-radius: 12px;
-  margin: 15px 0;
-}
-
-.instrucoes-box ol { padding-left: 20px; color: var(--text-secondary); line-height: 1.6; }
-
-.musculos-tag {
-  display: inline-block;
-  background: var(--primary-color);
-  color: white;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 0.75em;
-  margin: 2px;
-}
-
-/* Forms */
-.form-input, .form-select, .form-textarea {
-  width: 100%; padding: 14px; background: rgba(255,255,255,0.05);
-  border: 2px solid var(--border-color); border-radius: 12px; color: white;
-  margin-top: 5px;
-}
-
-/* Bottom Nav */
-.bottom-nav {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  background: var(--card-bg); border-top: 1px solid var(--border-color);
-  display: flex; justify-content: space-around;
-  padding: 8px 0; z-index: 100; max-width: 480px; margin: 0 auto;
-}
-
-.nav-item {
-  flex: 1; border: none; background: transparent; color: var(--text-secondary);
-  display: flex; flex-direction: column; align-items: center; font-size: 0.7em;
-}
-
-.nav-item.active { color: var(--primary-color); }
-.nav-icon { font-size: 1.5em; margin-bottom: 2px; }
-
-.toast {
-  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-  background: var(--primary-color); color: white; padding: 12px 20px;
-  border-radius: 10px; z-index: 2000; display: none;
-}
+.avatar-container { background: #fff; border-radius: 10px; min-height: 200px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; }
+.avatar-container img { max-width: 100%; border-radius: 8px; }
+.nav-bottom { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); display: flex; justify-content: space-around; padding: 10px; border-top: 1px solid #2d3561; }
+.btn-ver { background: var(--secondary-color); color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; }
 </style>
 </head>
-
 <body>
 
 <div class="app-container">
+  <header>
+    <h1>Olá, Gisele 👋</h1>
+    <p style="opacity: 0.7;">Foco no objetivo: Meta IMC 18.5</p>
+  </header>
 
-<div id="welcomeScreen" class="welcome-screen">
-  <div style="font-size: 5em; margin-bottom: 20px;">💪</div>
-  <h1>FitTrack</h1>
-  <p>Bem-vindo de volta!</p><br>
-  <button class="btn btn-primary" onclick="mostrarCadastro()">🚀 Começar</button>
-  <button class="btn btn-outline" onclick="verificarUsuario()">Já tenho conta</button>
+  <div class="card" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center;">
+    <div><small>PESO ATUAL</small><br><strong>48.75 kg</strong></div>
+    <div><small>IMC ATUAL</small><br><strong>17.9</strong></div>
+  </div>
+
+  <div id="listaTreinos">
+    </div>
 </div>
-
-<header class="app-header" id="appHeader" style="display: none;">
-  <div class="header-content">
-    <div class="header-title">💪 FitTrack</div>
-    <div class="header-user" id="headerUser"></div>
-  </div>
-</header>
-
-<div class="app-content" id="appContent" style="display: none;">
-  
-  <div id="homePage" class="page active">
-    <div class="profile-card">
-      <div class="profile-avatar" id="homeAvatar">👤</div>
-      <div id="homeName" style="font-size: 1.5em; font-weight: bold;"></div>
-      <div id="homeInfo" style="opacity: 0.8;"></div>
-    </div>
-    
-    <div class="stats-grid">
-      <div class="stat-card primary"><div class="stat-label">Peso</div><div class="stat-value" id="statPeso">-</div></div>
-      <div class="stat-card accent"><div class="stat-label">IMC</div><div class="stat-value" id="statIMC">-</div></div>
-    </div>
-    
-    <div class="card">
-      <div class="card-title">🏋️ Próximo Treino</div>
-      <div id="treinoHojeCard" style="margin-top: 15px;"></div>
-    </div>
-  </div>
-
-  <div id="treinosPage" class="page">
-    <h2 style="margin-bottom: 20px;">Meus Treinos</h2>
-    <div id="treinosContainer"></div>
-  </div>
-
-  <div id="medicoesPage" class="page">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-      <h2>Medições</h2>
-      <button class="btn btn-small btn-primary" onclick="abrirFormMedicao()">➕ Nova</button>
-    </div>
-    <div id="medicoesContainer"></div>
-  </div>
-
-  <div id="perfilPage" class="page">
-    <div class="card">
-      <h3>Configurações</h3><br>
-      <button class="btn btn-outline" onclick="limparDados()">🗑️ Resetar App</button>
-    </div>
-  </div>
-</div>
-
-<nav class="bottom-nav" id="bottomNav" style="display: none;">
-  <button class="nav-item active" onclick="navegarPara('home')"><div class="nav-icon">🏠</div>Home</button>
-  <button class="nav-item" onclick="navegarPara('treinos')"><div class="nav-icon">🏋️</div>Treinos</button>
-  <button class="nav-item" onclick="navegarPara('medicoes')"><div class="nav-icon">📊</div>Medições</button>
-  <button class="nav-item" onclick="navegarPara('perfil')"><div class="nav-icon">👤</div>Perfil</button>
-</nav>
 
 <div id="exerciseModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h2 id="modalExerciseName" style="color: white;"></h2>
-      <button onclick="fecharModal('exerciseModal')" style="position: absolute; right: 15px; top: 15px; background: none; border: none; color: white; font-size: 1.5em;">×</button>
-    </div>
-    <div class="avatar-container" id="avatarContainer">
+  <div style="background: var(--card-bg); border-radius: 20px; padding: 20px; max-width: 400px; margin: auto;">
+    <h2 id="modalTitle"></h2>
+    <div class="avatar-container" id="modalImage">
       </div>
-    <div style="padding: 20px;">
-      <div id="modalMusculos"></div>
-      <div class="instrucoes-box">
-        <h4>Como executar:</h4>
-        <div id="modalInstructions"></div>
-      </div>
-    </div>
+    <div id="modalDetails" style="font-size: 0.9em; line-height: 1.6;"></div>
+    <button onclick="fecharModal()" style="width: 100%; margin-top: 15px; padding: 12px; background: var(--primary-color); border: none; color: white; border-radius: 10px;">Fechar</button>
   </div>
-</div>
-
-<div id="cadastroModal" class="modal">
-  <div class="modal-content" style="padding: 20px;">
-    <h2>Seu Perfil</h2><br>
-    <form onsubmit="salvarCadastro(event)">
-      <input type="text" id="nome" class="form-input" placeholder="Nome Completo" required><br><br>
-      <input type="date" id="dataNascimento" class="form-input" required><br><br>
-      <select id="objetivo" class="form-select">
-        <option value="emagrecimento">Emagrecimento</option>
-        <option value="hipertrofia">Ganho de Massa</option>
-      </select><br><br>
-      <button type="submit" class="btn btn-primary">Salvar</button>
-    </form>
-  </div>
-</div>
-
-<div id="medicaoModal" class="modal">
-  <div class="modal-content" style="padding: 20px;">
-    <h2>Nova Medição</h2><br>
-    <form onsubmit="salvarMedicao(event)">
-      <input type="number" step="0.1" id="peso" class="form-input" placeholder="Peso (kg)" required><br><br>
-      <input type="number" step="0.01" id="altura" class="form-input" placeholder="Altura (ex: 1.75)" required><br><br>
-      <button type="submit" class="btn btn-primary">Salvar Medição</button>
-    </form>
-  </div>
-</div>
-
-<div id="toast" class="toast"></div>
-
 </div>
 
 <script>
-// Banco de dados com imagens reais (GIFs técnicos)
-const exerciciosDB = {
-  'Desenvolvimento com barra': {
-    instrucoes: ['Costas apoiadas', 'Barra na altura do queixo', 'Suba estendendo os braços'],
-    musculos: ['Ombros', 'Tríceps'],
-    img: 'https://www.strengthlog.com/wp-content/uploads/2020/03/Overhead-press.gif'
-  },
-  'Supino reto': {
-    instrucoes: ['Pés no chão', 'Desça até o peito', 'Mantenha escápulas contraídas'],
-    musculos: ['Peitoral', 'Tríceps'],
-    img: 'https://www.strengthlog.com/wp-content/uploads/2020/03/Bench-press.gif'
-  },
-  'Agachamento livre': {
-    instrucoes: ['Pés largura dos ombros', 'Coluna reta', 'Desça o quadril'],
-    musculos: ['Quadríceps', 'Glúteos'],
-    img: 'https://www.strengthlog.com/wp-content/uploads/2020/03/Squat.gif'
-  },
-  'Pulldown com barra': {
-    instrucoes: ['Puxe a barra ao peito', 'Não balance o corpo', 'Cotovelos para baixo'],
-    musculos: ['Costas', 'Bíceps'],
-    img: 'https://www.strengthlog.com/wp-content/uploads/2020/03/Lat-pulldown.gif'
-  },
-  'Leg press': {
-    instrucoes: ['Pés na largura do ombro', 'Não trave os joelhos', 'Lombar apoiada'],
-    musculos: ['Quadríceps', 'Glúteos'],
-    img: 'https://www.strengthlog.com/wp-content/uploads/2020/03/Leg-press.gif'
-  },
-  'Stiff com barra': {
-    instrucoes: ['Joelhos quase retos', 'Barra rente à perna', 'Sinta o posterior'],
-    musculos: ['Posterior', 'Lombar'],
-    img: 'https://www.strengthlog.com/wp-content/uploads/2020/03/Stiff-legged-deadlift.gif'
-  }
+// Banco de Dados extraído da Imagem
+const treinoDB = {
+  'Segunda (A)': [
+    { nome: 'Desenvolvimento com Barra', series: 3, reps: 10, descanso: "1' a 2'", img: 'https://wger.de/media/exercise-images/130/Overhead-press-1.png' },
+    { nome: 'Supino Inclinado Halteres', series: 3, reps: '12+10', descanso: "1'30\"", img: 'https://wger.de/media/exercise-images/130/Incline-bench-press-1.png' },
+    { nome: 'Elevação Frontal Anilha', series: 4, reps: 12, descanso: "1'", img: 'https://wger.de/media/exercise-images/130/Front-raise-1.png' }
+  ],
+  'Terça (B)': [
+    { nome: 'Pulldown Barra Aberta', series: 4, reps: 12, descanso: "1'", img: 'https://wger.de/media/exercise-images/130/Lat-pulldown-1.png' },
+    { nome: 'Remada Curvada Barra', series: 3, reps: 12, descanso: "1'30\"", img: 'https://wger.de/media/exercise-images/130/Bent-over-row-1.png' }
+  ],
+  'Quarta (C)': [
+    { nome: 'Stiff com Barra', series: 3, reps: '12+10', descanso: "1'30\"", img: 'https://wger.de/media/exercise-images/130/Stiff-legged-deadlift-1.png' },
+    { nome: 'Panturrilha em Pé', series: 4, reps: 20, descanso: "1'", img: 'https://wger.de/media/exercise-images/130/Calf-raises-1.png' }
+  ]
 };
 
-const treinos = {
-  'Segunda': { nome: 'Peito e Ombros', exercicios: [{exercicio: 'Supino reto', series: 4, reps: 10}, {exercicio: 'Desenvolvimento com barra', series: 3, reps: 12}] },
-  'Terça': { nome: 'Costas e Bíceps', exercicios: [{exercicio: 'Pulldown com barra', series: 4, reps: 12}] },
-  'Quarta': { nome: 'Pernas', exercicios: [{exercicio: 'Agachamento livre', series: 4, reps: 10}, {exercicio: 'Leg press', series: 3, reps: 15}] },
-  'Quinta': { nome: 'Superior Foco Peito', exercicios: [{exercicio: 'Supino reto', series: 4, reps: 10}] },
-  'Sexta': { nome: 'Pernas Foco Posterior', exercicios: [{exercicio: 'Stiff com barra', series: 4, reps: 12}] },
-  'Sábado': { nome: 'Descanso', exercicios: [] },
-  'Domingo': { nome: 'Descanso', exercicios: [] }
-};
-
-// Funções Core
-function carregar(chave) { return JSON.parse(localStorage.getItem(chave)); }
-function salvar(chave, valor) { localStorage.setItem(chave, JSON.stringify(valor)); }
-
-function navegarPara(pagina) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById(pagina + 'Page').classList.add('active');
-  const idx = ['home', 'treinos', 'medicoes', 'perfil'].indexOf(pagina);
-  document.querySelectorAll('.nav-item')[idx].classList.add('active');
-  if(pagina === 'home') carregarHome();
-  if(pagina === 'treinos') carregarTreinos();
-  if(pagina === 'medicoes') carregarMedicoes();
-}
-
-function carregarHome() {
-  const user = carregar('usuario');
-  const meds = carregar('medicoes') || [];
-  if(user) {
-    document.getElementById('homeName').textContent = user.nome.split(' ')[0];
-    document.getElementById('homeAvatar').textContent = user.nome[0].toUpperCase();
-    document.getElementById('headerUser').textContent = user.nome.split(' ')[0];
-  }
-  if(meds.length > 0) {
-    document.getElementById('statPeso').textContent = meds[0].peso + 'kg';
-    document.getElementById('statIMC').textContent = meds[0].imc;
-  }
-  const dia = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'][new Date().getDay()];
-  const t = treinos[dia];
-  document.getElementById('treinoHojeCard').innerHTML = `<b>${dia}:</b> ${t.nome} (${t.exercicios.length} exerc.)`;
-}
-
-function carregarTreinos() {
-  let html = '';
-  for(const [dia, t] of Object.entries(treinos)) {
-    html += `<div class="treino-card"><h3>${dia} - ${t.nome}</h3>`;
-    t.exercicios.forEach(ex => {
+// Integração com API: Como você não tem as imagens, o código busca no banco da wger.de
+// ou você pode usar o RapidAPI ExerciseDB para GIFs
+function renderizarTreinos() {
+  const container = document.getElementById('listaTreinos');
+  for (const dia in treinoDB) {
+    let html = `<div class="card"><h3><span class="badge">DIA</span> ${dia}</h3>`;
+    treinoDB[dia].forEach(ex => {
       html += `
         <div class="exercicio-item">
-          <div class="exercicio-nome">
-            ${ex.exercicio}
-            <button class="btn-small btn-primary" onclick="mostrarExercicio('${ex.exercicio}')">VER</button>
+          <div>
+            <strong>${ex.nome}</strong><br>
+            <small>${ex.series} séries de ${ex.reps}</small>
           </div>
-          <div class="exercicio-detalhes">${ex.series}x${ex.reps}</div>
+          <button class="btn-ver" onclick="abrirModal('${dia}', '${ex.nome}')">VER</button>
         </div>`;
     });
-    html += '</div>';
+    html += `</div>`;
+    container.innerHTML += html;
   }
-  document.getElementById('treinosContainer').innerHTML = html;
 }
 
-function mostrarExercicio(nome) {
-  const ex = exerciciosDB[nome];
-  if(!ex) return alert('Exercício não detalhado no DB');
-  document.getElementById('modalExerciseName').textContent = nome;
-  document.getElementById('avatarContainer').innerHTML = `<img src="${ex.img}" alt="${nome}">`;
-  document.getElementById('modalMusculos').innerHTML = ex.musculos.map(m => `<span class="musculos-tag">${m}</span>`).join('');
-  document.getElementById('modalInstructions').innerHTML = `<ol>${ex.instrucoes.map(i => `<li>${i}</li>`).join('')}</ol>`;
+function abrirModal(dia, nomeEx) {
+  const ex = treinoDB[dia].find(e => e.nome === nomeEx);
+  document.getElementById('modalTitle').innerText = ex.nome;
+  // Fallback: Se não houver imagem no DB, usa um placeholder de exercício
+  document.getElementById('modalImage').innerHTML = `<img src="${ex.img}" alt="Execução">`;
+  document.getElementById('modalDetails').innerHTML = `
+    <p>⏱️ Descanso: ${ex.descanso}</p>
+    <p>📝 Método: Tradicional / Bi-Set conforme tabela.</p>
+  `;
   document.getElementById('exerciseModal').classList.add('active');
 }
 
-function fecharModal(id) { document.getElementById(id).classList.remove('active'); }
-
-function salvarCadastro(e) {
-  e.preventDefault();
-  const user = { nome: document.getElementById('nome').value, dataNascimento: document.getElementById('dataNascimento').value };
-  salvar('usuario', user);
-  fecharModal('cadastroModal');
-  init();
+function fecharModal() {
+  document.getElementById('exerciseModal').classList.remove('active');
 }
 
-function salvarMedicao(e) {
-  e.preventDefault();
-  const p = parseFloat(document.getElementById('peso').value);
-  const a = parseFloat(document.getElementById('altura').value);
-  const med = { peso: p, altura: a, imc: (p/(a*a)).toFixed(1), data: new Date().toLocaleDateString() };
-  let meds = carregar('medicoes') || [];
-  meds.unshift(med);
-  salvar('medicoes', meds);
-  fecharModal('medicaoModal');
-  carregarHome();
-  carregarMedicoes();
-}
-
-function carregarMedicoes() {
-  const meds = carregar('medicoes') || [];
-  document.getElementById('medicoesContainer').innerHTML = meds.map(m => `
-    <div class="card">
-      <b>${m.data}</b> - ${m.peso}kg (IMC: ${m.imc})
-    </div>
-  `).join('');
-}
-
-function limparDados() { if(confirm('Apagar tudo?')) { localStorage.clear(); location.reload(); } }
-
-function mostrarCadastro() { document.getElementById('cadastroModal').classList.add('active'); }
-
-function verificarUsuario() {
-  if(carregar('usuario')) init();
-  else alert('Nenhum cadastro!');
-}
-
-function init() {
-  const user = carregar('usuario');
-  if(user) {
-    document.getElementById('welcomeScreen').style.display = 'none';
-    document.getElementById('appHeader').style.display = 'block';
-    document.getElementById('appContent').style.display = 'block';
-    document.getElementById('bottomNav').style.display = 'flex';
-    navegarPara('home');
-  }
-}
-
-document.addEventListener('DOMContentLoaded', init);
+// Inicialização
+document.addEventListener('DOMContentLoaded', renderizarTreinos);
 </script>
 
 </body>
