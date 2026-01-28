@@ -3,114 +3,210 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#4CAF50">
 <title>FitTrack Pro - Gisele</title>
+
 <style>
-/* ... (Seus estilos anteriores permanecem aqui, com foco no modo dark) ... */
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 :root {
   --primary-color: #4CAF50;
   --secondary-color: #2196F3;
+  --accent-color: #FF9800;
   --dark-bg: #1a1a2e;
   --card-bg: #16213e;
   --text-primary: #ffffff;
+  --text-secondary: #b8b8b8;
+  --border-color: #2d3561;
 }
-body { font-family: sans-serif; background: var(--dark-bg); color: var(--text-primary); margin: 0; padding-bottom: 70px; }
-.app-container { max-width: 480px; margin: 0 auto; padding: 15px; }
-.card { background: var(--card-bg); border-radius: 15px; padding: 20px; margin-bottom: 15px; border: 1px solid #2d3561; }
-.badge { padding: 5px 10px; border-radius: 20px; font-size: 0.8em; background: var(--primary-color); }
-.exercicio-item { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-.modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); display: none; z-index: 1000; padding: 20px; }
-.modal.active { display: block; }
-.avatar-container { background: #fff; border-radius: 10px; min-height: 200px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; }
-.avatar-container img { max-width: 100%; border-radius: 8px; }
-.nav-bottom { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); display: flex; justify-content: space-around; padding: 10px; border-top: 1px solid #2d3561; }
-.btn-ver { background: var(--secondary-color); color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--dark-bg);
+  color: var(--text-primary);
+  padding-bottom: 80px;
+}
+
+/* App Header */
+.app-header {
+  position: fixed; top: 0; left: 0; right: 0;
+  background: linear-gradient(135deg, var(--primary-color), #45a049);
+  padding: 15px 20px; z-index: 100;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.app-content { padding: 80px 15px 20px 15px; max-width: 480px; margin: 0 auto; }
+
+.page { display: none; animation: fadeInUp 0.3s ease; }
+.page.active { display: block; }
+
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Cards e Stats */
+.card {
+  background: var(--card-bg); border-radius: 16px; padding: 20px;
+  margin-bottom: 15px; border: 1px solid var(--border-color);
+}
+
+.stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+.stat-card { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 15px; text-align: center; border: 1px solid var(--border-color); }
+.stat-value { font-size: 1.4em; font-weight: bold; color: var(--primary-color); }
+.stat-label { font-size: 0.7em; color: var(--text-secondary); text-transform: uppercase; }
+
+/* Exercícios */
+.exercicio-item {
+  background: rgba(255,255,255,0.03); border-radius: 12px; padding: 15px;
+  margin-bottom: 10px; border-left: 4px solid var(--primary-color);
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+.btn-view { background: var(--secondary-color); color: white; border: none; padding: 8px 12px; border-radius: 8px; font-size: 0.8em; }
+
+/* Modal */
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; display: none; padding: 20px; overflow-y: auto; }
+.modal.active { display: flex; align-items: center; justify-content: center; }
+.modal-content { background: var(--card-bg); border-radius: 20px; width: 100%; max-width: 400px; padding: 20px; position: relative; }
+.avatar-container { background: #fff; border-radius: 12px; margin: 15px 0; min-height: 200px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.avatar-container img { max-width: 100%; max-height: 250px; }
+
+/* Nav */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--card-bg); display: flex; justify-content: space-around;
+  padding: 10px 0; border-top: 1px solid var(--border-color);
+}
+.nav-item { background: none; border: none; color: var(--text-secondary); display: flex; flex-direction: column; align-items: center; font-size: 0.7em; }
+.nav-item.active { color: var(--primary-color); }
 </style>
 </head>
 <body>
 
-<div class="app-container">
-  <header>
-    <h1>Olá, Gisele 👋</h1>
-    <p style="opacity: 0.7;">Foco no objetivo: Meta IMC 18.5</p>
-  </header>
+<header class="app-header">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <strong>💪 FitTrack Pro</strong>
+    <span id="userNameHeader" style="font-size: 0.9em;">Gisele</span>
+  </div>
+</header>
 
-  <div class="card" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center;">
-    <div><small>PESO ATUAL</small><br><strong>48.75 kg</strong></div>
-    <div><small>IMC ATUAL</small><br><strong>17.9</strong></div>
+<div class="app-content">
+  <div id="home" class="page active">
+    <div class="card" style="text-align: center;">
+      <div style="font-size: 3em; margin-bottom: 10px;">👤</div>
+      <h2 id="welcomeName">Gisele</h2>
+      <p style="color: var(--text-secondary);">Meta: IMC 18.5</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-value">48.75kg</div><div class="stat-label">Peso Atual</div></div>
+      <div class="stat-card"><div class="stat-value">17.9</div><div class="stat-label">IMC</div></div>
+      <div class="stat-card"><div class="stat-value">1,64m</div><div class="stat-label">Altura</div></div>
+      <div class="stat-card"><div class="stat-value">1112.7</div><div class="stat-label">Metabolismo</div></div>
+    </div>
+
+    <h3 style="margin-bottom: 10px;">Treino de Hoje</h3>
+    <div id="treinoHoje"></div>
   </div>
 
-  <div id="listaTreinos">
-    </div>
+  <div id="treinos" class="page">
+    <h2 style="margin-bottom: 15px;">Ficha de Treinamento</h2>
+    <div id="listaTreinos"></div>
+  </div>
 </div>
 
+<nav class="bottom-nav">
+  <button class="nav-item active" onclick="navegar('home')">🏠<span>Home</span></button>
+  <button class="nav-item" onclick="navegar('treinos')">🏋️<span>Treinos</span></button>
+  <button class="nav-item" onclick="alert('Funcionalidade de Medições em breve!')">📊<span>Medidas</span></button>
+</nav>
+
 <div id="exerciseModal" class="modal">
-  <div style="background: var(--card-bg); border-radius: 20px; padding: 20px; max-width: 400px; margin: auto;">
-    <h2 id="modalTitle"></h2>
-    <div class="avatar-container" id="modalImage">
-      </div>
-    <div id="modalDetails" style="font-size: 0.9em; line-height: 1.6;"></div>
-    <button onclick="fecharModal()" style="width: 100%; margin-top: 15px; padding: 12px; background: var(--primary-color); border: none; color: white; border-radius: 10px;">Fechar</button>
+  <div class="modal-content">
+    <h2 id="modalExTitle"></h2>
+    <div class="avatar-container" id="modalExImage"></div>
+    <div id="modalExInfo" style="margin-bottom: 15px;"></div>
+    <button onclick="fecharModal()" style="width: 100%; padding: 12px; border-radius: 10px; background: var(--primary-color); border: none; color: white; font-weight: bold;">FECHAR</button>
   </div>
 </div>
 
 <script>
-// Banco de Dados extraído da Imagem
-const treinoDB = {
-  'Segunda (A)': [
-    { nome: 'Desenvolvimento com Barra', series: 3, reps: 10, descanso: "1' a 2'", img: 'https://wger.de/media/exercise-images/130/Overhead-press-1.png' },
-    { nome: 'Supino Inclinado Halteres', series: 3, reps: '12+10', descanso: "1'30\"", img: 'https://wger.de/media/exercise-images/130/Incline-bench-press-1.png' },
-    { nome: 'Elevação Frontal Anilha', series: 4, reps: 12, descanso: "1'", img: 'https://wger.de/media/exercise-images/130/Front-raise-1.png' }
-  ],
-  'Terça (B)': [
-    { nome: 'Pulldown Barra Aberta', series: 4, reps: 12, descanso: "1'", img: 'https://wger.de/media/exercise-images/130/Lat-pulldown-1.png' },
-    { nome: 'Remada Curvada Barra', series: 3, reps: 12, descanso: "1'30\"", img: 'https://wger.de/media/exercise-images/130/Bent-over-row-1.png' }
-  ],
-  'Quarta (C)': [
-    { nome: 'Stiff com Barra', series: 3, reps: '12+10', descanso: "1'30\"", img: 'https://wger.de/media/exercise-images/130/Stiff-legged-deadlift-1.png' },
-    { nome: 'Panturrilha em Pé', series: 4, reps: 20, descanso: "1'", img: 'https://wger.de/media/exercise-images/130/Calf-raises-1.png' }
-  ]
+// Dados reais da imagem da Gisele
+const dadosGisele = {
+  treinos: {
+    'Segunda (A)': [
+      { nome: 'Desenvolvimento com Barra', series: 3, reps: 10, descanso: "112' MINUTOS", search: 'barbell overhead press' },
+      { nome: 'Supino Inclinado - Trilho/Corda', series: 3, reps: '12+10', descanso: "1'30' MINUTOS", search: 'incline cable chest press' },
+      { nome: 'Elevação Frontal com Anilha', series: 4, reps: 12, descanso: "1 MINUTO", search: 'plate front raise' }
+    ],
+    'Terça (B)': [
+      { nome: 'Remada Curvada com Barra', series: 3, reps: 12, descanso: "1'15' MINUTOS", search: 'barbell bent over row' },
+      { nome: 'Pulldown com Barra Aberta', series: 4, reps: 12, descanso: "1 MINUTO", search: 'lat pulldown' }
+    ],
+    'Quarta (C)': [
+      { nome: 'Stiff com Barra Próxima', series: 3, reps: '12+10', descanso: "2 MINUTOS", search: 'barbell stiff leg deadlift' },
+      { nome: 'Abdução na Polia', series: 4, reps: 12, descanso: "1'15' MINUTOS", search: 'cable hip abduction' }
+    ]
+  }
 };
 
-// Integração com API: Como você não tem as imagens, o código busca no banco da wger.de
-// ou você pode usar o RapidAPI ExerciseDB para GIFs
-function renderizarTreinos() {
+// Integração com banco de imagens wger/ExerciseDB via busca por termo
+function navegar(pagina) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(pagina).classList.add('active');
+  if(pagina === 'treinos') renderizarListaTreinos();
+}
+
+function renderizarListaTreinos() {
   const container = document.getElementById('listaTreinos');
-  for (const dia in treinoDB) {
-    let html = `<div class="card"><h3><span class="badge">DIA</span> ${dia}</h3>`;
-    treinoDB[dia].forEach(ex => {
+  container.innerHTML = '';
+  for (const dia in dadosGisele.treinos) {
+    let html = `<div class="card"><h3>${dia}</h3><div style="margin-top:10px;">`;
+    dadosGisele.treinos[dia].forEach(ex => {
       html += `
         <div class="exercicio-item">
-          <div>
-            <strong>${ex.nome}</strong><br>
-            <small>${ex.series} séries de ${ex.reps}</small>
-          </div>
-          <button class="btn-ver" onclick="abrirModal('${dia}', '${ex.nome}')">VER</button>
+          <div><strong>${ex.nome}</strong><br><small>${ex.series}x${ex.reps}</small></div>
+          <button class="btn-view" onclick="abrirModal('${dia}', '${ex.nome}')">VER</button>
         </div>`;
     });
-    html += `</div>`;
+    html += '</div></div>';
     container.innerHTML += html;
   }
 }
 
-function abrirModal(dia, nomeEx) {
-  const ex = treinoDB[dia].find(e => e.nome === nomeEx);
-  document.getElementById('modalTitle').innerText = ex.nome;
-  // Fallback: Se não houver imagem no DB, usa um placeholder de exercício
-  document.getElementById('modalImage').innerHTML = `<img src="${ex.img}" alt="Execução">`;
-  document.getElementById('modalDetails').innerHTML = `
-    <p>⏱️ Descanso: ${ex.descanso}</p>
-    <p>📝 Método: Tradicional / Bi-Set conforme tabela.</p>
-  `;
+function abrirModal(dia, nome) {
+  const ex = dadosGisele.treinos[dia].find(e => e.nome === nome);
+  document.getElementById('modalExTitle').innerText = ex.nome;
+  
+  // Lógica de API: O link abaixo simula o retorno de um banco de imagens técnico
+  // Em produção, você usaria fetch('https://exercisedb.p.rapidapi.com/exercises/name/' + ex.search)
+  const imagePlaceholder = `https://wger.de/media/exercise-images/130/${ex.search.replace(/ /g, '-')}-1.png`;
+  
+  document.getElementById('modalExImage').innerHTML = `<img src="${imagePlaceholder}" onerror="this.src='https://via.placeholder.com/300x200?text=Exercicio+Tecnico'" alt="GIF do Exercício">`;
+  document.getElementById('modalExInfo').innerHTML = `<p><strong>Descanso:</strong> ${ex.descanso}</p><p style="font-size:0.8em; margin-top:5px; color:var(--text-secondary);">Mantenha a postura e contração abdominal durante todo o movimento conforme indicado na ficha da Gisele.</p>`;
+  
   document.getElementById('exerciseModal').classList.add('active');
 }
 
-function fecharModal() {
-  document.getElementById('exerciseModal').classList.remove('active');
+function fecharModal() { document.getElementById('exerciseModal').classList.remove('active'); }
+
+// Inicialização automática para hoje
+function init() {
+  const diaSemana = new Date().getDay();
+  const dias = ['Domingo', 'Segunda (A)', 'Terça (B)', 'Quarta (C)', 'Quinta (A)', 'Sexta (B)', 'Sábado'];
+  const treinoHoje = dadosGisele.treinos[dias[diaSemana]] || [];
+  
+  const container = document.getElementById('treinoHoje');
+  if(treinoHoje.length > 0) {
+    treinoHoje.forEach(ex => {
+      container.innerHTML += `<div class="exercicio-item"><div><strong>${ex.nome}</strong></div><small>${ex.series}x${ex.reps}</small></div>`;
+    });
+  } else {
+    container.innerHTML = '<div class="card">🎉 Dia de descanso ou recuperação ativa!</div>';
+  }
 }
 
-// Inicialização
-document.addEventListener('DOMContentLoaded', renderizarTreinos);
+document.addEventListener('DOMContentLoaded', init);
 </script>
-
 </body>
 </html>
