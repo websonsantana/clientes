@@ -731,6 +731,21 @@
                 }
             });
             
+            // Busca automática enquanto digita
+            let searchTimeout;
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                const query = e.target.value.trim();
+                
+                if (query.length >= 3) {
+                    searchTimeout = setTimeout(() => {
+                        searchBible(query);
+                    }, 500); // Aguarda 500ms após parar de digitar
+                } else if (query.length === 0) {
+                    searchResults.innerHTML = '<p class="text-gray-500 dark:text-gray-400">Os resultados da busca aparecerão aqui.</p>';
+                }
+            });
+            
             increaseFont.addEventListener('click', () => {
                 const currentSize = parseInt(bibleTextContainer.style.fontSize) || 16;
                 const newSize = currentSize + 1;
