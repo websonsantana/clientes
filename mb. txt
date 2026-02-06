@@ -1,22 +1,203 @@
 <?php
-session_start();
+include 'config.php';
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
 
-$host = 'localhost';
-$db   = 'u380811789_mb';
-$user = 'u380811789_mb';
-$pass = 'SArahsibele@241061%';
-$charset = 'utf8mb4';
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    exit(0);
+}
 
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
-$options = [
-    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_EMULATE_PREPARES   => false,
-];
+$data = json_decode(file_get_contents('php://input'), true) ?? [];
+$action = $_GET['action'] ?? '';
+
+function sendResponse($data, $status = 200) {
+    http_response_code($status);
+    echo json_encode($data);
+    exit;
+}
 
 try {
-    $pdo = new PDO($dsn, $user, $pass, $options);
-} catch (\PDOException $e) {
-    http_response_code(500);
-    die(json_encode(['error' => 'Database connection failed']));
+    switch ($action) {
+        case 'get_data':
+            // Buscar listas
+            $lists = $pdo->query("SELECT * FROM lists ORDER BY position ASC")->fetchAll();
+            
+            // Buscar usuários
+            $users = $pdo->query("SELECT * FROM users")->fetchAll();
+            
+            foreach ($lists as &$list) {
+                // Cards da lista
+                $stmt = $pdo->prepare("SELECT * FROM cards WHERE list_id = ? ORDER BY position ASC");
+                $stmt->execute([$list['id']]);
+                $list['cards'] = $stmt->fetchAll();
+                
+                foreach ($list['cards'] as &$card) {
+                    // Subtasks
+                    $st = $pdo->prepare("SELECT * FROM subtasks WHERE card_id = ? ORDER BY id ASC");
+                    $st->execute([$card['id']]);
+                    $card['subtasks'] = $st->fetchAll();
+                    
+                    // Comentários
+                    $cmt = $pdo->prepare("SELECT * FROM comments WHERE card_id = ? ORDER BY created_at DESC");
+                    $cmt->execute([$card['id']]);
+                    $card['comments'] = $cmt->fetchAll();
+                    
+                    // Atribuições
+                    $assign = $pdo->prepare("
+                        SELECT u.* FROM users u 
+                        JOIN card_assignments ca ON u.id = ca.user_id 
+                        WHERE ca.card_id = ?
+                    ");
+                    $assign->execute([$card['id']]);
+                    $card['assignments'] = $assign->fetchAll();
+                    
+                    // Parse labels
+                    $card['labels_array'] = $card['labels'] ? explode(',', $card['labels']) : [];
+                }
+            }
+            
+            sendResponse(['lists' => $lists, 'users' => $users]);
+            break;
+
+        case 'add_list':
+            $stmt = $pdo->prepare("INSERT INTO lists (title, position, color) VALUES (?, 99, ?)");
+            $stmt->execute([$data['title'], $data['color'] ?? '#ebecf0']);
+            sendResponse(['success' => true, 'id' => $pdo->lastInsertId()]);
+            break;
+
+        case 'update_list':
+            $stmt = $pdo->prepare("UPDATE lists SET title = ?, color = ? WHERE id = ?");
+            $stmt->execute([$data['title'], $data['color'], $data['id']]);
+            sendResponse(['success' => true]);
+            break;
+
+        case 'delete_list':
+            $stmt = $pdo->prepare("DELETE FROM lists WHERE id = ?");
+            $stmt->execute([$data['id']]);
+            sendResponse(['success' => true]);
+            break;
+
+        case 'add_card':
+            $stmt = $pdo->prepare("
+                INSERT INTO cards (list_id, content, position, bg_color, font_color, due_date, priority, labels) 
+                VALUES (?, ?, 99, ?, ?, ?, ?, ?)
+            ");
+            $stmt->execute([
+                $data['list_id'],
+                $data['content'],
+                $data['bg_color'] ?? '#ffffff',
+                $data['font_color'] ?? '#333333',
+                $data['due_date'] ?? null,
+                $data['priority'] ?? 3,
+                $data['labels'] ?? ''
+            ]);
+            $cardId = $pdo->lastInsertId();
+            
+            // Adicionar atribuições se existirem
+            if (!empty($data['assignments'])) {
+                foreach ($data['assignments'] as $userId) {
+                    $assignStmt = $pdo->prepare("INSERT INTO card_assignments (card_id, user_id) VALUES (?, ?)");
+                    $assignStmt->execute([$cardId, $userId]);
+                }
+            }
+            
+            sendResponse(['success' => true, 'id' => $cardId]);
+            break;
+
+        case 'update_card':
+            $fields = ['content', 'bg_color', 'font_color', 'due_date', 'priority', 'labels'];
+            $updates = [];
+            $params = [];
+            
+            foreach ($fields as $field) {
+                if (isset($data[$field])) {
+                    $updates[] = "$field = ?";
+                    $params[] = $data[$field];
+                }
+            }
+            
+            $params[] = $data['id'];
+            $stmt = $pdo->prepare("UPDATE cards SET " . implode(', ', $updates) . ", updated_at = NOW() WHERE id = ?");
+            $stmt->execute($params);
+            sendResponse(['success' => true]);
+            break;
+
+        case 'update_card_assignments':
+            // Remover atribuições antigas
+            $stmt = $pdo->prepare("DELETE FROM card_assignments WHERE card_id = ?");
+            $stmt->execute([$data['card_id']]);
+            
+            // Adicionar novas atribuições
+            if (!empty($data['user_ids'])) {
+                foreach ($data['user_ids'] as $userId) {
+                    $assignStmt = $pdo->prepare("INSERT INTO card_assignments (card_id, user_id) VALUES (?, ?)");
+                    $assignStmt->execute([$data['card_id'], $userId]);
+                }
+            }
+            sendResponse(['success' => true]);
+            break;
+
+        case 'delete_card':
+            $stmt = $pdo->prepare("DELETE FROM cards WHERE id = ?");
+            $stmt->execute([$data['id']]);
+            sendResponse(['success' => true]);
+            break;
+
+        case 'move_card':
+            $stmt = $pdo->prepare("UPDATE cards SET list_id = ?, position = ? WHERE id = ?");
+            foreach ($data['cards'] as $index => $cardId) {
+                $stmt->execute([$data['list_id'], $index, $cardId]);
+            }
+            sendResponse(['success' => true]);
+            break;
+
+        case 'add_subtask':
+            $stmt = $pdo->prepare("INSERT INTO subtasks (card_id, content) VALUES (?, ?)");
+            $stmt->execute([$data['card_id'], $data['content']]);
+            sendResponse(['success' => true, 'id' => $pdo->lastInsertId()]);
+            break;
+
+        case 'update_subtask':
+            $stmt = $pdo->prepare("UPDATE subtasks SET content = ? WHERE id = ?");
+            $stmt->execute([$data['content'], $data['id']]);
+            sendResponse(['success' => true]);
+            break;
+
+        case 'toggle_subtask':
+            $stmt = $pdo->prepare("UPDATE subtasks SET is_done = !is_done WHERE id = ?");
+            $stmt->execute([$data['id']]);
+            sendResponse(['success' => true]);
+            break;
+
+        case 'delete_subtask':
+            $stmt = $pdo->prepare("DELETE FROM subtasks WHERE id = ?");
+            $stmt->execute([$data['id']]);
+            sendResponse(['success' => true]);
+            break;
+
+        case 'add_comment':
+            $stmt = $pdo->prepare("INSERT INTO comments (card_id, content) VALUES (?, ?)");
+            $stmt->execute([$data['card_id'], $data['content']]);
+            sendResponse(['success' => true, 'id' => $pdo->lastInsertId()]);
+            break;
+
+        case 'delete_comment':
+            $stmt = $pdo->prepare("DELETE FROM comments WHERE id = ?");
+            $stmt->execute([$data['id']]);
+            sendResponse(['success' => true]);
+            break;
+
+        case 'add_user':
+            $stmt = $pdo->prepare("INSERT INTO users (name, avatar_color) VALUES (?, ?)");
+            $stmt->execute([$data['name'], $data['avatar_color'] ?? '#0079bf']);
+            sendResponse(['success' => true, 'id' => $pdo->lastInsertId()]);
+            break;
+
+        default:
+            sendResponse(['error' => 'Ação inválida'], 400);
+    }
+} catch (Exception $e) {
+    sendResponse(['error' => $e->getMessage()], 500);
 }
