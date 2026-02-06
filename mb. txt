@@ -1,0 +1,45 @@
+-- Adicionar novos campos para mais funcionalidades
+ALTER TABLE `lists` 
+ADD `color` VARCHAR(7) DEFAULT '#ebecf0',
+ADD `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE `cards`
+ADD `due_date` DATE DEFAULT NULL,
+ADD `labels` VARCHAR(255) DEFAULT '',
+ADD `priority` INT DEFAULT 3,
+ADD `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ADD `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+
+ALTER TABLE `subtasks`
+ADD `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+-- Tabela para comentários nos cards
+CREATE TABLE IF NOT EXISTS `comments` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `card_id` INT,
+  `content` TEXT,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`card_id`) REFERENCES `cards`(`id`) ON DELETE CASCADE
+);
+
+-- Tabela para usuários/colaboradores
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `name` VARCHAR(100),
+  `avatar_color` VARCHAR(7) DEFAULT '#0079bf'
+);
+
+-- Tabela para atribuição de cards
+CREATE TABLE IF NOT EXISTS `card_assignments` (
+  `card_id` INT,
+  `user_id` INT,
+  PRIMARY KEY (`card_id`, `user_id`),
+  FOREIGN KEY (`card_id`) REFERENCES `cards`(`id`) ON DELETE CASCADE
+);
+
+-- Inserir alguns usuários de exemplo
+INSERT INTO `users` (`name`, `avatar_color`) VALUES
+('Admin', '#0079bf'),
+('Usuário 1', '#eb5a46'),
+('Usuário 2', '#61bd4f'),
+('Usuário 3', '#ff9f1a');
