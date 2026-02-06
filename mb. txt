@@ -1,203 +1,1285 @@
-<?php
-include 'config.php';
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MB Kanban Pro | Gestão de Tarefas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <style>
+        :root {
+            --primary: #0079bf;
+            --primary-dark: #0067a3;
+            --secondary: #ebecf0;
+            --danger: #eb5a46;
+            --success: #61bd4f;
+            --warning: #ff9f1a;
+            --info: #00c2e0;
+            --dark: #172b4d;
+            --light: #f4f5f7;
+            --border-radius: 12px;
+            --shadow: 0 8px 30px rgba(0,0,0,0.12);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    exit(0);
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-$data = json_decode(file_get_contents('php://input'), true) ?? [];
-$action = $_GET['action'] ?? '';
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            overflow-x: hidden;
+        }
 
-function sendResponse($data, $status = 200) {
-    http_response_code($status);
-    echo json_encode($data);
-    exit;
-}
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
 
-try {
-    switch ($action) {
-        case 'get_data':
-            // Buscar listas
-            $lists = $pdo->query("SELECT * FROM lists ORDER BY position ASC")->fetchAll();
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo i {
+            color: var(--primary);
+            font-size: 28px;
+        }
+
+        .logo h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--dark);
+            margin: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 121, 191, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        .btn-icon:hover {
+            background: var(--secondary);
+        }
+
+        /* Board */
+        .board {
+            display: flex;
+            padding: 24px;
+            gap: 24px;
+            overflow-x: auto;
+            min-height: calc(100vh - 80px);
+            align-items: flex-start;
+        }
+
+        .board::-webkit-scrollbar {
+            height: 12px;
+        }
+
+        .board::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .board::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        /* List */
+        .list {
+            background: var(--secondary);
+            width: 320px;
+            border-radius: var(--border-radius);
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            max-height: 85vh;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .list:hover {
+            border-color: rgba(0, 121, 191, 0.3);
+            transform: translateY(-4px);
+        }
+
+        .list.editing {
+            border-color: var(--primary);
+        }
+
+        .list-header {
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(0,0,0,0.08);
+        }
+
+        .list-title {
+            flex: 1;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: var(--transition);
+        }
+
+        .list-title:hover {
+            background: rgba(0,0,0,0.05);
+        }
+
+        .list-title-input {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            background: white;
+        }
+
+        .list-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .list-color-picker {
+            width: 24px;
+            height: 24px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            background: none;
+        }
+
+        .list-count {
+            background: rgba(0,0,0,0.1);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Cards Container */
+        .cards-container {
+            padding: 12px;
+            overflow-y: auto;
+            min-height: 40px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .cards-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .cards-container::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+            border-radius: 4px;
+        }
+
+        .cards-container::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.2);
+            border-radius: 4px;
+        }
+
+        /* Card */
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 16px;
+            cursor: grab;
+            position: relative;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+
+        .card:active {
+            cursor: grabbing;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .card.priority-high {
+            border-left-color: var(--danger);
+        }
+
+        .card.priority-medium {
+            border-left-color: var(--warning);
+        }
+
+        .card.priority-low {
+            border-left-color: var(--success);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 15px;
+            flex: 1;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+        }
+
+        .card-title:hover {
+            background: var(--light);
+        }
+
+        .card-edit-input {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .labels-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 12px;
+        }
+
+        .label {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .label:hover {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+
+        .assignments {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 12px;
+        }
+
+        .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--secondary);
+        }
+
+        .card-meta {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .due-date {
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: var(--light);
+        }
+
+        .due-date.overdue {
+            background: #ffebee;
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .due-date.today {
+            background: #fff3e0;
+            color: var(--warning);
+        }
+
+        .subtasks-progress {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 4px;
+            background: var(--secondary);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--success);
+            transition: width 0.3s ease;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .card:hover .card-actions {
+            opacity: 1;
+        }
+
+        .action-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--light);
+            color: var(--dark);
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* Subtasks */
+        .subtasks-list {
+            margin: 12px 0;
+        }
+
+        .subtask-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .subtask-item:hover {
+            background: var(--light);
+        }
+
+        .subtask-item.done {
+            opacity: 0.6;
+        }
+
+        .subtask-item.done .subtask-content {
+            text-decoration: line-through;
+        }
+
+        .subtask-content {
+            flex: 1;
+            font-size: 13px;
+            padding: 2px;
+            border-radius: 4px;
+        }
+
+        .subtask-content:hover {
+            background: rgba(0,0,0,0.05);
+        }
+
+        /* Comments */
+        .comments-section {
+            margin-top: 16px;
+            border-top: 1px solid var(--secondary);
+            padding-top: 12px;
+        }
+
+        .comment {
+            padding: 8px;
+            background: var(--light);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            font-size: 11px;
+            color: #666;
+        }
+
+        /* Add Forms */
+        .add-card-form, .add-list-form {
+            padding: 16px;
+            background: white;
+            border-radius: var(--border-radius);
+            margin-top: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid var(--secondary);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid var(--secondary);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* New List Button */
+        .new-list-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px dashed var(--primary);
+            color: var(--primary);
+            min-width: 300px;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: var(--transition);
+            flex-shrink: 0;
+            height: fit-content;
+        }
+
+        .new-list-btn:hover {
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .board {
+                padding: 12px;
+                gap: 12px;
+            }
             
-            // Buscar usuários
-            $users = $pdo->query("SELECT * FROM users")->fetchAll();
+            .list {
+                width: 280px;
+            }
             
-            foreach ($lists as &$list) {
-                // Cards da lista
-                $stmt = $pdo->prepare("SELECT * FROM cards WHERE list_id = ? ORDER BY position ASC");
-                $stmt->execute([$list['id']]);
-                $list['cards'] = $stmt->fetchAll();
-                
-                foreach ($list['cards'] as &$card) {
-                    // Subtasks
-                    $st = $pdo->prepare("SELECT * FROM subtasks WHERE card_id = ? ORDER BY id ASC");
-                    $st->execute([$card['id']]);
-                    $card['subtasks'] = $st->fetchAll();
+            .header {
+                flex-direction: column;
+                gap: 12px;
+                padding: 12px;
+            }
+            
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        /* Loading */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            color: white;
+            font-size: 24px;
+            gap: 16px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <span>Carregando Kanban...</span>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <i class="fas fa-columns"></i>
+            <h1>MB Kanban Pro</h1>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-outline" onclick="showStatsModal()">
+                <i class="fas fa-chart-bar"></i> Estatísticas
+            </button>
+            <button class="btn btn-icon" title="Configurações" onclick="showSettingsModal()">
+                <i class="fas fa-cog"></i>
+            </button>
+            <button class="btn btn-primary" onclick="showCardModal(null)">
+                <i class="fas fa-plus"></i> Novo Card
+            </button>
+        </div>
+    </header>
+
+    <!-- Board -->
+    <div class="board" id="board"></div>
+
+    <!-- Card Detail Modal -->
+    <div class="modal" id="cardModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Detalhes do Card</h3>
+                <button class="action-btn" onclick="closeModal('cardModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="cardForm">
+                    <input type="hidden" id="cardId">
+                    <input type="hidden" id="cardListId">
                     
-                    // Comentários
-                    $cmt = $pdo->prepare("SELECT * FROM comments WHERE card_id = ? ORDER BY created_at DESC");
-                    $cmt->execute([$card['id']]);
-                    $card['comments'] = $cmt->fetchAll();
+                    <div class="form-group">
+                        <label class="form-label" for="cardTitle">Título</label>
+                        <input type="text" id="cardTitle" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="cardDescription">Descrição</label>
+                        <textarea id="cardDescription" class="form-control" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Atribuir para</label>
+                        <div id="assignmentsContainer" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Prioridade</label>
+                        <div style="display: flex; gap: 12px;">
+                            <label>
+                                <input type="radio" name="priority" value="1"> Alta
+                            </label>
+                            <label>
+                                <input type="radio" name="priority" value="2"> Média
+                            </label>
+                            <label>
+                                <input type="radio" name="priority" value="3" checked> Baixa
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="dueDate">Data de Vencimento</label>
+                        <input type="date" id="dueDate" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="cardLabels">Labels (separados por vírgula)</label>
+                        <input type="text" id="cardLabels" class="form-control" placeholder="urgente, bug, feature">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Cores</label>
+                        <div style="display: flex; gap: 12px;">
+                            <input type="color" id="bgColor" title="Cor de fundo">
+                            <input type="color" id="fontColor" title="Cor da fonte">
+                        </div>
+                    </div>
+                </form>
+                
+                <div class="comments-section" id="commentsSection"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('cardModal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveCard()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Modal -->
+    <div class="modal" id="statsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Estatísticas do Projeto</h3>
+                <button class="action-btn" onclick="closeModal('statsModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="statsContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Configurações</h3>
+                <button class="action-btn" onclick="closeModal('settingsModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <h4>Gerenciar Usuários</h4>
+                    <div id="usersList"></div>
+                    <button class="btn btn-outline" onclick="addUser()" style="margin-top: 12px;">
+                        <i class="fas fa-plus"></i> Novo Usuário
+                    </button>
+                </div>
+                
+                <div class="form-group">
+                    <h4>Aparência</h4>
+                    <label>
+                        <input type="checkbox" id="darkMode"> Modo Escuro
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const api = 'api.php?action=';
+        let boardData = { lists: [], users: [] };
+        let editingCardId = null;
+        let editingListId = null;
+
+        // Funções de API
+        async function fetchData(url) {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('Network error');
+            return await res.json();
+        }
+
+        async function postData(url, data) {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            return await res.json();
+        }
+
+        // Carregar Board
+        async function loadBoard() {
+            try {
+                const data = await fetchData(api + 'get_data');
+                boardData = data;
+                renderBoard();
+                hideLoading();
+            } catch (error) {
+                console.error('Error loading board:', error);
+                alert('Erro ao carregar dados. Verifique a conexão.');
+            }
+        }
+
+        // Renderizar Board
+        function renderBoard() {
+            const board = document.getElementById('board');
+            board.innerHTML = '';
+            
+            boardData.lists.forEach(list => {
+                const listDiv = document.createElement('div');
+                listDiv.className = 'list fade-in';
+                listDiv.style.backgroundColor = list.color || '#ebecf0';
+                
+                const isEditing = editingListId === list.id;
+                
+                listDiv.innerHTML = `
+                    <div class="list-header">
+                        ${isEditing ? `
+                            <input type="text" class="list-title-input" value="${list.title}" 
+                                   onblur="updateListTitle(${list.id}, this)" 
+                                   onkeypress="if(event.key=='Enter') this.blur()" autofocus>
+                        ` : `
+                            <div class="list-title" onclick="editListTitle(${list.id})">${list.title}</div>
+                        `}
+                        <div class="list-actions">
+                            <input type="color" class="list-color-picker" value="${list.color || '#ebecf0'}" 
+                                   onchange="updateListColor(${list.id}, this.value)">
+                            <span class="list-count">${list.cards?.length || 0}</span>
+                            <button class="action-btn" onclick="deleteList(${list.id})" title="Excluir Lista">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="cards-container" data-list-id="${list.id}"></div>
+                    <button class="add-btn" onclick="showCardModal(${list.id})">
+                        <i class="fas fa-plus"></i> Adicionar Card
+                    </button>
+                `;
+                
+                const container = listDiv.querySelector('.cards-container');
+                list.cards?.forEach(card => renderCard(card, container));
+                
+                board.appendChild(listDiv);
+                
+                // Configurar Sortable
+                new Sortable(container, {
+                    group: 'shared',
+                    animation: 150,
+                    ghostClass: 'ghost-card',
+                    onEnd: async (evt) => {
+                        const cardIds = Array.from(evt.to.children).map(c => c.dataset.id);
+                        await postData(api + 'move_card', {
+                            list_id: evt.to.dataset.listId,
+                            cards: cardIds
+                        });
+                    }
+                });
+            });
+            
+            // Botão para nova lista
+            const newListBtn = document.createElement('button');
+            newListBtn.className = 'new-list-btn';
+            newListBtn.innerHTML = '<i class="fas fa-plus"></i> Nova Lista';
+            newListBtn.onclick = addNewList;
+            board.appendChild(newListBtn);
+        }
+
+        // Renderizar Card
+        function renderCard(card, container) {
+            const cardDiv = document.createElement('div');
+            cardDiv.className = `card priority-${getPriorityClass(card.priority)}`;
+            cardDiv.dataset.id = card.id;
+            cardDiv.style.backgroundColor = card.bg_color || '#ffffff';
+            cardDiv.style.color = card.font_color || '#333333';
+            
+            const dueDate = card.due_date ? new Date(card.due_date) : null;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            let dueDateClass = 'due-date';
+            if (dueDate) {
+                if (dueDate < today) dueDateClass += ' overdue';
+                else if (dueDate.getTime() === today.getTime()) dueDateClass += ' today';
+            }
+            
+            const doneSubtasks = card.subtasks?.filter(s => s.is_done).length || 0;
+            const totalSubtasks = card.subtasks?.length || 0;
+            const progressPercent = totalSubtasks > 0 ? (doneSubtasks / totalSubtasks) * 100 : 0;
+            
+            const assignmentsHtml = card.assignments?.map(user => `
+                <div class="avatar" style="background-color: ${user.avatar_color}" title="${user.name}">
+                    ${user.name.charAt(0).toUpperCase()}
+                </div>
+            `).join('') || '';
+            
+            const labelsHtml = card.labels_array?.map(label => `
+                <span class="label" style="background-color: ${getRandomColor(label)}" title="${label}">
+                    ${label}
+                </span>
+            `).join('') || '';
+            
+            cardDiv.innerHTML = `
+                <div class="card-header">
+                    <div class="card-title" onclick="showCardDetail(${card.id})">
+                        ${card.content}
+                    </div>
+                    <div class="card-actions">
+                        <button class="action-btn" onclick="showCardModal(null, ${card.id})" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn" onclick="deleteCard(${card.id})" title="Excluir">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                ${labelsHtml ? `<div class="labels-container">${labelsHtml}</div>` : ''}
+                
+                ${assignmentsHtml ? `<div class="assignments">${assignmentsHtml}</div>` : ''}
+                
+                ${totalSubtasks > 0 ? `
+                    <div class="subtasks-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progressPercent}%"></div>
+                        </div>
+                        <span>${doneSubtasks}/${totalSubtasks}</span>
+                    </div>
+                ` : ''}
+                
+                <div class="card-footer">
+                    <div class="card-meta">
+                        ${dueDate ? `
+                            <span class="${dueDateClass}">
+                                <i class="far fa-calendar"></i> ${formatDate(dueDate)}
+                            </span>
+                        ` : ''}
+                        ${card.comments?.length > 0 ? `
+                            <span><i class="far fa-comment"></i> ${card.comments.length}</span>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(cardDiv);
+        }
+
+        // Funções de Lista
+        async function addNewList() {
+            const title = prompt('Nome da nova lista:', 'Nova Lista');
+            if (!title) return;
+            
+            const color = '#' + Math.floor(Math.random()*16777215).toString(16);
+            await postData(api + 'add_list', { title, color });
+            loadBoard();
+        }
+
+        function editListTitle(listId) {
+            editingListId = listId;
+            renderBoard();
+        }
+
+        async function updateListTitle(listId, input) {
+            const newTitle = input.value.trim();
+            if (newTitle && newTitle !== boardData.lists.find(l => l.id == listId)?.title) {
+                await postData(api + 'update_list', { id: listId, title: newTitle });
+            }
+            editingListId = null;
+            loadBoard();
+        }
+
+        async function updateListColor(listId, color) {
+            await postData(api + 'update_list', { id: listId, color });
+            loadBoard();
+        }
+
+        async function deleteList(listId) {
+            if (!confirm('Tem certeza que deseja excluir esta lista e todos os seus cards?')) return;
+            await postData(api + 'delete_list', { id: listId });
+            loadBoard();
+        }
+
+        // Funções de Card
+        function showCardModal(listId, cardId = null) {
+            const modal = document.getElementById('cardModal');
+            editingCardId = cardId;
+            
+            if (cardId) {
+                // Editar card existente
+                const card = findCardById(cardId);
+                if (card) {
+                    document.getElementById('cardId').value = card.id;
+                    document.getElementById('cardListId').value = card.list_id;
+                    document.getElementById('cardTitle').value = card.content;
+                    document.getElementById('cardDescription').value = card.description || '';
+                    document.getElementById('cardLabels').value = card.labels || '';
+                    document.getElementById('bgColor').value = card.bg_color || '#ffffff';
+                    document.getElementById('fontColor').value = card.font_color || '#333333';
+                    document.getElementById('dueDate').value = card.due_date || '';
+                    
+                    // Prioridade
+                    document.querySelectorAll('input[name="priority"]').forEach(radio => {
+                        radio.checked = radio.value == (card.priority || 3);
+                    });
                     
                     // Atribuições
-                    $assign = $pdo->prepare("
-                        SELECT u.* FROM users u 
-                        JOIN card_assignments ca ON u.id = ca.user_id 
-                        WHERE ca.card_id = ?
-                    ");
-                    $assign->execute([$card['id']]);
-                    $card['assignments'] = $assign->fetchAll();
-                    
-                    // Parse labels
-                    $card['labels_array'] = $card['labels'] ? explode(',', $card['labels']) : [];
+                    renderAssignments(card.assignments);
                 }
+            } else {
+                // Novo card
+                document.getElementById('cardForm').reset();
+                document.getElementById('cardListId').value = listId;
+                document.getElementById('bgColor').value = '#ffffff';
+                document.getElementById('fontColor').value = '#333333';
+                document.querySelector('input[name="priority"][value="3"]').checked = true;
+                renderAssignments([]);
             }
             
-            sendResponse(['lists' => $lists, 'users' => $users]);
-            break;
+            modal.classList.add('active');
+        }
 
-        case 'add_list':
-            $stmt = $pdo->prepare("INSERT INTO lists (title, position, color) VALUES (?, 99, ?)");
-            $stmt->execute([$data['title'], $data['color'] ?? '#ebecf0']);
-            sendResponse(['success' => true, 'id' => $pdo->lastInsertId()]);
-            break;
-
-        case 'update_list':
-            $stmt = $pdo->prepare("UPDATE lists SET title = ?, color = ? WHERE id = ?");
-            $stmt->execute([$data['title'], $data['color'], $data['id']]);
-            sendResponse(['success' => true]);
-            break;
-
-        case 'delete_list':
-            $stmt = $pdo->prepare("DELETE FROM lists WHERE id = ?");
-            $stmt->execute([$data['id']]);
-            sendResponse(['success' => true]);
-            break;
-
-        case 'add_card':
-            $stmt = $pdo->prepare("
-                INSERT INTO cards (list_id, content, position, bg_color, font_color, due_date, priority, labels) 
-                VALUES (?, ?, 99, ?, ?, ?, ?, ?)
-            ");
-            $stmt->execute([
-                $data['list_id'],
-                $data['content'],
-                $data['bg_color'] ?? '#ffffff',
-                $data['font_color'] ?? '#333333',
-                $data['due_date'] ?? null,
-                $data['priority'] ?? 3,
-                $data['labels'] ?? ''
-            ]);
-            $cardId = $pdo->lastInsertId();
+        async function saveCard() {
+            const cardData = {
+                list_id: document.getElementById('cardListId').value,
+                content: document.getElementById('cardTitle').value,
+                bg_color: document.getElementById('bgColor').value,
+                font_color: document.getElementById('fontColor').value,
+                due_date: document.getElementById('dueDate').value || null,
+                priority: document.querySelector('input[name="priority"]:checked').value,
+                labels: document.getElementById('cardLabels').value,
+                assignments: Array.from(document.querySelectorAll('#assignmentsContainer input:checked'))
+                    .map(input => input.value)
+            };
             
-            // Adicionar atribuições se existirem
-            if (!empty($data['assignments'])) {
-                foreach ($data['assignments'] as $userId) {
-                    $assignStmt = $pdo->prepare("INSERT INTO card_assignments (card_id, user_id) VALUES (?, ?)");
-                    $assignStmt->execute([$cardId, $userId]);
+            if (!cardData.content.trim()) {
+                alert('O título do card é obrigatório!');
+                return;
+            }
+            
+            if (editingCardId) {
+                cardData.id = editingCardId;
+                await postData(api + 'update_card', cardData);
+                
+                // Atualizar atribuições
+                await postData(api + 'update_card_assignments', {
+                    card_id: editingCardId,
+                    user_ids: cardData.assignments
+                });
+            } else {
+                await postData(api + 'add_card', cardData);
+            }
+            
+            closeModal('cardModal');
+            loadBoard();
+        }
+
+        async function deleteCard(cardId) {
+            if (!confirm('Tem certeza que deseja excluir este card?')) return;
+            await postData(api + 'delete_card', { id: cardId });
+            loadBoard();
+        }
+
+        function showCardDetail(cardId) {
+            const card = findCardById(cardId);
+            if (!card) return;
+            
+            showCardModal(null, cardId);
+        }
+
+        // Funções Auxiliares
+        function findCardById(cardId) {
+            for (const list of boardData.lists) {
+                const card = list.cards?.find(c => c.id == cardId);
+                if (card) return { ...card, list_id: list.id };
+            }
+            return null;
+        }
+
+        function getPriorityClass(priority) {
+            switch (parseInt(priority)) {
+                case 1: return 'high';
+                case 2: return 'medium';
+                case 3: 
+                default: return 'low';
+            }
+        }
+
+        function getRandomColor(str) {
+            const colors = [
+                '#eb5a46', '#ff9f1a', '#61bd4f', 
+                '#00c2e0', '#0079bf', '#c377e0',
+                '#ff78cb', '#51e898', '#ffcc00'
+            ];
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            return colors[Math.abs(hash) % colors.length];
+        }
+
+        function formatDate(date) {
+            return date.toLocaleDateString('pt-BR');
+        }
+
+        function renderAssignments(assignments) {
+            const container = document.getElementById('assignmentsContainer');
+            container.innerHTML = '';
+            
+            boardData.users.forEach(user => {
+                const isAssigned = assignments.some(a => a.id == user.id);
+                container.innerHTML += `
+                    <label style="display: flex; align-items: center; gap: 4px;">
+                        <input type="checkbox" value="${user.id}" ${isAssigned ? 'checked' : ''}>
+                        <div class="avatar" style="background-color: ${user.avatar_color}">
+                            ${user.name.charAt(0).toUpperCase()}
+                        </div>
+                        <span>${user.name}</span>
+                    </label>
+                `;
+            });
+        }
+
+        // Funções de Modal
+        function showStatsModal() {
+            const stats = calculateStats();
+            const modal = document.getElementById('statsModal');
+            document.getElementById('statsContent').innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                    <div style="background: #f0f9ff; padding: 20px; border-radius: 10px;">
+                        <h4>Total de Cards</h4>
+                        <div style="font-size: 32px; font-weight: bold; color: #0079bf;">${stats.totalCards}</div>
+                    </div>
+                    <div style="background: #f0fff4; padding: 20px; border-radius: 10px;">
+                        <h4>Cards Concluídos</h4>
+                        <div style="font-size: 32px; font-weight: bold; color: #61bd4f;">${stats.completedCards}</div>
+                    </div>
+                    <div style="background: #fffaf0; padding: 20px; border-radius: 10px;">
+                        <h4>Cards Atrasados</h4>
+                        <div style="font-size: 32px; font-weight: bold; color: #eb5a46;">${stats.overdueCards}</div>
+                    </div>
+                    <div style="background: #f5f0ff; padding: 20px; border-radius: 10px;">
+                        <h4>Média por Lista</h4>
+                        <div style="font-size: 32px; font-weight: bold; color: #764ba2;">${stats.avgPerList}</div>
+                    </div>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+
+        function showSettingsModal() {
+            const modal = document.getElementById('settingsModal');
+            modal.classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            editingCardId = null;
+            editingListId = null;
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function calculateStats() {
+            let totalCards = 0;
+            let completedCards = 0;
+            let overdueCards = 0;
+            
+            boardData.lists.forEach(list => {
+                totalCards += list.cards?.length || 0;
+                
+                if (list.title.toLowerCase().includes('concluído')) {
+                    completedCards += list.cards?.length || 0;
                 }
-            }
+                
+                list.cards?.forEach(card => {
+                    if (card.due_date) {
+                        const dueDate = new Date(card.due_date);
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        if (dueDate < today && !list.title.toLowerCase().includes('concluído')) {
+                            overdueCards++;
+                        }
+                    }
+                });
+            });
             
-            sendResponse(['success' => true, 'id' => $cardId]);
-            break;
+            return {
+                totalCards,
+                completedCards,
+                overdueCards,
+                avgPerList: boardData.lists.length > 0 ? (totalCards / boardData.lists.length).toFixed(1) : 0
+            };
+        }
 
-        case 'update_card':
-            $fields = ['content', 'bg_color', 'font_color', 'due_date', 'priority', 'labels'];
-            $updates = [];
-            $params = [];
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            loadBoard();
             
-            foreach ($fields as $field) {
-                if (isset($data[$field])) {
-                    $updates[] = "$field = ?";
-                    $params[] = $data[$field];
-                }
-            }
-            
-            $params[] = $data['id'];
-            $stmt = $pdo->prepare("UPDATE cards SET " . implode(', ', $updates) . ", updated_at = NOW() WHERE id = ?");
-            $stmt->execute($params);
-            sendResponse(['success' => true]);
-            break;
-
-        case 'update_card_assignments':
-            // Remover atribuições antigas
-            $stmt = $pdo->prepare("DELETE FROM card_assignments WHERE card_id = ?");
-            $stmt->execute([$data['card_id']]);
-            
-            // Adicionar novas atribuições
-            if (!empty($data['user_ids'])) {
-                foreach ($data['user_ids'] as $userId) {
-                    $assignStmt = $pdo->prepare("INSERT INTO card_assignments (card_id, user_id) VALUES (?, ?)");
-                    $assignStmt->execute([$data['card_id'], $userId]);
-                }
-            }
-            sendResponse(['success' => true]);
-            break;
-
-        case 'delete_card':
-            $stmt = $pdo->prepare("DELETE FROM cards WHERE id = ?");
-            $stmt->execute([$data['id']]);
-            sendResponse(['success' => true]);
-            break;
-
-        case 'move_card':
-            $stmt = $pdo->prepare("UPDATE cards SET list_id = ?, position = ? WHERE id = ?");
-            foreach ($data['cards'] as $index => $cardId) {
-                $stmt->execute([$data['list_id'], $index, $cardId]);
-            }
-            sendResponse(['success' => true]);
-            break;
-
-        case 'add_subtask':
-            $stmt = $pdo->prepare("INSERT INTO subtasks (card_id, content) VALUES (?, ?)");
-            $stmt->execute([$data['card_id'], $data['content']]);
-            sendResponse(['success' => true, 'id' => $pdo->lastInsertId()]);
-            break;
-
-        case 'update_subtask':
-            $stmt = $pdo->prepare("UPDATE subtasks SET content = ? WHERE id = ?");
-            $stmt->execute([$data['content'], $data['id']]);
-            sendResponse(['success' => true]);
-            break;
-
-        case 'toggle_subtask':
-            $stmt = $pdo->prepare("UPDATE subtasks SET is_done = !is_done WHERE id = ?");
-            $stmt->execute([$data['id']]);
-            sendResponse(['success' => true]);
-            break;
-
-        case 'delete_subtask':
-            $stmt = $pdo->prepare("DELETE FROM subtasks WHERE id = ?");
-            $stmt->execute([$data['id']]);
-            sendResponse(['success' => true]);
-            break;
-
-        case 'add_comment':
-            $stmt = $pdo->prepare("INSERT INTO comments (card_id, content) VALUES (?, ?)");
-            $stmt->execute([$data['card_id'], $data['content']]);
-            sendResponse(['success' => true, 'id' => $pdo->lastInsertId()]);
-            break;
-
-        case 'delete_comment':
-            $stmt = $pdo->prepare("DELETE FROM comments WHERE id = ?");
-            $stmt->execute([$data['id']]);
-            sendResponse(['success' => true]);
-            break;
-
-        case 'add_user':
-            $stmt = $pdo->prepare("INSERT INTO users (name, avatar_color) VALUES (?, ?)");
-            $stmt->execute([$data['name'], $data['avatar_color'] ?? '#0079bf']);
-            sendResponse(['success' => true, 'id' => $pdo->lastInsertId()]);
-            break;
-
-        default:
-            sendResponse(['error' => 'Ação inválida'], 400);
-    }
-} catch (Exception $e) {
-    sendResponse(['error' => $e->getMessage()], 500);
-}
+            // Fechar modal ao clicar fora
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.remove('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
