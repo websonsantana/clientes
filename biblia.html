@@ -18,15 +18,12 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .dark ::-webkit-scrollbar-thumb { background: #475569; }
         
-        /* Modern Glassmorphism */
         .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
         .dark .glass { background: rgba(31, 41, 55, 0.85); border-color: rgba(255, 255, 255, 0.05); }
         
-        /* Floating Pill Nav */
         .floating-nav-container { position: fixed; bottom: calc(20px + var(--safe-bottom)); left: 50%; transform: translateX(-50%); width: 92%; max-width: 400px; z-index: 40; }
         .floating-nav { display: flex; justify-content: space-between; padding: 6px 12px; border-radius: 9999px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
         
-        /* Verse Styles */
         .verse { transition: background-color 0.2s ease, transform 0.1s ease; line-height: 1.8; }
         .verse.highlighted { background-color: rgba(199, 210, 254, 0.5); border-radius: 8px; }
         .dark .verse.highlighted { background-color: rgba(55, 48, 163, 0.4); }
@@ -39,13 +36,11 @@
         
         .note-indicator { display: inline-block; width: 6px; height: 6px; background: #8b5cf6; border-radius: 50%; margin-left: 4px; vertical-align: super; }
         
-        /* Animations */
         .fade-in { animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         
-        /* Progress Bar for Splash */
         .progress-bar-fill { transition: width 0.4s ease; }
     </style>
 </head>
@@ -56,7 +51,7 @@
             <i class="fas fa-bible text-white text-6xl animate-pulse"></i>
         </div>
         <h1 class="text-white text-3xl font-bold mb-2 tracking-tight">Bíblia Digital</h1>
-        <p id="splashStatus" class="text-indigo-200 text-sm mb-8 font-medium">Sincronizando banco de dados...</p>
+        <p id="splashStatus" class="text-indigo-200 text-sm mb-8 font-medium text-center px-6">Iniciando sistema...</p>
         <div class="w-56 h-1.5 bg-indigo-900/50 rounded-full overflow-hidden">
             <div id="splashProgress" class="progress-bar-fill h-full bg-white rounded-full w-0"></div>
         </div>
@@ -80,8 +75,8 @@
         
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 mx-4 mt-6 flex justify-between items-center">
             <div class="flex-1 cursor-pointer group" id="openSelectorBtn">
-                <h2 id="currentBook" class="font-bold text-xl text-indigo-700 dark:text-indigo-400 group-hover:text-indigo-600 transition tracking-tight">Gênesis</h2>
-                <p id="currentChapter" class="text-gray-500 dark:text-gray-400 text-sm font-medium">Capítulo 1</p>
+                <h2 id="currentBook" class="font-bold text-xl text-indigo-700 dark:text-indigo-400 group-hover:text-indigo-600 transition tracking-tight">Carregando...</h2>
+                <p id="currentChapter" class="text-gray-500 dark:text-gray-400 text-sm font-medium">Aguarde</p>
             </div>
             <button class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400 flex items-center justify-center pointer-events-none">
                 <i class="fas fa-chevron-down text-sm"></i>
@@ -116,13 +111,10 @@
                 </div>
                 <div class="flex-grow overflow-y-auto pr-2 pb-4">
                     <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 block">Capítulo</label>
-                    <div id="chapterGrid" class="grid grid-cols-5 gap-2">
-                        </div>
+                    <div id="chapterGrid" class="grid grid-cols-5 gap-2"></div>
                 </div>
             </div>
-            <button id="closeSelectorBtn" class="w-full bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200 font-bold py-4 rounded-xl mt-4 active:scale-95 transition">
-                Cancelar
-            </button>
+            <button id="closeSelectorBtn" class="w-full bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200 font-bold py-4 rounded-xl mt-4 active:scale-95 transition">Cancelar</button>
         </div>
     </div>
     
@@ -340,8 +332,11 @@
     </div>
     
     <script>
-        // URL segura que contém todo o JSON da Bíblia ACF, possibilitando a pesquisa local veloz e 100% offline
-        const BIBLE_JSON_URL = 'https://raw.githubusercontent.com/MaatheusGois/bible/main/versions/pt-br/acf.json';
+        // Array robusto de fallback caso a primeira URL falhe
+        const BIBLE_URLS = [
+            'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/pt_acf.json',
+            'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/pt_acf.json'
+        ];
         
         const STORAGE_KEYS = {
             bookmarks: 'bible_bookmarks', notes: 'bible_notes', highlights: 'bible_highlights',
@@ -349,16 +344,18 @@
             lastRead: 'bible_last_read', lastDailyDate: 'bible_last_daily_date', dailyHistory: 'bible_daily_history'
         };
 
-        // Banco IndexedDB nativo (Rápido, aguenta arquivos pesados e não expira)
         const DB_NAME = 'BibliaAppDB';
         function openDB() {
             return new Promise((resolve, reject) => {
-                const req = indexedDB.open(DB_NAME, 1);
-                req.onupgradeneeded = e => e.target.result.createObjectStore("store");
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => reject(req.error);
+                try {
+                    const req = indexedDB.open(DB_NAME, 1);
+                    req.onupgradeneeded = e => e.target.result.createObjectStore("store");
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => reject(req.error);
+                } catch(e) { reject(e); }
             });
         }
+
         async function getOfflineBible() {
             try {
                 const db = await openDB();
@@ -366,10 +363,11 @@
                     const tx = db.transaction("store", "readonly");
                     const req = tx.objectStore("store").get("bible_data");
                     req.onsuccess = () => resolve(req.result);
-                    req.onerror = () => resolve(null);
+                    req.onerror = () => resolve(null); // Evita trava
                 });
             } catch(e) { return null; }
         }
+
         async function saveOfflineBible(data) {
             try {
                 const db = await openDB();
@@ -377,8 +375,9 @@
                     const tx = db.transaction("store", "readwrite");
                     tx.objectStore("store").put(data, "bible_data");
                     tx.oncomplete = () => resolve();
+                    tx.onerror = () => resolve(); // Evita trava se estourar limite do celular
                 });
-            } catch(e) {}
+            } catch(e) { console.warn("IndexedDB block"); }
         }
 
         let bibleDataFull = null;
@@ -388,7 +387,6 @@
         
         let bookmarks = []; let notes = []; let highlights = []; let underlines = [];
 
-        // Versículos selecionados a dedo para a tela inicial
         const dailyVerseRefs = [
             {b: "João", c: 3, v: 16}, {b: "Filipenses", c: 4, v: 13}, {b: "Salmos", c: 23, v: 1},
             {b: "Romanos", c: 8, v: 28}, {b: "Isaías", c: 41, v: 10}, {b: "Josué", c: 1, v: 9},
@@ -398,64 +396,80 @@
         ];
 
         async function initApp() {
+            const splash = document.getElementById('splashScreen');
             const progress = document.getElementById('splashProgress');
-            progress.style.width = '30%';
+            const status = document.getElementById('splashStatus');
             
-            // Tenta pegar a base de dados em cache (Offline)
-            bibleDataFull = await getOfflineBible();
-            progress.style.width = '60%';
-            
-            // Se for o primeiro acesso, baixa a Bíblia
-            if (!bibleDataFull) {
-                try {
-                    document.getElementById('splashStatus').textContent = "Baixando Bíblia para uso Offline (única vez)...";
-                    const res = await fetch(BIBLE_JSON_URL);
-                    bibleDataFull = await res.json();
+            try {
+                progress.style.width = '30%';
+                
+                bibleDataFull = await getOfflineBible();
+                progress.style.width = '60%';
+                
+                if (!bibleDataFull || !Array.isArray(bibleDataFull)) {
+                    status.textContent = "Baixando Bíblia para uso Offline (única vez)...";
+                    let fetched = false;
+                    
+                    for (const url of BIBLE_URLS) {
+                        try {
+                            const res = await fetch(url);
+                            if (res.ok) {
+                                bibleDataFull = await res.json();
+                                fetched = true;
+                                break;
+                            }
+                        } catch (e) { console.warn("Falha ao buscar URL: " + url); }
+                    }
+                    
+                    if (!fetched) throw new Error("Sem internet e sem banco local.");
+                    
                     progress.style.width = '90%';
+                    status.textContent = "Salvando para uso futuro...";
                     await saveOfflineBible(bibleDataFull);
-                } catch(e) {
-                    alert("Erro ao conectar. Verifique sua internet para a configuração inicial.");
-                    return;
                 }
-            }
-            
-            progress.style.width = '100%';
-            loadLocalUserData();
-            populateBookSelect();
-            
-            const lastRead = getFromStorage(STORAGE_KEYS.lastRead);
-            if (lastRead && bibleDataFull.some(b => b.name === lastRead.book)) {
-                currentBook = lastRead.book;
-                currentChapter = lastRead.chapter;
-            } else {
-                currentBook = bibleDataFull[0].name;
-            }
-            
-            updateChapterSelect(currentBook);
-            document.getElementById('bookSelect').value = currentBook;
-            loadChapter(currentBook, currentChapter);
-            
-            // Ajuste do tamanho da fonte
-            const savedFontSize = getFromStorage(STORAGE_KEYS.fontSize) || 18;
-            document.getElementById('bibleText').style.fontSize = `${savedFontSize}px`;
-            document.getElementById('fontSizeDisplay').textContent = savedFontSize;
+                
+                progress.style.width = '100%';
+                
+                loadLocalUserData();
+                populateBookSelect();
+                
+                const lastRead = getFromStorage(STORAGE_KEYS.lastRead);
+                if (lastRead && bibleDataFull.some(b => b.name === lastRead.book)) {
+                    currentBook = lastRead.book;
+                    currentChapter = lastRead.chapter;
+                } else {
+                    currentBook = bibleDataFull[0].name;
+                    currentChapter = 1;
+                }
+                
+                updateChapterSelect(currentBook);
+                document.getElementById('bookSelect').value = currentBook;
+                loadChapter(currentBook, currentChapter);
+                
+                const savedFontSize = getFromStorage(STORAGE_KEYS.fontSize) || 18;
+                document.getElementById('bibleText').style.fontSize = `${savedFontSize}px`;
+                document.getElementById('fontSizeDisplay').textContent = savedFontSize;
 
-            // Modo Escuro automático ou salvo
-            if (getFromStorage(STORAGE_KEYS.theme) === 'dark' || (window.matchMedia('(prefers-color-scheme: dark)').matches && !getFromStorage(STORAGE_KEYS.theme))) {
-                document.body.classList.add('dark');
-            }
+                if (getFromStorage(STORAGE_KEYS.theme) === 'dark' || (window.matchMedia('(prefers-color-scheme: dark)').matches && !getFromStorage(STORAGE_KEYS.theme))) {
+                    document.body.classList.add('dark');
+                }
 
-            setupEventListeners();
-            
-            // Oculta splash e checa versículo do dia
-            setTimeout(() => {
-                const splash = document.getElementById('splashScreen');
-                splash.style.opacity = '0';
+                setupEventListeners();
+                
+            } catch (error) {
+                console.error("Erro na inicialização:", error);
+                status.textContent = "Houve um erro. Tente limpar os dados do navegador.";
+                status.classList.add("text-red-300");
+            } finally {
+                // Força o fechamento da tela de loading independentemente de erro
                 setTimeout(() => {
-                    splash.classList.add('hidden');
-                    checkDailyVerse();
-                }, 500);
-            }, 600);
+                    splash.style.opacity = '0';
+                    setTimeout(() => {
+                        splash.classList.add('hidden');
+                        if (bibleDataFull) checkDailyVerse();
+                    }, 500);
+                }, 800);
+            }
         }
 
         function checkDailyVerse() {
@@ -470,7 +484,7 @@
                 const randomRef = available[Math.floor(Math.random() * available.length)];
                 const refStr = `${randomRef.b} ${randomRef.c}:${randomRef.v}`;
                 
-                const book = bibleDataFull.find(b => b.name === randomRef.b);
+                const book = bibleDataFull.find(b => b.abbrev === randomRef.b || b.name === randomRef.b);
                 if (book && book.chapters[randomRef.c - 1]) {
                     const verseText = book.chapters[randomRef.c - 1][randomRef.v - 1];
                     document.getElementById('dailyVerseText').textContent = `"${verseText}"`;
@@ -519,6 +533,7 @@
 
         function loadChapter(bookName, chapterNum) {
             const book = bibleDataFull.find(b => b.name === bookName);
+            if (!book) return;
             const verses = book.chapters[chapterNum - 1];
             
             document.getElementById('currentBook').textContent = bookName;
@@ -554,7 +569,6 @@
             updateChapterSelect(bookName);
         }
 
-        // MOTOR DE BUSCA 100% OFFLINE (Ultra Rápido e a Prova de Falhas)
         function searchBible(query) {
             const resDiv = document.getElementById('searchResults');
             if (!query || query.length < 3) {
@@ -564,7 +578,6 @@
             
             resDiv.innerHTML = `<div class="flex justify-center py-20"><i class="fas fa-spinner fa-spin text-indigo-500 text-4xl"></i></div>`;
             
-            // Timeout permite que o Spinner apareça antes de travar o JS pesquisando o array gigante
             setTimeout(() => {
                 const normalize = str => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
                 const normQuery = normalize(query);
@@ -587,7 +600,6 @@
                 }
                 
                 let html = `<div class="mb-4 text-sm font-bold text-gray-500">${results.length} resultados</div><div class="space-y-3">`;
-                // Limitar renderização para não travar o celular se buscar palavras muito comuns
                 results.slice(0, 100).forEach(res => {
                     const regex = new RegExp(`(${query})`, 'gi');
                     const hlText = res.text.replace(regex, '<span class="bg-yellow-200 dark:bg-yellow-700/50 text-gray-900 dark:text-yellow-100 rounded px-1">$1</span>');
@@ -620,7 +632,6 @@
             window.goToVerse(parts.join(' '), parseInt(verse[0]));
         };
 
-        // --- Eventos de Interface ---
         function setupEventListeners() {
             document.getElementById('closeDailyVerse').addEventListener('click', () => {
                 document.getElementById('dailyVerseModal').classList.add('hidden');
@@ -649,7 +660,6 @@
                 if (currentChapter < book.chapters.length) loadChapter(currentBook, currentChapter + 1);
             });
             
-            // Interação de Clique nos Versículos
             document.addEventListener('click', (e) => {
                 if (e.target.closest('.verse-number')) {
                     const verseElement = e.target.closest('.verse');
@@ -661,11 +671,9 @@
                     currentVerseId = `${currentBook} ${currentChapter}:${verseNum}`;
                     document.getElementById('verseNumber').textContent = currentVerseId;
                     
-                    // Pega o texto puro sem o span do número
                     const textNode = verseElement.querySelector('.text-content').textContent;
                     document.getElementById('verseText').textContent = `"${textNode}"`;
                     
-                    // Ajustar estados dos botões
                     document.getElementById('underlineVerseText').textContent = underlines.includes(currentVerseId) ? "Remover Risco" : "Sublinhar";
                     document.getElementById('bookmarkVerseText').textContent = bookmarks.some(b => b.id === currentVerseId) ? "Desmarcar" : "Salvar";
                     
@@ -678,7 +686,6 @@
                 document.querySelectorAll('.verse').forEach(v => v.classList.remove('highlighted'));
             });
 
-            // Ações do Versículo
             document.getElementById('underlineVerse').addEventListener('click', () => {
                 const idx = underlines.indexOf(currentVerseId);
                 idx > -1 ? underlines.splice(idx, 1) : underlines.push(currentVerseId);
@@ -761,7 +768,6 @@
                 saveToStorage(STORAGE_KEYS.theme, document.body.classList.contains('dark') ? 'dark' : 'light');
             });
 
-            // Controle de Menus Base
             const toggleOverlay = (id, show, navId) => {
                 ['searchOverlay', 'settingsOverlay', 'bookmarksOverlay'].forEach(o => document.getElementById(o).classList.add('hidden'));
                 if (show) document.getElementById(id).classList.remove('hidden');
@@ -783,7 +789,6 @@
             document.getElementById('navBookmarks').addEventListener('click', () => { toggleOverlay('bookmarksOverlay', true, 'navBookmarks'); renderRegisters('bookmarks'); });
             document.getElementById('closeBookmarks').addEventListener('click', () => toggleOverlay(null, false, 'navHome'));
 
-            // Fonte e Limpeza
             document.getElementById('increaseFont').addEventListener('click', () => {
                 let size = parseInt(document.getElementById('bibleText').style.fontSize) || 18;
                 size += 2; document.getElementById('bibleText').style.fontSize = size + 'px';
@@ -802,7 +807,6 @@
                 }
             });
 
-            // Abas de Registros
             ['Bookmarks', 'Notes', 'Highlights'].forEach(tab => {
                 document.getElementById(`show${tab}Tab`).addEventListener('click', (e) => {
                     ['Bookmarks', 'Notes', 'Highlights'].forEach(t => {
