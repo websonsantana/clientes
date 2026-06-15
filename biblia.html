@@ -2,980 +2,610 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bíblia Sagrada Evangélica</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bíblia Sagrada Digital</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #555; }
+        :root { --safe-bottom: env(safe-area-inset-bottom, 20px); }
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .font-bible { font-family: 'Lora', serif; }
         
-        .verse { transition: background-color 0.2s ease; }
-        .verse.highlighted { background-color: rgba(253, 230, 138, 0.5); border-radius: 4px; }
-        .verse.highlight-yellow { background-color: rgba(253, 230, 138, 0.4); padding: 2px 4px; border-radius: 4px; }
-        .verse.highlight-green { background-color: rgba(134, 239, 172, 0.4); padding: 2px 4px; border-radius: 4px; }
-        .verse.highlight-blue { background-color: rgba(147, 197, 253, 0.4); padding: 2px 4px; border-radius: 4px; }
-        .verse.highlight-pink { background-color: rgba(251, 207, 232, 0.4); padding: 2px 4px; border-radius: 4px; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
         
-        /* Nova classe para sublinhar/demarcar texto */
-        .verse.underlined-text { 
-            text-decoration: underline; 
-            text-decoration-color: #3b82f6; 
-            text-decoration-thickness: 2px; 
-            text-underline-offset: 4px; 
-        }
+        /* Modern Glassmorphism */
+        .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .dark .glass { background: rgba(31, 41, 55, 0.85); border-color: rgba(255, 255, 255, 0.05); }
         
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        /* Floating Pill Nav */
+        .floating-nav-container { position: fixed; bottom: calc(20px + var(--safe-bottom)); left: 50%; transform: translateX(-50%); width: 92%; max-width: 400px; z-index: 40; }
+        .floating-nav { display: flex; justify-content: space-between; padding: 6px 12px; border-radius: 9999px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
         
-        .offline-banner { transform: translateY(-100%); transition: transform 0.3s ease-in-out; }
-        .offline-banner.show { transform: translateY(0); }
+        /* Verse Styles */
+        .verse { transition: background-color 0.2s ease, transform 0.1s ease; line-height: 1.8; }
+        .verse.highlighted { background-color: rgba(199, 210, 254, 0.5); border-radius: 8px; }
+        .dark .verse.highlighted { background-color: rgba(55, 48, 163, 0.4); }
         
-        .dark { background-color: #1a202c; color: #e2e8f0; }
-        .dark .bg-gray-50 { background-color: #2d3748; }
-        .dark .bg-white { background-color: #2d3748; }
-        .dark .text-gray-800 { color: #e2e8f0; }
-        .dark .text-gray-600 { color: #cbd5e0; }
-        .dark .text-gray-700 { color: #cbd5e0; }
-        .dark .shadow-lg { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
-        .dark .bg-gray-100 { background-color: #4a5568; }
-        .dark .border-gray-300 { border-color: #4a5568; }
-        .dark .border-gray-200 { border-color: #4a5568; }
-        .dark .border-gray-700 { border-color: #4a5568; }
-        .dark .bg-blue-100 { background-color: #2a4365; }
-        .dark .text-blue-700 { color: #63b3ed; }
-        .dark .bg-gray-200 { background-color: #4a5568; }
-        .dark .bg-gray-300:hover { background-color: #4a5568; }
-        .dark .bg-yellow-500 { background-color: #d69e2e; }
-        .dark .text-yellow-500 { color: #ecc94b; }
-        .dark .bg-black { background-color: rgba(0,0,0,0.7); }
+        .verse.underlined-text span.text-content { text-decoration: underline; text-decoration-color: #6366f1; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+        .verse.highlight-yellow span.text-content { background-color: rgba(253, 224, 71, 0.4); padding: 2px 4px; border-radius: 4px; }
+        .verse.highlight-green span.text-content { background-color: rgba(134, 239, 172, 0.4); padding: 2px 4px; border-radius: 4px; }
+        .verse.highlight-blue span.text-content { background-color: rgba(147, 197, 253, 0.4); padding: 2px 4px; border-radius: 4px; }
+        .verse.highlight-pink span.text-content { background-color: rgba(249, 168, 212, 0.4); padding: 2px 4px; border-radius: 4px; }
         
-        .bookmark-icon { color: #3b82f6; margin-left: 6px; font-size: 0.85em; }
-        .note-indicator { 
-            display: inline-block; 
-            width: 8px; 
-            height: 8px; 
-            background: #8b5cf6; 
-            border-radius: 50%; 
-            margin-left: 4px;
-        }
+        .note-indicator { display: inline-block; width: 6px; height: 6px; background: #8b5cf6; border-radius: 50%; margin-left: 4px; vertical-align: super; }
         
-        .fade-in { animation: fadeIn 0.3s ease-in; }
+        /* Animations */
+        .fade-in { animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .slide-up { animation: slideUp 0.3s ease-out; }
+        .slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        
+        /* Progress Bar for Splash */
+        .progress-bar-fill { transition: width 0.4s ease; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans transition-colors duration-300 dark:bg-gray-900 dark:text-gray-200">
-    <div id="offlineBanner" class="offline-banner fixed top-0 left-0 right-0 bg-yellow-500 text-white text-center py-2 z-50 shadow-md">
-        <i class="fas fa-wifi-slash mr-2"></i> Você está offline - Modo somente leitura
+<body class="bg-gray-50 text-gray-800 transition-colors duration-300 dark:bg-gray-900 dark:text-gray-200 antialiased selection:bg-indigo-200 dark:selection:bg-indigo-900">
+
+    <div id="splashScreen" class="fixed inset-0 z-[100] bg-gradient-to-br from-indigo-600 to-blue-700 flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="bg-white/20 p-6 rounded-3xl backdrop-blur-sm mb-6 shadow-2xl">
+            <i class="fas fa-bible text-white text-6xl animate-pulse"></i>
+        </div>
+        <h1 class="text-white text-3xl font-bold mb-2 tracking-tight">Bíblia Digital</h1>
+        <p id="splashStatus" class="text-indigo-200 text-sm mb-8 font-medium">Sincronizando banco de dados...</p>
+        <div class="w-56 h-1.5 bg-indigo-900/50 rounded-full overflow-hidden">
+            <div id="splashProgress" class="progress-bar-fill h-full bg-white rounded-full w-0"></div>
+        </div>
     </div>
     
-    <div id="mainContent" class="pb-16 transition-transform duration-300 transform translate-x-0">
-        <header class="bg-blue-700 text-white sticky top-0 z-40 shadow-md">
-            <div class="container mx-auto px-4 py-3 flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-bible text-xl"></i>
-                    <h1 class="text-xl font-bold">Bíblia Sagrada</h1>
+    <header class="glass sticky top-0 z-30 border-b border-gray-200/50 dark:border-gray-700/50">
+        <div class="container mx-auto px-5 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                    <i class="fas fa-book-open text-white text-lg"></i>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <button id="themeToggle" class="p-1 rounded-full focus:outline-none hover:bg-blue-600 transition">
-                        <i class="fas fa-moon text-white"></i>
-                    </button>
-                </div>
+                <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-700 dark:from-blue-400 dark:to-indigo-400 tracking-tight">Bíblia Sagrada</h1>
             </div>
-        </header>
+            <button id="themeToggle" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition active:scale-95">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </header>
+
+    <div id="mainContent" class="pb-32 transition-transform duration-300 transform translate-x-0">
         
-        <div id="bookChapterSelector" class="bg-white shadow-lg rounded-lg mx-4 my-2 p-4 hidden dark:bg-gray-800 border dark:border-gray-700">
-            <div class="flex justify-between mb-4">
-                <select id="bookSelect" class="bg-gray-100 border border-gray-300 rounded px-3 py-2 w-full mr-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Selecione um livro</option>
-                </select>
-                <select id="chapterSelect" class="bg-gray-100 border border-gray-300 rounded px-3 py-2 w-20 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Cap.</option>
-                </select>
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 mx-4 mt-6 flex justify-between items-center">
+            <div class="flex-1 cursor-pointer group" id="openSelectorBtn">
+                <h2 id="currentBook" class="font-bold text-xl text-indigo-700 dark:text-indigo-400 group-hover:text-indigo-600 transition tracking-tight">Gênesis</h2>
+                <p id="currentChapter" class="text-gray-500 dark:text-gray-400 text-sm font-medium">Capítulo 1</p>
             </div>
-            <div class="flex justify-between">
-                <button id="prevChapter" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50 transition">
-                    <i class="fas fa-arrow-left"></i> Anterior
+            <button class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400 flex items-center justify-center pointer-events-none">
+                <i class="fas fa-chevron-down text-sm"></i>
+            </button>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-xl shadow-gray-200/40 dark:shadow-none border border-gray-100 dark:border-gray-700 p-6 sm:p-8 mx-4 mt-4">
+            <h3 id="chapterTitle" class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-gray-100 border-b-2 border-indigo-50 dark:border-gray-700 pb-4 tracking-tight font-serif"></h3>
+            <div id="bibleText" class="font-bible text-lg md:text-xl leading-relaxed space-y-2 text-gray-800 dark:text-gray-200">
+                </div>
+            
+            <div class="flex justify-between items-center mt-12 pt-6 border-t border-gray-100 dark:border-gray-700">
+                <button id="prevChapter" class="flex items-center text-sm font-medium text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition bg-gray-50 dark:bg-gray-700/50 px-4 py-2 rounded-full disabled:opacity-30">
+                    <i class="fas fa-arrow-left mr-2"></i> Anterior
                 </button>
-                <button id="nextChapter" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50 transition">
-                    Próximo <i class="fas fa-arrow-right"></i>
+                <button id="nextChapter" class="flex items-center text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 px-6 py-2 rounded-full shadow-md shadow-indigo-600/20 transition disabled:opacity-30">
+                    Próximo <i class="fas fa-arrow-right ml-2"></i>
                 </button>
             </div>
         </div>
-        
-        <div class="bg-white shadow-sm mx-4 my-2 p-3 rounded-lg flex justify-between items-center dark:bg-gray-800 border dark:border-gray-700">
-            <div>
-                <h2 id="currentBook" class="font-bold text-lg text-blue-700 dark:text-blue-400">Gênesis</h2>
-                <p id="currentChapter" class="text-gray-600 dark:text-gray-300 text-sm">Capítulo 1</p>
-            </div>
-            <button id="showSelector" class="bg-blue-100 text-blue-700 px-4 py-2 rounded-full dark:bg-blue-900 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800 transition shadow-sm font-medium text-sm">
-                <i class="fas fa-exchange-alt mr-1"></i> Mudar
-            </button>
-        </div>
-        
-        <div id="bibleText" class="container mx-auto px-4 py-2">
-            <div class="bg-white rounded-lg shadow p-4 dark:bg-gray-800 border dark:border-gray-700">
-                <div class="text-center py-8">
-                    <i class="fas fa-spinner fa-spin text-4xl text-blue-500 mb-4"></i>
-                    <p class="text-gray-600 dark:text-gray-300">Carregando as escrituras...</p>
+    </div>
+
+    <div id="bookChapterSelector" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end justify-center hidden fade-in">
+        <div class="bg-white dark:bg-gray-800 w-full rounded-t-3xl p-6 slide-up max-h-[85vh] flex flex-col">
+            <div class="w-12 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto mb-6"></div>
+            <h3 class="text-xl font-bold mb-4 dark:text-white">Selecione o Capítulo</h3>
+            
+            <div class="space-y-4 flex-grow overflow-hidden flex flex-col">
+                <div>
+                    <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 block">Livro</label>
+                    <select id="bookSelect" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800 font-medium focus:ring-2 focus:ring-indigo-500 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white appearance-none"></select>
+                </div>
+                <div class="flex-grow overflow-y-auto pr-2 pb-4">
+                    <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 block">Capítulo</label>
+                    <div id="chapterGrid" class="grid grid-cols-5 gap-2">
+                        </div>
                 </div>
             </div>
+            <button id="closeSelectorBtn" class="w-full bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200 font-bold py-4 rounded-xl mt-4 active:scale-95 transition">
+                Cancelar
+            </button>
         </div>
     </div>
     
-    <div id="searchOverlay" class="fixed inset-0 bg-gray-50 dark:bg-gray-900 z-50 hidden transition-all duration-300 p-4 pt-16 flex flex-col">
-        <div class="flex items-center space-x-2 mb-4 shrink-0">
-            <button id="closeSearch" class="text-gray-600 dark:text-gray-400 p-2">
-                <i class="fas fa-arrow-left text-xl"></i>
+    <div id="searchOverlay" class="fixed inset-0 bg-gray-50 dark:bg-gray-900 z-50 hidden transition-all duration-300 p-4 pt-safe flex flex-col">
+        <div class="glass -mx-4 -mt-4 p-4 flex items-center space-x-3 mb-4 shadow-sm border-b dark:border-gray-800 shrink-0">
+            <button id="closeSearch" class="w-10 h-10 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800 transition">
+                <i class="fas fa-arrow-left text-lg"></i>
             </button>
-            <input type="text" id="searchInput" placeholder="Buscar palavra ou frase..." class="flex-grow bg-white border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white shadow-sm">
-            <button id="searchButton" class="bg-blue-600 text-white p-2 w-10 h-10 rounded-full shadow-md hover:bg-blue-700 transition">
-                <i class="fas fa-search"></i>
-            </button>
+            <div class="flex-grow relative">
+                <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="searchInput" placeholder="Pesquisar em toda Bíblia..." class="w-full bg-white border-0 rounded-full pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white shadow-sm font-medium">
+            </div>
         </div>
-        <div id="searchResults" class="bg-white rounded-lg shadow-md p-4 dark:bg-gray-800 flex-grow overflow-y-auto border dark:border-gray-700">
-            <div class="text-center py-10">
-                <i class="fas fa-search text-gray-300 dark:text-gray-600 text-4xl mb-3"></i>
-                <p class="text-gray-500 dark:text-gray-400">Digite algo para pesquisar em toda a Bíblia.</p>
+        <div id="searchResults" class="flex-grow overflow-y-auto pb-24">
+            <div class="text-center py-20 flex flex-col items-center opacity-60">
+                <div class="w-20 h-20 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mb-4">
+                    <i class="fas fa-search text-indigo-500 text-3xl"></i>
+                </div>
+                <p class="text-gray-500 dark:text-gray-400 font-medium">Busca offline instantânea</p>
+                <p class="text-sm text-gray-400 mt-1">Digite uma palavra ou frase</p>
             </div>
         </div>
     </div>
     
-    <div id="settingsOverlay" class="fixed inset-0 bg-gray-50 dark:bg-gray-900 z-50 hidden transition-all duration-300 p-4 pt-16">
-        <div class="flex items-center space-x-2 mb-4">
-            <button id="closeSettings" class="text-gray-600 dark:text-gray-400 p-2">
-                <i class="fas fa-arrow-left text-xl"></i>
+    <div id="settingsOverlay" class="fixed inset-0 bg-gray-50 dark:bg-gray-900 z-50 hidden transition-all duration-300 p-4 pt-safe">
+        <div class="flex items-center space-x-3 mb-6 bg-white dark:bg-gray-800 -mx-4 -mt-4 p-4 shadow-sm">
+            <button id="closeSettings" class="w-10 h-10 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <i class="fas fa-arrow-left text-lg"></i>
             </button>
-            <h2 class="text-xl font-bold">Configurações</h2>
+            <h2 class="text-xl font-bold dark:text-white">Ajustes</h2>
         </div>
-        <div class="bg-white rounded-lg shadow-md p-4 space-y-4 dark:bg-gray-800 border dark:border-gray-700">
-            <div>
-                <h3 class="font-bold text-lg mb-2 text-gray-700 dark:text-gray-300 border-b pb-1 dark:border-gray-700">Leitura</h3>
-                <div class="flex items-center justify-between mt-2 p-3 bg-gray-50 dark:bg-gray-700 rounded border dark:border-gray-600">
-                    <label class="text-gray-600 dark:text-gray-300 font-medium">Tamanho da Fonte</label>
-                    <div class="flex items-center space-x-3">
-                        <button id="decreaseFont" class="bg-white border border-gray-300 p-2 rounded-full dark:bg-gray-800 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 w-10 h-10 flex items-center justify-center shadow-sm"><i class="fas fa-minus"></i></button>
-                        <span id="fontSizeDisplay" class="w-6 text-center font-bold">16</span>
-                        <button id="increaseFont" class="bg-white border border-gray-300 p-2 rounded-full dark:bg-gray-800 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 w-10 h-10 flex items-center justify-center shadow-sm"><i class="fas fa-plus"></i></button>
+        
+        <div class="space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm p-5 dark:bg-gray-800 border dark:border-gray-700">
+                <h3 class="font-bold text-sm text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-4">Leitura</h3>
+                <div class="flex items-center justify-between">
+                    <span class="text-gray-700 dark:text-gray-300 font-medium">Tamanho do Texto</span>
+                    <div class="flex items-center space-x-4 bg-gray-50 dark:bg-gray-900 rounded-full p-1 border dark:border-gray-700">
+                        <button id="decreaseFont" class="w-10 h-10 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 hover:shadow-sm"><i class="fas fa-minus"></i></button>
+                        <span id="fontSizeDisplay" class="w-6 text-center font-bold dark:text-white">18</span>
+                        <button id="increaseFont" class="w-10 h-10 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 hover:shadow-sm"><i class="fas fa-plus"></i></button>
                     </div>
                 </div>
             </div>
-            <div>
-                <h3 class="font-bold text-lg mb-2 text-gray-700 dark:text-gray-300 border-b pb-1 dark:border-gray-700">Aparência</h3>
-                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded border dark:border-gray-600">
-                    <label class="text-gray-600 dark:text-gray-300 font-medium">Modo Escuro</label>
-                    <button id="themeToggleSettings" class="bg-gray-300 dark:bg-blue-600 p-1 rounded-full w-14 h-8 flex items-center transition-colors duration-300 relative focus:outline-none">
-                        <div class="bg-white w-6 h-6 rounded-full shadow-md transition-transform duration-300 transform dark:translate-x-6"></div>
-                    </button>
-                </div>
-            </div>
-            <div>
-                <h3 class="font-bold text-lg mb-2 text-gray-700 dark:text-gray-300 border-b pb-1 dark:border-gray-700">Gerenciamento</h3>
-                <button id="clearData" class="w-full bg-red-50 text-red-600 border border-red-200 p-3 rounded hover:bg-red-100 dark:bg-red-900/30 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/50 transition flex justify-center items-center font-medium">
-                    <i class="fas fa-trash mr-2"></i> Limpar todos os dados salvos
+
+            <div class="bg-white rounded-2xl shadow-sm p-5 dark:bg-gray-800 border dark:border-gray-700">
+                <h3 class="font-bold text-sm text-red-500 uppercase tracking-wider mb-4">Dados do Aplicativo</h3>
+                <button id="clearData" class="w-full bg-red-50 text-red-600 p-4 rounded-xl hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40 transition flex items-center justify-center font-bold">
+                    <i class="fas fa-trash-alt mr-2"></i> Limpar Histórico e Registros
                 </button>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">Isso removerá marcadores, notas, sublinhados e destaques.</p>
             </div>
         </div>
     </div>
     
-    <div id="bookmarksOverlay" class="fixed inset-0 bg-gray-50 dark:bg-gray-900 z-50 hidden transition-all duration-300 p-4 pt-16 flex flex-col">
-        <div class="flex items-center space-x-2 mb-4 shrink-0">
-            <button id="closeBookmarks" class="text-gray-600 dark:text-gray-400 p-2">
-                <i class="fas fa-arrow-left text-xl"></i>
+    <div id="bookmarksOverlay" class="fixed inset-0 bg-gray-50 dark:bg-gray-900 z-50 hidden transition-all duration-300 p-4 pt-safe flex flex-col">
+        <div class="flex items-center space-x-3 mb-4 bg-white dark:bg-gray-800 -mx-4 -mt-4 p-4 shadow-sm shrink-0">
+            <button id="closeBookmarks" class="w-10 h-10 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <i class="fas fa-arrow-left text-lg"></i>
             </button>
-            <h2 class="text-xl font-bold">Meus Registros</h2>
+            <h2 class="text-xl font-bold dark:text-white">Meus Registros</h2>
         </div>
         
-        <div class="mb-4 shrink-0">
-            <div class="flex space-x-2 bg-white p-1 rounded-lg shadow-sm border dark:bg-gray-800 dark:border-gray-700">
-                <button id="showBookmarksTab" class="flex-1 bg-blue-600 text-white px-3 py-2 rounded text-sm font-medium transition">
-                    <i class="fas fa-bookmark mr-1"></i> Marcadores
-                </button>
-                <button id="showNotesTab" class="flex-1 bg-transparent text-gray-600 dark:text-gray-300 px-3 py-2 rounded text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-                    <i class="fas fa-sticky-note mr-1"></i> Notas
-                </button>
-                <button id="showHighlightsTab" class="flex-1 bg-transparent text-gray-600 dark:text-gray-300 px-3 py-2 rounded text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-                    <i class="fas fa-highlighter mr-1"></i> Cores
-                </button>
-            </div>
+        <div class="bg-gray-200/50 dark:bg-gray-800 p-1 rounded-xl flex mb-4 shrink-0">
+            <button id="showBookmarksTab" class="flex-1 bg-white dark:bg-gray-700 shadow text-indigo-600 dark:text-indigo-400 py-2 rounded-lg text-sm font-bold transition">Marcadores</button>
+            <button id="showNotesTab" class="flex-1 text-gray-500 dark:text-gray-400 py-2 rounded-lg text-sm font-bold transition">Notas</button>
+            <button id="showHighlightsTab" class="flex-1 text-gray-500 dark:text-gray-400 py-2 rounded-lg text-sm font-bold transition">Cores</button>
         </div>
         
-        <div id="bookmarksList" class="bg-white rounded-lg shadow-md p-4 dark:bg-gray-800 flex-grow overflow-y-auto border dark:border-gray-700"></div>
-        <div id="notesList" class="bg-white rounded-lg shadow-md p-4 dark:bg-gray-800 flex-grow overflow-y-auto border dark:border-gray-700 hidden"></div>
-        <div id="highlightsList" class="bg-white rounded-lg shadow-md p-4 dark:bg-gray-800 flex-grow overflow-y-auto border dark:border-gray-700 hidden"></div>
+        <div id="bookmarksList" class="flex-grow overflow-y-auto pb-24"></div>
+        <div id="notesList" class="flex-grow overflow-y-auto pb-24 hidden"></div>
+        <div id="highlightsList" class="flex-grow overflow-y-auto pb-24 hidden"></div>
     </div>
 
-    <div id="dailyVerseModal" class="fixed inset-0 bg-black bg-opacity-70 z-[60] flex items-center justify-center hidden px-4 fade-in">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md dark:bg-gray-800 overflow-hidden slide-up">
-            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-center">
-                <i class="fas fa-sun text-yellow-300 text-4xl mb-2"></i>
-                <h3 class="font-bold text-xl text-white">Versículo do Dia</h3>
+    <div id="dailyVerseModal" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm z-[60] flex items-center justify-center hidden px-4 fade-in">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm dark:bg-gray-800 overflow-hidden slide-up border border-indigo-100 dark:border-gray-700">
+            <div class="bg-gradient-to-br from-indigo-500 to-purple-600 p-8 text-center relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNmZmYiLz48L3N2Zz4=')]"></div>
+                <i class="fas fa-sun text-yellow-300 text-4xl mb-3 relative z-10 drop-shadow-md"></i>
+                <h3 class="font-bold text-2xl text-white relative z-10">Pão Diário</h3>
             </div>
-            <div class="p-6 text-center">
-                <i class="fas fa-quote-left text-gray-300 dark:text-gray-600 text-3xl mb-2 block"></i>
-                <p id="dailyVerseText" class="text-lg text-gray-800 dark:text-gray-200 font-medium italic mb-4 leading-relaxed"></p>
-                <p id="dailyVerseRef" class="font-bold text-blue-600 dark:text-blue-400"></p>
+            <div class="p-8 text-center">
+                <i class="fas fa-quote-left text-gray-200 dark:text-gray-700 text-4xl absolute -ml-4 -mt-2"></i>
+                <p id="dailyVerseText" class="text-lg text-gray-700 dark:text-gray-200 font-bible italic mb-6 leading-relaxed relative z-10"></p>
+                <div class="inline-block bg-indigo-50 dark:bg-gray-700 px-4 py-1.5 rounded-full">
+                    <p id="dailyVerseRef" class="font-bold text-indigo-600 dark:text-indigo-400 text-sm"></p>
+                </div>
             </div>
-            <div class="p-4 bg-gray-50 dark:bg-gray-700 border-t dark:border-gray-600 flex justify-center">
-                <button id="closeDailyVerse" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-8 py-2 rounded-full shadow-md transition">
+            <div class="p-4 bg-gray-50 dark:bg-gray-800/50">
+                <button id="closeDailyVerse" class="w-full bg-gray-900 hover:bg-gray-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white font-bold py-4 rounded-xl transition active:scale-95">
                     Amém
                 </button>
             </div>
         </div>
     </div>
     
-    <div id="verseOptionsModal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-end sm:items-center justify-center hidden fade-in">
-        <div class="bg-white rounded-t-xl sm:rounded-xl shadow-2xl w-full sm:w-11/12 sm:max-w-sm dark:bg-gray-800 slide-up overflow-hidden">
-            <div class="p-4 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80 flex justify-between items-center">
+    <div id="verseOptionsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end justify-center hidden fade-in">
+        <div class="bg-white dark:bg-gray-800 w-full sm:w-96 rounded-t-3xl slide-up overflow-hidden pb-safe">
+            <div class="p-5 border-b dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/80">
                 <div>
-                    <h3 class="font-bold text-lg text-gray-800 dark:text-white">Opções do Versículo</h3>
-                    <p id="verseNumber" class="text-sm font-medium text-blue-600 dark:text-blue-400"></p>
+                    <p id="verseNumber" class="text-xs font-bold uppercase tracking-wider text-indigo-500 mb-1"></p>
+                    <h3 class="font-bold text-lg text-gray-800 dark:text-white">Opções</h3>
                 </div>
-                <button id="closeVerseOptions" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-2">
-                    <i class="fas fa-times text-xl"></i>
+                <button id="closeVerseOptions" class="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-300">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="p-2 text-sm text-gray-600 dark:text-gray-400 border-b dark:border-gray-700 italic max-h-24 overflow-y-auto px-4 py-3" id="verseText"></div>
+            <div class="p-4 max-h-24 overflow-y-auto bg-white dark:bg-gray-900/30">
+                <p id="verseText" class="text-sm text-gray-600 dark:text-gray-400 font-bible italic border-l-4 border-indigo-200 dark:border-indigo-800 pl-3"></p>
+            </div>
             
-            <div class="p-2 space-y-1">
-                <button id="underlineVerse" class="flex items-center w-full p-3 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition text-left text-gray-700 dark:text-gray-200">
-                    <i class="fas fa-underline text-indigo-500 mr-3 w-6 text-center"></i> 
-                    <span class="font-medium" id="underlineVerseText">Sublinhar trecho lido</span>
+            <div class="p-3 grid grid-cols-2 gap-2">
+                <button id="underlineVerse" class="flex flex-col items-center justify-center p-4 bg-gray-50 hover:bg-indigo-50 dark:bg-gray-700 dark:hover:bg-indigo-900/30 rounded-2xl transition">
+                    <i class="fas fa-underline text-indigo-500 text-xl mb-2"></i> 
+                    <span class="font-semibold text-xs text-gray-700 dark:text-gray-200" id="underlineVerseText">Sublinhar</span>
                 </button>
-                <button id="highlightVerse" class="flex items-center w-full p-3 hover:bg-yellow-50 dark:hover:bg-gray-700 rounded-lg transition text-left text-gray-700 dark:text-gray-200">
-                    <i class="fas fa-highlighter text-yellow-500 mr-3 w-6 text-center"></i> 
-                    <span class="font-medium">Destacar com cor</span>
+                <button id="highlightVerse" class="flex flex-col items-center justify-center p-4 bg-gray-50 hover:bg-yellow-50 dark:bg-gray-700 dark:hover:bg-yellow-900/20 rounded-2xl transition">
+                    <i class="fas fa-highlighter text-yellow-500 text-xl mb-2"></i> 
+                    <span class="font-semibold text-xs text-gray-700 dark:text-gray-200">Destacar cor</span>
                 </button>
-                <button id="bookmarkVerse" class="flex items-center w-full p-3 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition text-left text-gray-700 dark:text-gray-200">
-                    <i class="fas fa-bookmark text-blue-500 mr-3 w-6 text-center"></i> 
-                    <span class="font-medium" id="bookmarkVerseText">Salvar marcador</span>
+                <button id="bookmarkVerse" class="flex flex-col items-center justify-center p-4 bg-gray-50 hover:bg-blue-50 dark:bg-gray-700 dark:hover:bg-blue-900/20 rounded-2xl transition">
+                    <i class="fas fa-bookmark text-blue-500 text-xl mb-2"></i> 
+                    <span class="font-semibold text-xs text-gray-700 dark:text-gray-200" id="bookmarkVerseText">Marcador</span>
                 </button>
-                <button id="noteVerse" class="flex items-center w-full p-3 hover:bg-purple-50 dark:hover:bg-gray-700 rounded-lg transition text-left text-gray-700 dark:text-gray-200">
-                    <i class="fas fa-sticky-note text-purple-500 mr-3 w-6 text-center"></i> 
-                    <span class="font-medium">Adicionar nota</span>
+                <button id="noteVerse" class="flex flex-col items-center justify-center p-4 bg-gray-50 hover:bg-purple-50 dark:bg-gray-700 dark:hover:bg-purple-900/20 rounded-2xl transition">
+                    <i class="fas fa-sticky-note text-purple-500 text-xl mb-2"></i> 
+                    <span class="font-semibold text-xs text-gray-700 dark:text-gray-200">Criar Nota</span>
                 </button>
-                <div class="border-t dark:border-gray-700 my-1"></div>
-                <button id="copyVerse" class="flex items-center w-full p-3 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition text-left text-gray-700 dark:text-gray-200">
-                    <i class="fas fa-copy text-gray-500 mr-3 w-6 text-center"></i> 
-                    <span class="font-medium">Copiar</span>
+            </div>
+            <div class="p-3 border-t dark:border-gray-700 flex space-x-2">
+                <button id="copyVerse" class="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 py-3 rounded-xl font-medium flex justify-center items-center">
+                    <i class="fas fa-copy mr-2"></i> Copiar
                 </button>
-                <button id="shareVerse" class="flex items-center w-full p-3 hover:bg-green-50 dark:hover:bg-gray-700 rounded-lg transition text-left text-gray-700 dark:text-gray-200">
-                    <i class="fas fa-share-alt text-green-500 mr-3 w-6 text-center"></i> 
-                    <span class="font-medium">Compartilhar</span>
+                <button id="shareVerse" class="flex-1 bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400 py-3 rounded-xl font-medium flex justify-center items-center">
+                    <i class="fas fa-share-alt mr-2"></i> Enviar
                 </button>
             </div>
         </div>
     </div>
     
-    <div id="highlightColorModal" class="fixed inset-0 bg-black bg-opacity-60 z-[55] flex items-end sm:items-center justify-center hidden fade-in">
-        <div class="bg-white rounded-t-xl sm:rounded-xl shadow-2xl w-full sm:w-11/12 sm:max-w-sm dark:bg-gray-800 slide-up">
-            <div class="p-4 border-b dark:border-gray-700 flex justify-between items-center">
-                <h3 class="font-bold text-lg text-gray-800 dark:text-white">Escolha a cor</h3>
-                <button id="closeHighlightModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
-                    <i class="fas fa-times text-xl"></i>
+    <div id="highlightColorModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[55] flex items-end justify-center hidden fade-in">
+        <div class="bg-white dark:bg-gray-800 w-full rounded-t-3xl slide-up pb-safe">
+            <div class="p-5 border-b dark:border-gray-700 flex justify-between items-center">
+                <h3 class="font-bold text-lg dark:text-white">Cor do Destaque</h3>
+                <button id="closeHighlightModal" class="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-gray-500">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="p-4 grid grid-cols-2 gap-3">
-                <button class="highlight-color-btn p-3 rounded-lg border-2 border-transparent hover:border-yellow-400 bg-gray-50 dark:bg-gray-700 transition" data-color="yellow">
-                    <div class="w-full h-10 bg-yellow-300 rounded mb-2 shadow-inner"></div>
-                    <span class="text-sm font-medium">Amarelo</span>
+            <div class="p-6 grid grid-cols-4 gap-4">
+                <button class="highlight-color-btn flex flex-col items-center group" data-color="yellow">
+                    <div class="w-14 h-14 rounded-full bg-yellow-300 shadow-inner mb-2 ring-4 ring-transparent group-hover:ring-yellow-100 dark:group-hover:ring-yellow-900 transition"></div>
                 </button>
-                <button class="highlight-color-btn p-3 rounded-lg border-2 border-transparent hover:border-green-400 bg-gray-50 dark:bg-gray-700 transition" data-color="green">
-                    <div class="w-full h-10 bg-green-300 rounded mb-2 shadow-inner"></div>
-                    <span class="text-sm font-medium">Verde</span>
+                <button class="highlight-color-btn flex flex-col items-center group" data-color="green">
+                    <div class="w-14 h-14 rounded-full bg-green-300 shadow-inner mb-2 ring-4 ring-transparent group-hover:ring-green-100 dark:group-hover:ring-green-900 transition"></div>
                 </button>
-                <button class="highlight-color-btn p-3 rounded-lg border-2 border-transparent hover:border-blue-400 bg-gray-50 dark:bg-gray-700 transition" data-color="blue">
-                    <div class="w-full h-10 bg-blue-300 rounded mb-2 shadow-inner"></div>
-                    <span class="text-sm font-medium">Azul</span>
+                <button class="highlight-color-btn flex flex-col items-center group" data-color="blue">
+                    <div class="w-14 h-14 rounded-full bg-blue-300 shadow-inner mb-2 ring-4 ring-transparent group-hover:ring-blue-100 dark:group-hover:ring-blue-900 transition"></div>
                 </button>
-                <button class="highlight-color-btn p-3 rounded-lg border-2 border-transparent hover:border-pink-400 bg-gray-50 dark:bg-gray-700 transition" data-color="pink">
-                    <div class="w-full h-10 bg-pink-300 rounded mb-2 shadow-inner"></div>
-                    <span class="text-sm font-medium">Rosa</span>
+                <button class="highlight-color-btn flex flex-col items-center group" data-color="pink">
+                    <div class="w-14 h-14 rounded-full bg-pink-300 shadow-inner mb-2 ring-4 ring-transparent group-hover:ring-pink-100 dark:group-hover:ring-pink-900 transition"></div>
                 </button>
             </div>
-            <div class="p-4 border-t dark:border-gray-700">
-                <button id="removeHighlight" class="w-full bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400 px-4 py-2 rounded-lg font-medium transition flex items-center justify-center">
-                    <i class="fas fa-eraser mr-2"></i> Remover Destaque
+            <div class="p-4">
+                <button id="removeHighlight" class="w-full py-4 text-red-500 font-bold bg-red-50 dark:bg-red-900/20 rounded-xl">
+                    Remover Cor
                 </button>
             </div>
         </div>
     </div>
     
-    <div id="noteModal" class="fixed inset-0 bg-black bg-opacity-60 z-[55] flex items-end sm:items-center justify-center hidden fade-in">
-        <div class="bg-white rounded-t-xl sm:rounded-xl shadow-2xl w-full sm:w-11/12 sm:max-w-md dark:bg-gray-800 slide-up flex flex-col max-h-[90vh]">
-            <div class="p-4 border-b dark:border-gray-700 flex justify-between items-center shrink-0">
-                <h3 class="font-bold text-lg text-gray-800 dark:text-white">Nota para <span id="noteVerseRef" class="text-blue-600 dark:text-blue-400"></span></h3>
-                <button id="closeNoteModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
+    <div id="noteModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[55] flex items-center justify-center hidden fade-in px-4">
+        <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl shadow-2xl slide-up overflow-hidden">
+            <div class="p-5 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80">
+                <h3 class="font-bold text-lg dark:text-white">Reflexão</h3>
+                <p id="noteVerseRef" class="text-sm text-indigo-500 font-medium"></p>
             </div>
-            <div class="p-4 flex-grow overflow-y-auto">
-                <textarea id="noteTextarea" rows="6" class="w-full bg-yellow-50 border border-yellow-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white shadow-inner resize-none" placeholder="Escreva suas reflexões aqui..."></textarea>
+            <div class="p-5 bg-yellow-50/50 dark:bg-gray-900/50">
+                <textarea id="noteTextarea" rows="5" class="w-full bg-transparent border-0 focus:ring-0 resize-none text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-600 font-medium text-lg" placeholder="O que Deus falou com você aqui?"></textarea>
             </div>
-            <div class="p-4 border-t flex justify-between items-center dark:border-gray-700 shrink-0 bg-gray-50 dark:bg-gray-800/80 rounded-b-xl">
-                <button id="deleteNote" class="text-red-500 hover:text-red-700 font-medium px-2 hidden">
-                    <i class="fas fa-trash"></i> Excluir
+            <div class="p-4 border-t dark:border-gray-700 flex justify-between items-center">
+                <button id="deleteNote" class="w-10 h-10 flex items-center justify-center rounded-full text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 hidden transition">
+                    <i class="fas fa-trash"></i>
                 </button>
-                <button id="saveNote" class="ml-auto bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg shadow-md transition">
-                    Salvar Nota
-                </button>
+                <div class="flex space-x-3 ml-auto">
+                    <button id="closeNoteModal" class="px-5 py-2 font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400">Cancelar</button>
+                    <button id="saveNote" class="px-6 py-2 bg-indigo-600 text-white font-bold rounded-xl shadow-md hover:bg-indigo-700 transition">Salvar</button>
+                </div>
             </div>
         </div>
     </div>
     
-    <div id="toast" class="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full shadow-lg hidden z-50 fade-in flex items-center space-x-2 border border-gray-700 text-sm font-medium">
-        <i class="fas fa-check-circle text-green-400"></i>
+    <div id="toast" class="fixed top-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-5 py-3 rounded-full shadow-2xl hidden z-[100] fade-in flex items-center space-x-3 font-medium text-sm">
+        <i class="fas fa-check-circle text-green-400 text-lg"></i>
         <span id="toastMessage"></span>
     </div>
     
-    <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-[0_-2px_10px_rgba(0,0,0,0.05)] border-t border-gray-200 z-30 dark:bg-gray-800 dark:border-gray-700 pb-safe">
-        <div class="flex justify-around">
-            <button id="navHome" class="py-3 px-2 flex-1 text-center text-blue-600 dark:text-blue-400 transition">
-                <i class="fas fa-book-open block text-xl mb-1"></i>
-                <span class="text-[10px] font-medium uppercase tracking-wide">Bíblia</span>
+    <div class="floating-nav-container">
+        <div class="floating-nav glass">
+            <button id="navHome" class="flex flex-col items-center justify-center w-[72px] h-14 text-indigo-600 dark:text-indigo-400">
+                <i class="fas fa-book-open text-[22px] mb-1"></i>
+                <span class="text-[9px] font-bold uppercase tracking-wider">Ler</span>
             </button>
-            <button id="navSearch" class="py-3 px-2 flex-1 text-center text-gray-500 dark:text-gray-400 hover:text-blue-500 transition">
-                <i class="fas fa-search block text-xl mb-1"></i>
-                <span class="text-[10px] font-medium uppercase tracking-wide">Buscar</span>
+            <button id="navSearch" class="flex flex-col items-center justify-center w-[72px] h-14 text-gray-400 hover:text-indigo-500 transition-colors">
+                <i class="fas fa-search text-[22px] mb-1"></i>
+                <span class="text-[9px] font-bold uppercase tracking-wider">Buscar</span>
             </button>
-            <button id="navBookmarks" class="py-3 px-2 flex-1 text-center text-gray-500 dark:text-gray-400 hover:text-blue-500 transition">
-                <i class="fas fa-bookmark block text-xl mb-1"></i>
-                <span class="text-[10px] font-medium uppercase tracking-wide">Salvos</span>
+            <button id="navBookmarks" class="flex flex-col items-center justify-center w-[72px] h-14 text-gray-400 hover:text-indigo-500 transition-colors">
+                <i class="fas fa-bookmark text-[22px] mb-1"></i>
+                <span class="text-[9px] font-bold uppercase tracking-wider">Salvos</span>
             </button>
-            <button id="navSettings" class="py-3 px-2 flex-1 text-center text-gray-500 dark:text-gray-400 hover:text-blue-500 transition">
-                <i class="fas fa-cog block text-xl mb-1"></i>
-                <span class="text-[10px] font-medium uppercase tracking-wide">Config</span>
+            <button id="navSettings" class="flex flex-col items-center justify-center w-[72px] h-14 text-gray-400 hover:text-indigo-500 transition-colors">
+                <i class="fas fa-cog text-[22px] mb-1"></i>
+                <span class="text-[9px] font-bold uppercase tracking-wider">Menu</span>
             </button>
         </div>
-    </nav>
+    </div>
     
     <script>
-        const BIBLE_API_URL = 'https://bible-api.com/';
-        // Usamos abibliadigital para busca pois ela suporta pesquisa na tradução ACF nativamente
-        const SEARCH_API_URL = 'https://www.abibliadigital.com.br/api/verses/search';
+        // URL segura que contém todo o JSON da Bíblia ACF, possibilitando a pesquisa local veloz e 100% offline
+        const BIBLE_JSON_URL = 'https://raw.githubusercontent.com/MaatheusGois/bible/main/versions/pt-br/acf.json';
         
         const STORAGE_KEYS = {
-            bookmarks: 'bible_bookmarks',
-            notes: 'bible_notes',
-            highlights: 'bible_highlights',
-            underlines: 'bible_underlines',
-            theme: 'bible_theme',
-            fontSize: 'bible_font_size',
-            lastRead: 'bible_last_read',
-            lastDailyDate: 'bible_last_daily_date',
-            dailyHistory: 'bible_daily_history'
+            bookmarks: 'bible_bookmarks', notes: 'bible_notes', highlights: 'bible_highlights',
+            underlines: 'bible_underlines', theme: 'bible_theme', fontSize: 'bible_font_size',
+            lastRead: 'bible_last_read', lastDailyDate: 'bible_last_daily_date', dailyHistory: 'bible_daily_history'
         };
 
-        // Banco de Dados local para o Versículo do Dia (Nunca falha e funciona offline)
-        const dailyVersesDB = [
-            { ref: "João 3:16", text: "Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna." },
-            { ref: "Filipenses 4:13", text: "Posso todas as coisas em Cristo que me fortalece." },
-            { ref: "Salmos 23:1", text: "O Senhor é o meu pastor, nada me faltará." },
-            { ref: "Romanos 8:28", text: "E sabemos que todas as coisas contribuem juntamente para o bem daqueles que amam a Deus, daqueles que são chamados segundo o seu propósito." },
-            { ref: "Isaías 41:10", text: "Não temas, porque eu sou contigo; não te assombres, porque eu sou teu Deus; eu te fortaleço, e te ajudo, e te sustento com a destra da minha justiça." },
-            { ref: "Provérbios 3:5-6", text: "Confia no Senhor de todo o teu coração, e não te estribes no teu próprio entendimento. Reconhece-o em todos os teus caminhos, e ele endireitará as tuas veredas." },
-            { ref: "Josué 1:9", text: "Não to mandei eu? Esforça-te, e tem bom ânimo; não temas, nem te espantes; porque o Senhor teu Deus é contigo, por onde quer que andares." },
-            { ref: "Mateus 11:28", text: "Vinde a mim, todos os que estais cansados e oprimidos, e eu vos aliviarei." },
-            { ref: "Jeremias 29:11", text: "Porque eu bem sei os pensamentos que tenho a vosso respeito, diz o Senhor; pensamentos de paz, e não de mal, para vos dar o fim que esperais." },
-            { ref: "Salmos 46:1", text: "Deus é o nosso refúgio e fortaleza, socorro bem presente na angústia." },
-            { ref: "Romanos 12:2", text: "E não sede conformados com este mundo, mas sede transformados pela renovação do vosso entendimento..." },
-            { ref: "Hebreus 11:1", text: "Ora, a fé é o firme fundamento das coisas que se esperam, e a prova das coisas que se não veem." },
-            { ref: "1 Pedro 5:7", text: "Lançando sobre ele toda a vossa ansiedade, porque ele tem cuidado de vós." },
-            { ref: "Salmos 119:105", text: "Lâmpada para os meus pés é tua palavra, e luz para o meu caminho." },
-            { ref: "Efésios 2:8", text: "Porque pela graça sois salvos, por meio da fé; e isto não vem de vós, é dom de Deus." },
-            { ref: "João 14:6", text: "Disse-lhe Jesus: Eu sou o caminho, e a verdade e a vida; ninguém vem ao Pai, senão por mim." },
-            { ref: "Gálatas 5:22-23", text: "Mas o fruto do Espírito é: amor, gozo, paz, longanimidade, benignidade, bondade, fé, mansidão, temperança." },
-            { ref: "Colossenses 3:14", text: "E, sobre tudo isto, revesti-vos de amor, que é o vínculo da perfeição." },
-            { ref: "Tiago 1:5", text: "E, se algum de vós tem falta de sabedoria, peça-a a Deus, que a todos dá liberalmente, e o não lança em rosto, e ser-lhe-á dada." },
-            { ref: "1 Coríntios 13:4", text: "O amor é sofredor, é benigno; o amor não é invejoso; o amor não trata com leviandade, não se ensoberbece." }
-        ];
-        
-        const bibleData = {
-            "oldTestament": [
-                {"name": "Gênesis", "abbreviation": "gen", "chapters": 50},
-                {"name": "Êxodo", "abbreviation": "exo", "chapters": 40},
-                {"name": "Levítico", "abbreviation": "lev", "chapters": 27},
-                {"name": "Números", "abbreviation": "num", "chapters": 36},
-                {"name": "Deuteronômio", "abbreviation": "deu", "chapters": 34},
-                {"name": "Josué", "abbreviation": "jos", "chapters": 24},
-                {"name": "Juízes", "abbreviation": "jdg", "chapters": 21},
-                {"name": "Rute", "abbreviation": "rut", "chapters": 4},
-                {"name": "1 Samuel", "abbreviation": "1sa", "chapters": 31},
-                {"name": "2 Samuel", "abbreviation": "2sa", "chapters": 24},
-                {"name": "1 Reis", "abbreviation": "1ki", "chapters": 22},
-                {"name": "2 Reis", "abbreviation": "2ki", "chapters": 25},
-                {"name": "1 Crônicas", "abbreviation": "1ch", "chapters": 29},
-                {"name": "2 Crônicas", "abbreviation": "2ch", "chapters": 36},
-                {"name": "Esdras", "abbreviation": "ezr", "chapters": 10},
-                {"name": "Neemias", "abbreviation": "neh", "chapters": 13},
-                {"name": "Ester", "abbreviation": "est", "chapters": 10},
-                {"name": "Jó", "abbreviation": "job", "chapters": 42},
-                {"name": "Salmos", "abbreviation": "psa", "chapters": 150},
-                {"name": "Provérbios", "abbreviation": "pro", "chapters": 31},
-                {"name": "Eclesiastes", "abbreviation": "ecc", "chapters": 12},
-                {"name": "Cânticos", "abbreviation": "sos", "chapters": 8},
-                {"name": "Isaías", "abbreviation": "isa", "chapters": 66},
-                {"name": "Jeremias", "abbreviation": "jer", "chapters": 52},
-                {"name": "Lamentações", "abbreviation": "lam", "chapters": 5},
-                {"name": "Ezequiel", "abbreviation": "ezk", "chapters": 48},
-                {"name": "Daniel", "abbreviation": "dan", "chapters": 12},
-                {"name": "Oséias", "abbreviation": "hos", "chapters": 14},
-                {"name": "Joel", "abbreviation": "jol", "chapters": 3},
-                {"name": "Amós", "abbreviation": "amo", "chapters": 9},
-                {"name": "Obadias", "abbreviation": "oba", "chapters": 1},
-                {"name": "Jonas", "abbreviation": "jon", "chapters": 4},
-                {"name": "Miquéias", "abbreviation": "mic", "chapters": 7},
-                {"name": "Naum", "abbreviation": "nah", "chapters": 3},
-                {"name": "Habacuque", "abbreviation": "hab", "chapters": 3},
-                {"name": "Sofonias", "abbreviation": "zep", "chapters": 3},
-                {"name": "Ageu", "abbreviation": "hag", "chapters": 2},
-                {"name": "Zacarias", "abbreviation": "zec", "chapters": 14},
-                {"name": "Malaquias", "abbreviation": "mal", "chapters": 4}
-            ],
-            "newTestament": [
-                {"name": "Mateus", "abbreviation": "mat", "chapters": 28},
-                {"name": "Marcos", "abbreviation": "mar", "chapters": 16},
-                {"name": "Lucas", "abbreviation": "luk", "chapters": 24},
-                {"name": "João", "abbreviation": "jhn", "chapters": 21},
-                {"name": "Atos", "abbreviation": "act", "chapters": 28},
-                {"name": "Romanos", "abbreviation": "rom", "chapters": 16},
-                {"name": "1 Coríntios", "abbreviation": "1co", "chapters": 16},
-                {"name": "2 Coríntios", "abbreviation": "2co", "chapters": 13},
-                {"name": "Gálatas", "abbreviation": "gal", "chapters": 6},
-                {"name": "Efésios", "abbreviation": "eph", "chapters": 6},
-                {"name": "Filipenses", "abbreviation": "php", "chapters": 4},
-                {"name": "Colossenses", "abbreviation": "col", "chapters": 4},
-                {"name": "1 Tessalonicenses", "abbreviation": "1th", "chapters": 5},
-                {"name": "2 Tessalonicenses", "abbreviation": "2th", "chapters": 3},
-                {"name": "1 Timóteo", "abbreviation": "1ti", "chapters": 6},
-                {"name": "2 Timóteo", "abbreviation": "2ti", "chapters": 4},
-                {"name": "Tito", "abbreviation": "tit", "chapters": 3},
-                {"name": "Filemom", "abbreviation": "phm", "chapters": 1},
-                {"name": "Hebreus", "abbreviation": "heb", "chapters": 13},
-                {"name": "Tiago", "abbreviation": "jas", "chapters": 5},
-                {"name": "1 Pedro", "abbreviation": "1pe", "chapters": 5},
-                {"name": "2 Pedro", "abbreviation": "2pe", "chapters": 3},
-                {"name": "1 João", "abbreviation": "1jo", "chapters": 5},
-                {"name": "2 João", "abbreviation": "2jo", "chapters": 1},
-                {"name": "3 João", "abbreviation": "3jo", "chapters": 1},
-                {"name": "Judas", "abbreviation": "jud", "chapters": 1},
-                {"name": "Apocalipse", "abbreviation": "rev", "chapters": 22}
-            ]
-        };
+        // Banco IndexedDB nativo (Rápido, aguenta arquivos pesados e não expira)
+        const DB_NAME = 'BibliaAppDB';
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open(DB_NAME, 1);
+                req.onupgradeneeded = e => e.target.result.createObjectStore("store");
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+        async function getOfflineBible() {
+            try {
+                const db = await openDB();
+                return new Promise(resolve => {
+                    const tx = db.transaction("store", "readonly");
+                    const req = tx.objectStore("store").get("bible_data");
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => resolve(null);
+                });
+            } catch(e) { return null; }
+        }
+        async function saveOfflineBible(data) {
+            try {
+                const db = await openDB();
+                return new Promise(resolve => {
+                    const tx = db.transaction("store", "readwrite");
+                    tx.objectStore("store").put(data, "bible_data");
+                    tx.oncomplete = () => resolve();
+                });
+            } catch(e) {}
+        }
 
+        let bibleDataFull = null;
         let currentBook = "Gênesis";
         let currentChapter = 1;
         let currentVerseId = null;
-        let bookmarks = [];
-        let notes = [];
-        let highlights = [];
-        let underlines = [];
         
-        // DOM Elements
-        const bookSelect = document.getElementById('bookSelect');
-        const chapterSelect = document.getElementById('chapterSelect');
-        const currentBookDisplay = document.getElementById('currentBook');
-        const currentChapterDisplay = document.getElementById('currentChapter');
-        const bibleTextContainer = document.getElementById('bibleText');
-        const bookChapterSelector = document.getElementById('bookChapterSelector');
-        const showSelector = document.getElementById('showSelector');
-        const prevChapterBtn = document.getElementById('prevChapter');
-        const nextChapterBtn = document.getElementById('nextChapter');
-        
-        const verseOptionsModal = document.getElementById('verseOptionsModal');
-        const verseNumberDisplay = document.getElementById('verseNumber');
-        const verseTextDisplay = document.getElementById('verseText');
-        
-        const underlineVerse = document.getElementById('underlineVerse');
-        const underlineVerseText = document.getElementById('underlineVerseText');
-        const bookmarkVerse = document.getElementById('bookmarkVerse');
-        const bookmarkVerseText = document.getElementById('bookmarkVerseText');
-        const highlightVerse = document.getElementById('highlightVerse');
-        const noteVerse = document.getElementById('noteVerse');
-        
-        const searchInput = document.getElementById('searchInput');
-        const searchButton = document.getElementById('searchButton');
-        const searchResults = document.getElementById('searchResults');
-        
-        const toast = document.getElementById('toast');
-        const toastMessage = document.getElementById('toastMessage');
+        let bookmarks = []; let notes = []; let highlights = []; let underlines = [];
 
-        function initApp() {
-            loadData();
+        // Versículos selecionados a dedo para a tela inicial
+        const dailyVerseRefs = [
+            {b: "João", c: 3, v: 16}, {b: "Filipenses", c: 4, v: 13}, {b: "Salmos", c: 23, v: 1},
+            {b: "Romanos", c: 8, v: 28}, {b: "Isaías", c: 41, v: 10}, {b: "Josué", c: 1, v: 9},
+            {b: "Jeremias", c: 29, v: 11}, {b: "Hebreus", c: 11, v: 1}, {b: "1 Pedro", c: 5, v: 7},
+            {b: "Efésios", c: 2, v: 8}, {b: "João", c: 14, v: 6}, {b: "Tiago", c: 1, v: 5},
+            {b: "Salmos", c: 46, v: 1}, {b: "Mateus", c: 11, v: 28}, {b: "Provérbios", c: 3, v: 5}
+        ];
+
+        async function initApp() {
+            const progress = document.getElementById('splashProgress');
+            progress.style.width = '30%';
+            
+            // Tenta pegar a base de dados em cache (Offline)
+            bibleDataFull = await getOfflineBible();
+            progress.style.width = '60%';
+            
+            // Se for o primeiro acesso, baixa a Bíblia
+            if (!bibleDataFull) {
+                try {
+                    document.getElementById('splashStatus').textContent = "Baixando Bíblia para uso Offline (única vez)...";
+                    const res = await fetch(BIBLE_JSON_URL);
+                    bibleDataFull = await res.json();
+                    progress.style.width = '90%';
+                    await saveOfflineBible(bibleDataFull);
+                } catch(e) {
+                    alert("Erro ao conectar. Verifique sua internet para a configuração inicial.");
+                    return;
+                }
+            }
+            
+            progress.style.width = '100%';
+            loadLocalUserData();
             populateBookSelect();
             
             const lastRead = getFromStorage(STORAGE_KEYS.lastRead);
-            if (lastRead) {
+            if (lastRead && bibleDataFull.some(b => b.name === lastRead.book)) {
                 currentBook = lastRead.book;
                 currentChapter = lastRead.chapter;
+            } else {
+                currentBook = bibleDataFull[0].name;
             }
             
-            bookSelect.value = currentBook;
-            currentBookDisplay.textContent = currentBook;
-            currentChapterDisplay.textContent = `Capítulo ${currentChapter}`;
             updateChapterSelect(currentBook);
-            chapterSelect.value = currentChapter;
-            
+            document.getElementById('bookSelect').value = currentBook;
             loadChapter(currentBook, currentChapter);
             
-            const savedFontSize = getFromStorage(STORAGE_KEYS.fontSize) || 16;
-            bibleTextContainer.style.fontSize = `${savedFontSize}px`;
+            // Ajuste do tamanho da fonte
+            const savedFontSize = getFromStorage(STORAGE_KEYS.fontSize) || 18;
+            document.getElementById('bibleText').style.fontSize = `${savedFontSize}px`;
             document.getElementById('fontSizeDisplay').textContent = savedFontSize;
 
-            setupEventListeners();
-            checkDailyVerse();
-            
+            // Modo Escuro automático ou salvo
             if (getFromStorage(STORAGE_KEYS.theme) === 'dark' || (window.matchMedia('(prefers-color-scheme: dark)').matches && !getFromStorage(STORAGE_KEYS.theme))) {
                 document.body.classList.add('dark');
-                const iTag = document.getElementById('themeToggle').querySelector('i');
-                if(iTag) iTag.classList.replace('fa-moon', 'fa-sun');
             }
+
+            setupEventListeners();
+            
+            // Oculta splash e checa versículo do dia
+            setTimeout(() => {
+                const splash = document.getElementById('splashScreen');
+                splash.style.opacity = '0';
+                setTimeout(() => {
+                    splash.classList.add('hidden');
+                    checkDailyVerse();
+                }, 500);
+            }, 600);
         }
 
-        // Lógica do Versículo do Dia (Garante que nunca se repita)
         function checkDailyVerse() {
             const today = new Date().toLocaleDateString('pt-BR');
             const lastDailyDate = getFromStorage(STORAGE_KEYS.lastDailyDate);
             
-            if (lastDailyDate !== today) {
+            if (lastDailyDate !== today && bibleDataFull) {
                 let history = getFromStorage(STORAGE_KEYS.dailyHistory) || [];
+                if (history.length >= dailyVerseRefs.length) history = [];
                 
-                // Se esgotou a lista, reseta o histórico
-                if (history.length >= dailyVersesDB.length) {
-                    history = [];
-                }
+                const available = dailyVerseRefs.filter(ref => !history.includes(`${ref.b} ${ref.c}:${ref.v}`));
+                const randomRef = available[Math.floor(Math.random() * available.length)];
+                const refStr = `${randomRef.b} ${randomRef.c}:${randomRef.v}`;
                 
-                // Encontrar versículo que ainda não foi exibido
-                const availableVerses = dailyVersesDB.filter(v => !history.includes(v.ref));
-                // Escolher um aleatoriamente da lista de disponíveis
-                const randomVerse = availableVerses[Math.floor(Math.random() * availableVerses.length)];
-                
-                // Mostrar o Modal
-                document.getElementById('dailyVerseText').textContent = randomVerse.text;
-                document.getElementById('dailyVerseRef').textContent = randomVerse.ref;
-                document.getElementById('dailyVerseModal').classList.remove('hidden');
-                
-                // Salvar que já viu hoje e qual viu
-                history.push(randomVerse.ref);
-                saveToStorage(STORAGE_KEYS.dailyHistory, history);
-                saveToStorage(STORAGE_KEYS.lastDailyDate, today);
-            }
-        }
-
-        document.getElementById('closeDailyVerse').addEventListener('click', () => {
-            document.getElementById('dailyVerseModal').classList.add('hidden');
-        });
-
-        function setupEventListeners() {
-            bookSelect.addEventListener('change', (e) => {
-                const book = e.target.value;
-                if (book) {
-                    currentBook = book;
-                    currentBookDisplay.textContent = book;
-                    updateChapterSelect(book);
-                    currentChapter = 1;
-                    chapterSelect.value = 1;
-                    currentChapterDisplay.textContent = `Capítulo 1`;
-                    loadChapter(book, 1);
-                    bookChapterSelector.classList.add('hidden');
-                }
-            });
-            
-            chapterSelect.addEventListener('change', (e) => {
-                const chapter = parseInt(e.target.value);
-                if (chapter) {
-                    currentChapter = chapter;
-                    currentChapterDisplay.textContent = `Capítulo ${chapter}`;
-                    loadChapter(currentBook, chapter);
-                    bookChapterSelector.classList.add('hidden');
-                }
-            });
-            
-            document.getElementById('showSelector').addEventListener('click', () => {
-                bookChapterSelector.classList.toggle('hidden');
-            });
-            
-            prevChapterBtn.addEventListener('click', () => {
-                if (currentChapter > 1) {
-                    currentChapter--;
-                    chapterSelect.value = currentChapter;
-                    currentChapterDisplay.textContent = `Capítulo ${currentChapter}`;
-                    loadChapter(currentBook, currentChapter);
-                }
-            });
-            
-            nextChapterBtn.addEventListener('click', () => {
-                const bookData = [...bibleData.oldTestament, ...bibleData.newTestament].find(b => b.name === currentBook);
-                if (bookData && currentChapter < bookData.chapters) {
-                    currentChapter++;
-                    chapterSelect.value = currentChapter;
-                    currentChapterDisplay.textContent = `Capítulo ${currentChapter}`;
-                    loadChapter(currentBook, currentChapter);
-                }
-            });
-            
-            document.addEventListener('click', (e) => {
-                if (e.target.classList.contains('verse-number')) {
-                    const verseNum = e.target.textContent;
-                    const verseElement = e.target.closest('.verse');
-                    const verseText = verseElement.textContent.replace(verseNum, '').trim();
+                const book = bibleDataFull.find(b => b.name === randomRef.b);
+                if (book && book.chapters[randomRef.c - 1]) {
+                    const verseText = book.chapters[randomRef.c - 1][randomRef.v - 1];
+                    document.getElementById('dailyVerseText').textContent = `"${verseText}"`;
+                    document.getElementById('dailyVerseRef').textContent = refStr;
+                    document.getElementById('dailyVerseModal').classList.remove('hidden');
                     
-                    document.querySelectorAll('.verse').forEach(v => {
-                        v.classList.remove('highlighted');
-                    });
-                    verseElement.classList.add('highlighted');
-                    
-                    currentVerseId = `${currentBook} ${currentChapter}:${verseNum}`;
-                    verseNumberDisplay.textContent = currentVerseId;
-                    verseTextDisplay.textContent = `"${verseText}"`;
-                    
-                    // Ajustar textos dos botões de acordo com o estado do versículo
-                    const isUnderlined = underlines.includes(currentVerseId);
-                    underlineVerseText.textContent = isUnderlined ? "Remover sublinhado" : "Sublinhar trecho lido";
-                    
-                    const isBookmarked = bookmarks.some(b => b.id === currentVerseId);
-                    bookmarkVerseText.textContent = isBookmarked ? "Remover marcador" : "Salvar marcador";
-                    
-                    verseOptionsModal.classList.remove('hidden');
+                    history.push(refStr);
+                    saveToStorage(STORAGE_KEYS.dailyHistory, history);
+                    saveToStorage(STORAGE_KEYS.lastDailyDate, today);
                 }
-            });
-            
-            document.getElementById('closeVerseOptions').addEventListener('click', () => {
-                verseOptionsModal.classList.add('hidden');
-                document.querySelectorAll('.verse').forEach(v => v.classList.remove('highlighted'));
-            });
-            
-            underlineVerse.addEventListener('click', toggleUnderline);
-            bookmarkVerse.addEventListener('click', toggleBookmark);
-            highlightVerse.addEventListener('click', () => {
-                verseOptionsModal.classList.add('hidden');
-                document.getElementById('highlightColorModal').classList.remove('hidden');
-            });
-            noteVerse.addEventListener('click', openNoteModal);
-            document.getElementById('shareVerse').addEventListener('click', shareVerseFunc);
-            document.getElementById('copyVerse').addEventListener('click', copyVerseFunc);
-            
-            document.querySelectorAll('.highlight-color-btn').forEach(btn => {
-                btn.addEventListener('click', () => addHighlight(btn.dataset.color));
-            });
-            
-            document.getElementById('closeHighlightModal').addEventListener('click', () => {
-                document.getElementById('highlightColorModal').classList.add('hidden');
-            });
-            document.getElementById('removeHighlight').addEventListener('click', deleteHighlight);
-            
-            document.getElementById('closeNoteModal').addEventListener('click', () => {
-                document.getElementById('noteModal').classList.add('hidden');
-            });
-            document.getElementById('saveNote').addEventListener('click', saveNoteFunc);
-            document.getElementById('deleteNote').addEventListener('click', deleteNoteFunc);
-            
-            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-            document.getElementById('themeToggleSettings').addEventListener('click', toggleTheme);
-            
-            // Controle de Navegação e Menus
-            document.getElementById('navSearch').addEventListener('click', () => {
-                hideAllOverlays();
-                document.getElementById('searchOverlay').classList.remove('hidden');
-                updateNavActive('navSearch');
-            });
-            document.getElementById('closeSearch').addEventListener('click', () => {
-                document.getElementById('searchOverlay').classList.add('hidden');
-                document.getElementById('mainContent').classList.remove('hidden');
-                updateNavActive('navHome');
-            });
-            
-            document.getElementById('navSettings').addEventListener('click', () => {
-                hideAllOverlays();
-                document.getElementById('settingsOverlay').classList.remove('hidden');
-                updateNavActive('navSettings');
-            });
-            document.getElementById('closeSettings').addEventListener('click', () => {
-                document.getElementById('settingsOverlay').classList.add('hidden');
-                document.getElementById('mainContent').classList.remove('hidden');
-                updateNavActive('navHome');
-            });
-            
-            document.getElementById('navBookmarks').addEventListener('click', () => {
-                hideAllOverlays();
-                document.getElementById('bookmarksOverlay').classList.remove('hidden');
-                updateNavActive('navBookmarks');
-                displayBookmarks();
-            });
-            document.getElementById('closeBookmarks').addEventListener('click', () => {
-                document.getElementById('bookmarksOverlay').classList.add('hidden');
-                document.getElementById('mainContent').classList.remove('hidden');
-                updateNavActive('navHome');
-            });
-            
-            document.getElementById('navHome').addEventListener('click', () => {
-                hideAllOverlays();
-                document.getElementById('mainContent').classList.remove('hidden');
-                updateNavActive('navHome');
-            });
-            
-            // Acionadores de Pesquisa
-            searchButton.addEventListener('click', () => {
-                const query = searchInput.value.trim();
-                if (query) searchBible(query);
-            });
-            searchInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    const query = searchInput.value.trim();
-                    if (query) searchBible(query);
-                }
-            });
-            
-            document.getElementById('increaseFont').addEventListener('click', () => {
-                const currentSize = parseInt(bibleTextContainer.style.fontSize) || 16;
-                const newSize = currentSize + 1;
-                bibleTextContainer.style.fontSize = `${newSize}px`;
-                document.getElementById('fontSizeDisplay').textContent = newSize;
-                saveToStorage(STORAGE_KEYS.fontSize, newSize);
-            });
-            
-            document.getElementById('decreaseFont').addEventListener('click', () => {
-                const currentSize = parseInt(bibleTextContainer.style.fontSize) || 16;
-                if (currentSize > 12) {
-                    const newSize = currentSize - 1;
-                    bibleTextContainer.style.fontSize = `${newSize}px`;
-                    document.getElementById('fontSizeDisplay').textContent = newSize;
-                    saveToStorage(STORAGE_KEYS.fontSize, newSize);
-                }
-            });
-            
-            document.getElementById('clearData').addEventListener('click', () => {
-                if (confirm('Tem certeza que deseja limpar todos os dados salvos? Esta ação não pode ser desfeita.')) {
-                    localStorage.removeItem(STORAGE_KEYS.bookmarks);
-                    localStorage.removeItem(STORAGE_KEYS.notes);
-                    localStorage.removeItem(STORAGE_KEYS.highlights);
-                    localStorage.removeItem(STORAGE_KEYS.underlines);
-                    bookmarks = []; notes = []; highlights = []; underlines = [];
-                    showToast('Todos os dados foram removidos');
-                    loadChapter(currentBook, currentChapter);
-                }
-            });
-            
-            // Abas de Registro
-            const tabBtns = {
-                bookmarks: document.getElementById('showBookmarksTab'),
-                notes: document.getElementById('showNotesTab'),
-                highlights: document.getElementById('showHighlightsTab')
-            };
-            const tabLists = {
-                bookmarks: document.getElementById('bookmarksList'),
-                notes: document.getElementById('notesList'),
-                highlights: document.getElementById('highlightsList')
-            };
-            
-            const switchTab = (activeKey) => {
-                Object.keys(tabBtns).forEach(key => {
-                    if (key === activeKey) {
-                        tabBtns[key].classList.replace('bg-transparent', 'bg-blue-600');
-                        tabBtns[key].classList.replace('text-gray-600', 'text-white');
-                        tabBtns[key].classList.remove('dark:text-gray-300', 'hover:bg-gray-100', 'dark:hover:bg-gray-700');
-                        tabLists[key].classList.remove('hidden');
-                    } else {
-                        tabBtns[key].classList.replace('bg-blue-600', 'bg-transparent');
-                        tabBtns[key].classList.replace('text-white', 'text-gray-600');
-                        tabBtns[key].classList.add('dark:text-gray-300', 'hover:bg-gray-100', 'dark:hover:bg-gray-700');
-                        tabLists[key].classList.add('hidden');
-                    }
-                });
-            };
-
-            tabBtns.bookmarks.addEventListener('click', () => { switchTab('bookmarks'); displayBookmarks(); });
-            tabBtns.notes.addEventListener('click', () => { switchTab('notes'); displayNotes(); });
-            tabBtns.highlights.addEventListener('click', () => { switchTab('highlights'); displayHighlights(); });
-        }
-
-        function hideAllOverlays() {
-            document.getElementById('mainContent').classList.add('hidden');
-            document.getElementById('searchOverlay').classList.add('hidden');
-            document.getElementById('settingsOverlay').classList.add('hidden');
-            document.getElementById('bookmarksOverlay').classList.add('hidden');
-        }
-
-        function updateNavActive(activeNav) {
-            ['navHome', 'navSearch', 'navBookmarks', 'navSettings'].forEach(id => {
-                const nav = document.getElementById(id);
-                if (nav) {
-                    if (id === activeNav) {
-                        nav.classList.remove('text-gray-500', 'dark:text-gray-400');
-                        nav.classList.add('text-blue-600', 'dark:text-blue-400');
-                    } else {
-                        nav.classList.remove('text-blue-600', 'dark:text-blue-400');
-                        nav.classList.add('text-gray-500', 'dark:text-gray-400');
-                    }
-                }
-            });
-        }
-
-        function toggleTheme() {
-            document.body.classList.toggle('dark');
-            const isDarkMode = document.body.classList.contains('dark');
-            const icon = document.getElementById('themeToggle').querySelector('i');
-
-            if (isDarkMode) {
-                if(icon) icon.classList.replace('fa-moon', 'fa-sun');
-                saveToStorage(STORAGE_KEYS.theme, 'dark');
-            } else {
-                if(icon) icon.classList.replace('fa-sun', 'fa-moon');
-                saveToStorage(STORAGE_KEYS.theme, 'light');
             }
         }
 
         function populateBookSelect() {
-            bookSelect.innerHTML = '<option value="">Selecione um livro</option>';
-            const oldTestamentGroup = document.createElement('optgroup');
-            oldTestamentGroup.label = "Antigo Testamento";
-            bibleData.oldTestament.forEach(b => oldTestamentGroup.appendChild(new Option(b.name, b.name)));
-            bookSelect.appendChild(oldTestamentGroup);
+            const bookSelect = document.getElementById('bookSelect');
+            bookSelect.innerHTML = '';
+            
+            const ot = document.createElement('optgroup'); ot.label = "Antigo Testamento";
+            const nt = document.createElement('optgroup'); nt.label = "Novo Testamento";
 
-            const newTestamentGroup = document.createElement('optgroup');
-            newTestamentGroup.label = "Novo Testamento";
-            bibleData.newTestament.forEach(b => newTestamentGroup.appendChild(new Option(b.name, b.name)));
-            bookSelect.appendChild(newTestamentGroup);
+            bibleDataFull.forEach((book, i) => {
+                const opt = new Option(book.name, book.name);
+                (i < 39 ? ot : nt).appendChild(opt);
+            });
+            bookSelect.appendChild(ot); bookSelect.appendChild(nt);
         }
 
         function updateChapterSelect(bookName) {
-            chapterSelect.innerHTML = '<option value="">Cap.</option>';
-            const book = [...bibleData.oldTestament, ...bibleData.newTestament].find(b => b.name === bookName);
+            const grid = document.getElementById('chapterGrid');
+            grid.innerHTML = '';
+            const book = bibleDataFull.find(b => b.name === bookName);
             if (book) {
-                for (let i = 1; i <= book.chapters; i++) {
-                    chapterSelect.appendChild(new Option(i, i));
+                for (let i = 1; i <= book.chapters.length; i++) {
+                    const btn = document.createElement('button');
+                    btn.className = `py-3 rounded-xl font-bold text-sm transition ${i === currentChapter ? 'bg-indigo-600 text-white shadow-md' : 'bg-white border border-gray-200 text-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'}`;
+                    btn.textContent = i;
+                    btn.onclick = () => {
+                        currentChapter = i;
+                        loadChapter(currentBook, currentChapter);
+                        document.getElementById('bookChapterSelector').classList.add('hidden');
+                    };
+                    grid.appendChild(btn);
                 }
             }
         }
 
-        async function loadChapter(bookName, chapterNumber) {
-            const book = [...bibleData.oldTestament, ...bibleData.newTestament].find(b => b.name === bookName);
-            if (!book) return showError("Livro não encontrado.");
-
-            bibleTextContainer.innerHTML = `
-                <div class="bg-white rounded-lg shadow p-4 dark:bg-gray-800 border dark:border-gray-700">
-                    <div class="animate-pulse flex flex-col space-y-4">
-                        <div class="h-6 bg-gray-200 rounded w-1/3 mx-auto dark:bg-gray-700"></div>
-                        <div class="h-4 bg-gray-200 rounded dark:bg-gray-700 mt-6"></div>
-                        <div class="h-4 bg-gray-200 rounded w-5/6 dark:bg-gray-700"></div>
-                        <div class="h-4 bg-gray-200 rounded w-4/6 dark:bg-gray-700"></div>
-                    </div>
-                </div>`;
-
-            try {
-                // Mantemos o bible-api para o capítulo inteiro porque ele traz versículos fáceis de renderizar
-                const response = await fetch(`${BIBLE_API_URL}${book.abbreviation}+${chapterNumber}?translation=almeida`);
-                if (!response.ok) throw new Error("Erro na API");
-                const data = await response.json();
+        function loadChapter(bookName, chapterNum) {
+            const book = bibleDataFull.find(b => b.name === bookName);
+            const verses = book.chapters[chapterNum - 1];
+            
+            document.getElementById('currentBook').textContent = bookName;
+            document.getElementById('currentChapter').textContent = `Capítulo ${chapterNum}`;
+            document.getElementById('chapterTitle').textContent = `${bookName} ${chapterNum}`;
+            
+            let html = '';
+            verses.forEach((verseText, i) => {
+                const verseNum = i + 1;
+                const verseId = `${bookName} ${chapterNum}:${verseNum}`;
                 
-                let html = `
-                    <div class="bg-white rounded-lg shadow-sm p-5 dark:bg-gray-800 border dark:border-gray-700">
-                        <h3 class="text-2xl font-bold text-center mb-8 text-gray-800 dark:text-white border-b pb-2 dark:border-gray-700">${bookName} ${chapterNumber}</h3>
-                        <div class="bible-text text-lg leading-relaxed space-y-3">
+                const isBookmarked = bookmarks.some(b => b.id === verseId);
+                const hasNote = notes.some(n => n.id === verseId);
+                const highlight = highlights.find(h => h.id === verseId);
+                const isUnderlined = underlines.includes(verseId);
+                
+                const highlightClass = highlight ? `highlight-${highlight.color}` : '';
+                const underlineClass = isUnderlined ? 'underlined-text' : '';
+                
+                html += `
+                    <p class="verse ${highlightClass} rounded-lg p-1" data-verse-id="${verseId}">
+                        <span class="verse-number select-none inline-flex items-center justify-center bg-indigo-50 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400 text-xs font-bold rounded-full min-w-[26px] h-[26px] mr-2 cursor-pointer border border-indigo-100 dark:border-indigo-800/50">${verseNum}</span>
+                        <span class="text-content ${underlineClass}">${verseText}</span>
+                        ${isBookmarked ? '<i class="fas fa-bookmark bookmark-icon"></i>' : ''}
+                        ${hasNote ? '<span class="note-indicator"></span>' : ''}
+                    </p>
                 `;
-                
-                data.verses.forEach((verse) => {
-                    const verseId = `${bookName} ${chapterNumber}:${verse.verse}`;
-                    const isBookmarked = bookmarks.some(b => b.id === verseId);
-                    const hasNote = notes.some(n => n.id === verseId);
-                    const highlight = highlights.find(h => h.id === verseId);
-                    const isUnderlined = underlines.includes(verseId);
-                    
-                    const highlightClass = highlight ? `highlight-${highlight.color}` : '';
-                    const underlineClass = isUnderlined ? 'underlined-text' : '';
-                    
-                    html += `
-                        <p class="verse ${highlightClass} rounded p-1" data-verse-id="${verseId}">
-                            <span class="verse-number inline-flex items-center justify-center bg-blue-50 text-blue-700 text-xs font-bold rounded-full min-w-[24px] h-[24px] mr-2 cursor-pointer dark:bg-gray-700 dark:text-blue-400 border border-blue-100 dark:border-gray-600">${verse.verse}</span>
-                            <span class="${underlineClass}">${verse.text}</span>
-                            ${isBookmarked ? '<i class="fas fa-bookmark bookmark-icon"></i>' : ''}
-                            ${hasNote ? '<span class="note-indicator"></span>' : ''}
-                        </p>
-                    `;
-                });
-                
-                html += `</div></div>`;
-                bibleTextContainer.innerHTML = html;
-                saveToStorage(STORAGE_KEYS.lastRead, { book: bookName, chapter: chapterNumber });
-                
-            } catch (error) {
-                showError("Não foi possível carregar o capítulo. Verifique sua conexão.");
-            }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+            
+            document.getElementById('bibleText').innerHTML = html;
+            saveToStorage(STORAGE_KEYS.lastRead, { book: bookName, chapter: chapterNum });
+            window.scrollTo({ top: 0 });
+            updateChapterSelect(bookName);
         }
 
-        // Nova e robusta função de Busca via POST usando a ABíbliaDigital
-        async function searchBible(query) {
-            searchResults.innerHTML = `
-                <div class="animate-pulse flex flex-col space-y-4 pt-4">
-                    <div class="h-5 bg-gray-200 rounded w-full dark:bg-gray-700"></div>
-                    <div class="h-4 bg-gray-200 rounded w-5/6 dark:bg-gray-700"></div>
-                </div>`;
+        // MOTOR DE BUSCA 100% OFFLINE (Ultra Rápido e a Prova de Falhas)
+        function searchBible(query) {
+            const resDiv = document.getElementById('searchResults');
+            if (!query || query.length < 3) {
+                resDiv.innerHTML = `<div class="text-center py-20 opacity-60"><i class="fas fa-search text-3xl mb-4"></i><p>Digite ao menos 3 letras.</p></div>`;
+                return;
+            }
             
-            try {
-                const response = await fetch(SEARCH_API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        version: "acf",
-                        search: query
-                    })
-                });
-
-                if (!response.ok) throw new Error("Falha na busca");
+            resDiv.innerHTML = `<div class="flex justify-center py-20"><i class="fas fa-spinner fa-spin text-indigo-500 text-4xl"></i></div>`;
+            
+            // Timeout permite que o Spinner apareça antes de travar o JS pesquisando o array gigante
+            setTimeout(() => {
+                const normalize = str => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+                const normQuery = normalize(query);
+                const results = [];
                 
-                const data = await response.json();
-                const results = data.verses;
-
-                if (!results || results.length === 0) {
-                    searchResults.innerHTML = `
-                        <div class="text-center py-10">
-                            <i class="fas fa-search-minus text-gray-300 dark:text-gray-600 text-4xl mb-3"></i>
-                            <p class="text-gray-500 dark:text-gray-400">Nenhum resultado encontrado para "<strong>${query}</strong>".</p>
-                        </div>`;
+                for (const book of bibleDataFull) {
+                    for (let c = 0; c < book.chapters.length; c++) {
+                        for (let v = 0; v < book.chapters[c].length; v++) {
+                            const text = book.chapters[c][v];
+                            if (normalize(text).includes(normQuery)) {
+                                results.push({ bookName: book.name, chapter: c + 1, verse: v + 1, text: text });
+                            }
+                        }
+                    }
+                }
+                
+                if (results.length === 0) {
+                    resDiv.innerHTML = `<div class="text-center py-20 opacity-60"><i class="fas fa-folder-open text-4xl mb-4"></i><p>Nada encontrado para "<strong>${query}</strong>".</p></div>`;
                     return;
                 }
-
-                let html = `<div class="mb-4 text-sm text-gray-500 dark:text-gray-400 font-medium">${results.length} resultado(s) encontrados</div><div class="space-y-3">`;
-                results.forEach(verse => {
-                    const escapedBook = verse.book.name.replace(/'/g, "\\'");
+                
+                let html = `<div class="mb-4 text-sm font-bold text-gray-500">${results.length} resultados</div><div class="space-y-3">`;
+                // Limitar renderização para não travar o celular se buscar palavras muito comuns
+                results.slice(0, 100).forEach(res => {
+                    const regex = new RegExp(`(${query})`, 'gi');
+                    const hlText = res.text.replace(regex, '<span class="bg-yellow-200 dark:bg-yellow-700/50 text-gray-900 dark:text-yellow-100 rounded px-1">$1</span>');
                     html += `
-                        <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-700 transition border border-transparent hover:border-blue-200 dark:hover:border-gray-600" onclick="window.goToVerse('${escapedBook}', ${verse.chapter})">
-                            <h4 class="font-bold text-blue-600 dark:text-blue-400 flex items-center">
-                                <i class="fas fa-book-open mr-2 text-xs"></i> ${verse.book.name} ${verse.chapter}:${verse.number}
-                            </h4>
-                            <p class="text-gray-700 dark:text-gray-300 mt-2 text-sm leading-relaxed">${verse.text}</p>
-                        </div>
-                    `;
+                        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 cursor-pointer active:scale-95 transition" onclick="window.goToVerse('${res.bookName.replace(/'/g, "\\'")}', ${res.chapter})">
+                            <h4 class="font-bold text-indigo-600 dark:text-indigo-400 mb-2 text-sm"><i class="fas fa-book-open mr-2 opacity-50"></i>${res.bookName} ${res.chapter}:${res.verse}</h4>
+                            <p class="text-gray-700 dark:text-gray-300 font-bible text-sm leading-relaxed">${hlText}</p>
+                        </div>`;
                 });
+                if(results.length > 100) html += `<p class="text-center text-sm text-gray-400 py-4">Exibindo os primeiros 100 resultados.</p>`;
                 html += '</div>';
-                searchResults.innerHTML = html;
-            } catch (error) {
-                console.error(error);
-                searchResults.innerHTML = `<div class="text-center py-8"><p class="text-red-500 font-medium">Erro ao comunicar com o servidor de buscas.</p><p class="text-sm text-gray-500 mt-2">Tente novamente em alguns instantes.</p></div>`;
-            }
+                resDiv.innerHTML = html;
+            }, 50);
         }
 
         window.goToVerse = function(bookName, chapter) {
-            currentBook = bookName;
-            currentChapter = chapter;
-            bookSelect.value = bookName;
-            currentBookDisplay.textContent = bookName;
-            currentChapterDisplay.textContent = `Capítulo ${chapter}`;
-            updateChapterSelect(bookName);
-            chapterSelect.value = chapter;
+            currentBook = bookName; currentChapter = chapter;
+            document.getElementById('bookSelect').value = bookName;
             loadChapter(bookName, chapter);
             
             document.getElementById('searchOverlay').classList.add('hidden');
@@ -987,248 +617,262 @@
         window.goToVerseById = function(verseId) {
             const parts = verseId.split(' ');
             const verse = parts.pop().split(':');
-            const chapter = parseInt(verse[0]);
-            const bookName = parts.join(' ');
-            window.goToVerse(bookName, chapter);
+            window.goToVerse(parts.join(' '), parseInt(verse[0]));
         };
 
-        // Função de Sublinhar (Novidade)
-        function toggleUnderline() {
-            const index = underlines.indexOf(currentVerseId);
-            if (index > -1) {
-                underlines.splice(index, 1);
-                showToast('Sublinhado removido');
-            } else {
-                underlines.push(currentVerseId);
-                showToast('Trecho sublinhado salvo');
-            }
-            saveToStorage(STORAGE_KEYS.underlines, underlines);
-            loadChapter(currentBook, currentChapter);
-            verseOptionsModal.classList.add('hidden');
-        }
+        // --- Eventos de Interface ---
+        function setupEventListeners() {
+            document.getElementById('closeDailyVerse').addEventListener('click', () => {
+                document.getElementById('dailyVerseModal').classList.add('hidden');
+            });
 
-        function toggleBookmark() {
-            const index = bookmarks.findIndex(b => b.id === currentVerseId);
-            if (index > -1) {
-                bookmarks.splice(index, 1);
-                showToast('Marcador removido');
-            } else {
-                bookmarks.push({
-                    id: currentVerseId,
-                    text: verseTextDisplay.textContent.replace(/"/g, ''),
-                    date: new Date().toISOString()
-                });
-                showToast('Versículo marcado');
-            }
-            saveToStorage(STORAGE_KEYS.bookmarks, bookmarks);
-            loadChapter(currentBook, currentChapter);
-            verseOptionsModal.classList.add('hidden');
-        }
-
-        function addHighlight(color) {
-            const existingIndex = highlights.findIndex(h => h.id === currentVerseId);
-            if (existingIndex > -1) {
-                highlights[existingIndex].color = color;
-            } else {
-                highlights.push({
-                    id: currentVerseId,
-                    color: color,
-                    text: verseTextDisplay.textContent.replace(/"/g, ''),
-                    date: new Date().toISOString()
-                });
-            }
-            saveToStorage(STORAGE_KEYS.highlights, highlights);
-            loadChapter(currentBook, currentChapter);
-            document.getElementById('highlightColorModal').classList.add('hidden');
-            showToast('Destaque adicionado');
-        }
-
-        function deleteHighlight() {
-            const index = highlights.findIndex(h => h.id === currentVerseId);
-            if (index > -1) {
-                highlights.splice(index, 1);
-                saveToStorage(STORAGE_KEYS.highlights, highlights);
-                loadChapter(currentBook, currentChapter);
-                showToast('Destaque removido');
-            }
-            document.getElementById('highlightColorModal').classList.add('hidden');
-        }
-
-        function openNoteModal() {
-            const existingNote = notes.find(n => n.id === currentVerseId);
-            document.getElementById('noteVerseRef').textContent = currentVerseId;
-            if (existingNote) {
-                document.getElementById('noteTextarea').value = existingNote.note;
-                document.getElementById('deleteNote').classList.remove('hidden');
-            } else {
-                document.getElementById('noteTextarea').value = '';
-                document.getElementById('deleteNote').classList.add('hidden');
-            }
-            verseOptionsModal.classList.add('hidden');
-            document.getElementById('noteModal').classList.remove('hidden');
-        }
-
-        function saveNoteFunc() {
-            const noteText = document.getElementById('noteTextarea').value.trim();
-            if (!noteText) return showToast('Escreva algo primeiro');
+            document.getElementById('openSelectorBtn').addEventListener('click', () => {
+                document.getElementById('bookSelect').value = currentBook;
+                updateChapterSelect(currentBook);
+                document.getElementById('bookChapterSelector').classList.remove('hidden');
+            });
+            document.getElementById('closeSelectorBtn').addEventListener('click', () => {
+                document.getElementById('bookChapterSelector').classList.add('hidden');
+            });
             
-            const existingIndex = notes.findIndex(n => n.id === currentVerseId);
-            if (existingIndex > -1) {
-                notes[existingIndex].note = noteText;
-                notes[existingIndex].date = new Date().toISOString();
-            } else {
-                notes.push({
-                    id: currentVerseId,
-                    note: noteText,
-                    text: verseTextDisplay.textContent.replace(/"/g, ''),
-                    date: new Date().toISOString()
-                });
-            }
+            document.getElementById('bookSelect').addEventListener('change', (e) => {
+                currentBook = e.target.value;
+                updateChapterSelect(currentBook);
+            });
             
-            saveToStorage(STORAGE_KEYS.notes, notes);
-            loadChapter(currentBook, currentChapter);
-            document.getElementById('noteModal').classList.add('hidden');
-            showToast('Nota salva com sucesso');
-        }
+            document.getElementById('prevChapter').addEventListener('click', () => {
+                if (currentChapter > 1) loadChapter(currentBook, currentChapter - 1);
+            });
+            
+            document.getElementById('nextChapter').addEventListener('click', () => {
+                const book = bibleDataFull.find(b => b.name === currentBook);
+                if (currentChapter < book.chapters.length) loadChapter(currentBook, currentChapter + 1);
+            });
+            
+            // Interação de Clique nos Versículos
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.verse-number')) {
+                    const verseElement = e.target.closest('.verse');
+                    const verseNum = e.target.closest('.verse-number').textContent;
+                    
+                    document.querySelectorAll('.verse').forEach(v => v.classList.remove('highlighted'));
+                    verseElement.classList.add('highlighted');
+                    
+                    currentVerseId = `${currentBook} ${currentChapter}:${verseNum}`;
+                    document.getElementById('verseNumber').textContent = currentVerseId;
+                    
+                    // Pega o texto puro sem o span do número
+                    const textNode = verseElement.querySelector('.text-content').textContent;
+                    document.getElementById('verseText').textContent = `"${textNode}"`;
+                    
+                    // Ajustar estados dos botões
+                    document.getElementById('underlineVerseText').textContent = underlines.includes(currentVerseId) ? "Remover Risco" : "Sublinhar";
+                    document.getElementById('bookmarkVerseText').textContent = bookmarks.some(b => b.id === currentVerseId) ? "Desmarcar" : "Salvar";
+                    
+                    document.getElementById('verseOptionsModal').classList.remove('hidden');
+                }
+            });
+            
+            document.getElementById('closeVerseOptions').addEventListener('click', () => {
+                document.getElementById('verseOptionsModal').classList.add('hidden');
+                document.querySelectorAll('.verse').forEach(v => v.classList.remove('highlighted'));
+            });
 
-        function deleteNoteFunc() {
-            const index = notes.findIndex(n => n.id === currentVerseId);
-            if (index > -1) {
-                notes.splice(index, 1);
-                saveToStorage(STORAGE_KEYS.notes, notes);
+            // Ações do Versículo
+            document.getElementById('underlineVerse').addEventListener('click', () => {
+                const idx = underlines.indexOf(currentVerseId);
+                idx > -1 ? underlines.splice(idx, 1) : underlines.push(currentVerseId);
+                saveToStorage(STORAGE_KEYS.underlines, underlines);
                 loadChapter(currentBook, currentChapter);
-                showToast('Nota apagada');
-            }
-            document.getElementById('noteModal').classList.add('hidden');
-        }
+                document.getElementById('verseOptionsModal').classList.add('hidden');
+            });
 
-        function shareVerseFunc() {
-            const shareText = `"${verseTextDisplay.textContent.replace(/"/g, '')}"\n\n${currentVerseId}\nBíblia Sagrada`;
-            if (navigator.share) {
-                navigator.share({ title: currentVerseId, text: shareText }).then(() => showToast('Compartilhado')).catch(() => copyToClipboard(shareText));
-            } else {
-                copyToClipboard(shareText);
-            }
-            verseOptionsModal.classList.add('hidden');
-        }
-
-        function copyVerseFunc() {
-            copyToClipboard(`"${verseTextDisplay.textContent.replace(/"/g, '')}"\n\n${currentVerseId}`);
-            verseOptionsModal.classList.add('hidden');
-        }
-
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => showToast('Copiado!')).catch(() => showToast('Erro ao copiar'));
-        }
-
-        window.removeBookmark = function(index) {
-            if (confirm('Remover marcador?')) {
-                bookmarks.splice(index, 1);
+            document.getElementById('bookmarkVerse').addEventListener('click', () => {
+                const idx = bookmarks.findIndex(b => b.id === currentVerseId);
+                if (idx > -1) { bookmarks.splice(idx, 1); showToast('Marcador removido'); }
+                else { bookmarks.push({ id: currentVerseId, text: document.getElementById('verseText').textContent.replace(/"/g,''), date: new Date().toISOString() }); showToast('Salvo!'); }
                 saveToStorage(STORAGE_KEYS.bookmarks, bookmarks);
-                displayBookmarks();
                 loadChapter(currentBook, currentChapter);
-                showToast('Marcador removido');
-            }
-        };
+                document.getElementById('verseOptionsModal').classList.add('hidden');
+            });
 
-        window.removeNote = function(index) {
-            if (confirm('Apagar nota?')) {
-                notes.splice(index, 1);
+            document.getElementById('highlightVerse').addEventListener('click', () => {
+                document.getElementById('verseOptionsModal').classList.add('hidden');
+                document.getElementById('highlightColorModal').classList.remove('hidden');
+            });
+
+            document.querySelectorAll('.highlight-color-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const color = btn.dataset.color;
+                    const idx = highlights.findIndex(h => h.id === currentVerseId);
+                    if (idx > -1) highlights[idx].color = color;
+                    else highlights.push({ id: currentVerseId, color: color, text: document.getElementById('verseText').textContent.replace(/"/g,''), date: new Date().toISOString() });
+                    saveToStorage(STORAGE_KEYS.highlights, highlights);
+                    loadChapter(currentBook, currentChapter);
+                    document.getElementById('highlightColorModal').classList.add('hidden');
+                });
+            });
+
+            document.getElementById('removeHighlight').addEventListener('click', () => {
+                const idx = highlights.findIndex(h => h.id === currentVerseId);
+                if (idx > -1) { highlights.splice(idx, 1); saveToStorage(STORAGE_KEYS.highlights, highlights); loadChapter(currentBook, currentChapter); }
+                document.getElementById('highlightColorModal').classList.add('hidden');
+            });
+
+            document.getElementById('noteVerse').addEventListener('click', () => {
+                const note = notes.find(n => n.id === currentVerseId);
+                document.getElementById('noteVerseRef').textContent = currentVerseId;
+                document.getElementById('noteTextarea').value = note ? note.note : '';
+                document.getElementById('deleteNote').classList.toggle('hidden', !note);
+                document.getElementById('verseOptionsModal').classList.add('hidden');
+                document.getElementById('noteModal').classList.remove('hidden');
+            });
+
+            document.getElementById('saveNote').addEventListener('click', () => {
+                const text = document.getElementById('noteTextarea').value.trim();
+                if(!text) return;
+                const idx = notes.findIndex(n => n.id === currentVerseId);
+                if(idx > -1) { notes[idx].note = text; }
+                else { notes.push({ id: currentVerseId, note: text, text: document.getElementById('verseText').textContent.replace(/"/g,''), date: new Date().toISOString() }); }
                 saveToStorage(STORAGE_KEYS.notes, notes);
-                displayNotes();
                 loadChapter(currentBook, currentChapter);
-                showToast('Nota apagada');
+                document.getElementById('noteModal').classList.add('hidden');
+                showToast('Nota salva!');
+            });
+
+            document.getElementById('deleteNote').addEventListener('click', () => {
+                const idx = notes.findIndex(n => n.id === currentVerseId);
+                if(idx > -1) { notes.splice(idx, 1); saveToStorage(STORAGE_KEYS.notes, notes); loadChapter(currentBook, currentChapter); }
+                document.getElementById('noteModal').classList.add('hidden');
+            });
+            document.getElementById('closeNoteModal').addEventListener('click', () => document.getElementById('noteModal').classList.add('hidden'));
+
+            const doShare = () => {
+                const txt = `"${document.getElementById('verseText').textContent.replace(/"/g,'')}"\n\n${currentVerseId}`;
+                if (navigator.share) navigator.share({ text: txt }).catch(()=>{});
+                else { navigator.clipboard.writeText(txt); showToast('Copiado!'); }
+                document.getElementById('verseOptionsModal').classList.add('hidden');
+            };
+            document.getElementById('shareVerse').addEventListener('click', doShare);
+            document.getElementById('copyVerse').addEventListener('click', doShare);
+
+            document.getElementById('themeToggle').addEventListener('click', () => {
+                document.body.classList.toggle('dark');
+                saveToStorage(STORAGE_KEYS.theme, document.body.classList.contains('dark') ? 'dark' : 'light');
+            });
+
+            // Controle de Menus Base
+            const toggleOverlay = (id, show, navId) => {
+                ['searchOverlay', 'settingsOverlay', 'bookmarksOverlay'].forEach(o => document.getElementById(o).classList.add('hidden'));
+                if (show) document.getElementById(id).classList.remove('hidden');
+                document.getElementById('mainContent').classList.toggle('hidden', show);
+                updateNavActive(navId);
+            };
+
+            document.getElementById('navHome').addEventListener('click', () => toggleOverlay(null, false, 'navHome'));
+            
+            document.getElementById('navSearch').addEventListener('click', () => toggleOverlay('searchOverlay', true, 'navSearch'));
+            document.getElementById('closeSearch').addEventListener('click', () => toggleOverlay(null, false, 'navHome'));
+            
+            document.getElementById('searchButton').addEventListener('click', () => searchBible(document.getElementById('searchInput').value.trim()));
+            document.getElementById('searchInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') searchBible(e.target.value.trim()); });
+
+            document.getElementById('navSettings').addEventListener('click', () => toggleOverlay('settingsOverlay', true, 'navSettings'));
+            document.getElementById('closeSettings').addEventListener('click', () => toggleOverlay(null, false, 'navHome'));
+
+            document.getElementById('navBookmarks').addEventListener('click', () => { toggleOverlay('bookmarksOverlay', true, 'navBookmarks'); renderRegisters('bookmarks'); });
+            document.getElementById('closeBookmarks').addEventListener('click', () => toggleOverlay(null, false, 'navHome'));
+
+            // Fonte e Limpeza
+            document.getElementById('increaseFont').addEventListener('click', () => {
+                let size = parseInt(document.getElementById('bibleText').style.fontSize) || 18;
+                size += 2; document.getElementById('bibleText').style.fontSize = size + 'px';
+                document.getElementById('fontSizeDisplay').textContent = size;
+                saveToStorage(STORAGE_KEYS.fontSize, size);
+            });
+            document.getElementById('decreaseFont').addEventListener('click', () => {
+                let size = parseInt(document.getElementById('bibleText').style.fontSize) || 18;
+                if(size > 14) { size -= 2; document.getElementById('bibleText').style.fontSize = size + 'px'; document.getElementById('fontSizeDisplay').textContent = size; saveToStorage(STORAGE_KEYS.fontSize, size); }
+            });
+            document.getElementById('clearData').addEventListener('click', () => {
+                if (confirm('Deseja apagar tudo?')) {
+                    [STORAGE_KEYS.bookmarks, STORAGE_KEYS.notes, STORAGE_KEYS.highlights, STORAGE_KEYS.underlines, STORAGE_KEYS.dailyHistory].forEach(k => localStorage.removeItem(k));
+                    bookmarks = []; notes = []; highlights = []; underlines = [];
+                    loadChapter(currentBook, currentChapter); showToast('Tudo apagado');
+                }
+            });
+
+            // Abas de Registros
+            ['Bookmarks', 'Notes', 'Highlights'].forEach(tab => {
+                document.getElementById(`show${tab}Tab`).addEventListener('click', (e) => {
+                    ['Bookmarks', 'Notes', 'Highlights'].forEach(t => {
+                        const btn = document.getElementById(`show${t}Tab`);
+                        const list = document.getElementById(`${t.toLowerCase()}List`);
+                        if(t === tab) {
+                            btn.className = 'flex-1 bg-white dark:bg-gray-700 shadow text-indigo-600 dark:text-indigo-400 py-2 rounded-lg text-sm font-bold transition';
+                            list.classList.remove('hidden');
+                        } else {
+                            btn.className = 'flex-1 text-gray-500 dark:text-gray-400 py-2 rounded-lg text-sm font-bold transition';
+                            list.classList.add('hidden');
+                        }
+                    });
+                    renderRegisters(tab.toLowerCase());
+                });
+            });
+        }
+
+        function renderRegisters(type) {
+            const listObj = { bookmarks, notes, highlights }[type];
+            const div = document.getElementById(`${type}List`);
+            
+            if (listObj.length === 0) {
+                div.innerHTML = `<div class="text-center py-20 opacity-50"><i class="fas fa-folder-open text-4xl mb-3"></i><p>Nenhum registro aqui.</p></div>`;
+                return;
+            }
+            
+            div.innerHTML = '<div class="space-y-4">' + listObj.map((item, i) => `
+                <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <div class="flex justify-between items-start mb-3">
+                        <h4 class="font-bold text-indigo-600 dark:text-indigo-400 cursor-pointer" onclick="window.goToVerseById('${item.id.replace(/'/g, "\\'")}')">${item.id}</h4>
+                        <button onclick="window.delReg('${type}', ${i})" class="text-gray-400 hover:text-red-500"><i class="fas fa-trash"></i></button>
+                    </div>
+                    ${type === 'notes' ? `<div class="bg-yellow-50 dark:bg-gray-900 p-3 rounded-xl mb-2 border-l-4 border-yellow-400"><p class="text-sm font-medium dark:text-gray-200">${item.note}</p></div>` : ''}
+                    <p class="text-gray-600 dark:text-gray-400 font-bible text-sm italic">"${item.text}"</p>
+                </div>
+            `).join('') + '</div>';
+        }
+
+        window.delReg = function(type, i) {
+            if(confirm('Apagar item?')) {
+                const arr = { bookmarks, notes, highlights }[type];
+                arr.splice(i, 1);
+                saveToStorage(STORAGE_KEYS[type], arr);
+                renderRegisters(type);
+                loadChapter(currentBook, currentChapter);
             }
         };
 
-        window.removeHighlightByIndex = function(index) {
-            if (confirm('Remover destaque?')) {
-                highlights.splice(index, 1);
-                saveToStorage(STORAGE_KEYS.highlights, highlights);
-                displayHighlights();
-                loadChapter(currentBook, currentChapter);
-            }
-        };
-
-        function displayBookmarks() {
-            const list = document.getElementById('bookmarksList');
-            if (bookmarks.length === 0) return list.innerHTML = '<p class="text-gray-500 text-center py-6">Nenhum marcador salvo.</p>';
-            
-            list.innerHTML = '<div class="space-y-3">' + bookmarks.map((b, i) => `
-                <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border dark:border-gray-600">
-                    <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-bold text-blue-600 dark:text-blue-400 cursor-pointer" onclick="window.goToVerseById('${b.id.replace(/'/g, "\\'")}')">${b.id}</h4>
-                        <button onclick="window.removeBookmark(${i})" class="text-gray-400 hover:text-red-500"><i class="fas fa-trash"></i></button>
-                    </div>
-                    <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">"${b.text}"</p>
-                </div>`).join('') + '</div>';
+        function updateNavActive(activeId) {
+            ['navHome', 'navSearch', 'navBookmarks', 'navSettings'].forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.toggle('text-indigo-600', id === activeId); el.classList.toggle('dark:text-indigo-400', id === activeId);
+                el.classList.toggle('text-gray-400', id !== activeId);
+            });
         }
 
-        function displayNotes() {
-            const list = document.getElementById('notesList');
-            if (notes.length === 0) return list.innerHTML = '<p class="text-gray-500 text-center py-6">Nenhuma nota escrita.</p>';
-            
-            list.innerHTML = '<div class="space-y-3">' + notes.map((n, i) => `
-                <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border dark:border-gray-600">
-                    <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-bold text-purple-600 dark:text-purple-400 cursor-pointer" onclick="window.goToVerseById('${n.id.replace(/'/g, "\\'")}')">${n.id}</h4>
-                        <button onclick="window.removeNote(${i})" class="text-gray-400 hover:text-red-500"><i class="fas fa-trash"></i></button>
-                    </div>
-                    <div class="bg-white dark:bg-gray-800 p-3 rounded shadow-sm border-l-4 border-purple-500 mb-2">
-                        <p class="text-gray-800 dark:text-gray-200 text-sm font-medium">${n.note}</p>
-                    </div>
-                    <p class="text-gray-500 dark:text-gray-400 text-xs italic">"${n.text}"</p>
-                </div>`).join('') + '</div>';
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = msg;
+            t.classList.remove('hidden');
+            setTimeout(() => t.classList.add('hidden'), 2500);
         }
 
-        function displayHighlights() {
-            const list = document.getElementById('highlightsList');
-            if (highlights.length === 0) return list.innerHTML = '<p class="text-gray-500 text-center py-6">Nenhum trecho destacado.</p>';
-            
-            list.innerHTML = '<div class="space-y-3">' + highlights.map((h, i) => `
-                <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border dark:border-gray-600">
-                    <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-bold text-gray-800 dark:text-gray-200 cursor-pointer" onclick="window.goToVerseById('${h.id.replace(/'/g, "\\'")}')">${h.id}</h4>
-                        <button onclick="window.removeHighlightByIndex(${i})" class="text-gray-400 hover:text-red-500"><i class="fas fa-trash"></i></button>
-                    </div>
-                    <div class="highlight-${h.color} p-2 rounded text-gray-800 dark:text-gray-200 text-sm leading-relaxed">
-                        ${h.text}
-                    </div>
-                </div>`).join('') + '</div>';
+        function saveToStorage(key, data) { try { localStorage.setItem(key, JSON.stringify(data)); } catch(e){} }
+        function getFromStorage(key) { try { return JSON.parse(localStorage.getItem(key)); } catch(e){ return null; } }
+        function loadLocalUserData() {
+            bookmarks = getFromStorage(STORAGE_KEYS.bookmarks) || []; notes = getFromStorage(STORAGE_KEYS.notes) || [];
+            highlights = getFromStorage(STORAGE_KEYS.highlights) || []; underlines = getFromStorage(STORAGE_KEYS.underlines) || [];
         }
-
-        function showToast(message) {
-            toastMessage.textContent = message;
-            toast.classList.remove('hidden');
-            setTimeout(() => toast.classList.add('hidden'), 2500);
-        }
-
-        function showError(message) {
-            bibleTextContainer.innerHTML = `
-                <div class="bg-white rounded-lg shadow p-8 dark:bg-gray-800 text-center">
-                    <i class="fas fa-exclamation-circle text-red-400 text-4xl mb-4"></i>
-                    <p class="text-gray-700 dark:text-gray-300 font-medium">${message}</p>
-                </div>`;
-        }
-
-        function saveToStorage(key, data) { try { localStorage.setItem(key, JSON.stringify(data)); } catch (e) {} }
-        function getFromStorage(key) { try { const data = localStorage.getItem(key); return data ? JSON.parse(data) : null; } catch (e) { return null; } }
-
-        function loadData() {
-            bookmarks = getFromStorage(STORAGE_KEYS.bookmarks) || [];
-            notes = getFromStorage(STORAGE_KEYS.notes) || [];
-            highlights = getFromStorage(STORAGE_KEYS.highlights) || [];
-            underlines = getFromStorage(STORAGE_KEYS.underlines) || [];
-        }
-
-        function updateOnlineStatus() {
-            const banner = document.getElementById('offlineBanner');
-            if (banner) navigator.onLine ? banner.classList.remove('show') : banner.classList.add('show');
-        }
-        
-        window.addEventListener('online', updateOnlineStatus);
-        window.addEventListener('offline', updateOnlineStatus);
-        updateOnlineStatus();
 
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
