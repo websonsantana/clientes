@@ -13,10 +13,10 @@
         ::-webkit-scrollbar-thumb:hover { background: #555; }
         
         .verse.highlighted { background-color: rgba(253, 230, 138, 0.5); }
-        .verse.highlight-yellow { background-color: rgba(253, 230, 138, 0.3); padding: 2px 0; }
-        .verse.highlight-green { background-color: rgba(134, 239, 172, 0.3); padding: 2px 0; }
-        .verse.highlight-blue { background-color: rgba(147, 197, 253, 0.3); padding: 2px 0; }
-        .verse.highlight-pink { background-color: rgba(251, 207, 232, 0.3); padding: 2px 0; }
+        .verse.highlight-yellow { background-color: rgba(253, 230, 138, 0.4); padding: 2px 4px; border-radius: 4px; }
+        .verse.highlight-green { background-color: rgba(134, 239, 172, 0.4); padding: 2px 4px; border-radius: 4px; }
+        .verse.highlight-blue { background-color: rgba(147, 197, 253, 0.4); padding: 2px 4px; border-radius: 4px; }
+        .verse.highlight-pink { background-color: rgba(251, 207, 232, 0.4); padding: 2px 4px; border-radius: 4px; }
         
         @keyframes pulse {
             0%, 100% { opacity: 1; }
@@ -59,23 +59,11 @@
             margin-left: 4px;
         }
         
-        .fade-in {
-            animation: fadeIn 0.3s ease-in;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .slide-up {
-            animation: slideUp 0.3s ease-out;
-        }
-        
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
+        .slide-up { animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans transition-colors duration-300 dark:bg-gray-900 dark:text-gray-200">
@@ -93,9 +81,6 @@
                 <div class="flex items-center space-x-4">
                     <button id="themeToggle" class="p-1 rounded-full focus:outline-none">
                         <i class="fas fa-moon text-white"></i>
-                    </button>
-                    <button id="menuButton" class="p-1 rounded-full focus:outline-none">
-                        <i class="fas fa-bars text-white"></i>
                     </button>
                 </div>
             </div>
@@ -140,7 +125,6 @@
         </div>
     </div>
     
-    <!-- Search Overlay -->
     <div id="searchOverlay" class="fixed inset-0 bg-gray-50 dark:bg-gray-900 z-50 hidden transition-all duration-300 p-4 pt-16">
         <div class="flex items-center space-x-2 mb-4">
             <button id="closeSearch" class="text-gray-600 dark:text-gray-400">
@@ -156,7 +140,6 @@
         </div>
     </div>
     
-    <!-- Settings Overlay -->
     <div id="settingsOverlay" class="fixed inset-0 bg-gray-50 dark:bg-gray-900 z-50 hidden transition-all duration-300 p-4 pt-16">
         <div class="flex items-center space-x-2 mb-4">
             <button id="closeSettings" class="text-gray-600 dark:text-gray-400">
@@ -192,16 +175,9 @@
                 </button>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Isso removerá todos os marcadores, notas e destaques.</p>
             </div>
-            <div class="border-t pt-4 dark:border-gray-700">
-                <h3 class="font-bold text-lg mb-2">Sobre</h3>
-                <p class="text-sm text-gray-600 dark:text-gray-400">Bíblia Sagrada Evangélica</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Versão Almeida</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">© 2024 - Todos os direitos reservados</p>
-            </div>
         </div>
     </div>
     
-    <!-- Bookmarks Overlay -->
     <div id="bookmarksOverlay" class="fixed inset-0 bg-gray-50 dark:bg-gray-900 z-50 hidden transition-all duration-300 p-4 pt-16">
         <div class="flex items-center space-x-2 mb-4">
             <button id="closeBookmarks" class="text-gray-600 dark:text-gray-400">
@@ -237,7 +213,6 @@
         </div>
     </div>
     
-    <!-- Verse Options Modal -->
     <div id="verseOptionsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end sm:items-center justify-center hidden">
         <div class="bg-white rounded-t-lg sm:rounded-lg shadow-lg w-full sm:w-11/12 sm:max-w-md dark:bg-gray-800 slide-up">
             <div class="p-4 border-b dark:border-gray-700">
@@ -274,7 +249,6 @@
         </div>
     </div>
     
-    <!-- Highlight Color Modal -->
     <div id="highlightColorModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end sm:items-center justify-center hidden">
         <div class="bg-white rounded-t-lg sm:rounded-lg shadow-lg w-full sm:w-11/12 sm:max-w-md dark:bg-gray-800 slide-up">
             <div class="p-4 border-b dark:border-gray-700">
@@ -309,7 +283,6 @@
         </div>
     </div>
     
-    <!-- Note Modal -->
     <div id="noteModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end sm:items-center justify-center hidden">
         <div class="bg-white rounded-t-lg sm:rounded-lg shadow-lg w-full sm:w-11/12 sm:max-w-md dark:bg-gray-800 slide-up">
             <div class="p-4 border-b dark:border-gray-700">
@@ -334,12 +307,10 @@
         </div>
     </div>
     
-    <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg hidden z-50">
         <span id="toastMessage"></span>
     </div>
     
-    <!-- Bottom Navigation -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200 z-30 dark:bg-gray-800 dark:border-gray-700">
         <div class="flex justify-around">
             <button id="navHome" class="py-3 px-4 text-center text-blue-600 dark:text-blue-400">
@@ -364,7 +335,6 @@
     <script>
         const BIBLE_API_URL = 'https://bible-api.com/';
         
-        // LocalStorage keys
         const STORAGE_KEYS = {
             bookmarks: 'bible_bookmarks',
             notes: 'bible_notes',
@@ -374,7 +344,6 @@
             lastRead: 'bible_last_read'
         };
         
-        // Bible data with English abbreviations for API
         const bibleData = {
             "oldTestament": [
                 {"name": "Gênesis", "abbreviation": "gen", "chapters": 50},
@@ -517,7 +486,6 @@
             populateBookSelect();
             updateChapterSelect(currentBook);
             
-            // Load last read position or default
             const lastRead = getFromStorage(STORAGE_KEYS.lastRead);
             if (lastRead) {
                 currentBook = lastRead.book;
@@ -531,17 +499,16 @@
             
             loadChapter(currentBook, currentChapter);
             
-            // Load font size
             const savedFontSize = getFromStorage(STORAGE_KEYS.fontSize) || 16;
             bibleTextContainer.style.fontSize = `${savedFontSize}px`;
             fontSizeDisplay.textContent = savedFontSize;
 
             setupEventListeners();
             
-            // Load theme
             if (getFromStorage(STORAGE_KEYS.theme) === 'dark' || (window.matchMedia('(prefers-color-scheme: dark)').matches && !getFromStorage(STORAGE_KEYS.theme))) {
                 document.body.classList.add('dark');
-                themeToggle.querySelector('i').classList.replace('fa-moon', 'fa-sun');
+                const iTag = themeToggle.querySelector('i');
+                if(iTag) iTag.classList.replace('fa-moon', 'fa-sun');
             }
         }
 
@@ -585,7 +552,7 @@
             
             nextChapterBtn.addEventListener('click', () => {
                 const bookData = [...bibleData.oldTestament, ...bibleData.newTestament].find(b => b.name === currentBook);
-                if (currentChapter < bookData.chapters) {
+                if (bookData && currentChapter < bookData.chapters) {
                     currentChapter++;
                     chapterSelect.value = currentChapter;
                     currentChapterDisplay.textContent = `Capítulo ${currentChapter}`;
@@ -731,7 +698,6 @@
                 }
             });
             
-            // Busca automática enquanto digita
             let searchTimeout;
             searchInput.addEventListener('input', (e) => {
                 clearTimeout(searchTimeout);
@@ -740,7 +706,7 @@
                 if (query.length >= 3) {
                     searchTimeout = setTimeout(() => {
                         searchBible(query);
-                    }, 500); // Aguarda 500ms após parar de digitar
+                    }, 500);
                 } else if (query.length === 0) {
                     searchResults.innerHTML = '<p class="text-gray-500 dark:text-gray-400">Os resultados da busca aparecerão aqui.</p>';
                 }
@@ -828,12 +794,14 @@
         function updateNavActive(activeNav) {
             ['navHome', 'navSearch', 'navBookmarks', 'navSettings'].forEach(id => {
                 const nav = document.getElementById(id);
-                if (id === activeNav) {
-                    nav.classList.remove('text-gray-500', 'dark:text-gray-400');
-                    nav.classList.add('text-blue-600', 'dark:text-blue-400');
-                } else {
-                    nav.classList.remove('text-blue-600', 'dark:text-blue-400');
-                    nav.classList.add('text-gray-500', 'dark:text-gray-400');
+                if (nav) {
+                    if (id === activeNav) {
+                        nav.classList.remove('text-gray-500', 'dark:text-gray-400');
+                        nav.classList.add('text-blue-600', 'dark:text-blue-400');
+                    } else {
+                        nav.classList.remove('text-blue-600', 'dark:text-blue-400');
+                        nav.classList.add('text-gray-500', 'dark:text-gray-400');
+                    }
                 }
             });
         }
@@ -844,10 +812,10 @@
             const icon = themeToggle.querySelector('i');
 
             if (isDarkMode) {
-                icon.classList.replace('fa-moon', 'fa-sun');
+                if(icon) icon.classList.replace('fa-moon', 'fa-sun');
                 saveToStorage(STORAGE_KEYS.theme, 'dark');
             } else {
-                icon.classList.replace('fa-sun', 'fa-moon');
+                if(icon) icon.classList.replace('fa-sun', 'fa-moon');
                 saveToStorage(STORAGE_KEYS.theme, 'light');
             }
         }
@@ -904,8 +872,6 @@
                         <div class="h-6 bg-gray-200 rounded w-3/4 dark:bg-gray-700"></div>
                         <div class="h-4 bg-gray-200 rounded dark:bg-gray-700"></div>
                         <div class="h-4 bg-gray-200 rounded w-5/6 dark:bg-gray-700"></div>
-                        <div class="h-4 bg-gray-200 rounded w-2/3 dark:bg-gray-700"></div>
-                        <div class="h-4 bg-gray-200 rounded w-4/5 dark:bg-gray-700"></div>
                     </div>
                 </div>
             `;
@@ -948,14 +914,9 @@
                 
                 html += `
                         </div>
-                        <div class="mt-8 pt-4 border-t text-center text-gray-500 text-sm dark:text-gray-400 dark:border-gray-700">
-                            <p>Bíblia Sagrada - Versão Almeida</p>
-                        </div>
                     </div>
                 `;
                 bibleTextContainer.innerHTML = html;
-                
-                // Save last read position
                 saveToStorage(STORAGE_KEYS.lastRead, { book: bookName, chapter: chapterNumber });
                 
             } catch (error) {
@@ -970,7 +931,6 @@
                 <div class="animate-pulse flex flex-col space-y-4">
                     <div class="h-4 bg-gray-200 rounded w-full dark:bg-gray-700"></div>
                     <div class="h-4 bg-gray-200 rounded w-5/6 dark:bg-gray-700"></div>
-                    <div class="h-4 bg-gray-200 rounded w-2/3 dark:bg-gray-700"></div>
                 </div>
             `;
             
@@ -989,8 +949,9 @@
 
                 let html = '<div class="space-y-4">';
                 results.forEach(verse => {
+                    const escapedBook = verse.book_name.replace(/'/g, "\\'");
                     html += `
-                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600" onclick="goToVerse('${verse.book_name}', ${verse.chapter})">
+                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600" onclick="window.goToVerse('${escapedBook}', ${verse.chapter})">
                             <h4 class="font-bold text-lg text-blue-600 dark:text-blue-400">${verse.book_name} ${verse.chapter}:${verse.verse}</h4>
                             <p class="text-gray-700 dark:text-gray-300 mt-2">${verse.text}</p>
                         </div>
@@ -1004,7 +965,8 @@
             }
         }
 
-        function goToVerse(bookName, chapter) {
+        // Exportando funçoes manipuladas por strings de eventos para o escopo global do Window
+        window.goToVerse = function(bookName, chapter) {
             currentBook = bookName;
             currentChapter = chapter;
             bookSelect.value = bookName;
@@ -1013,10 +975,51 @@
             updateChapterSelect(bookName);
             chapterSelect.value = chapter;
             loadChapter(bookName, chapter);
+            
             searchOverlay.classList.add('hidden');
+            bookmarksOverlay.classList.add('hidden');
             mainContent.classList.remove('hidden');
             updateNavActive('navHome');
-        }
+        };
+
+        window.goToVerseById = function(verseId) {
+            const parts = verseId.split(' ');
+            const verse = parts.pop().split(':');
+            const chapter = parseInt(verse[0]);
+            const bookName = parts.join(' ');
+            
+            window.goToVerse(bookName, chapter);
+        };
+
+        window.removeBookmark = function(index) {
+            if (confirm('Remover este marcador?')) {
+                bookmarks.splice(index, 1);
+                saveToStorage(STORAGE_KEYS.bookmarks, bookmarks);
+                displayBookmarks();
+                loadChapter(currentBook, currentChapter);
+                showToast('Marcador removido');
+            }
+        };
+
+        window.removeNote = function(index) {
+            if (confirm('Remover esta nota?')) {
+                notes.splice(index, 1);
+                saveToStorage(STORAGE_KEYS.notes, notes);
+                displayNotes();
+                loadChapter(currentBook, currentChapter);
+                showToast('Nota removida');
+            }
+        };
+
+        window.removeHighlightByIndex = function(index) {
+            if (confirm('Remover este destaque?')) {
+                highlights.splice(index, 1);
+                saveToStorage(STORAGE_KEYS.highlights, highlights);
+                displayHighlights();
+                loadChapter(currentBook, currentChapter);
+                showToast('Destaque removido');
+            }
+        };
 
         function toggleBookmark() {
             const index = bookmarks.findIndex(b => b.id === currentVerseId);
@@ -1156,11 +1159,12 @@
             
             let html = '<div class="space-y-3">';
             bookmarks.forEach((bookmark, index) => {
+                const escapedId = bookmark.id.replace(/'/g, "\\'");
                 html += `
                     <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                         <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-bold text-blue-600 dark:text-blue-400 cursor-pointer" onclick="goToVerseById('${bookmark.id}')">${bookmark.id}</h4>
-                            <button onclick="removeBookmark(${index})" class="text-red-500 hover:text-red-700">
+                            <h4 class="font-bold text-blue-600 dark:text-blue-400 cursor-pointer" onclick="window.goToVerseById('${escapedId}')">${bookmark.id}</h4>
+                            <button onclick="window.removeBookmark(${index})" class="text-red-500 hover:text-red-700">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -1181,11 +1185,12 @@
             
             let html = '<div class="space-y-3">';
             notes.forEach((note, index) => {
+                const escapedId = note.id.replace(/'/g, "\\'");
                 html += `
                     <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                         <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-bold text-purple-600 dark:text-purple-400 cursor-pointer" onclick="goToVerseById('${note.id}')">${note.id}</h4>
-                            <button onclick="removeNote(${index})" class="text-red-500 hover:text-red-700">
+                            <h4 class="font-bold text-purple-600 dark:text-purple-400 cursor-pointer" onclick="window.goToVerseById('${escapedId}')">${note.id}</h4>
+                            <button onclick="window.removeNote(${index})" class="text-red-500 hover:text-red-700">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -1207,20 +1212,15 @@
                 return;
             }
             
-            const colorNames = {
-                yellow: 'Amarelo',
-                green: 'Verde',
-                blue: 'Azul',
-                pink: 'Rosa'
-            };
-            
+            const colorNames = { yellow: 'Amarelo', green: 'Verde', blue: 'Azul', pink: 'Rosa' };
             let html = '<div class="space-y-3">';
             highlights.forEach((highlight, index) => {
+                const escapedId = highlight.id.replace(/'/g, "\\'");
                 html += `
                     <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                         <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-bold text-${highlight.color}-600 cursor-pointer" onclick="goToVerseById('${highlight.id}')">${highlight.id}</h4>
-                            <button onclick="removeHighlightByIndex(${index})" class="text-red-500 hover:text-red-700">
+                            <h4 class="font-bold text-blue-600 dark:text-blue-400 cursor-pointer" onclick="window.goToVerseById('${escapedId}')">${highlight.id}</h4>
+                            <button onclick="window.removeHighlightByIndex(${index})" class="text-red-500 hover:text-red-700">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -1235,46 +1235,6 @@
             });
             html += '</div>';
             highlightsList.innerHTML = html;
-        }
-
-        function goToVerseById(verseId) {
-            const parts = verseId.split(' ');
-            const verse = parts.pop().split(':');
-            const chapter = parseInt(verse[0]);
-            const bookName = parts.join(' ');
-            
-            goToVerse(bookName, chapter);
-            bookmarksOverlay.classList.add('hidden');
-        }
-
-        function removeBookmark(index) {
-            if (confirm('Remover este marcador?')) {
-                bookmarks.splice(index, 1);
-                saveToStorage(STORAGE_KEYS.bookmarks, bookmarks);
-                displayBookmarks();
-                loadChapter(currentBook, currentChapter);
-                showToast('Marcador removido');
-            }
-        }
-
-        function removeNote(index) {
-            if (confirm('Remover esta nota?')) {
-                notes.splice(index, 1);
-                saveToStorage(STORAGE_KEYS.notes, notes);
-                displayNotes();
-                loadChapter(currentBook, currentChapter);
-                showToast('Nota removida');
-            }
-        }
-
-        function removeHighlightByIndex(index) {
-            if (confirm('Remover este destaque?')) {
-                highlights.splice(index, 1);
-                saveToStorage(STORAGE_KEYS.highlights, highlights);
-                displayHighlights();
-                loadChapter(currentBook, currentChapter);
-                showToast('Destaque removido');
-            }
         }
 
         function showToast(message) {
@@ -1320,13 +1280,14 @@
             highlights = getFromStorage(STORAGE_KEYS.highlights) || [];
         }
 
-        // Check online status
         function updateOnlineStatus() {
             const offlineBanner = document.getElementById('offlineBanner');
-            if (navigator.onLine) {
-                offlineBanner.classList.remove('show');
-            } else {
-                offlineBanner.classList.add('show');
+            if(offlineBanner) {
+                if (navigator.onLine) {
+                    offlineBanner.classList.remove('show');
+                } else {
+                    offlineBanner.classList.add('show');
+                }
             }
         }
         
@@ -1334,7 +1295,6 @@
         window.addEventListener('offline', updateOnlineStatus);
         updateOnlineStatus();
 
-        // Initialize app when DOM is ready
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
